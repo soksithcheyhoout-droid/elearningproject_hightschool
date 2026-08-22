@@ -276,17 +276,12 @@ export const sendOtpEmail = async (toEmail, otpCode, purpose = 'login') => {
 
   try {
     const info = await transporter.sendMail({
-      from: `"MoTDAR E-Learning Portal" <${senderEmail}>`,
+      from: `"MoTDAR E-Learning" <${senderEmail}>`,
       to: toEmail,
-      subject: `${otpCode} is your MoTDAR Verification Code (លេខកូដសម្ងាត់ OTP)`,
+      subject: `លេខកូដសម្ងាត់ MoTDAR OTP របស់អ្នកគឺ: ${otpCode}`,
       text: plainText,
       html: htmlContent,
-      attachments,
-      headers: {
-        'X-Priority': '1',
-        'X-MSMail-Priority': 'High',
-        'Importance': 'high'
-      }
+      attachments
     });
 
     console.log(`✅ [Gmail SMTP Success]: OTP Email sent to ${toEmail} (MessageId: ${info.messageId})`);
