@@ -11,6 +11,7 @@
     "start": "node start_production.js"
   },
   "dependencies": {
+    "@sparticuz/chromium": "^131.0.0",
     "@travisvn/edge-tts": "^1.0.2",
     "bakong-khqr": "^1.0.20",
     "bcryptjs": "^2.4.3",
@@ -27,6 +28,7 @@
     "multer": "^1.4.5-lts.1",
     "mysql2": "^3.12.0",
     "nodemailer": "^9.0.5",
+    "playwright-core": "^1.49.0",
     "qrcode": "^1.5.4",
     "qrcode.react": "^4.2.0",
     "react": "^19.2.8",

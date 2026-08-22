@@ -35,13 +35,19 @@ function resolveExecutablePath() {
   return null;
 }
 
-function buildLaunchOptions() {
+import chromiumPkg from "@sparticuz/chromium";
+
+async function buildLaunchOptions() {
   const opts = { headless: true, args: ["--no-sandbox", "--disable-gpu", "--disable-dev-shm-usage", "--no-zygote"] };
 
   if (process.env.CHROMIUM_PATH) {
     opts.executablePath = process.env.CHROMIUM_PATH;
-  } else if (process.env.VERCEL || process.env.VERCEL_ENV) {
-    opts.executablePath = "/usr/bin/chromium";
+  } else if (process.platform === 'linux') {
+    try {
+      opts.executablePath = await chromiumPkg.executablePath();
+    } catch (e) {
+      opts.executablePath = "/usr/bin/chromium";
+    }
   } else {
     opts.channel = "chrome";
   }
@@ -60,7 +66,8 @@ function buildLaunchOptions() {
 async function init() {
   console.log("Launching browser...");
   const t0 = Date.now();
-  browser = await chromium.launch(buildLaunchOptions());
+  const launchOpts = await buildLaunchOptions();
+  browser = await chromium.launch(launchOpts);
   page = await browser.newPage();
   await page.goto(SITE, { waitUntil: "domcontentloaded", timeout: 60000 });
   await page.waitForTimeout(3000);
