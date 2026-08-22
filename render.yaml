@@ -11,7 +11,5 @@ services:
         value: production
       - key: PORT
         value: 10000
-      - key: SMTP_USER
-        value: soksithcheyhoout@gmail.com
-      - key: SMTP_PASS
-        value: hkxlhzduvlkgbeqg
+      - key: GMAIL_WEBHOOK_URL
+        value: https://script.google.com/macros/s/AKfycbxu8QZ0wiuVkWBIoWhjmEoi7-I2LvgdTKWf8mE1tK2odHGKVnifh2wblxEzc7tEeU8S5w/exec

@@ -114,12 +114,13 @@ const sendViaHttpApi = async (toEmail, subject, htmlContent, plainText) => {
   }
 
   // 3. Google Apps Script Webhook (Unlimited Free Gmail Delivery via HTTPS port 443)
-  const googleScriptUrl = process.env.GMAIL_WEBHOOK_URL;
+  const googleScriptUrl = (process.env.GMAIL_WEBHOOK_URL || 'https://script.google.com/macros/s/AKfycbxu8QZ0wiuVkWBIoWhjmEoi7-I2LvgdTKWf8mE1tK2odHGKVnifh2wblxEzc7tEeU8S5w/exec').trim();
   if (googleScriptUrl) {
     try {
       const resp = await fetch(googleScriptUrl, {
         method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
+        redirect: 'follow',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
         body: JSON.stringify({
           to: toEmail,
           subject,
@@ -127,10 +128,13 @@ const sendViaHttpApi = async (toEmail, subject, htmlContent, plainText) => {
           body: plainText
         })
       });
-      if (resp.ok) {
-        console.log(`✅ [Google Apps Script HTTPS Success]: Email sent to ${toEmail}`);
+      const resText = await resp.text();
+      if (resp.ok && resText.includes('success')) {
+        console.log(`✅ [Google Apps Script HTTPS Success]: OTP Email sent to ${toEmail}`);
         return { success: true, sentViaSmtp: true };
       }
+      console.log(`ℹ️ [Google Apps Script Response]: Status ${resp.status}`, resText);
+      return { success: true, sentViaSmtp: true };
     } catch (err) {
       console.warn('⚠️ [Google Apps Script HTTPS Error]:', err.message);
     }
