@@ -394,6 +394,8 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
     }
   };
 
+  const hasInitializedContactRef = useRef(false);
+
   // 1. Fetch Real Registered Students from Database for Contacts List
   useEffect(() => {
     const fetchStudents = async () => {
@@ -401,9 +403,12 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
         const res = await api.getRegisteredStudents();
         if (res && Array.isArray(res.students)) {
           setRegisteredStudents(res.students);
-          const otherStudent = res.students.find(s => s.id !== student?.id && s.username !== student?.username);
-          if (otherStudent && !activeContactId) {
-            setActiveContactId(otherStudent.id);
+          if (!hasInitializedContactRef.current) {
+            const otherStudent = res.students.find(s => s.id !== student?.id && s.username !== student?.username);
+            if (otherStudent) {
+              setActiveContactId(prev => prev ? prev : otherStudent.id);
+              hasInitializedContactRef.current = true;
+            }
           }
         }
       } catch (e) {}
@@ -1629,8 +1634,8 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                   </div>
                 );
               })
-            ) : (
-              /* Clean Empty State */
+            ) : chatType === 'global' ? (
+              /* Clean Global Channel Empty State */
               <div className="h-full min-h-[320px] flex flex-col items-center justify-center text-center p-8 space-y-4 max-w-md mx-auto my-auto animate-fade-in">
                 <div className="w-20 h-20 rounded-3xl bg-blue-50/80 border-2 border-blue-200 text-[#005baa] flex items-center justify-center shadow-xs">
                   <div className="scale-150">
@@ -1664,6 +1669,55 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                   >
                     <span className="text-base">📚</span>
                     <span>សួរសំណួរមេរៀន</span>
+                  </button>
+                </div>
+              </div>
+            ) : (
+              /* Clean Direct Message (DM) Empty State */
+              <div className="h-full min-h-[320px] flex flex-col items-center justify-center text-center p-8 space-y-4 max-w-md mx-auto my-auto animate-fade-in">
+                <div className="relative w-20 h-20 flex items-center justify-center flex-shrink-0 select-none shadow-md rounded-full bg-slate-900 border-2 border-blue-300">
+                  <div className="w-[82%] h-[82%] rounded-full overflow-hidden bg-slate-900 shadow-xs border border-slate-300">
+                    <img 
+                      src={api.formatAvatarUrl(activeContact.avatar)} 
+                      alt={activeContact.full_name} 
+                      onError={(e) => { e.currentTarget.src = '/assets/anime/boys/boy_1.png'; }}
+                      className="w-full h-full object-cover" 
+                    />
+                  </div>
+                  {(activeContact.avatar_frame || activeContact.avatarFrame) && (
+                    <img
+                      src={activeContact.avatar_frame || activeContact.avatarFrame}
+                      alt="Frame"
+                      className="absolute inset-0 w-full h-full object-contain pointer-events-none scale-120 drop-shadow-md z-10"
+                    />
+                  )}
+                </div>
+
+                <div className="space-y-1.5">
+                  <h3 className="text-base font-extrabold text-[#003366] flex items-center justify-center gap-2">
+                    <span>ការសន្ទនាផ្ទាល់ជាមួយ {activeContact.full_name || activeContact.username}</span>
+                  </h3>
+                  <p className="text-xs text-slate-500 leading-relaxed">
+                    {activeContact.school || 'វិទ្យាល័យ ព្រះស៊ីសុវត្ថិ'} • ផ្ញើសារដំបូងរបស់អ្នកទៅកាន់ {activeContact.full_name || activeContact.username}!
+                  </p>
+                </div>
+
+                <div className="flex flex-wrap items-center justify-center gap-2.5 pt-2">
+                  <button
+                    type="button"
+                    onClick={() => setInputMessage(`សួស្តី ${activeContact.full_name || activeContact.username}! 👋`)}
+                    className="px-4 py-2 rounded-2xl bg-white hover:bg-blue-50 text-slate-700 hover:text-[#005baa] text-xs font-bold border border-slate-200 hover:border-blue-300 transition-all shadow-2xs hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2"
+                  >
+                    <span className="text-base">👋</span>
+                    <span>សួស្តី!</span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setInputMessage('តោះជជែកគ្នាពីមេរៀនបន្តិច! 📚 💡')}
+                    className="px-4 py-2 rounded-2xl bg-white hover:bg-blue-50 text-slate-700 hover:text-[#005baa] text-xs font-bold border border-slate-200 hover:border-blue-300 transition-all shadow-2xs hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2"
+                  >
+                    <span className="text-base">📚</span>
+                    <span>ជជែកមេរៀន</span>
                   </button>
                 </div>
               </div>
