@@ -890,40 +890,6 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
           {step === 2 && !isGeneratingQR && (
             <div className="space-y-3 py-1 flex flex-col items-center justify-center animate-fadeIn">
               
-              {/* Top Gateway Toggle */}
-              <div className="inline-flex p-1 bg-slate-200/80 rounded-2xl gap-1">
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPaymentGateway('aba');
-                    handleProceedToQR();
-                  }}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 ${
-                    paymentGateway === 'aba'
-                      ? 'bg-[#002D56] text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900 bg-transparent'
-                  }`}
-                >
-                  <AbaLogoBadge size="sm" />
-                  <span>ABA PayWay</span>
-                </button>
-                <button
-                  type="button"
-                  onClick={() => {
-                    setPaymentGateway('bakong');
-                    handleProceedToQR();
-                  }}
-                  className={`px-3 py-1.5 rounded-xl text-xs font-black transition-all cursor-pointer flex items-center gap-1.5 ${
-                    paymentGateway === 'bakong'
-                      ? 'bg-[rgb(226,26,26)] text-white shadow-xs'
-                      : 'text-slate-600 hover:text-slate-900 bg-transparent'
-                  }`}
-                >
-                  <BakongLogoBadge size="sm" />
-                  <span>Bakong KHQR</span>
-                </button>
-              </div>
-
               {/* Dynamic Payment Card (ABA PayWay vs Bakong KHQR) */}
               <div className="rounded-[22px] w-[280px] sm:w-[290px] flex flex-col bg-white shadow-[0_15px_35px_rgba(0,0,0,0.12)] border border-slate-200 overflow-hidden text-[rgb(8,27,55)] relative">
                 
