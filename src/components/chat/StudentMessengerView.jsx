@@ -262,7 +262,7 @@ function VoiceMessagePlayer({ audioUrl, duration, isMe }) {
   );
 }
 
-export default function StudentMessengerView({ onLaunchDuelGame }) {
+export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
   const { student } = useAuth();
   const levelInfo = computeLevelData(student?.xp || 3568);
 
@@ -833,6 +833,16 @@ export default function StudentMessengerView({ onLaunchDuelGame }) {
       {/* Header Bar */}
       <div className="bg-white border-b border-slate-200 px-2.5 sm:px-6 py-2 sm:py-3 flex items-center justify-between gap-2 flex-shrink-0 select-none shadow-2xs">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+          {onBack && (
+            <button
+              type="button"
+              onClick={onBack}
+              className="sm:hidden p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex-shrink-0 cursor-pointer transition-colors"
+              title="ត្រឡប់ទៅទំព័រដើម (Back to Home)"
+            >
+              <ArrowLeft className="w-4 h-4" />
+            </button>
+          )}
           <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-[#002d62] via-[#005baa] to-sky-400 flex items-center justify-center text-white shadow-xs flex-shrink-0">
             <MessageSquare className="w-4 h-4 sm:w-5 sm:h-5" />
           </div>
