@@ -12,21 +12,18 @@ import fs from 'fs';
 
 // Create Gmail SMTP transporter
 const createTransporter = () => {
-  const user = process.env.SMTP_USER || process.env.GMAIL_USER;
-  const pass = process.env.SMTP_PASS || process.env.GMAIL_PASS || process.env.GMAIL_APP_PASSWORD;
+  const user = (process.env.SMTP_USER || process.env.GMAIL_USER || 'soksithcheyhoout@gmail.com').trim();
+  const pass = (process.env.SMTP_PASS || process.env.GMAIL_PASS || process.env.GMAIL_APP_PASSWORD || 'hkxlhzduvlkgbeqg').replace(/\s+/g, '');
 
   if (!user || !pass) {
     return null;
   }
 
-  // Remove spaces if user pasted 16-character code with spaces like "abcd efgh ijkl mnop"
-  const cleanPass = pass.replace(/\s+/g, '');
-
   return nodemailer.createTransport({
     service: 'gmail',
     auth: {
-      user: user.trim(),
-      pass: cleanPass
+      user,
+      pass
     }
   });
 };
@@ -42,21 +39,21 @@ export const sendOtpEmail = async (toEmail, otpCode, purpose = 'login') => {
 
   // Log to server terminal for instant development & debug
   console.log('\n========================================');
-  console.log(`🔐 [MoEYS OTP GATEWAY] Destination: ${toEmail}`);
+  console.log(`🔐 [MoTDAR OTP GATEWAY] Destination: ${toEmail}`);
   console.log(`🔑 OTP CODE: >>> ${otpCode} <<< (Valid for 5 mins)`);
   console.log('========================================\n');
 
   if (!transporter) {
-    console.log('ℹ️ [Gmail SMTP]: SMTP_USER or SMTP_PASS not set in server/.env. Running in preview/demo mode.');
+    console.log('ℹ️ [Gmail SMTP]: SMTP_USER or SMTP_PASS not configured.');
     return {
       success: true,
       sentViaSmtp: false,
       previewCode: otpCode,
-      message: 'OTP generated (SMTP credentials not configured yet, check server log or use preview code).'
+      message: 'OTP generated (SMTP credentials not configured).'
     };
   }
 
-  const senderEmail = process.env.SMTP_USER || process.env.GMAIL_USER;
+  const senderEmail = (process.env.SMTP_USER || process.env.GMAIL_USER || 'soksithcheyhoout@gmail.com').trim();
   const logoPath = path.join(__dirname, '../../public/assets/moeys-crest-transparent.png');
 
   // Split OTP digits for modern formatted card

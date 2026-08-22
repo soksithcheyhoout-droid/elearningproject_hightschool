@@ -1,4 +1,4 @@
-import { spawn } from 'child_process';
+import { spawn, spawnSync } from 'child_process';
 import path from 'path';
 import { fileURLToPath } from 'url';
 
@@ -11,6 +11,18 @@ console.log('🚀 Starting MoTDAR National E-Learning Production Services...');
 const pythonCmd = process.platform === 'win32' ? 'python' : 'python3';
 const pythonDir = path.join(__dirname, 'python_ai');
 const pythonScript = path.join(pythonDir, 'ai_engine.py');
+const reqFile = path.join(pythonDir, 'requirements.txt');
+
+// Auto-ensure requirements are installed
+try {
+  console.log(`📦 Ensuring Python AI packages are installed (${pythonCmd} -m pip install -r ${reqFile})...`);
+  spawnSync(pythonCmd, ['-m', 'pip', 'install', '-r', reqFile, '--quiet'], {
+    stdio: 'ignore',
+    timeout: 30000
+  });
+} catch (e) {
+  // Continue even if pip install fails
+}
 
 console.log(`🧠 Launching Python AI Knowledge Engine (${pythonCmd} ${pythonScript} --server)...`);
 const pythonProcess = spawn(pythonCmd, [pythonScript, '--server'], {
