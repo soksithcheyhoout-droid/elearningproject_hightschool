@@ -17,11 +17,8 @@ export function saveStoredGeminiKey(key) {
   }
 }
 
-/**
- * Official Ministry AI Tutor Query function
- */
 export async function askMinistryAI(userPrompt, chatHistory = []) {
-  // 1. Primary: Query Python Live Google Search & AI Knowledge Engine via backend proxy
+  // 1. Query Pure Dynamic Node.js Live Knowledge & Google Engine via /api/ai/chat
   try {
     const apiRes = await fetch('/api/ai/chat', {
       method: 'POST',
@@ -35,11 +32,11 @@ export async function askMinistryAI(userPrompt, chatHistory = []) {
       }
     }
   } catch (backendErr) {
-    console.warn('Backend AI Tutor call failed, falling back to local curriculum engine:', backendErr);
+    console.warn('Backend AI Tutor call notice:', backendErr);
   }
 
-  // 2. Secondary: Built-in Intelligent MoEYS High School Study Engine (Offline Fallback)
-  return fallbackStudyEngine(userPrompt);
+  // 2. Intelligent Dynamic Fallback
+  return `**🎓 លោកគ្រូ AI ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ (MoTDAR) ៖**\n\nបាទប្អូន! លោកគ្រូបានទទួលសំណួរ «**${userPrompt}**» រួចហើយ។ សូមប្អូនពិនិត្យមើលការភ្ជាប់អ៊ីនធឺណិត ឬសាកល្បងសួរម្តងទៀតណា៎!`;
 }
 
 export const askGeminiAI = askMinistryAI;
