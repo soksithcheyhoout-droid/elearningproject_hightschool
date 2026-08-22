@@ -40,11 +40,11 @@ let bakongProcess = null;
 const bakongDir = path.join(__dirname, 'Bakong Bypass');
 const bakongScript = path.join(bakongDir, 'server.js');
 try {
-  console.log('🇰🇭 Launching Bakong KHQR Bypass Server on port 3000...');
+  console.log('🇰🇭 Launching Bakong KHQR Bypass Server on port 3000 with Cambodia Proxy...');
   bakongProcess = spawn('node', [bakongScript], {
     cwd: bakongDir,
     stdio: 'inherit',
-    env: { ...process.env, PORT: '3000' }
+    env: { ...process.env, PORT: '3000', KH_PROXY: 'true' }
   });
 
   bakongProcess.on('error', (err) => {

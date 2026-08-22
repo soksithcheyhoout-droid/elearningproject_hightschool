@@ -55,25 +55,39 @@ async function buildLaunchOptions() {
   const proxyUrl = process.env.PROXY_URL;
   if (proxyUrl) {
     opts.proxy = { server: proxyUrl };
-  } else if (process.env.KH_PROXY === "true") {
+    console.log(`🇰🇭 [Bakong Proxy] Using Custom Proxy: ${proxyUrl}`);
+  } else if (process.env.KH_PROXY === "true" || process.env.RENDER || process.env.VERCEL || process.platform === 'linux') {
     const idx = Math.floor(Math.random() * KH_PROXIES.length);
     opts.proxy = { server: KH_PROXIES[idx] };
+    console.log(`🇰🇭 [Bakong Proxy] Auto-selected Cambodia SOCKS5 Proxy: ${opts.proxy.server}`);
   }
 
   return opts;
 }
 
-async function init() {
-  console.log("Launching browser...");
+async function init(attempt = 0) {
+  console.log(`Launching browser with Cambodia proxy (attempt ${attempt + 1})...`);
   const t0 = Date.now();
-  const launchOpts = await buildLaunchOptions();
-  browser = await chromium.launch(launchOpts);
-  page = await browser.newPage();
-  await page.goto(SITE, { waitUntil: "domcontentloaded", timeout: 60000 });
-  await page.waitForTimeout(3000);
-  await getToken().catch(() => {});
-  ready = true;
-  console.log(`Ready in ${Date.now() - t0} ms`);
+  try {
+    const launchOpts = await buildLaunchOptions();
+    browser = await chromium.launch(launchOpts);
+    page = await browser.newPage();
+    await page.goto(SITE, { waitUntil: "domcontentloaded", timeout: 45000 });
+    await page.waitForTimeout(3000);
+    await getToken().catch(() => {});
+    ready = true;
+    console.log(`✅ Bakong Bypass Ready in ${Date.now() - t0} ms`);
+  } catch (err) {
+    console.warn(`⚠️ [Bakong Proxy Warning]: Attempt ${attempt + 1} failed (${err.message}). Retrying with next Cambodia proxy...`);
+    if (browser) {
+      await browser.close().catch(() => {});
+      browser = null;
+    }
+    if (attempt < 4) {
+      await new Promise(r => setTimeout(r, 2000));
+      return init(attempt + 1);
+    }
+  }
 }
 
 async function getToken() {
