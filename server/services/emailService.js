@@ -8,6 +8,8 @@ const __dirname = path.dirname(__filename);
 
 dotenv.config();
 
+import fs from 'fs';
+
 // Create Gmail SMTP transporter
 const createTransporter = () => {
   const user = process.env.SMTP_USER || process.env.GMAIL_USER;
@@ -22,9 +24,6 @@ const createTransporter = () => {
 
   return nodemailer.createTransport({
     service: 'gmail',
-    host: 'smtp.gmail.com',
-    port: 465,
-    secure: true,
     auth: {
       user: user.trim(),
       pass: cleanPass
@@ -269,20 +268,23 @@ export const sendOtpEmail = async (toEmail, otpCode, purpose = 'login') => {
 
   const plainText = `[MoEYS Cambodia - National E-Learning Platform]\n\nYour 6-Digit Security OTP PIN is: ${otpCode}\n\nThis verification code is valid for 5 minutes. Please enter it to complete your sign-in / registration.\n\n© ${new Date().getFullYear()} Ministry of Education, Youth and Sport (MoEYS Cambodia)`;
 
+  const attachments = [];
+  if (fs.existsSync(logoPath)) {
+    attachments.push({
+      filename: 'moeys-logo.png',
+      path: logoPath,
+      cid: 'moeyslogo'
+    });
+  }
+
   try {
     const info = await transporter.sendMail({
-      from: `"MoEYS E-Learning Portal" <${senderEmail}>`,
+      from: `"MoTDAR E-Learning Portal" <${senderEmail}>`,
       to: toEmail,
-      subject: `${otpCode} is your MoEYS Verification Code (លេខកូដសម្ងាត់ OTP)`,
+      subject: `${otpCode} is your MoTDAR Verification Code (លេខកូដសម្ងាត់ OTP)`,
       text: plainText,
       html: htmlContent,
-      attachments: [
-        {
-          filename: 'moeys-logo.png',
-          path: logoPath,
-          cid: 'moeyslogo'
-        }
-      ],
+      attachments,
       headers: {
         'X-Priority': '1',
         'X-MSMail-Priority': 'High',
