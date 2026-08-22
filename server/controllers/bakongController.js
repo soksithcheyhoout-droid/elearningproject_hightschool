@@ -182,7 +182,7 @@ export const generateBakongKhqr = (req, res) => {
 };
 
 /**
- * Proxy check transaction status from local Bakong Bypass server or direct NBC
+ * Proxy check transaction status from local Bakong Bypass server, Vercel cloud bypass, or direct NBC Open API
  * GET /api/bakong/check/:md5
  */
 export const checkBakongStatus = async (req, res) => {
@@ -191,14 +191,54 @@ export const checkBakongStatus = async (req, res) => {
     return res.status(400).json({ error: 'Invalid 32-character MD5 hash' });
   }
 
-  // Forward to local Playwright bypass server (port 3000)
-  const bypassUrl = `http://localhost:3000/api/bakong/unofficial/md5=${md5}`;
+  // 1. Check via Official NBC Open API if BAKONG_TOKEN is configured
+  const bakongToken = process.env.BAKONG_TOKEN;
+  if (bakongToken) {
+    try {
+      const nbcResp = await fetch('https://api-bakong.nbc.gov.kh/v1/check_transaction_by_md5', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${bakongToken.trim()}`
+        },
+        body: JSON.stringify({ md5 }),
+        signal: AbortSignal.timeout(10000)
+      });
+      if (nbcResp.ok) {
+        const nbcData = await nbcResp.json();
+        if (nbcData.responseCode === 0 || nbcData.errorCode === 0) {
+          return res.json({ status: 'SUCCESS', responseCode: 0, errorCode: 0, data: nbcData.data || { status: 'SUCCESS' } });
+        }
+      }
+    } catch (e) {
+      console.warn('⚠️ [NBC Open API Warning]:', e.message);
+    }
+  }
+
+  // 2. Check via Custom Hosted Cloud Bypass URL (e.g. Vercel deployment) or Local server
+  let bypassBase = (process.env.BAKONG_BYPASS_URL || 'http://localhost:3000').trim();
+  // Strip trailing slash if present
+  bypassBase = bypassBase.replace(/\/+$/, '');
+  
+  let targetUrl = bypassBase;
+  if (!targetUrl.includes('/api/bakong/unofficial/md5=')) {
+    targetUrl = `${bypassBase}/api/bakong/unofficial/md5=${md5}`;
+  } else {
+    targetUrl = targetUrl.replace(/md5=[0-9a-fA-F]{32}/i, `md5=${md5}`);
+  }
 
   try {
-    const fetchRes = await fetch(bypassUrl, { signal: AbortSignal.timeout(15000) });
-    const data = await fetchRes.json();
-    return res.json(data);
+    const fetchRes = await fetch(targetUrl, { 
+      headers: { 'Accept': 'application/json' },
+      signal: AbortSignal.timeout(15000) 
+    });
+    if (fetchRes.ok) {
+      const data = await fetchRes.json();
+      return res.json(data);
+    }
   } catch (err) {
-    return res.json({ status: 'PENDING', message: 'Waiting for payment confirmation...' });
+    // Return standard pending response if bypass server is unreachable
   }
+
+  return res.json({ status: 'PENDING', message: 'Waiting for payment confirmation...' });
 };
