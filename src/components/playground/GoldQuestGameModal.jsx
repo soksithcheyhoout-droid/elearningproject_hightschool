@@ -130,7 +130,7 @@ export default function GoldQuestGameModal({ game, onClose }) {
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md animate-fade-in font-kantumruy">
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-1.5 sm:p-4 md:p-6 bg-slate-950/90 backdrop-blur-md animate-fade-in font-kantumruy overflow-y-auto">
       
       <div className="bg-gradient-to-b from-[#002b5b] to-[#001737] rounded-3xl w-full max-w-4xl border-2 border-amber-400/80 shadow-2xl overflow-hidden flex flex-col relative text-white">
         

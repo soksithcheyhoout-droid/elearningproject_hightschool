@@ -432,11 +432,11 @@ export default function SpaceShooterGameModal({ game, onClose }) {
     spawnTargets();
   };
 
-  return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/90 backdrop-blur-md animate-fade-in font-kantumruy">
+  return (
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-1.5 sm:p-4 bg-slate-950/90 backdrop-blur-md animate-fade-in font-kantumruy overflow-y-auto">
       
       {/* Sci-Fi Space Game Frame */}
-      <div className="bg-slate-950 border-2 border-cyan-500/80 rounded-3xl w-full max-w-4xl flex flex-col overflow-hidden shadow-2xl relative text-white">
+      <div className="bg-slate-900 border border-indigo-500/40 rounded-2xl sm:rounded-3xl w-full max-w-4xl max-h-[96vh] sm:max-h-[92vh] flex flex-col shadow-[0_0_50px_rgba(99,102,241,0.25)] overflow-hidden text-slate-100 relative my-auto">
         
         {/* Cockpit HUD Header Bar */}
         <div className="bg-slate-900/90 px-5 py-3.5 border-b border-cyan-500/30 flex items-center justify-between gap-3">

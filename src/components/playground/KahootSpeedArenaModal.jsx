@@ -161,7 +161,7 @@ export default function KahootSpeedArenaModal({ game, onClose }) {
   ];
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-6 bg-slate-950/90 backdrop-blur-lg animate-fade-in font-kantumruy">
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-1.5 sm:p-4 md:p-6 bg-slate-950/90 backdrop-blur-lg animate-fade-in font-kantumruy overflow-y-auto">
       
       {/* Full-Featured Game Show Modal Window */}
       <div className="bg-[#46178f] rounded-3xl w-full max-w-5xl h-full max-h-[92vh] border-2 border-white/20 shadow-2xl overflow-hidden flex flex-col text-white relative">

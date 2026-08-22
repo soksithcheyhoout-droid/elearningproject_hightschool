@@ -190,7 +190,7 @@ export default function Science2048GameModal({ onClose }) {
   });
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-slate-950/85 backdrop-blur-md animate-fade-in font-kantumruy">
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-1.5 sm:p-4 bg-slate-950/90 backdrop-blur-md animate-fade-in font-kantumruy overflow-y-auto">
       
       <div className="arcade-cabinet-frame arcade-crt-overlay rounded-3xl w-full max-w-lg flex flex-col overflow-hidden shadow-2xl relative text-white border-2 border-amber-400">
         

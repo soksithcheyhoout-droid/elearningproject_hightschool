@@ -152,7 +152,7 @@ export default function PlaygroundGameModal({ game, onClose }) {
   const earnedXP = Math.round(game.xpReward * (correctAnswersCount / (questions.length || 1)));
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-slate-950/85 backdrop-blur-md animate-fade-in font-kantumruy">
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-1.5 sm:p-4 md:p-6 bg-slate-950/90 backdrop-blur-md animate-fade-in font-kantumruy overflow-y-auto">
       
       {/* Game Window Card */}
       <div className="bg-[#0e1626] rounded-3xl w-full max-w-2xl border-2 border-slate-700 shadow-2xl overflow-hidden flex flex-col max-h-[90vh] text-white relative">
