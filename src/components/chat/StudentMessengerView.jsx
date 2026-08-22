@@ -367,6 +367,30 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
   const [channelMessages, setChannelMessages] = useState([]);
   const [registeredStudents, setRegisteredStudents] = useState([]);
   const [overviewData, setOverviewData] = useState({});
+  const [channelMessageList, setChannelMessageList] = useState({});
+  const [readMap, setReadMap] = useState(() => {
+    try {
+      const saved = localStorage.getItem(`moeys_chat_read_map_${student?.id || 1}`);
+      return saved ? JSON.parse(saved) : {};
+    } catch (e) {
+      return {};
+    }
+  });
+
+  // Calculate unread messages count for any channel or DM
+  const getUnreadCount = (channelKey) => {
+    const msgs = channelMessageList[channelKey] || [];
+    const lastReadId = Number(readMap[channelKey] || 0);
+    if (!msgs || msgs.length === 0) {
+      const latest = overviewData[channelKey];
+      if (latest && latest.id && Number(latest.id) > lastReadId && String(latest.sender_id) !== String(student?.id)) {
+        return 1;
+      }
+      return 0;
+    }
+    const unread = msgs.filter(m => Number(m.id) > lastReadId && String(m.sender_id) !== String(student?.id));
+    return unread.length;
+  };
   const [directMessages, setDirectMessages] = useState({});
   const [activeMenuMsgId, setActiveMenuMsgId] = useState(null);
   const [copiedMsgId, setCopiedMsgId] = useState(null);
@@ -424,8 +448,9 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
     const fetchOverview = async () => {
       try {
         const res = await api.getChatOverview();
-        if (isMounted && res && res.latestByChannel) {
-          setOverviewData(res.latestByChannel);
+        if (isMounted && res) {
+          if (res.latestByChannel) setOverviewData(res.latestByChannel);
+          if (res.channelMessageList) setChannelMessageList(res.channelMessageList);
         }
       } catch (e) {}
     };
@@ -437,6 +462,27 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
       clearInterval(ovInterval);
     };
   }, []);
+
+  // 2b. Automatically mark active channel / DM as read
+  useEffect(() => {
+    const targetChannel = chatType === 'global' 
+      ? activeChannelId 
+      : `dm_${[Number(student?.id || 1), Number(activeContactId || 2)].sort((a,b) => a-b).join('_')}`;
+
+    const msgs = channelMessageList[targetChannel] || channelMessages || [];
+    const latestMsg = msgs[msgs.length - 1];
+    const latestId = Number(latestMsg?.id || overviewData[targetChannel]?.id || 0);
+
+    if (latestId > 0 && latestId !== Number(readMap[targetChannel] || 0)) {
+      setReadMap(prev => {
+        const updated = { ...prev, [targetChannel]: latestId };
+        try {
+          localStorage.setItem(`moeys_chat_read_map_${student?.id || 1}`, JSON.stringify(updated));
+        } catch (e) {}
+        return updated;
+      });
+    }
+  }, [activeChannelId, activeContactId, chatType, channelMessageList, channelMessages, overviewData, student?.id]);
 
   // Scroll smoothly to bottom on message updates
   const scrollToBottom = (behavior = 'smooth') => {
@@ -1005,35 +1051,57 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
           </div>
         </div>
 
-        {/* Global / Direct Tab Switcher */}
+        {/* Global / Direct Tab Switcher with Unread Count Badges */}
         <div className="flex items-center bg-slate-100 p-0.5 sm:p-1 rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-inner flex-shrink-0">
-          <button
-            type="button"
-            onClick={() => { setChatType('global'); setMobileChatView('list'); }}
-            className={`px-2 sm:px-4 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer flex items-center gap-1 sm:gap-2 ${
-              chatType === 'global'
-                ? 'bg-white text-[#005baa] shadow-xs border border-slate-200/80 font-extrabold'
-                : 'text-slate-600 hover:text-slate-950'
-            }`}
-          >
-            <Globe className="w-3.5 h-3.5 text-[#005baa]" />
-            <span className="hidden sm:inline">បន្ទប់រួម (Global)</span>
-            <span className="sm:hidden">បន្ទប់រួម</span>
-          </button>
-          
-          <button
-            type="button"
-            onClick={() => { setChatType('direct'); setMobileChatView('list'); }}
-            className={`px-2 sm:px-4 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[10.5px] sm:text-xs font-bold transition-all cursor-pointer flex items-center gap-1 sm:gap-2 ${
-              chatType === 'direct'
-                ? 'bg-white text-[#005baa] shadow-xs border border-slate-200/80 font-extrabold'
-                : 'text-slate-600 hover:text-slate-950'
-            }`}
-          >
-            <Users className="w-3.5 h-3.5 text-[#005baa]" />
-            <span className="hidden sm:inline">សារផ្ទាល់ខ្លួន (DMs)</span>
-            <span className="sm:hidden">សារផ្ទាល់</span>
-          </button>
+          {(() => {
+            const totalGlobalUnread = CHAT_CHANNELS.reduce((sum, ch) => sum + getUnreadCount(ch.id), 0);
+            const totalDmUnread = registeredStudents.reduce((sum, s) => {
+              const dmKey = `dm_${[Number(student?.id || 1), Number(s.id || 2)].sort((a,b)=>a-b).join('_')}`;
+              return sum + getUnreadCount(dmKey);
+            }, 0);
+
+            return (
+              <>
+                <button
+                  type="button"
+                  onClick={() => { setChatType('global'); setMobileChatView('list'); }}
+                  className={`px-2 sm:px-4 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    chatType === 'global'
+                      ? 'bg-white text-[#005baa] shadow-xs border border-slate-200/80 font-extrabold'
+                      : 'text-slate-600 hover:text-slate-950'
+                  }`}
+                >
+                  <Globe className="w-3.5 h-3.5 text-[#005baa]" />
+                  <span className="hidden sm:inline">បន្ទប់រួម (Global)</span>
+                  <span className="sm:hidden">បន្ទប់រួម</span>
+                  {totalGlobalUnread > 0 && (
+                    <span className="px-1.5 py-0.2 min-w-[17px] h-[17px] rounded-full bg-rose-500 text-white text-[9px] font-black font-mono flex items-center justify-center shadow-xs animate-pulse">
+                      {totalGlobalUnread > 99 ? '99+' : totalGlobalUnread}
+                    </span>
+                  )}
+                </button>
+                
+                <button
+                  type="button"
+                  onClick={() => { setChatType('direct'); setMobileChatView('list'); }}
+                  className={`px-2 sm:px-4 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[10.5px] sm:text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
+                    chatType === 'direct'
+                      ? 'bg-white text-[#005baa] shadow-xs border border-slate-200/80 font-extrabold'
+                      : 'text-slate-600 hover:text-slate-950'
+                  }`}
+                >
+                  <Users className="w-3.5 h-3.5 text-[#005baa]" />
+                  <span className="hidden sm:inline">សារផ្ទាល់ខ្លួន (DMs)</span>
+                  <span className="sm:hidden">សារផ្ទាល់</span>
+                  {totalDmUnread > 0 && (
+                    <span className="px-1.5 py-0.2 min-w-[17px] h-[17px] rounded-full bg-rose-500 text-white text-[9px] font-black font-mono flex items-center justify-center shadow-xs animate-pulse">
+                      {totalDmUnread > 99 ? '99+' : totalDmUnread}
+                    </span>
+                  )}
+                </button>
+              </>
+            );
+          })()}
         </div>
       </div>
 
@@ -1070,6 +1138,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                 {filteredChannels.map((channel) => {
                   const isActive = activeChannelId === channel.id;
                   const latest = overviewData[channel.id];
+                  const unreadCount = getUnreadCount(channel.id);
                   return (
                     <button
                       key={channel.id}
@@ -1101,8 +1170,10 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                           )}
                         </p>
                       </div>
-                      {latest && !isActive && (
-                        <span className="w-2 h-2 rounded-full bg-[#005baa] flex-shrink-0 animate-pulse" />
+                      {unreadCount > 0 && !isActive && (
+                        <span className="px-1.5 py-0.5 min-w-[20px] h-5 rounded-full bg-rose-500 text-white text-[10px] font-black font-mono flex items-center justify-center shadow-xs ring-2 ring-white animate-bounce flex-shrink-0">
+                          {unreadCount > 99 ? '99+' : unreadCount}
+                        </span>
                       )}
                     </button>
                   );
@@ -1123,6 +1194,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                     const isActive = activeContactId === contact.id;
                     const dmKey = `dm_${[Number(student?.id || 1), Number(contact.id || 2)].sort((a,b)=>a-b).join('_')}`;
                     const latest = overviewData[dmKey];
+                    const unreadCount = getUnreadCount(dmKey);
                     return (
                       <button
                         key={contact.id}
@@ -1182,8 +1254,10 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                           </p>
                         </div>
 
-                        {latest && !isActive && String(latest.sender_id) !== String(student?.id) && (
-                          <span className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0 animate-pulse" />
+                        {unreadCount > 0 && !isActive && (
+                          <span className="px-1.5 py-0.5 min-w-[20px] h-5 rounded-full bg-rose-500 text-white text-[10px] font-black font-mono flex items-center justify-center shadow-xs ring-2 ring-white animate-bounce flex-shrink-0">
+                            {unreadCount > 99 ? '99+' : unreadCount}
+                          </span>
                         )}
                       </button>
                     );

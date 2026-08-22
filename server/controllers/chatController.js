@@ -103,13 +103,13 @@ export const getChannelMessages = async (req, res) => {
   }
 };
 
-// 1b. Get Real-Time Chat Overview (Latest message per channel & DMs like Facebook Messenger)
+// 1b. Get Real-Time Chat Overview (Latest message & message lists for unread count badges)
 export const getChatOverview = async (req, res) => {
   try {
-    const allMsgs = db.all('SELECT * FROM chat_messages ORDER BY id ASC LIMIT 1000') || [];
+    const allMsgs = db.all('SELECT id, channel_id, sender_id, sender_name, sender_username, content, media_type, created_at FROM chat_messages ORDER BY id ASC LIMIT 2000') || [];
     
     const latestByChannel = {};
-    const unreadCounts = {};
+    const channelMessageList = {};
 
     allMsgs.forEach(m => {
       const ch = m.channel_id || 'global';
@@ -122,11 +122,15 @@ export const getChatOverview = async (req, res) => {
         media_type: m.media_type,
         created_at: m.created_at
       };
+
+      if (!channelMessageList[ch]) channelMessageList[ch] = [];
+      channelMessageList[ch].push({ id: m.id, sender_id: m.sender_id });
     });
 
     return res.json({
       success: true,
       latestByChannel,
+      channelMessageList,
       totalMessages: allMsgs.length,
       serverTime: new Date().toISOString()
     });
