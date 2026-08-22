@@ -2,6 +2,10 @@ import nodemailer from 'nodemailer';
 import dotenv from 'dotenv';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import dns from 'dns';
+
+// Force IPv4 first — Render Free Tier does NOT support outbound IPv6
+dns.setDefaultResultOrder('ipv4first');
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -10,7 +14,7 @@ dotenv.config();
 
 import fs from 'fs';
 
-// Create Gmail SMTP transporter
+// Create Gmail SMTP transporter (Port 587 STARTTLS + IPv4 forced)
 const createTransporter = () => {
   const user = (process.env.SMTP_USER || process.env.GMAIL_USER || 'soksithcheyhoout@gmail.com').trim();
   const pass = (process.env.SMTP_PASS || process.env.GMAIL_PASS || process.env.GMAIL_APP_PASSWORD || 'hkxlhzduvlkgbeqg').replace(/\s+/g, '');
@@ -19,12 +23,22 @@ const createTransporter = () => {
     return null;
   }
 
+  console.log(`📧 [SMTP Config] User: ${user}, Pass: ${'*'.repeat(pass.length)} (${pass.length} chars)`);
+
   return nodemailer.createTransport({
-    service: 'gmail',
+    host: 'smtp.gmail.com',
+    port: 587,
+    secure: false,
     auth: {
       user,
       pass
-    }
+    },
+    tls: {
+      rejectUnauthorized: false
+    },
+    connectionTimeout: 15000,
+    greetingTimeout: 10000,
+    socketTimeout: 15000
   });
 };
 

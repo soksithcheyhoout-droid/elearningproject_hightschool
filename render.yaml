@@ -4,12 +4,14 @@ services:
     runtime: node
     plan: free
     region: singapore
-    buildCommand: npm install && npm run build && cd server && npm install && pip install -r ../python_ai/requirements.txt
+    buildCommand: npm install && pip install -r python_ai/requirements.txt && npm run build
     startCommand: node start_production.js
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
-      - key: JWT_SECRET
-        generateValue: true
+      - key: SMTP_USER
+        value: soksithcheyhoout@gmail.com
+      - key: SMTP_PASS
+        value: hkxlhzduvlkgbeqg
