@@ -26,8 +26,21 @@ app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 import fs from 'fs';
 
-// Serve Uploaded Student Profile Pictures statically
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
+// Serve Uploaded Media & Audios statically with full Range support for mobile playback
+const staticUploadOptions = {
+  setHeaders: (res, filePath) => {
+    res.setHeader('Accept-Ranges', 'bytes');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    if (filePath.endsWith('.webm')) res.setHeader('Content-Type', 'audio/webm');
+    else if (filePath.endsWith('.mp4')) res.setHeader('Content-Type', 'video/mp4');
+    else if (filePath.endsWith('.m4a') || filePath.endsWith('.aac')) res.setHeader('Content-Type', 'audio/mp4');
+    else if (filePath.endsWith('.wav')) res.setHeader('Content-Type', 'audio/wav');
+    else if (filePath.endsWith('.ogg')) res.setHeader('Content-Type', 'audio/ogg');
+  }
+};
+
+app.use('/uploads', express.static(path.join(process.cwd(), 'uploads'), staticUploadOptions));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads'), staticUploadOptions));
 
 // Serve built frontend assets in production if dist directory exists
 const distPath = path.join(__dirname, '../dist');

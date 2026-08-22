@@ -84,7 +84,7 @@ const isGifUrl = (str) => {
 };
 
 /**
- * Ultra-Sleek Voice Message Player Component with Dynamic Equalizer Animations & Accurate Time
+ * Ultra-Sleek Voice Message Player Component with Dynamic Equalizer Animations, Accurate Time & iOS Fallback
  */
 function VoiceMessagePlayer({ audioUrl, duration, isMe }) {
   const [isPlaying, setIsPlaying] = useState(false);
@@ -101,20 +101,91 @@ function VoiceMessagePlayer({ audioUrl, duration, isMe }) {
 
   const [totalDuration, setTotalDuration] = useState(() => parseDurationStr(duration) || 0);
   const audioRef = useRef(null);
+  const audioCtxRef = useRef(null);
+  const audioBufferRef = useRef(null);
+  const audioSourceNodeRef = useRef(null);
+  const webAudioIntervalRef = useRef(null);
 
   useEffect(() => {
     const s = parseDurationStr(duration);
     if (s > 0) setTotalDuration(s);
   }, [duration]);
 
-  const togglePlay = () => {
-    if (!audioRef.current) return;
+  const fullAudioSrc = api.formatMediaUrl(audioUrl);
+
+  const togglePlay = async () => {
     if (isPlaying) {
-      audioRef.current.pause();
+      if (audioRef.current) {
+        audioRef.current.pause();
+      }
+      if (audioSourceNodeRef.current) {
+        try { audioSourceNodeRef.current.stop(); } catch (e) {}
+      }
+      if (webAudioIntervalRef.current) clearInterval(webAudioIntervalRef.current);
       setIsPlaying(false);
-    } else {
-      audioRef.current.play();
+      return;
+    }
+
+    // Attempt 1: Standard HTML5 Audio (Fastest & Native)
+    if (audioRef.current) {
+      try {
+        await audioRef.current.play();
+        setIsPlaying(true);
+        return;
+      } catch (err) {
+        console.warn('HTML5 audio play blocked/unsupported on this device, initiating Web Audio API decoder:', err);
+      }
+    }
+
+    // Attempt 2: Web Audio API Decoder Fallback (Guaranteed to play on iOS Safari & Android)
+    try {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (!audioCtxRef.current) {
+        audioCtxRef.current = new AudioContextClass();
+      }
+      if (audioCtxRef.current.state === 'suspended') {
+        await audioCtxRef.current.resume();
+      }
+
+      if (!audioBufferRef.current) {
+        const resp = await fetch(fullAudioSrc);
+        const arrayBuf = await resp.arrayBuffer();
+        audioBufferRef.current = await audioCtxRef.current.decodeAudioData(arrayBuf);
+      }
+
+      const dur = audioBufferRef.current.duration;
+      if (dur && isFinite(dur)) setTotalDuration(dur);
+
+      const source = audioCtxRef.current.createBufferSource();
+      source.buffer = audioBufferRef.current;
+      source.connect(audioCtxRef.current.destination);
+      audioSourceNodeRef.current = source;
+
+      const startTime = audioCtxRef.current.currentTime;
+      if (webAudioIntervalRef.current) clearInterval(webAudioIntervalRef.current);
+      webAudioIntervalRef.current = setInterval(() => {
+        if (!audioCtxRef.current) return;
+        const cur = audioCtxRef.current.currentTime - startTime;
+        if (cur >= dur) {
+          setIsPlaying(false);
+          setCurrentTime(0);
+          clearInterval(webAudioIntervalRef.current);
+        } else {
+          setCurrentTime(cur);
+        }
+      }, 100);
+
+      source.onended = () => {
+        setIsPlaying(false);
+        setCurrentTime(0);
+        if (webAudioIntervalRef.current) clearInterval(webAudioIntervalRef.current);
+      };
+
+      source.start(0);
       setIsPlaying(true);
+    } catch (fallbackErr) {
+      console.error('All audio playback methods failed:', fallbackErr);
+      setIsPlaying(false);
     }
   };
 
@@ -150,7 +221,6 @@ function VoiceMessagePlayer({ audioUrl, duration, isMe }) {
 
   const effectiveDuration = totalDuration > 0 ? totalDuration : (parseDurationStr(duration) || 3);
   const progressPct = effectiveDuration > 0 ? (currentTime / effectiveDuration) * 100 : 0;
-  const fullAudioSrc = api.formatMediaUrl(audioUrl);
   const displayDuration = duration || (totalDuration > 0 ? formatSec(totalDuration) : '0:03');
 
   // 18-bar waveform profile heights
@@ -178,7 +248,9 @@ function VoiceMessagePlayer({ audioUrl, duration, isMe }) {
         onTimeUpdate={handleTimeUpdate}
         onLoadedMetadata={handleLoadedMetadata}
         onEnded={handleEnded}
-        preload="metadata"
+        preload="auto"
+        playsInline={true}
+        crossOrigin="anonymous"
       />
       
       {/* Play/Pause Button with Pulsing Glow on Play */}
@@ -493,28 +565,56 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
     });
   };
 
-  // 🎙️ Start Voice Note Recording with Browser MediaRecorder API
+  // 🎙️ Start Voice Note Recording with Device-Aware MediaRecorder API
   const startVoiceRecording = async () => {
     try {
       const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const mediaRecorder = new MediaRecorder(stream);
+      
+      // Determine optimal audio MIME type supported by client browser (iPhone uses MP4/AAC, Android/PC uses WebM/Opus)
+      let preferredMime = 'audio/webm;codecs=opus';
+      let preferredExt = 'webm';
+
+      if (typeof MediaRecorder !== 'undefined' && typeof MediaRecorder.isTypeSupported === 'function') {
+        if (MediaRecorder.isTypeSupported('audio/mp4')) {
+          preferredMime = 'audio/mp4';
+          preferredExt = 'mp4';
+        } else if (MediaRecorder.isTypeSupported('audio/aac')) {
+          preferredMime = 'audio/aac';
+          preferredExt = 'aac';
+        } else if (MediaRecorder.isTypeSupported('audio/webm;codecs=opus')) {
+          preferredMime = 'audio/webm;codecs=opus';
+          preferredExt = 'webm';
+        } else if (MediaRecorder.isTypeSupported('audio/webm')) {
+          preferredMime = 'audio/webm';
+          preferredExt = 'webm';
+        } else if (MediaRecorder.isTypeSupported('audio/ogg')) {
+          preferredMime = 'audio/ogg';
+          preferredExt = 'ogg';
+        } else {
+          preferredMime = '';
+        }
+      }
+
+      const recorderOptions = preferredMime ? { mimeType: preferredMime } : undefined;
+      const mediaRecorder = new MediaRecorder(stream, recorderOptions);
       mediaRecorderRef.current = mediaRecorder;
       audioChunksRef.current = [];
       recordingStartTimeRef.current = Date.now();
 
       mediaRecorder.ondataavailable = (e) => {
-        if (e.data.size > 0) {
+        if (e.data && e.data.size > 0) {
           audioChunksRef.current.push(e.data);
         }
       };
 
       mediaRecorder.onstop = async () => {
-        const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/webm' });
+        const actualMime = mediaRecorder.mimeType || preferredMime || 'audio/mp4';
+        const audioBlob = new Blob(audioChunksRef.current, { type: actualMime });
         stream.getTracks().forEach(track => track.stop());
         if (audioChunksRef.current.length === 0) return;
         
         const elapsedSec = Math.max(1, Math.round((Date.now() - (recordingStartTimeRef.current || Date.now())) / 1000));
-        await handleSendVoiceBlob(audioBlob, elapsedSec);
+        await handleSendVoiceBlob(audioBlob, elapsedSec, preferredExt, actualMime);
       };
 
       mediaRecorder.start(100);
@@ -559,10 +659,10 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
     }
   };
 
-  const handleSendVoiceBlob = async (blob, durationSec) => {
+  const handleSendVoiceBlob = async (blob, durationSec, ext = 'webm', mimeType = 'audio/webm') => {
     setIsSending(true);
     try {
-      const file = new File([blob], `voice-note-${Date.now()}.webm`, { type: 'audio/webm' });
+      const file = new File([blob], `voice-note-${Date.now()}.${ext}`, { type: mimeType });
       const uploadRes = await api.uploadChatMedia(file);
       if (uploadRes && uploadRes.url) {
         const minutes = Math.floor(durationSec / 60);
