@@ -202,12 +202,22 @@ export default function LoginView() {
         setOtpStep(2);
         setActiveTab('login');
         setOtpTimer(60);
-        setOtpDigits(['', '', '', '', '', '']);
-        setSuccessMessage(
-          lang === 'km' 
-            ? `លេខកូដសម្ងាត់ OTP ៦ ខ្ទង់ត្រូវបានផ្ញើទៅកាន់ ${finalTarget} រួចរាល់ហើយ! សូមពិនិត្យប្រអប់សំបុត្រ Gmail របស់អ្នក។`
-            : `6-Digit OTP code sent to ${finalTarget}! Please check your Gmail inbox.`
-        );
+        
+        if (otpRes.previewCode) {
+          setOtpDigits(otpRes.previewCode.split(''));
+          setSuccessMessage(
+            lang === 'km'
+              ? `✨ លេខកូដ OTP (សាកល្បង) គឺ៖ ${otpRes.previewCode} (បានបំពេញស្វ័យប្រវត្តិតាមរយៈ Demo Mode)`
+              : `✨ Preview OTP Code: ${otpRes.previewCode} (Auto-filled via Demo Mode)`
+          );
+        } else {
+          setOtpDigits(['', '', '', '', '', '']);
+          setSuccessMessage(
+            lang === 'km' 
+              ? `លេខកូដសម្ងាត់ OTP ៦ ខ្ទង់ត្រូវបានផ្ញើចូលប្រអប់សំបុត្រ Gmail (${finalTarget}) រួចរាល់ហើយ! សូមពិនិត្យមើល Inbox/Spam។`
+              : `6-Digit OTP code sent to ${finalTarget}! Please check your Gmail inbox.`
+          );
+        }
         setTimeout(() => {
           otpInputRefs[0]?.current?.focus();
         }, 200);
@@ -260,12 +270,21 @@ export default function LoginView() {
         setOtpStep(2);
         setActiveTab('login');
         setOtpTimer(60);
-        setOtpDigits(['', '', '', '', '', '']);
-        setSuccessMessage(
-          lang === 'km' 
-            ? `លេខកូដសម្ងាត់ OTP ៦ ខ្ទង់ត្រូវបានផ្ញើឡើងវិញទៅកាន់ ${finalTarget} រួចរាល់ហើយ!` 
-            : `New 6-Digit OTP code resent to ${finalTarget}!`
-        );
+        if (res.previewCode) {
+          setOtpDigits(res.previewCode.split(''));
+          setSuccessMessage(
+            lang === 'km'
+              ? `✨ លេខកូដ OTP (សាកល្បង) គឺ៖ ${res.previewCode} (បានបំពេញស្វ័យប្រវត្តិតាមរយៈ Demo Mode)`
+              : `✨ Preview OTP Code: ${res.previewCode} (Auto-filled via Demo Mode)`
+          );
+        } else {
+          setOtpDigits(['', '', '', '', '', '']);
+          setSuccessMessage(
+            lang === 'km' 
+              ? `លេខកូដសម្ងាត់ OTP ៦ ខ្ទង់ត្រូវបានផ្ញើឡើងវិញទៅកាន់ ${finalTarget} រួចរាល់ហើយ!` 
+              : `New 6-Digit OTP code resent to ${finalTarget}!`
+          );
+        }
         setTimeout(() => {
           otpInputRefs[0]?.current?.focus();
         }, 200);

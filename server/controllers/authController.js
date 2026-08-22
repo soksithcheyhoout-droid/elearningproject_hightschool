@@ -391,14 +391,20 @@ export const sendOtp = async (req, res) => {
       console.log(`========================================\n`);
     }
 
+    const previewCode = emailResult?.previewCode || (!emailResult?.sentViaSmtp ? otpCode : null);
+    const sentViaSmtp = emailResult?.sentViaSmtp || false;
+
     return res.json({
       success: true,
-      message: `លេខកូដ OTP ត្រូវបានផ្ញើទៅកាន់ ${actualTarget} រួចរាល់ហើយ!`,
+      message: sentViaSmtp
+        ? `លេខកូដសម្ងាត់ OTP ៦ ខ្ទង់ត្រូវបានផ្ញើចូលប្រអប់សំបុត្រ Gmail (${actualTarget}) រួចរាល់ហើយ!`
+        : `លេខកូដ OTP សាកល្បង (Demo Mode) គឺ៖ ${otpCode}`,
       target: actualTarget,
       resolvedTarget: actualTarget,
       originalTarget: cleanInput,
       expiresIn: 300,
-      sentViaSmtp: emailResult?.sentViaSmtp || false
+      sentViaSmtp,
+      previewCode
     });
   } catch (err) {
     console.error('[Send OTP Error]:', err);
