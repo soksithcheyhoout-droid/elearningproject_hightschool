@@ -103,6 +103,39 @@ export const getChannelMessages = async (req, res) => {
   }
 };
 
+// 1b. Get Real-Time Chat Overview (Latest message per channel & DMs like Facebook Messenger)
+export const getChatOverview = async (req, res) => {
+  try {
+    const allMsgs = db.all('SELECT * FROM chat_messages ORDER BY id ASC LIMIT 1000') || [];
+    
+    const latestByChannel = {};
+    const unreadCounts = {};
+
+    allMsgs.forEach(m => {
+      const ch = m.channel_id || 'global';
+      latestByChannel[ch] = {
+        id: m.id,
+        sender_id: m.sender_id,
+        sender_name: m.sender_name,
+        sender_username: m.sender_username,
+        content: m.content || (m.media_type === 'image' ? '📷 រូបភាព' : m.media_type === 'audio' ? '🎙️ សំឡេង' : m.media_type === 'video' ? '🎥 វីដេអូ' : 'សារថ្មី'),
+        media_type: m.media_type,
+        created_at: m.created_at
+      };
+    });
+
+    return res.json({
+      success: true,
+      latestByChannel,
+      totalMessages: allMsgs.length,
+      serverTime: new Date().toISOString()
+    });
+  } catch (error) {
+    console.error('Error fetching chat overview:', error);
+    return res.status(500).json({ error: 'Failed to fetch chat overview' });
+  }
+};
+
 // 2. Send message in a channel
 export const sendChannelMessage = async (req, res) => {
   try {

@@ -646,6 +646,16 @@ export const api = {
   },
 
   // 7. Real-Time Chat System (Database Driven)
+  getChatOverview: async () => {
+    try {
+      const res = await fetch(`${API_BASE}/chat/overview`);
+      if (!res.ok) return { latestByChannel: {} };
+      return await res.json();
+    } catch (err) {
+      return { latestByChannel: {} };
+    }
+  },
+
   getChatMessages: async (channel = 'global') => {
     try {
       const res = await fetch(`${API_BASE}/chat/messages?channel=${encodeURIComponent(channel)}`);

@@ -68,6 +68,7 @@ router.get('/arena/invite/status/:roomCode', getRoomInviteStatus);
 
 import {
   getChannelMessages,
+  getChatOverview,
   sendChannelMessage,
   toggleReaction,
   clearChannel,
@@ -97,6 +98,7 @@ router.post('/arena/invite/:inviteId/respond', respondInvite);
 router.get('/arena/invite/status/:roomCode', getRoomInviteStatus);
 
 // 7. Real-Time National Chat Channels & DMs (Live Database)
+router.get('/chat/overview', getChatOverview);
 router.get('/chat/messages', getChannelMessages);
 router.post('/chat/messages', sendChannelMessage);
 router.post('/chat/upload', uploadChatMediaMulter.single('file'), uploadChatMedia);

@@ -294,6 +294,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
   // Real Database Data
   const [channelMessages, setChannelMessages] = useState([]);
   const [registeredStudents, setRegisteredStudents] = useState([]);
+  const [overviewData, setOverviewData] = useState({});
   const [directMessages, setDirectMessages] = useState({});
   const [activeMenuMsgId, setActiveMenuMsgId] = useState(null);
   const [copiedMsgId, setCopiedMsgId] = useState(null);
@@ -308,14 +309,18 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
   const audioChunksRef = useRef([]);
   const recordingTimerRef = useRef(null);
   const recordingStartTimeRef = useRef(null);
+  const lastMsgCountRef = useRef(0);
 
-  // Purge old mock storage on mount
-  useEffect(() => {
+  // Format short timestamp (e.g. 18:35 or 01:06 AM)
+  const formatTimeShort = (isoStr) => {
+    if (!isoStr) return '';
     try {
-      localStorage.removeItem('moeys_real_global_chat_v2');
-      localStorage.removeItem('moeys_real_direct_chat_v2');
-    } catch (e) {}
-  }, []);
+      const d = new Date(isoStr);
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+    } catch (e) {
+      return '';
+    }
+  };
 
   // 1. Fetch Real Registered Students from Database for Contacts List
   useEffect(() => {
@@ -332,7 +337,29 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
       } catch (e) {}
     };
     fetchStudents();
+    const stuInterval = setInterval(fetchStudents, 5000);
+    return () => clearInterval(stuInterval);
   }, [student?.id, student?.username]);
+
+  // 2. Poll Real-Time Chat Overview (Latest message in all channels & DMs like Facebook Messenger)
+  useEffect(() => {
+    let isMounted = true;
+    const fetchOverview = async () => {
+      try {
+        const res = await api.getChatOverview();
+        if (isMounted && res && res.latestByChannel) {
+          setOverviewData(res.latestByChannel);
+        }
+      } catch (e) {}
+    };
+
+    fetchOverview();
+    const ovInterval = setInterval(fetchOverview, 1800);
+    return () => {
+      isMounted = false;
+      clearInterval(ovInterval);
+    };
+  }, []);
 
   // Scroll smoothly to bottom on message updates
   const scrollToBottom = (behavior = 'smooth') => {
@@ -353,15 +380,26 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
     setShowScrollBottom(distanceToBottom > 120);
   };
 
-  // 2. Poll Real Messages from Database for Current Channel
+  // 3. Fast Low-Latency Poll for Active Channel Messages (1200ms)
   useEffect(() => {
     let isMounted = true;
+    const targetChannel = chatType === 'global' 
+      ? activeChannelId 
+      : `dm_${[Number(student?.id || 1), Number(activeContactId || 2)].sort((a,b) => a-b).join('_')}`;
+
     const fetchMessages = async () => {
       try {
-        const targetChannel = chatType === 'global' ? activeChannelId : `dm_${[student?.id || 1, activeContactId || 2].sort().join('_')}`;
         const res = await api.getChatMessages(targetChannel);
         if (isMounted && res && Array.isArray(res.messages)) {
           setChannelMessages(prev => {
+            // Play notification sound when new message arrives from another student
+            if (prev.length > 0 && res.messages.length > prev.length) {
+              const lastIncoming = res.messages[res.messages.length - 1];
+              if (lastIncoming && String(lastIncoming.sender_id) !== String(student?.id)) {
+                playSound.pop();
+              }
+            }
+
             // If message count and last message are identical, keep exact state reference
             if (prev.length === res.messages.length) {
               const lastPrev = prev[prev.length - 1];
@@ -374,7 +412,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
             // Only auto-scroll down if user is already near the bottom!
             if (chatContainerRef.current) {
               const { scrollTop, scrollHeight, clientHeight } = chatContainerRef.current;
-              const isNearBottom = (scrollHeight - scrollTop - clientHeight) < 120;
+              const isNearBottom = (scrollHeight - scrollTop - clientHeight) < 140;
               if (isNearBottom) {
                 setTimeout(() => scrollToBottom('smooth'), 50);
               }
@@ -387,7 +425,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
     };
 
     fetchMessages();
-    const interval = setInterval(fetchMessages, 2500);
+    const interval = setInterval(fetchMessages, 1200);
     return () => {
       isMounted = false;
       clearInterval(interval);
@@ -926,12 +964,13 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                 </div>
                 {filteredChannels.map((channel) => {
                   const isActive = activeChannelId === channel.id;
+                  const latest = overviewData[channel.id];
                   return (
                     <button
                       key={channel.id}
                       type="button"
                       onClick={() => { setActiveChannelId(channel.id); setMobileChatView('chat'); }}
-                      className={`w-full p-3 rounded-2xl text-left transition-all cursor-pointer flex items-center gap-3 group ${
+                      className={`w-full p-2.5 sm:p-3 rounded-2xl text-left transition-all cursor-pointer flex items-center gap-2.5 sm:gap-3 group relative ${
                         isActive
                           ? 'bg-blue-50/90 border border-blue-200 text-[#005baa] shadow-xs'
                           : 'hover:bg-white text-slate-700 hover:text-[#005baa] border border-transparent'
@@ -939,9 +978,27 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                     >
                       {getChannelIcon(channel.id, isActive)}
                       <div className="min-w-0 flex-1">
-                        <h4 className="font-bold text-xs truncate group-hover:text-[#005baa] transition-colors">{channel.name}</h4>
-                        <p className="text-[10px] text-slate-400 truncate mt-0.5">{channel.desc}</p>
+                        <div className="flex items-center justify-between gap-1">
+                          <h4 className="font-bold text-xs truncate group-hover:text-[#005baa] transition-colors">{channel.name}</h4>
+                          {latest?.created_at && (
+                            <span className="text-[9px] text-slate-400 font-mono font-bold flex-shrink-0">
+                              {formatTimeShort(latest.created_at)}
+                            </span>
+                          )}
+                        </div>
+                        <p className={`text-[10px] truncate mt-0.5 ${latest ? 'text-slate-600 font-medium' : 'text-slate-400'}`}>
+                          {latest ? (
+                            <span>
+                              <strong className="text-slate-800 font-semibold">{latest.sender_name || latest.sender_username}:</strong> {latest.content}
+                            </span>
+                          ) : (
+                            channel.desc
+                          )}
+                        </p>
                       </div>
+                      {latest && !isActive && (
+                        <span className="w-2 h-2 rounded-full bg-[#005baa] flex-shrink-0 animate-pulse" />
+                      )}
                     </button>
                   );
                 })}
@@ -959,19 +1016,21 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                 ) : (
                   filteredContacts.map((contact) => {
                     const isActive = activeContactId === contact.id;
+                    const dmKey = `dm_${[Number(student?.id || 1), Number(contact.id || 2)].sort((a,b)=>a-b).join('_')}`;
+                    const latest = overviewData[dmKey];
                     return (
                       <button
                         key={contact.id}
                         type="button"
                         onClick={() => { setActiveContactId(contact.id); setMobileChatView('chat'); }}
-                        className={`w-full p-3 rounded-2xl text-left transition-all cursor-pointer flex items-center gap-3 ${
+                        className={`w-full p-2.5 sm:p-3 rounded-2xl text-left transition-all cursor-pointer flex items-center gap-2.5 sm:gap-3 group relative ${
                           isActive
                             ? 'bg-blue-50/90 border border-blue-200 text-[#005baa] shadow-xs'
                             : 'hover:bg-white text-slate-700 hover:text-[#005baa] border border-transparent'
                         }`}
                       >
                         {/* Real Avatar with Animated Frame Overlay */}
-                        <div className="relative w-11 h-11 flex items-center justify-center flex-shrink-0 select-none">
+                        <div className="relative w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center flex-shrink-0 select-none">
                           <div className="w-[82%] h-[82%] rounded-full overflow-hidden bg-slate-900 shadow-xs border border-slate-300">
                             <img 
                               src={api.formatAvatarUrl(contact.avatar)} 
@@ -996,12 +1055,31 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                         </div>
 
                         <div className="min-w-0 flex-1">
-                          <div className="flex items-center justify-between">
+                          <div className="flex items-center justify-between gap-1">
                             <h4 className="font-bold text-xs truncate text-slate-900">{contact.full_name || contact.username}</h4>
-                            <span className="text-[9px] text-emerald-600 font-cinzel font-bold">Online</span>
+                            {latest?.created_at ? (
+                              <span className="text-[9px] text-slate-400 font-mono font-bold flex-shrink-0">
+                                {formatTimeShort(latest.created_at)}
+                              </span>
+                            ) : (
+                              <span className="text-[9px] text-emerald-600 font-cinzel font-bold">Online</span>
+                            )}
                           </div>
-                          <p className="text-[11px] text-slate-500 truncate mt-0.5">{contact.school || 'វិទ្យាល័យ ព្រះស៊ីសុវត្ថិ'}</p>
+                          <p className={`text-[10.5px] truncate mt-0.5 ${latest ? 'text-slate-700 font-medium' : 'text-slate-400'}`}>
+                            {latest ? (
+                              <span>
+                                {String(latest.sender_id) === String(student?.id) ? <span className="text-slate-400">អ្នក: </span> : ''}
+                                {latest.content}
+                              </span>
+                            ) : (
+                              contact.school || 'វិទ្យាល័យ ព្រះស៊ីសុវត្ថិ'
+                            )}
+                          </p>
                         </div>
+
+                        {latest && !isActive && String(latest.sender_id) !== String(student?.id) && (
+                          <span className="w-2 h-2 rounded-full bg-emerald-500 flex-shrink-0 animate-pulse" />
+                        )}
                       </button>
                     );
                   })
