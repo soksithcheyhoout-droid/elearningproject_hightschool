@@ -9,10 +9,12 @@ console.log('🚀 Starting MoTDAR National E-Learning Production Services...');
 
 // 1. Determine Python executable (python3 on Linux/Render, python on Windows)
 const pythonCmd = process.platform === 'win32' ? 'python' : 'python3';
-const pythonScript = path.join(__dirname, 'python_ai', 'ai_engine.py');
+const pythonDir = path.join(__dirname, 'python_ai');
+const pythonScript = path.join(pythonDir, 'ai_engine.py');
 
 console.log(`🧠 Launching Python AI Knowledge Engine (${pythonCmd} ${pythonScript} --server)...`);
 const pythonProcess = spawn(pythonCmd, [pythonScript, '--server'], {
+  cwd: pythonDir,
   stdio: 'inherit',
   env: { ...process.env, PYTHONUNBUFFERED: '1' }
 });
@@ -23,8 +25,10 @@ pythonProcess.on('error', (err) => {
 
 // 2. Launch Node.js Backend Server
 console.log('🌐 Launching Node.js Express Server...');
-const serverScript = path.join(__dirname, 'server', 'server.js');
+const serverDir = path.join(__dirname, 'server');
+const serverScript = path.join(serverDir, 'server.js');
 const nodeProcess = spawn('node', [serverScript], {
+  cwd: serverDir,
   stdio: 'inherit',
   env: { ...process.env }
 });
