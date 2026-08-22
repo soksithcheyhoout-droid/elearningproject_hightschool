@@ -1505,11 +1505,11 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
             )}
           </div>
 
-          {/* Bottom Chat Message Input Area (Native-App Responsive Layout) */}
-          <div className="p-1.5 sm:p-3 bg-white border-t border-slate-200 sticky bottom-0 z-30 shadow-xs">
-            <form onSubmit={handleSendMessage} className="flex items-center gap-1 sm:gap-2 relative">
+          {/* Input Bar Form */}
+          <div className="bg-white border-t border-slate-200 p-1.5 sm:p-3 flex-shrink-0 relative z-30 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-xs w-full max-w-full overflow-hidden">
+            <form onSubmit={handleSendMessage} className="flex items-center gap-1 sm:gap-2 relative w-full max-w-full">
               
-              {/* 1. Emoji Picker Container */}
+              {/* 1. Native Clean Emoji / Reaction Trigger Button */}
               <div ref={emojiPickerRef} className="relative flex-shrink-0">
                 <button
                   type="button"
@@ -1518,7 +1518,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                     setIsEmojiPickerOpen(!isEmojiPickerOpen);
                     setIsGifPickerOpen(false);
                   }}
-                  className={`p-1.5 sm:px-2.5 sm:py-2 rounded-xl transition-all cursor-pointer border shadow-2xs flex items-center justify-center flex-shrink-0 ${
+                  className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl transition-all cursor-pointer border shadow-2xs flex items-center justify-center flex-shrink-0 ${
                     isEmojiPickerOpen 
                       ? 'bg-amber-100 text-amber-900 border-amber-300 ring-2 ring-amber-400/40 shadow-md' 
                       : 'bg-slate-100 hover:bg-amber-50 text-slate-600 hover:text-amber-700 border-slate-200/90'
@@ -1592,7 +1592,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                     setIsGifPickerOpen(!isGifPickerOpen);
                     setIsEmojiPickerOpen(false);
                   }}
-                  className={`px-2.5 py-2 rounded-xl font-black text-xs transition-all cursor-pointer border shadow-2xs flex items-center gap-1 flex-shrink-0 ${
+                  className={`w-9 h-9 rounded-xl font-black text-xs transition-all cursor-pointer border shadow-2xs flex items-center justify-center gap-1 flex-shrink-0 ${
                     isGifPickerOpen 
                       ? 'bg-indigo-600 text-white border-indigo-500 ring-2 ring-indigo-400/40 shadow-md' 
                       : 'bg-slate-100 hover:bg-indigo-50 text-indigo-700 hover:text-indigo-900 border-slate-200/90'
@@ -1600,7 +1600,6 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                   title="GIF"
                 >
                   <Film className="w-3.5 h-3.5" />
-                  <span className="font-cinzel text-[10px]">GIF</span>
                 </button>
 
                 {/* GIF Picker Popover Window */}
@@ -1703,7 +1702,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                 type="button"
                 onClick={() => imageInputRef.current?.click()}
                 disabled={isSending || isRecordingVoice}
-                className="p-1.5 sm:px-2.5 sm:py-2 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 border border-slate-200/90 transition-all cursor-pointer flex-shrink-0 disabled:opacity-40"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 border border-slate-200/90 transition-all cursor-pointer flex items-center justify-center flex-shrink-0 disabled:opacity-40"
                 title="Photo"
               >
                 <ImageIcon className="w-4 h-4 text-emerald-600" />
@@ -1714,7 +1713,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                 type="button"
                 onClick={() => videoInputRef.current?.click()}
                 disabled={isSending || isRecordingVoice}
-                className="hidden sm:flex p-2 rounded-xl bg-slate-100 hover:bg-purple-50 text-slate-600 hover:text-purple-600 border border-slate-200/90 transition-all cursor-pointer flex-shrink-0 disabled:opacity-40"
+                className="hidden sm:flex w-9 h-9 rounded-xl bg-slate-100 hover:bg-purple-50 text-slate-600 hover:text-purple-600 border border-slate-200/90 transition-all cursor-pointer flex-shrink-0 items-center justify-center disabled:opacity-40"
                 title="Video"
               >
                 <Video className="w-4 h-4 text-purple-600" />
@@ -1722,7 +1721,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
 
               {/* Live Voice Recording UI vs Text Input Box */}
               {isRecordingVoice ? (
-                <div className="flex-1 min-w-0 flex items-center justify-between gap-1.5 bg-rose-50 border border-rose-200 px-2 sm:px-3 py-1.5 rounded-xl animate-fade-in">
+                <div className="flex-1 min-w-0 flex items-center justify-between gap-1.5 bg-rose-50 border border-rose-200 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl animate-fade-in">
                   <div className="flex items-center gap-1.5 min-w-0">
                     <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping flex-shrink-0" />
                     <span className="text-[11px] font-black text-rose-700 font-mono truncate">
@@ -1753,11 +1752,15 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                 <>
                   <input
                     type="text"
-                    placeholder={chatType === 'global' ? `ផ្ញើសារចូល ${activeChannel.name}...` : `ផ្ញើសារទៅកាន់ ${activeContact.full_name || activeContact.username}...`}
+                    placeholder={chatType === 'global' ? `ផ្ញើសារចូល ${activeChannel.name}...` : `ផ្ញើសារ...`}
                     value={inputMessage}
                     onChange={(e) => setInputMessage(e.target.value)}
                     disabled={isSending}
-                    className="flex-1 min-w-0 bg-slate-50 border border-slate-200 rounded-xl px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-xs sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#005baa] focus:bg-white transition-all shadow-inner font-medium"
+                    autoComplete="off"
+                    autoCorrect="off"
+                    autoCapitalize="sentences"
+                    spellCheck="false"
+                    className="flex-1 min-w-0 bg-slate-50 border border-slate-200 rounded-xl px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-[16px] sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#005baa] focus:bg-white transition-all shadow-inner font-medium leading-tight"
                   />
 
                   {/* Mic Voice Record Button */}
