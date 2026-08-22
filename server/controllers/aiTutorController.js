@@ -8,6 +8,18 @@
  * Cambodian & National Educational Institutions Knowledge Base
  */
 const CAMBODIA_INSTITUTIONS_KB = {
+  'ais': {
+    name: 'សាលារៀន អន្តរទ្វីប អាមេរិកាំង (American Intercon School - AIS & Aii Language Center)',
+    desc: 'សាលារៀន អន្តរទ្វីប អាមេរិកាំង (American Intercon School - AIS) គឺជាគ្រឹះស្ថានអប់រំឯកជនដ៏ល្បីល្បាញមួយនៅកម្ពុជា ក្រោមការដឹកនាំរបស់ អ្នកឧកញ៉ា វេជ្ជបណ្ឌិត គួច ម៉េងលី (Mengly J. Quach Education - MJQE)។',
+    programs: [
+      'ចំណេះទូទៅខ្មែរ (ថ្នាក់មត្តេយ្យ ដល់ ថ្នាក់ទី១២ តាមកម្មវិធីក្រសួងអប់រំ)',
+      'មជ្ឈមណ្ឌលភាសា អេ អាយ អាយ (Aii Language Center) ផ្តល់ការបណ្តុះបណ្តាលភាសាអង់គ្លេស និងភាសាចិន',
+      'កម្មវិធីអប់រំបែបអាមេរិកាំង និងបច្ចេកវិទ្យាទំនើប (STEM Education)',
+      'កម្មវិធីអភិវឌ្ឍន៍ភាពជាអ្នកដឹកនាំ វិន័យ សីលធម៌ និងសុខភាពសិស្ស'
+    ],
+    motto: '«គុណភាព វិន័យ និងសេវាកម្ម (Quality, Discipline and Service)»',
+    branches: 'មានសាខាធំៗជាច្រើននៅទូទាំងរាជធានីភ្នំពេញ (សាខាម៉ៅសេទុង, ទួលគោក, ចាក់អង្រែ, ចោមចៅ, ផ្សារថ្មី, ច្បារអំពៅ, សែនសុខ) និងខេត្តសៀមរាប។'
+  },
   'beltei': {
     name: 'សាលា ប៊ែលធី អន្តរជាតិ (BELTEI International School & University)',
     desc: 'សាលា ប៊ែលធី អន្តរជាតិ (BELTEI International School) គឺជាគ្រឹះស្ថានអប់រំឯកជនដ៏ធំ និងឈានមុខគេមួយនៅព្រះរាជាណាចក្រកម្ពុជា ដែលត្រូវបានទទួលស្គាល់ជាផ្លូវការដោយក្រសួងអប់រំ យុវជន និងកីឡា។',
@@ -40,8 +52,44 @@ const CAMBODIA_INSTITUTIONS_KB = {
   'itc': {
     name: 'វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា (Institute of Technology of Cambodia - ITC / តិចណូ)',
     desc: 'វិទ្យាស្ថានបច្ចេកវិទ្យាកម្ពុជា (សាលាតិចណូ) គឺជាគ្រឹះស្ថានឧត្តមសិក្សាឈានមុខគេបង្អស់នៅកម្ពុជា ក្នុងការបណ្តុះបណ្តាលវិស្វករ អ្នកបច្ចេកវិទ្យា និងអ្នកស្រាវជ្រាវវិទ្យាសាស្ត្រអនុវត្តន៍។'
+  },
+  'paragon': {
+    name: 'សាលា និងសាកលវិទ្យាល័យ ផារ៉ាហ្គន (Paragon International School & University / អតីត Zaman)',
+    desc: 'សាលា និងសាកលវិទ្យាល័យ ផារ៉ាហ្គន គឺជាគ្រឹះស្ថានអប់រំស្តង់ដារអន្តរជាតិឈានមុខគេមួយនៅកម្ពុជា ដែលផ្តោតលើភាសាអង់គ្លេស បច្ចេកវិទ្យាវិស្វកម្ម និងពាណិជ្ជកម្ម។'
+  },
+  'cia': {
+    name: 'សាលាអន្តរជាតិ ស៊ី អាយ អេ ហ្វឺសត៍ (CIA FIRST International School)',
+    desc: 'សាលាអន្តរជាតិ CIA FIRST គឺជាគ្រឹះស្ថានអប់រំឯកជនស្តង់ដារអន្តរជាតិលំដាប់ខ្ពស់នៅរាជធានីភ្នំពេញ ដែលត្រូវបានទទួលស្គាល់ដោយស្ថាប័នអន្តរជាតិ WASC ផ្តល់ការបង្រៀនចាប់ពីមត្តេយ្យដល់វិទ្យាល័យ។'
+  },
+  'aupp': {
+    name: 'សាកលវិទ្យាល័យអាមេរិកាំងភ្នំពេញ (American University of Phnom Penh - AUPP)',
+    desc: 'AUPP គឺជាសាកលវិទ្យាល័យស្តង់ដារសហរដ្ឋអាមេរិកតែមួយគត់នៅកម្ពុជា ដែលផ្តល់សញ្ញាបត្រពីរ (Dual Degree) ជាមួយសាកលវិទ្យាល័យល្បីៗនៅអាមេរិកដូចជា University of Arizona និង Fort Hays State University។'
   }
 };
+
+/**
+ * Multi-Turn Conversation Memory Resolver
+ */
+function resolveContextualQuery(currentPrompt, history = []) {
+  const q = (currentPrompt || '').trim().toLowerCase();
+  const pronouns = ['it', 'they', 'he', 'she', 'him', 'her', 'its', 'their', 'that', 'this', 'there', 'who is', 'where is', 'how many', 'who founded', 'founder', 'details', 'detail', 'វា', 'គាត់', 'នោះ', 'នេះ', 'ហ្នឹង', 'ចុះ', 'ស្ថាបនិក'];
+
+  const isShort = q.split(/\s+/).length <= 6;
+  const hasPronoun = pronouns.some(p => new RegExp(`\\b${p}\\b`, 'i').test(q) || q.includes(p));
+  const isFollowup = /tell\s+me\s+more|how\s+about|what\s+else|more\s+details|detail\s+me|and\s+then|ប្រាប់បន្ថែម|មានអ្វីទៀត|ចុះ|ហើយ|តទៅ/i.test(q);
+
+  if ((isShort || hasPronoun || isFollowup) && Array.isArray(history) && history.length > 0) {
+    for (let i = history.length - 1; i >= 0; i--) {
+      const msg = history[i];
+      const text = (msg.text || msg.content || '').trim();
+      const sender = msg.sender || msg.role;
+      if (sender === 'user' && text && text.toLowerCase() !== q) {
+        return `${text} ${currentPrompt}`;
+      }
+    }
+  }
+  return currentPrompt;
+}
 
 /**
  * 1. Live Google Neural Translation (Zero API Key)
@@ -181,15 +229,28 @@ async function searchWikipedia(topic) {
 }
 
 /**
- * 4. Clean search topic by removing conversational filler prefixes
+ * 4. Clean search topic by removing conversational filler prefixes (Word boundary safe)
  */
 function cleanQueryTopic(query) {
-  let topic = (query || '').trim();
-  topic = topic
-    .replace(/^(?:តើ|តើមាន|សូម|ជួយ|តើអ្នកអាច)?\s*(?:លោកគ្រូ|អ្នកគ្រូ|បង|ai|motdar)?\s*(?:អាច)?\s*(?:ជួយ)?\s*(?:ស្គាល់|ពន្យល់|ប្រាប់|បង្រៀន|បង្ហាញ|និយាយ|ដឹង|រក|គណនា)?\s*(?:ខ្ញុំ|យើង)?\s*(?:អំពី|ពី)?\s*/i, '')
-    .replace(/[\?\!\.\,\:\;\'\"\s]*(?:ទេ|ឬទេ|ឬអត់|អត់|ដែរ|ផង)?[\?\!\.\,\:\;\'\"\s]*$/i, '')
-    .trim();
-  return topic || query;
+  if (!query) return '';
+  let q = query.trim();
+
+  // 1. English conversational filler prefixes
+  q = q.replace(/^(?:can\s+you|could\s+you|please|do\s+you\s+know(?:\s+about)?|what\s+is|who\s+is|where\s+is|tell\s+me(?:\s+about)?|explain(?:\s+to\s+me)?|what\s+do\s+you\s+think\s+about|how\s+about|tell\s+me\s+about|explain\s+me\s+about|detail\s+me\s+about|detail\s+me|give\s+me\s+details\s+about|give\s+details\s+on|describe|share\s+info\s+on)\b\s*/gi, '');
+
+  // 2. Khmer conversational filler prefixes
+  q = q.replace(/^(?:តើ|តើមាន|សូម|ជួយ|តើអ្នកអាច|តើលោកគ្រូអាច)\s*/gi, '');
+  q = q.replace(/^(?:លោកគ្រូ|អ្នកគ្រូ|បង|motdar)\s*/gi, '');
+  q = q.replace(/^(?:អាច\s+)?(?:ជួយ\s+)?(?:ស្គាល់|ពន្យល់|ប្រាប់|បង្រៀន|បង្ហាញ|និយាយ|ដឹង|រក|គណនា|រៀបរាប់|ចែករំលែក)\s*/gi, '');
+  q = q.replace(/^(?:ខ្ញុំ|យើង)\s*/gi, '');
+  q = q.replace(/^(?:អំពី|ពី)\s*/gi, '');
+
+  // 3. Trailing filler suffixes
+  q = q.replace(/[\s\?\!\.\,\:\;\'\"]*(?:ដែរ\s*ទេ|ដែរទេ|ឬទេ|ឬអត់|អត់|ដែរ|ទេ|ផង)[\s\?\!\.\,\:\;\'\"]*$/gi, '');
+  q = q.replace(/\s+(?:in|at|from|of|inside)\s+(?:cambodia|phnom\s+penh|khmer|cambodian)[\s\?\!\.\,\:\;\'\"]*$/gi, '');
+  q = q.replace(/[\?\!\.\,\:\;\'\"\s]+$/g, '').trim();
+
+  return q || query.trim();
 }
 
 /**
@@ -197,24 +258,26 @@ function cleanQueryTopic(query) {
  */
 export async function handleAIChat(req, res) {
   try {
-    const prompt = (req.body?.prompt || req.query?.prompt || '').trim();
+    const rawPrompt = (req.body?.prompt || req.query?.prompt || '').trim();
     const messages = req.body?.messages || [];
 
-    if (!prompt) {
+    if (!rawPrompt) {
       return res.status(400).json({ error: 'Prompt is required.' });
     }
 
+    // Resolve multi-turn conversational follow-up questions
+    const prompt = resolveContextualQuery(rawPrompt, messages);
     const qLower = prompt.toLowerCase();
     const cleanTopic = cleanQueryTopic(prompt);
 
     // 1. Language directive detection
-    const isWantsEnglish = /\b(in english|to english|speak english|talk in english|english version|explain in english)\b/i.test(qLower);
-    const isWantsKhmer = /(to khmer|in khmer|ជាភាសាខ្មែរ|បកប្រែជាភាសាខ្មែរ|បកប្រែខ្មែរ|និយាយខ្មែរ)/i.test(qLower);
+    const isWantsEnglish = /\b(in english|to english|speak english|talk in english|english version|explain in english)\b/i.test(rawPrompt.toLowerCase());
+    const isWantsKhmer = /(to khmer|in khmer|ជាភាសាខ្មែរ|បកប្រែជាភាសាខ្មែរ|បកប្រែខ្មែរ|និយាយខ្មែរ)/i.test(rawPrompt.toLowerCase());
     const targetLang = isWantsEnglish ? 'en' : 'km';
 
     // 2. Direct Translation Request (e.g. translate "..." into khmer)
     const translatePattern = /(?:translate|បកប្រែ)\s*[:\"\'«]?\s*(.+?)\s*[\"\'»]?\s*(?:into|to|ជាភាសា)\s*(khmer|english|ខ្មែរ|អង់គ្លេស)/i;
-    const transMatch = prompt.match(translatePattern);
+    const transMatch = rawPrompt.match(translatePattern);
     if (transMatch) {
       const textToTrans = transMatch[1].trim();
       const langChoice = /english|អង់គ្លេស/i.test(transMatch[2]) ? 'en' : 'km';
@@ -227,7 +290,8 @@ export async function handleAIChat(req, res) {
 
     // 3. Check Dedicated Cambodian & National Educational Institutions Knowledge Base
     for (const [key, info] of Object.entries(CAMBODIA_INSTITUTIONS_KB)) {
-      if (qLower.includes(key) || cleanTopic.toLowerCase().includes(key)) {
+      const keyRegex = new RegExp(`\\b${key}\\b`, 'i');
+      if (keyRegex.test(qLower) || keyRegex.test(cleanTopic.toLowerCase()) || cleanTopic.toLowerCase().includes(key)) {
         let reply = `**🎓 លោកគ្រូ AI ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ (MoTDAR) ៖**\n\n`;
         reply += `បាទប្អូន! នេះជាព័ត៌មានលម្អិតអំពី **«${info.name}»** ៖\n\n`;
         reply += `• **ទិដ្ឋភាពទូទៅ ៖** ${info.desc}\n\n`;
