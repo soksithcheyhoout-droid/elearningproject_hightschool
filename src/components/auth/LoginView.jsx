@@ -50,6 +50,8 @@ const ALL_GRADES = [
   { value: '1', labelKm: 'ថ្នាក់ទី១ (Grade 1)', labelEn: 'Grade 1 (Primary School)' },
 ];
 
+const DEFAULT_GOOGLE_CLIENT_ID = '398760173693-c21013b3ih3e8b2kk5kfnau9khbtj96j.apps.googleusercontent.com';
+
 export default function LoginView() {
   const { lang, setLang } = useLanguage();
   const { login } = useAuth();
