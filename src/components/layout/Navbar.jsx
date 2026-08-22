@@ -1049,7 +1049,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
                     </button>
                   </div>
 
-                  {/* 2-Column Compact Grid */}
+                  {/* 2-Column Compact Grid with Game Arena */}
                   <div className="grid grid-cols-2 gap-1 text-[11px]">
                     <button
                       type="button"
@@ -1071,6 +1071,20 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
                     >
                       <BookOpen className="w-3.5 h-3.5 flex-shrink-0" />
                       <span className="truncate">{lang === 'km' ? 'កម្មវិធីសិក្សា' : 'Lessons'}</span>
+                    </button>
+
+                    {/* 🎮 ACADEMIC GAME ARENA */}
+                    <button
+                      type="button"
+                      onClick={() => { setActiveTab('playground'); setMobileMenuOpen(false); }}
+                      className={`p-2 rounded-xl font-bold flex items-center gap-1.5 transition-all cursor-pointer border ${
+                        activeTab === 'playground' 
+                          ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white border-amber-600 shadow-xs' 
+                          : 'text-amber-700 bg-amber-50/80 hover:bg-amber-100/90 border-amber-200/80'
+                      }`}
+                    >
+                      <Gamepad2 className="w-3.5 h-3.5 text-amber-500 flex-shrink-0 animate-pulse" />
+                      <span className="truncate font-black">{lang === 'km' ? '🎮 សង្វៀនហ្គេម' : '🎮 Game Arena'}</span>
                     </button>
 
                     <button
@@ -1104,6 +1118,17 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
                     >
                       <FlaskConical className="w-3.5 h-3.5 text-purple-600 flex-shrink-0" />
                       <span className="truncate">{lang === 'km' ? 'STEM Lab' : 'STEM Lab'}</span>
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={() => { setActiveTab('library'); setMobileMenuOpen(false); }}
+                      className={`p-2 rounded-xl font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                        activeTab === 'library' ? 'bg-[#005baa] text-white shadow-xs' : 'text-slate-700 bg-slate-50 hover:bg-blue-50 hover:text-[#005baa]'
+                      }`}
+                    >
+                      <Library className="w-3.5 h-3.5 text-indigo-600 flex-shrink-0" />
+                      <span className="truncate">{lang === 'km' ? 'សៀវភៅពុម្ព' : 'E-Books'}</span>
                     </button>
 
                     <button

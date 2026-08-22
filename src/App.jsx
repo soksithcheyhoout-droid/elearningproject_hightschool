@@ -596,58 +596,75 @@ function MainApp() {
 
 
 
-      {/* Mobile Bottom Navigation Bar (Streamlined 5-Item Native App Layout) */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl border-t border-slate-200 shadow-2xl px-2 py-1.5 flex items-center justify-around md:hidden select-none pb-[calc(0.375rem+env(safe-area-inset-bottom,0px))]">
+      {/* Mobile Bottom Navigation Bar (Streamlined 6-Item Native App Layout with 🎮 Game Arena) */}
+      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl border-t border-slate-200 shadow-2xl px-1.5 py-1.5 flex items-center justify-around md:hidden select-none pb-[calc(0.375rem+env(safe-area-inset-bottom,0px))] font-kantumruy">
         <button
           type="button"
           onClick={() => { setTabAndUrl('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-          className={`flex-1 flex flex-col items-center gap-0.5 py-1 rounded-xl text-[10px] font-bold transition-all cursor-pointer active:scale-90 ${
+          className={`flex-1 flex flex-col items-center gap-0.5 py-1 rounded-xl text-[9.5px] font-bold transition-all cursor-pointer active:scale-90 ${
             activeTab === 'home' 
               ? 'text-[#005baa] bg-blue-50/90 font-black' 
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
-          <Home className="w-5 h-5" />
+          <Home className="w-4.5 h-4.5" />
           <span>{lang === 'km' ? 'ទំព័រដើម' : 'Home'}</span>
         </button>
 
         <button
           type="button"
           onClick={() => { setTabAndUrl('courses'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-          className={`flex-1 flex flex-col items-center gap-0.5 py-1 rounded-xl text-[10px] font-bold transition-all cursor-pointer active:scale-90 ${
+          className={`flex-1 flex flex-col items-center gap-0.5 py-1 rounded-xl text-[9.5px] font-bold transition-all cursor-pointer active:scale-90 ${
             activeTab === 'courses' 
               ? 'text-[#005baa] bg-blue-50/90 font-black' 
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
-          <BookOpen className="w-5 h-5" />
+          <BookOpen className="w-4.5 h-4.5" />
           <span>{lang === 'km' ? 'មេរៀន' : 'Lessons'}</span>
+        </button>
+
+        {/* 🎮 ACADEMIC GAME ARENA / PLAYGROUND (RESPONSIVE MOBILE TAB) */}
+        <button
+          type="button"
+          onClick={() => { setTabAndUrl('playground'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
+          className={`flex-1 flex flex-col items-center gap-0.5 py-1 rounded-xl text-[9.5px] font-bold transition-all cursor-pointer relative active:scale-90 ${
+            activeTab === 'playground' 
+              ? 'text-amber-600 bg-amber-50/90 font-black shadow-xs' 
+              : 'text-slate-500 hover:text-amber-600'
+          }`}
+        >
+          <div className="relative">
+            <Gamepad2 className={`w-4.5 h-4.5 ${activeTab === 'playground' ? 'text-amber-500 animate-pulse' : 'text-amber-500/80'}`} />
+            <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+          </div>
+          <span className="font-extrabold text-amber-600">{lang === 'km' ? 'ហ្គេម' : 'Games'}</span>
         </button>
 
         <button
           type="button"
           onClick={() => { setTabAndUrl('bacii'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-          className={`flex-1 flex flex-col items-center gap-0.5 py-1 rounded-xl text-[10px] font-bold transition-all cursor-pointer relative active:scale-90 ${
+          className={`flex-1 flex flex-col items-center gap-0.5 py-1 rounded-xl text-[9.5px] font-bold transition-all cursor-pointer relative active:scale-90 ${
             activeTab === 'bacii' 
               ? 'text-rose-600 bg-rose-50/90 font-black' 
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
-          <GraduationCap className="w-5 h-5" />
+          <GraduationCap className="w-4.5 h-4.5" />
           <span>{lang === 'km' ? 'បាក់ឌុប' : 'Bac II'}</span>
         </button>
 
         <button
           type="button"
           onClick={() => { setTabAndUrl('chat'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-          className={`flex-1 flex flex-col items-center gap-0.5 py-1 rounded-xl text-[10px] font-bold transition-all cursor-pointer relative active:scale-90 ${
+          className={`flex-1 flex flex-col items-center gap-0.5 py-1 rounded-xl text-[9.5px] font-bold transition-all cursor-pointer relative active:scale-90 ${
             activeTab === 'chat' 
               ? 'text-[#005baa] bg-blue-50/90 font-black' 
               : 'text-slate-500 hover:text-slate-800'
           }`}
         >
           <div className="relative">
-            <MessageSquare className="w-5 h-5" />
+            <MessageSquare className="w-4.5 h-4.5" />
             <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
           </div>
           <span>{lang === 'km' ? 'ជជែក' : 'Chat'}</span>
@@ -656,9 +673,9 @@ function MainApp() {
         <button
           type="button"
           onClick={() => setIsAITutorOpen(true)}
-          className="flex-1 flex flex-col items-center gap-0.5 py-1 rounded-xl text-[10px] font-bold text-amber-600 hover:text-amber-700 transition-all cursor-pointer active:scale-90"
+          className="flex-1 flex flex-col items-center gap-0.5 py-1 rounded-xl text-[9.5px] font-bold text-amber-600 hover:text-amber-700 transition-all cursor-pointer active:scale-90"
         >
-          <Bot className="w-5 h-5 text-amber-500 animate-bounce" />
+          <Bot className="w-4.5 h-4.5 text-amber-500 animate-bounce" />
           <span>{lang === 'km' ? 'គ្រូ AI' : 'AI Tutor'}</span>
         </button>
       </nav>
