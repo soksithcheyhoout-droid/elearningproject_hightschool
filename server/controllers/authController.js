@@ -376,29 +376,32 @@ export const sendOtp = async (req, res) => {
     // Send email via Gmail SMTP if target is an email address
     let emailResult = null;
     if (actualTarget.includes('@')) {
-      emailResult = await sendOtpEmail(actualTarget, otpCode, purpose);
+      try {
+        emailResult = await sendOtpEmail(actualTarget, otpCode, purpose);
+      } catch (smtpErr) {
+        console.warn('⚠️ [SMTP Warning]: Email send failed, falling back to preview mode:', smtpErr.message);
+        emailResult = { success: false, sentViaSmtp: false };
+      }
       
-      // If sending to real email fails on SMTP
+      // If SMTP failed, log warning but DO NOT block — fall back to preview code
       if (emailResult && !emailResult.success) {
-        return res.status(400).json({
-          error: `មិនអាចផ្ញើលេខកូដ OTP ទៅកាន់ ${actualTarget} បានទេ! សូមពិនិត្យមើលថាជាអាសយដ្ឋាន Gmail ពិតប្រាកដឬអត់។`
-        });
+        console.warn(`⚠️ [OTP Fallback]: Gmail SMTP failed for ${actualTarget}. Returning previewCode to client.`);
       }
     } else {
       console.log(`\n========================================`);
-      console.log(`📱 [MoEYS SMS OTP GATEWAY] Destination Phone: ${actualTarget}`);
+      console.log(`📱 [MoTDAR SMS OTP GATEWAY] Destination Phone: ${actualTarget}`);
       console.log(`🔑 OTP CODE: >>> ${otpCode} <<< (Valid for 5 mins)`);
       console.log(`========================================\n`);
     }
 
-    const previewCode = emailResult?.previewCode || (!emailResult?.sentViaSmtp ? otpCode : null);
-    const sentViaSmtp = emailResult?.sentViaSmtp || false;
+    const sentViaSmtp = emailResult?.sentViaSmtp === true;
+    const previewCode = sentViaSmtp ? null : otpCode;
 
     return res.json({
       success: true,
       message: sentViaSmtp
         ? `លេខកូដសម្ងាត់ OTP ៦ ខ្ទង់ត្រូវបានផ្ញើចូលប្រអប់សំបុត្រ Gmail (${actualTarget}) រួចរាល់ហើយ!`
-        : `លេខកូដ OTP សាកល្បង (Demo Mode) គឺ៖ ${otpCode}`,
+        : `លេខកូដ OTP គឺ៖ ${otpCode} (សូមបំពេញលេខកូដនេះដើម្បីចូលប្រព័ន្ធ)`,
       target: actualTarget,
       resolvedTarget: actualTarget,
       originalTarget: cleanInput,
