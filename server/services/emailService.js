@@ -330,7 +330,7 @@ export const sendOtpEmail = async (toEmail, otpCode, purpose = 'login') => {
         <!-- 🌟 ROYAL OFFICIAL HEADER WITH NEW LOGO -->
         <div class="header">
           <div class="logo-box">
-            <img src="cid:moeyslogo" alt="MoEYS National Crest" width="96" height="96" style="display: block; margin: 0 auto; object-fit: contain; filter: drop-shadow(0 6px 18px rgba(245,158,11,0.35));" />
+            <img src="https://raw.githubusercontent.com/soksithcheyhoout-droid/elearningproject_hightschool/main/public/assets/moeys-crest-transparent.png" alt="MoTDAR National Crest" width="96" height="96" style="display: block; margin: 0 auto; object-fit: contain; filter: drop-shadow(0 6px 18px rgba(245,158,11,0.35));" />
           </div>
           <div class="header-title-en">MINISTRY OF TALENT DEVELOPMENT & ADVANCED RESEARCH</div>
           <div class="header-title-km">ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ និងការស្រាវជ្រាវកម្រិតខ្ពស់</div>
