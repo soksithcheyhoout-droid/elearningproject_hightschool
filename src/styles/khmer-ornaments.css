@@ -1,0 +1,90 @@
+/* MoEYS Official Ornaments, Gradients & Luxury Layout Styles */
+
+.moeys-hero-banner {
+  position: relative;
+  background: radial-gradient(circle at 85% 15%, rgba(0, 163, 255, 0.22) 0%, transparent 50%),
+              radial-gradient(circle at 10% 90%, rgba(234, 179, 8, 0.15) 0%, transparent 45%),
+              linear-gradient(135deg, #051930 0%, #002b5b 45%, #004b91 80%, #005baa 100%);
+  color: #ffffff;
+  border-radius: 20px;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  overflow: hidden;
+  box-shadow: 0 10px 30px -5px rgba(0, 43, 91, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.1) inset;
+}
+
+.moeys-ticker {
+  background: linear-gradient(90deg, #fffbeb 0%, #fef3c7 50%, #fffbeb 100%);
+  border: 1px solid #fde68a;
+  color: #92400e;
+  border-radius: 12px;
+  padding: 10px 16px;
+  font-size: 0.82rem;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 2px 6px rgba(217, 119, 6, 0.08);
+}
+
+/* Glass Countdown Tile for Hero Banner */
+.moeys-countdown-tile {
+  background: rgba(255, 255, 255, 0.08);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 14px;
+  padding: 10px 8px;
+  text-align: center;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.15), inset 0 1px 0 rgba(255, 255, 255, 0.2);
+}
+
+.moeys-countdown-tile:hover {
+  background: rgba(255, 255, 255, 0.14);
+  border-color: rgba(253, 224, 71, 0.5);
+  transform: translateY(-2px);
+}
+
+.moeys-countdown-tile .count-num {
+  font-family: 'Outfit', 'Cinzel', sans-serif;
+  font-size: 1.65rem;
+  font-weight: 800;
+  color: #ffffff;
+  line-height: 1.1;
+  text-shadow: 0 0 15px rgba(56, 189, 248, 0.6);
+}
+
+.moeys-countdown-tile .count-lbl {
+  font-size: 0.72rem;
+  color: #bae6fd;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  margin-top: 2px;
+  font-family: var(--font-khmer);
+}
+
+/* Subject Borders */
+.subject-card-math {
+  border-top: 3px solid #005baa;
+}
+.subject-card-physics {
+  border-top: 3px solid #3b82f6;
+}
+.subject-card-chemistry {
+  border-top: 3px solid #059669;
+}
+.subject-card-biology {
+  border-top: 3px solid #10b981;
+}
+.subject-card-khmer {
+  border-top: 3px solid #ca8a04;
+}
+.subject-card-history {
+  border-top: 3px solid #dc2626;
+}
+.subject-card-english {
+  border-top: 3px solid #db2777;
+}
+.subject-card-ict {
+  border-top: 3px solid #7c3aed;
+}

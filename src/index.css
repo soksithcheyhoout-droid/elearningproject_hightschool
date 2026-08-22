@@ -1,0 +1,374 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* Institutional & Academic Blue Palette (Kingdom of Cambodia MoEYS Standard) */
+    --moeys-blue-900: #001f3f; /* Deep National Navy */
+    --moeys-blue-800: #002b5b; /* MoEYS Primary Blue Header */
+    --moeys-blue-700: #003366; /* Standard Khmer Official Dark Blue */
+    --moeys-blue-600: #005baa; /* Interactive Action Blue */
+    --moeys-blue-500: #0070ba; /* Accent Blue */
+    --moeys-blue-100: #e6f0fa; /* Subtle Highlight Blue */
+    --moeys-blue-50:  #f0f7fd; /* Soft Academic Background */
+
+    /* National Gold / Amber Palette (Angkor & Khmer Heritage) */
+    --moeys-gold-700: #a16207; /* Deep Antique Bronze */
+    --moeys-gold-600: #ca8a04; /* Royal Khmer Gold */
+    --moeys-gold-500: #eab308; /* Bright Accent Gold */
+    --moeys-gold-400: #facc15; /* Highlight Warm Gold */
+    --moeys-gold-100: #fef9c3; /* Light Certificate Gold */
+    --moeys-gold-50:  #fefce8; /* Gold Tint Soft Background */
+
+    /* Institutional Neutral Surfaces */
+    --bg-surface: #f8fafc;
+    --bg-card: #ffffff;
+    --card-border: #e2e8f0;
+    --card-border-subtle: #edf2f7;
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+  }
+
+  body {
+    background-color: var(--bg-surface);
+    color: var(--text-primary);
+    font-family: 'Kantumruy Pro', 'Inter', system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+    margin: 0;
+    padding: 0;
+  }
+}
+
+/* Custom Scrollbars */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #f1f5f9;
+}
+::-webkit-scrollbar-thumb {
+  background: #cbd5e1;
+  border-radius: 9999px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #94a3b8;
+}
+
+/* Institutional Header Bar Gradient */
+.moeys-national-bar {
+  background: linear-gradient(180deg, #001a35 0%, #002b5b 100%);
+  color: #ffffff;
+  border-bottom: 1px solid #001428;
+}
+
+.bg-moeys-header {
+  background: linear-gradient(135deg, var(--moeys-blue-900) 0%, var(--moeys-blue-800) 45%, var(--moeys-blue-700) 100%);
+}
+
+.bg-moeys-header-subtle {
+  background: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+}
+
+/* Official MoEYS Button Styles */
+.btn-moeys-primary {
+  background: linear-gradient(180deg, #005baa 0%, #003366 100%);
+  color: #ffffff;
+  border: 1px solid #002b5b;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 600;
+  box-shadow: 0 1px 2px rgba(0, 43, 91, 0.2);
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-moeys-primary:hover {
+  background: linear-gradient(180deg, #0070ba 0%, #004488 100%);
+  box-shadow: 0 2px 4px rgba(0, 43, 91, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-moeys-primary:active {
+  transform: translateY(0);
+  box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.2);
+}
+
+.btn-moeys-gold {
+  background: linear-gradient(180deg, #eab308 0%, #ca8a04 100%);
+  color: #1c1917;
+  border: 1px solid #a16207;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 700;
+  box-shadow: 0 1px 2px rgba(202, 138, 4, 0.25);
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-moeys-gold:hover {
+  background: linear-gradient(180deg, #facc15 0%, #d97706 100%);
+  box-shadow: 0 2px 5px rgba(202, 138, 4, 0.35);
+  transform: translateY(-1px);
+}
+
+.btn-moeys-outline {
+  background: #ffffff;
+  color: var(--moeys-blue-700);
+  border: 1px solid #cbd5e1;
+  border-radius: 8px;
+  padding: 8px 16px;
+  font-weight: 600;
+  transition: all 0.15s ease-in-out;
+}
+
+.btn-moeys-outline:hover {
+  background: var(--moeys-blue-50);
+  border-color: var(--moeys-blue-600);
+  color: var(--moeys-blue-700);
+}
+
+/* Official MoEYS Card Styles */
+.card-moeys {
+  background: #ffffff;
+  border: 1px solid var(--card-border-subtle);
+  border-radius: 12px;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05), 0 1px 2px rgba(0, 0, 0, 0.03);
+  transition: all 0.2s ease;
+}
+
+.card-moeys:hover {
+  border-color: #cbd5e1;
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.08), 0 2px 4px -1px rgba(0, 0, 0, 0.04);
+}
+
+.card-moeys-featured {
+  background: #ffffff;
+  border: 1px solid rgba(202, 138, 4, 0.3);
+  border-top: 3px solid var(--moeys-gold-600);
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 43, 91, 0.06);
+}
+
+/* Official Badges */
+.badge-moeys-blue {
+  background: #e0f2fe;
+  border: 1px solid #bae6fd;
+  color: #0369a1;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+.badge-moeys-gold {
+  background: #fef9c3;
+  border: 1px solid #fde047;
+  color: #854d0e;
+  padding: 3px 10px;
+  border-radius: 6px;
+  font-size: 0.78rem;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Font utilities */
+.font-kantumruy {
+  font-family: 'Kantumruy Pro', system-ui, -apple-system, sans-serif;
+}
+
+.font-cinzel {
+  font-family: 'Cinzel', serif;
+}
+
+/* Floating Up and Down 3D Animation */
+@keyframes floatUpAndDown {
+  0%, 100% {
+    transform: translateY(0px) rotate(0deg);
+  }
+  50% {
+    transform: translateY(-16px) rotate(3deg) scale(1.05);
+  }
+}
+
+.animate-float-3d {
+  animation: floatUpAndDown 2.6s ease-in-out infinite;
+}
+
+/* Pulse Radial Glow Animation */
+@keyframes pulseGlow {
+  0%, 100% {
+    opacity: 0.35;
+    transform: scale(0.95);
+  }
+  50% {
+    opacity: 0.85;
+    transform: scale(1.25);
+  }
+}
+
+.animate-pulse-glow {
+  animation: pulseGlow 2.4s ease-in-out infinite;
+}
+
+/* Shimmer Animation for Badges */
+@keyframes shimmer {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-shimmer {
+  animation: shimmer 2s infinite;
+}
+
+/* Shake Animation for Combat Hit */
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20%, 60% { transform: translateX(-6px); }
+  40%, 80% { transform: translateX(6px); }
+}
+
+.animate-shake {
+  animation: shake 0.4s cubic-bezier(0.36, 0.07, 0.19, 0.97) both;
+}
+
+/* Confetti Fall Keyframes */
+@keyframes confettiFall {
+  0% {
+    transform: translateY(-20px) rotate(0deg);
+    opacity: 1;
+  }
+  100% {
+    transform: translateY(440px) rotate(720deg);
+    opacity: 0;
+  }
+}
+
+.confetti-piece {
+  position: absolute;
+  width: 10px;
+  height: 14px;
+  border-radius: 3px;
+  animation: confettiFall 2.8s ease-out forwards;
+}
+
+/* Arcade Scanlines & Glow */
+.arcade-cabinet-frame {
+  box-shadow: 0 0 35px rgba(0, 240, 255, 0.25), inset 0 0 20px rgba(0, 240, 255, 0.15);
+}
+
+.arcade-crt-overlay {
+  background: linear-gradient(
+    rgba(18, 16, 16, 0) 50%, 
+    rgba(0, 0, 0, 0.25) 50%
+  ), linear-gradient(
+    90deg,
+    rgba(255, 0, 0, 0.03),
+    rgba(0, 255, 0, 0.01),
+    rgba(0, 0, 255, 0.03)
+  );
+  background-size: 100% 3px, 6px 100%;
+}
+
+/* Slide Down Toast Animation */
+@keyframes slideDown {
+  0% {
+    transform: translate(-50%, -100%);
+    opacity: 0;
+  }
+  100% {
+    transform: translate(-50%, 0);
+    opacity: 1;
+  }
+}
+
+.animate-slide-down {
+  animation: slideDown 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+/* Dynamic Audio Equalizer Waveform Animation */
+@keyframes audioWaveEqualizer {
+  0%, 100% {
+    transform: scaleY(0.25);
+    opacity: 0.7;
+  }
+  50% {
+    transform: scaleY(1.4);
+    opacity: 1;
+  }
+}
+
+.animate-audio-wave {
+  animation: audioWaveEqualizer 0.65s ease-in-out infinite alternate;
+  transform-origin: center;
+}
+
+/* Futuristic Flow Line & Data Stream Animation */
+@keyframes flowDash {
+  0% {
+    stroke-dashoffset: 40;
+  }
+  100% {
+    stroke-dashoffset: 0;
+  }
+}
+
+.animate-flow-dash {
+  stroke-dasharray: 6, 6;
+  animation: flowDash 1.2s linear infinite;
+}
+
+@keyframes flowParticle {
+  0% {
+    transform: translateX(0%);
+    opacity: 0;
+  }
+  20% {
+    opacity: 1;
+  }
+  80% {
+    opacity: 1;
+  }
+  100% {
+    transform: translateX(100%);
+    opacity: 0;
+  }
+}
+
+.animate-flow-particle {
+  animation: flowParticle 1.4s ease-in-out infinite;
+}
+
+/* ══════════ AUTOMATIC HIDING FOR THIRD-PARTY BROWSER EXTENSIONS ══════════ */
+#sider-root,
+#monica-root,
+#maxai-root,
+#chatgpt-sidebar-root,
+[id*="sider-"],
+[id*="monica-"],
+[id*="maxai-"],
+[class*="sider-"],
+[class*="monica-"],
+[class*="maxai-"],
+[id*="floating-ai"],
+[class*="floating-ai"],
+[id*="ai-assistant"],
+[class*="ai-assistant"],
+[id*="deepseek"],
+[class*="deepseek"],
+div[data-extension-id],
+div[class*="extension-floating"] {
+  display: none !important;
+  visibility: hidden !important;
+  pointer-events: none !important;
+  opacity: 0 !important;
+  width: 0 !important;
+  height: 0 !important;
+  position: absolute !important;
+  z-index: -99999 !important;
+}

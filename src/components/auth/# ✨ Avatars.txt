@@ -1,0 +1,11 @@
+# ✨ Avatars 
+Avatars are small set of images that can be added as placeholders for profile pictures on your projects.
+
+ | Image                                                                                    | Link                                                                       |
+ | ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+ | <img src="https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_1.png" width="60px" />   | <code>https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_1.png</code>   |
+ | <img src="https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_2.png" width="60px" />   | <code>https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_2.png</code>   |
+ | <img src="https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_3.png" width="60px" />   | <code>https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_3.png</code>   |
+ | <img src="https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_4.png" width="60px" />   | <code>https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_4.png</code>   |
+ | <img src="https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_5.png" width="60px" />   | <code>https://cdn.jsdelivr.net/gh/alohe/avatars/png/vibrent_5.png</code>   |
+ | <img src="https://cdn.

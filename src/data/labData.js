@@ -1,0 +1,23 @@
+export const periodicElements = [
+  { number: 1, symbol: "H", nameKm: "អ៊ីដ្រូសែន", nameEn: "Hydrogen", mass: "1.008", category: "nonmetal", period: 1, group: 1, config: "1s¹", descriptionKm: "ឧស្ម័នស្រាលបំផុតក្នុងចក្រវាល ឆេះផ្តល់ជាទឹក។" },
+  { number: 2, symbol: "He", nameKm: "អេល្យូម", nameEn: "Helium", mass: "4.0026", category: "noble", period: 1, group: 18, config: "1s²", descriptionKm: "ឧស្ម័នកម្រ មិនឆេះ ប្រើសម្រាប់បង្ហោះប៉េងប៉ោង។" },
+  { number: 3, symbol: "Li", nameKm: "លីចូម", nameEn: "Lithium", mass: "6.94", category: "alkali", period: 2, group: 1, config: "[He] 2s¹", descriptionKm: "លោហៈស្រាលបំផុត ប្រើក្នុងអាគុយថ្មទូរស័ព្ទ និងឡានអគ្គិសនី។" },
+  { number: 4, symbol: "Be", nameKm: "បេរីល្យូម", nameEn: "Beryllium", mass: "9.0122", category: "alkaline-earth", period: 2, group: 2, config: "[He] 2s²", descriptionKm: "លោហៈរឹង ធន់នឹងកម្តៅ ប្រើក្នុងគ្រឿងយន្តអវកាស។" },
+  { number: 5, symbol: "B", nameKm: "ប័រ", nameEn: "Boron", mass: "10.81", category: "metalloid", period: 2, group: 13, config: "[He] 2s² 2p¹", descriptionKm: "ពាក់កណ្តាលលោហៈ ប្រើក្នុងកញ្ចក់ធន់កម្តៅ Pyrex។" },
+  { number: 6, symbol: "C", nameKm: "កាបូន", nameEn: "Carbon", mass: "12.011", category: "nonmetal", period: 2, group: 14, config: "[He] 2s² 2p²", descriptionKm: "ធាតុគ្រឹះនៃជីវិតសរីរាង្គទាំងអស់លើផែនដី និងពេជ្រ។" },
+  { number: 7, symbol: "N", nameKm: "អាសូត (នីត្រូសែន)", nameEn: "Nitrogen", mass: "14.007", category: "nonmetal", period: 2, group: 15, config: "[He] 2s² 2p³", descriptionKm: "មានប្រមាណ ៧៨% ក្នុងបរិយាកាសផែនដី សំខាន់សម្រាប់ជីកសិកម្ម។" },
+  { number: 8, symbol: "O", nameKm: "អុកស៊ីសែន", nameEn: "Oxygen", mass: "15.999", category: "nonmetal", period: 2, group: 16, config: "[He] 2s² 2p⁴", descriptionKm: "ឧស្ម័នចាំបាច់សម្រាប់ការដកដង្ហើម និងការឆេះ។" },
+  { number: 9, symbol: "F", nameKm: "ភ្លុយអរ", nameEn: "Fluorine", mass: "18.998", category: "halogen", period: 2, group: 17, config: "[He] 2s² 2p⁵", descriptionKm: "ហាឡូសែនសកម្មបំផុត ប្រើក្នុងថ្នាំដុសធ្មេញការពារធ្មេញពុក។" },
+  { number: 10, symbol: "Ne", nameKm: "ណេអុង", nameEn: "Neon", mass: "20.180", category: "noble", period: 2, group: 18, config: "[He] 2s² 2p⁶", descriptionKm: "ឧស្ម័នកម្រ ភ្លឺពណ៌ក្រហម-ទឹកក្រូចក្នុងអំពូលផ្សាយពាណិជ្ជកម្ម។" },
+  { number: 11, symbol: "Na", nameKm: "សូដ្យូម", nameEn: "Sodium", mass: "22.990", category: "alkali", period: 3, group: 1, config: "[Ne] 3s¹", descriptionKm: "លោហៈសកម្មខ្លាំង ឆេះជាមួយទឹក ជាធាតុផ្សំនៃអំបិលសម្ល NaCl។" },
+  { number: 12, symbol: "Mg", nameKm: "ម៉ាញ៉េស្យូម", nameEn: "Magnesium", mass: "24.305", category: "alkaline-earth", period: 3, group: 2, config: "[Ne] 3s²", descriptionKm: "លោហៈស្រាល ឆេះបញ្ចេញពន្លឺពណ៌សចាំងចែង ជាស្នូលក្លរ៉ូភីល។" },
+  { number: 13, symbol: "Al", nameKm: "អាលុយមីញ៉ូម", nameEn: "Aluminium", mass: "26.982", category: "post-transition", period: 3, group: 13, config: "[Ne] 3s² 3p¹", descriptionKm: "លោហៈស្រាល មិនងាយច្រែះ ប្រើផលិតយន្តហោះ និងកំប៉ុង។" },
+  { number: 14, symbol: "Si", nameKm: "ស៊ីលីស្យូម", nameEn: "Silicon", mass: "28.085", category: "metalloid", period: 3, group: 14, config: "[Ne] 3s² 3p²", descriptionKm: "បេះដូងនៃឧស្សាហកម្មកុំព្យូទ័រ និងបន្ទះឈីបអេឡិចត្រូនិក។" },
+  { number: 15, symbol: "P", nameKm: "ផូស្វ័រ", nameEn: "Phosphorus", mass: "30.974", category: "nonmetal", period: 3, group: 15, config: "[Ne] 3s² 3p³", descriptionKm: "ធាតុផ្សំនៃឆ្អឹង ធ្មេញ DNA និងក្បាលឈើគូស។" },
+  { number: 16, symbol: "S", nameKm: "ស្ពាន់ធ័រ", nameEn: "Sulfur", mass: "32.06", category: "nonmetal", period: 3, group: 16, config: "[Ne] 3s² 3p⁴", descriptionKm: "ម្សៅពណ៌លឿង ប្រើផលិតអាស៊ីតស៊ុលផួរិច H2SO4 និងកៅស៊ូ។" },
+  { number: 17, symbol: "Cl", nameKm: "ក្លរ", nameEn: "Chlorine", mass: "35.45", category: "halogen", period: 3, group: 17, config: "[Ne] 3s² 3p⁵", descriptionKm: "ឧស្ម័នពណ៌បៃតងខ្ចី ប្រើសម្លាប់មេរោគក្នុងទឹកស្អាត និងអាងហែលទឹក។" },
+  { number: 18, symbol: "Ar", nameKm: "អាកុង", nameEn: "Argon", mass: "39.948", category: "noble", period: 3, group: 18, config: "[Ne] 3s² 3p⁶", descriptionKm: "ឧស្ម័នអសកម្ម ប្រើក្នុងអំពូលអគ្គិសនី និងការផ្សារដែក។" },
+  { number: 26, symbol: "Fe", nameKm: "ដែក", nameEn: "Iron", mass: "55.845", category: "transition", period: 4, group: 8, config: "[Ar] 3d⁶ 4s²", descriptionKm: "លោហៈសំខាន់បំផុតក្នុងសំណង់ និងជាធាតុផ្សំអេម៉ូក្លូប៊ីនក្នុងឈាម។" },
+  { number: 29, symbol: "Cu", nameKm: "ទង់ដែង", nameEn: "Copper", mass: "63.546", category: "transition", period: 4, group: 11, config: "[Ar] 3d¹⁰ 4s¹", descriptionKm: "លោហៈចម្លងអគ្គិសនី និងកម្តៅបានយ៉ាងល្អឥតខ្ចោះ។" },
+  { number: 79, symbol: "Au", nameKm: "មាស", nameEn: "Gold", mass: "196.97", category: "transition", period: 6, group: 11, config: "[Xe] 4f¹⁴ 5d¹⁰ 6s¹", descriptionKm: "លោហៈធាតុដ៏មានតម្លៃ មិនច្រែះ និមិត្តរូបនៃភាពរុងរឿង និងប្រណីតភាព។" }
+];

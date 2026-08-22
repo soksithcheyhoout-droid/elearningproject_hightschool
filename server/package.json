@@ -1,0 +1,25 @@
+{
+  "name": "elearning-backend-api",
+  "version": "1.0.0",
+  "description": "Enterprise National High School E-Learning Backend API with MySQL/SQLite Support",
+  "main": "server.js",
+  "type": "module",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node --watch server.js"
+  },
+  "dependencies": {
+    "@travisvn/edge-tts": "^1.0.2",
+    "bakong-khqr": "^1.0.20",
+    "bcryptjs": "^2.4.3",
+    "better-sqlite3": "^11.8.1",
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.7",
+    "express": "^4.21.2",
+    "jsonwebtoken": "^9.0.2",
+    "msedge-tts": "^2.0.7",
+    "multer": "^1.4.5-lts.1",
+    "mysql2": "^3.12.0",
+    "nodemailer": "^9.0.5"
+  }
+}

@@ -1,0 +1,542 @@
+export const curriculumData = [
+  // ==========================================
+  // 🔬 ថ្នាក់វិទ្យាសាស្ត្រ (SCIENCE STREAM)
+  // ==========================================
+  
+  // 1. Mathematics (Grade 12 - Advanced Math MoTDAR)
+  {
+    id: 'math-12',
+    grade: '12',
+    stream: 'science',
+    nameKm: 'គណិតវិទ្យា ថ្នាក់ទី១២ (កម្រិតខ្ពស់)',
+    nameEn: 'Mathematics Grade 12 (Advanced Level)',
+    icon: 'Calculator',
+    color: '#005baa',
+    cardClass: 'subject-card-math',
+    teacher: 'ក្រុមការងារបច្ចេកទេស MoTDAR',
+    teacherRole: 'ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ និងការស្រាវជ្រាវកម្រិតខ្ពស់',
+    progress: 75,
+    totalChapters: 6,
+    totalLessons: 24,
+    quizzesCount: 12,
+    bannerImg: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=1200&q=80',
+    descriptionKm: 'កម្មវិធីសិក្សាគណិតវិទ្យាផ្លូវការថ្នាក់ទី១២ ស្របតាមក្របខ័ណ្ឌជាតិ ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ និងការស្រាវជ្រាវកម្រិតខ្ពស់ (MoTDAR) ផ្តោតលើលីមីត ដេរីវេ អាំងតេក្រាល ចំនួនកុំផ្លិច ធរណីមាត្រក្នុងលំហ និងប្រូបាប៊ីលីតេ។',
+    descriptionEn: 'Official MoTDAR Grade 12 Mathematics curriculum covering limits, derivatives, integrals, complex numbers, space geometry vectors, and probability.',
+    chapters: [
+      {
+        id: 'math-ch1',
+        titleKm: 'ជំពូកទី ១៖ លីមីតនៃអនុគមន៍ និងភាពជាប់ (Limits & Continuity)',
+        titleEn: 'Chapter 1: Limits of Functions & Continuity',
+        lessons: [
+          {
+            id: 'm12-l1',
+            titleKm: 'មេរៀនទី ១៖ លីមីតនៃអនុគមន៍ត្រង់ចំណុច និងរាងមិនកំណត់ [0/0]',
+            titleEn: 'Lesson 1: Limits at a Point & Indeterminate Form [0/0]',
+            duration: '26:40',
+            videoPoster: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=800&q=80',
+            notes: `
+**ខ្លឹមសារសង្ខេបមេរៀនទី ១ (MoTDAR Standard):**
+
+១. **និយមន័យលីមីត៖** អនុគមន៍ f(x) មានលីមីតស្មើនឹង L កាលណា x ខិតជិត a សរសេរ៖
+   lim (x → a) f(x) = L
+
+២. **វិធីសាស្ត្រគណនាលីមីតរាងមិនកំណត់ [0/0] ៖**
+- **វិធីទី ១ (បំបែកជាកត្តា):** បើភាគយក និងភាគបែងជាពហុធា ត្រូវបំបែកជាកត្តា (x - a) រួចសម្រួលចោល។
+- **វិធីទី ២ (គុណកន្សោមឆ្លាស់):** បើមានរ៉ាឌីកាល់ √(A) - √(B) ត្រូវគុណភាគយក និងភាគបែងនឹង √(A) + √(B)។
+- **វិធីទី ៣ (រូបមន្តត្រីកោណមាត្រគ្រឹះ):**
+   lim (x → 0) [sin(x) / x] = 1
+   lim (x → 0) [(1 - cos(x)) / x²] = 1/2
+
+៣. **លំហាត់គំរូបាក់ឌុប៖**
+គណនា  lim (x → 2) [√(x + 2) - 2] / (x - 2)
+- ជំនួស x = 2  =>  រាងមិនកំណត់ [0/0]
+- គុណកន្សោមឆ្លាស់៖
+   = lim (x → 2) [(√(x + 2) - 2)(√(x + 2) + 2)] / [(x - 2)(√(x + 2) + 2)]
+   = lim (x → 2) (x - 2) / [(x - 2)(√(x + 2) + 2)]
+   = lim (x → 2) 1 / [√(x + 2) + 2] = 1/4
+            `,
+            keyFormulas: [
+              'lim (x → a) [f(x) ± g(x)] = lim f(x) ± lim g(x)',
+              'lim (x → 0) [sin(x) / x] = 1',
+              'lim (x → 0) [1 - cos(x)] / x² = 1/2'
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
+  // 2. Physics (Grade 12 - Physics MoEYS)
+  {
+    id: 'physics-12',
+    grade: '12',
+    stream: 'science',
+    nameKm: 'រូបវិទ្យា ថ្នាក់ទី១២ (ទ្រឹស្តី និងលំហាត់)',
+    nameEn: 'Physics Grade 12 (Mechanics, Waves & Nuclear)',
+    icon: 'Atom',
+    color: '#0284c7',
+    cardClass: 'subject-card-physics',
+    teacher: 'សាស្ត្រាចារ្យ អ៊ុំ សុវណ្ណារិទ្ធ (គ្រូឧទ្ទេសរូបវិទ្យា)',
+    teacherRole: 'សមាជិកគណៈកម្មការតាក់តែងវិញ្ញាសារូបវិទ្យាបាក់ឌុប',
+    progress: 60,
+    totalChapters: 5,
+    totalLessons: 18,
+    quizzesCount: 9,
+    bannerImg: 'https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?auto=format&fit=crop&w=1200&q=80',
+    descriptionKm: 'កម្មវិធីសិក្សារូបវិទ្យាថ្នាក់ទី១២ រួមមានចលនាលំយោល ប៉ោលទោល ប៉ោលបត់បែន ទែរម៉ូឌីណាមិច សៀគ្វីអគ្គិសនីចរន្តឆ្លាស់ RLC និងរូបវិទ្យានុយក្លេអ៊ែរ។',
+    descriptionEn: 'Official Grade 12 Physics covering simple harmonic motion, spring pendulum, simple pendulum, thermodynamics, RLC AC circuits, and nuclear physics.',
+    chapters: [
+      {
+        id: 'phy-ch1',
+        titleKm: 'ជំពូកទី ១៖ ចលនាលំយោល និងរលក (Mechanical Oscillations)',
+        titleEn: 'Chapter 1: Simple Harmonic Motion & Pendulums',
+        lessons: [
+          {
+            id: 'p12-l1',
+            titleKm: 'មេរៀនទី ១៖ សមីការឌីផេរ៉ង់ស្យែលនៃចលនាលំយោល និងប៉ោលបត់បែន',
+            titleEn: 'Lesson 1: Differential Equations & Spring Pendulums',
+            duration: '29:40',
+            videoPoster: 'https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?auto=format&fit=crop&w=800&q=80',
+            notes: `
+**ច្បាប់ចលនាលំយោល៖**
+១. សមីការឌីផេរ៉ង់ស្យែល៖ x'' + ω₀² x = 0
+២. សមីការចលនា៖ x(t) = Xm · cos(ω₀t + φ)
+៣. ព្រេកង់កែងប៉ោលបត់បែន៖ ω₀ = √(k / m)
+៤. ខួបនៃលំយោល៖ T = 2π √(m / k)
+៥. ថាមពលមេកានិច៖ Em = Ec + Ep = ½ m v² + ½ k x² = ½ k Xm² = const
+            `,
+            keyFormulas: [
+              'x(t) = Xm · cos(ω₀t + φ)',
+              'T = 2π √(m / k) (Spring Pendulum)',
+              'Em = 1/2 k Xm²'
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
+  // 3. Chemistry (Grade 12 - Chemistry MoEYS)
+  {
+    id: 'chemistry-12',
+    grade: '12',
+    stream: 'science',
+    nameKm: 'គីមីវិទ្យា ថ្នាក់ទី១២ (ស៊ីនេទិច និងសរីរាង្គ)',
+    nameEn: 'Chemistry Grade 12 (Kinetics, Equilibrium & Organic)',
+    icon: 'FlaskConical',
+    color: '#059669',
+    cardClass: 'subject-card-chemistry',
+    teacher: 'សាស្ត្រាចារ្យ គង់ គីមសាន (គ្រូឧទ្ទេសគីមីវិទ្យា)',
+    teacherRole: 'អ្នកជំនាញកម្មវិធីសិក្សាគីមីវិទ្យាវិទ្យាល័យ',
+    progress: 80,
+    totalChapters: 4,
+    totalLessons: 16,
+    quizzesCount: 8,
+    bannerImg: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1200&q=80',
+    descriptionKm: 'កម្មវិធីសិក្សាគីមីវិទ្យាថ្នាក់ទី១២ ផ្តោតលើល្បឿនប្រតិកម្ម តុល្យភាពគីមី អាស៊ីត-បាស គណនា pH អេស្ទែរ ខ្លាញ់ អាមីន និងអាស៊ីតអាមីណេ។',
+    descriptionEn: 'Grade 12 Chemistry covering reaction kinetics, dynamic chemical equilibrium, acid-base equilibria, pH calculations, esters, fats, amines, and amino acids.',
+    chapters: [
+      {
+        id: 'chem-ch1',
+        titleKm: 'ជំពូកទី ១៖ ស៊ីនេទិចគីមី (Chemical Kinetics)',
+        titleEn: 'Chapter 1: Reaction Rates & Factors',
+        lessons: [
+          {
+            id: 'c12-l1',
+            titleKm: 'មេរៀនទី ១៖ ល្បឿនមធ្យម និងល្បឿនខណៈនៃប្រតិកម្មគីមី',
+            titleEn: 'Lesson 1: Average & Instantaneous Reaction Rates',
+            duration: '24:50',
+            videoPoster: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80',
+            notes: `
+**ស៊ីនេទិចគីមី៖**
+១. សមីការទូទៅ៖ aA + bB  →  cC + dD
+២. ល្បឿនមធ្យមកំណកកើត C៖ Vm(C) = Δ[C] / Δt
+៣. ល្បឿនមធ្យមបាត់បង់ A៖ Vm(A) = -Δ[A] / Δt
+៤. កត្តាជះឥទ្ធិពលលើល្បឿន៖ កំហាប់អង្គធាតុកកើត, សីតុណ្ហភាព, ផ្ទៃប៉ះ, និងកាតាលីករ។
+            `,
+            keyFormulas: [
+              'Vm(formation) = Δ[Product] / Δt',
+              'pH = -log[H₃O⁺], [H₃O⁺] = 10^(-pH)'
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
+  // 4. Biology (Grade 12 - MoTDAR)
+  {
+    id: 'biology-12',
+    grade: '12',
+    stream: 'science',
+    nameKm: 'ជីវវិទ្យា ថ្នាក់ទី១២ (ហ្សែន និងម៉ូលេគុល ADN)',
+    nameEn: 'Biology Grade 12 (Genetics, DNA & Human Biology)',
+    icon: 'Dna',
+    color: '#10b981',
+    cardClass: 'subject-card-biology',
+    teacher: 'សាស្ត្រាចារ្យ ចាន់ សារ៉េត (MoTDAR Educator)',
+    teacherRole: 'អ្នករៀបចំលំហាត់ជីវវិទ្យាប្រឡងថ្នាក់ជាតិ',
+    progress: 70,
+    totalChapters: 4,
+    totalLessons: 15,
+    quizzesCount: 7,
+    bannerImg: 'https://images.unsplash.com/photo-1530026405186-ed1f139313f8?auto=format&fit=crop&w=1200&q=80',
+    descriptionKm: 'សិក្សាពីម៉ូលេគុល ADN/ARN ស្វ័យតម្លើងទ្វេ ការសំយោគប្រូតេអ៊ីន តំណពូជម៉ង់ដែល និងប្រព័ន្ធសរីរាង្គមនុស្ស។',
+    descriptionEn: 'Grade 12 Biology exploring ADN/ARN molecular genetics, DNA replication, protein synthesis, and Mendelian inheritance laws.',
+    chapters: [
+      {
+        id: 'bio-ch1',
+        titleKm: 'ជំពូកទី ១៖ ហ្សែន និងការសំយោគប្រូតេអ៊ីន (Molecular Genetics)',
+        titleEn: 'Chapter 1: DNA Replication & Transcription',
+        lessons: [
+          {
+            id: 'b12-l1',
+            titleKm: 'មេរៀនទី ១៖ រចនាសម្ព័ន្ធម៉ូលេគុល ADN និងរូបមន្តគណនាចំនួននុយក្លេអូទីត',
+            titleEn: 'Lesson 1: DNA Structure & Nucleotide Calculation Rules',
+            duration: '27:30',
+            videoPoster: 'https://images.unsplash.com/photo-1530026405186-ed1f139313f8?auto=format&fit=crop&w=800&q=80',
+            notes: `
+**រូបមន្តគណនា ADN ថ្នាក់ទី១២ MoTDAR៖**
+១. ច្បាប់ផ្គុំបាសបំពេញគ្នា៖ A = T  និង  G = C
+២. ចំនួននុយក្លេអូទីតសរុប៖ N = 2A + 2G = 2(A + G)
+៣. ប្រវែងម៉ូលេគុល ADN៖ L = (N / 2) × 3.4 Å
+៤. ចំនួនសម្ព័ន្ធអ៊ីដ្រូសែន៖ H = 2A + 3G
+            `,
+            keyFormulas: [
+              'N = 2A + 2G = 2(A + C)',
+              'L = (N / 2) × 3.4 Å',
+              'H = 2A + 3G'
+            ]
+          }
+        ]
+      }
+    ]
+  },
+
+  // 5. Earth & Environmental Science (Science Stream)
+  {
+    id: 'earth-12',
+    grade: '12',
+    stream: 'science',
+    nameKm: 'ផែនដី និងបរិស្ថានវិទ្យា ថ្នាក់ទី១២',
+    nameEn: 'Earth & Environmental Science Grade 12',
+    icon: 'Compass',
+    color: '#0891b2',
+    cardClass: 'subject-card-physics',
+    teacher: 'សាស្ត្រាចារ្យ ស៊ុំ សុជាតិ (អ្នកឯកទេសបរិស្ថាន)',
+    teacherRole: 'គ្រូឧទ្ទេសភូគព្ភវិទ្យា និងអាកាសធាតុ MoTDAR',
+    progress: 65,
+    totalChapters: 4,
+    totalLessons: 14,
+    quizzesCount: 6,
+    bannerImg: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=1200&q=80',
+    descriptionKm: 'សិក្សាពីភូគព្ភសាស្ត្រ ប្លាកតិចតូនិច បរិយាកាសផែនដី បម្រែបម្រួលអាកាសធាតុ និងការគ្រប់គ្រងធនធានធម្មជាតិកម្ពុជា។',
+    descriptionEn: 'Grade 12 Earth Science covering plate tectonics, atmospheric science, climate change, and natural resource management in Cambodia.',
+    chapters: [
+      {
+        id: 'earth-ch1',
+        titleKm: 'ជំពូកទី ១៖ ប្លាកតិចតូនិច និងរញ្ជួយដី (Plate Tectonics)',
+        titleEn: 'Chapter 1: Plate Tectonics and Earthquakes',
+        lessons: [
+          {
+            id: 'e12-l1',
+            titleKm: 'មេរៀនទី ១៖ ចលនានៃប្លាកតិចតូនិច និងការកកើតភ្នំភ្លើង',
+            titleEn: 'Lesson 1: Plate Movements and Volcanic Formations',
+            duration: '25:10',
+            videoPoster: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
+            notes: 'សិក្សាពីរចនាសម្ព័ន្ធស្រទាប់ផែនដី សម្ពាធ និងចលនានៃប្លាកទ្វីប។',
+            keyFormulas: ['E = 10^(11.8 + 1.5M) (Earthquake Energy)']
+          }
+        ]
+      }
+    ]
+  },
+
+  // 6. Computer Science & Python (STEM Track)
+  {
+    id: 'stem-cs',
+    grade: '12',
+    stream: 'science',
+    nameKm: 'វិទ្យាសាស្ត្រកុំព្យូទ័រ & កូដ Python (STEM)',
+    nameEn: 'Computer Science & Python for STEM High School',
+    icon: 'Code',
+    color: '#7c3aed',
+    cardClass: 'subject-card-ict',
+    teacher: 'Dr. Kim Sengly (STEM Education Director)',
+    teacherRole: 'អ្នកសម្របសម្រួលកម្មវិធី STEM វិទ្យាល័យជំនាន់ថ្មី (NGS)',
+    progress: 55,
+    totalChapters: 4,
+    totalLessons: 16,
+    quizzesCount: 8,
+    bannerImg: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=1200&q=80',
+    descriptionKm: 'កម្មវិធីសិក្សា STEM អន្តរជាតិ បង្រៀនមូលដ្ឋានគ្រឹះសរសេរកូដ Python ក្បួនដោះស្រាយបញ្ហា (Algorithms) និងវិទ្យាសាស្ត្រទិន្នន័យ។',
+    descriptionEn: 'International STEM program teaching Python programming, algorithmic thinking, data structures, and foundational AI.',
+    chapters: [
+      {
+        id: 'stem-ch1',
+        titleKm: 'ជំពូកទី ១៖ មូលដ្ឋានគ្រឹះ Python (Python Fundamentals)',
+        titleEn: 'Chapter 1: Python Data Types & Functions',
+        lessons: [
+          {
+            id: 'cs-l1',
+            titleKm: 'មេរៀនទី ១៖ អថេរ លក្ខខណ្ឌ និងរង្វិលជុំក្នុង Python (Variables & Loops)',
+            titleEn: 'Lesson 1: Python Variables, Conditionals, and Loops',
+            duration: '22:15',
+            videoPoster: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80',
+            notes: 'រៀនសរសេរកូដ Python សម័យទំនើបសម្រាប់ដោះស្រាយលំហាត់គណិតវិទ្យា។',
+            keyFormulas: ['def solve_quadratic(a, b, c): return (-b ± √(b² - 4ac)) / (2a)']
+          }
+        ]
+      }
+    ]
+  },
+
+  // ==========================================
+  // 📜 ថ្នាក់វិទ្យាសាស្ត្រសង្គម (SOCIAL SCIENCE STREAM)
+  // ==========================================
+
+  // 7. Applied Mathematics for Social Science (Grade 12)
+  {
+    id: 'math-social-12',
+    grade: '12',
+    stream: 'social',
+    nameKm: 'គណិតវិទ្យា ថ្នាក់វិទ្យាសាស្ត្រសង្គម (ស្ថិតិ & ប្រូបាប)',
+    nameEn: 'Applied Mathematics Grade 12 (Social Sciences)',
+    icon: 'Calculator',
+    color: '#0284c7',
+    cardClass: 'subject-card-math',
+    teacher: 'សាស្ត្រាចារ្យ គង់ សុជាតិ (MoTDAR Educator)',
+    teacherRole: 'អ្នកជំនាញគណិតវិទ្យាអនុវត្ត និងស្ថិតិវិទ្យា MoTDAR',
+    progress: 80,
+    totalChapters: 4,
+    totalLessons: 16,
+    quizzesCount: 8,
+    bannerImg: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&w=1200&q=80',
+    descriptionKm: 'កម្មវិធីសិក្សាគណិតវិទ្យាផ្លូវការសម្រាប់ថ្នាក់វិទ្យាសាស្ត្រសង្គម ផ្តោតលើប្រូបាប៊ីលីតេ បន្សំ ស្ថិតិវិទ្យា ការវិភាគទិន្នន័យ និងគណិតវិទ្យាហិរញ្ញវត្ថុ។',
+    descriptionEn: 'Grade 12 Applied Mathematics for Social Science covering probability, combinatorics, statistics, regression, and financial calculations.',
+    chapters: [
+      {
+        id: 'math-soc-ch1',
+        titleKm: 'ជំពូកទី ១៖ ប្រូបាប៊ីលីតេ និងបន្សំ (Probability & Combinatorics)',
+        titleEn: 'Chapter 1: Probability and Combinatorics',
+        lessons: [
+          {
+            id: 'ms12-l1',
+            titleKm: 'មេរៀនទី ១៖ បន្សំ ចម្លាស់ និងការគណនាប្រូបាប៊ីលីតេព្រឹត្តិការណ៍',
+            titleEn: 'Lesson 1: Combinations, Permutations & Event Probability',
+            duration: '28:30',
+            videoPoster: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&w=800&q=80',
+            notes: `
+**រូបមន្តគ្រឹះគណិតវិទ្យាសង្គមបាក់ឌុប MoTDAR៖**
+១. បន្សំ n ធាតុយកម្តង r ធាតុ៖ C(n, r) = n! / [r! (n - r)!]
+២. ចម្លាស់ n ធាតុយកម្តង r ធាតុ៖ P(n, r) = n! / (n - r)!
+៣. ប្រូបាប៊ីលីតេនៃព្រឹត្តិការណ៍ A៖ P(A) = n(A) / n(S)
+៤. ព្រឹត្តិការណ៍បំពេញ៖ P(A) + P(Ā) = 1  =>  P(A) = 1 - P(Ā)
+            `,
+            keyFormulas: ['P(A) = n(A) / n(S)', 'C(n, r) = n! / [r!(n - r)!]']
+          }
+        ]
+      }
+    ]
+  },
+
+  // 8. Khmer Literature (Grade 12 - MoTDAR)
+  {
+    id: 'khmer-12',
+    grade: '12',
+    stream: 'social',
+    nameKm: 'អក្សរសាស្ត្រខ្មែរ ថ្នាក់ទី១២ (តែងសេចក្តី & អក្សរសិល្ប៍)',
+    nameEn: 'Khmer Literature Grade 12 (Essays & Literary Masterpieces)',
+    icon: 'BookOpen',
+    color: '#ca8a04',
+    cardClass: 'subject-card-khmer',
+    teacher: 'សាស្ត្រាចារ្យ ម៉ៅ វិបុល (MoTDAR Educator)',
+    teacherRole: 'ប្រធានគណៈកម្មការកំណែតែងសេចក្តីបាក់ឌុប',
+    progress: 90,
+    totalChapters: 4,
+    totalLessons: 14,
+    quizzesCount: 6,
+    bannerImg: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=1200&q=80',
+    descriptionKm: 'បង្រៀនគន្លឹះតែងសេចក្តីបែបពន្យល់ ពិភាក្សា និងប្រៀបធៀបដើម្បីបាននិទ្ទេស A ព្រមទាំងការវិភាគតួអង្គក្នុងរឿងទុំទាវ កុលាបប៉ៃលិន និងភូមិតិរច្ឆាន។',
+    descriptionEn: 'Grade 12 Khmer Literature covering advanced essay writing methods (Explanatory, Discussion, Comparative) and analysis of classic Khmer novels.',
+    chapters: [
+      {
+        id: 'khmer-ch1',
+        titleKm: 'ជំពូកទី ១៖ វិធីសាស្ត្រតែងសេចក្តីកម្រិតបាក់ឌុប (Essay Methodology)',
+        titleEn: 'Chapter 1: National BacII Essay Structuring',
+        lessons: [
+          {
+            id: 'k12-l1',
+            titleKm: 'មេរៀនទី ១៖ គម្រោងតែងសេចក្តីបែបពន្យល់ និងគន្លឹះយកពិន្ទុពេញ',
+            titleEn: 'Lesson 1: Explanatory Essay Outline & Marking Criteria',
+            duration: '34:00',
+            videoPoster: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80',
+            notes: `
+**គម្រោងតែងសេចក្តីបែបពន្យល់កម្រិតបាក់ឌុប MoTDAR៖**
+I. ផ្តើមសេចក្តី (១០%): លំនាំបញ្ហា + ចំណូលបញ្ហា + ចំណោទបញ្ហា
+II. តួសេចក្តី (៨០%): ពន្យល់ពាក្យគន្លឹះ + បកស្រាយគំនិត + លើកឧទាហរណ៍អក្សរសិល្ប៍
+III. បញ្ចប់សេចក្តី (១០%): វាយតម្លៃប្រធាន + មតិផ្ទាល់ខ្លួន
+            `,
+            keyFormulas: ['រចនាសម្ព័ន្ធ៖ ផ្តើមសេចក្តី (១០%) + តួសេចក្តី (៨០%) + បញ្ចប់សេចក្តី (១០%)']
+          }
+        ]
+      }
+    ]
+  },
+
+  // 8. History (Social Stream)
+  {
+    id: 'history-12',
+    grade: '12',
+    stream: 'social',
+    nameKm: 'ប្រវត្តិវិទ្យា ថ្នាក់ទី១២ (ប្រវត្តិសាស្ត្រជាតិ & អន្តរជាតិ)',
+    nameEn: 'History Grade 12 (Cambodian & World History)',
+    icon: 'Landmark',
+    color: '#dc2626',
+    cardClass: 'subject-card-history',
+    teacher: 'សាស្ត្រាចារ្យ ឌៀប សុផល (អ្នកប្រវត្តិសាស្ត្រ)',
+    teacherRole: 'ទីប្រឹក្សាស្រាវជ្រាវប្រវត្តិសាស្ត្រជាតិ MoTDAR',
+    progress: 85,
+    totalChapters: 4,
+    totalLessons: 16,
+    quizzesCount: 8,
+    bannerImg: 'https://images.unsplash.com/photo-1461360370896-922624d12aa1?auto=format&fit=crop&w=1200&q=80',
+    descriptionKm: 'សិក្សាប្រវត្តិសាស្ត្រកម្ពុជាពីសម័យអង្គរ សម័យអាណានិគមនិយមបារាំង សង្គ្រាមលោកលើកទី១ ទី២ និងដំណើរការកសាងសន្តិភាពកម្ពុជា។',
+    descriptionEn: 'Grade 12 History covering the Angkorian era, French protectorate period, World Wars I & II, Cold War, and Cambodia modern peacebuilding.',
+    chapters: [
+      {
+        id: 'hist-ch1',
+        titleKm: 'ជំពូកទី ១៖ ព្រះរាជាណាចក្រកម្ពុជាសម័យទំនើប (Modern Cambodia)',
+        titleEn: 'Chapter 1: Modern History of Cambodia',
+        lessons: [
+          {
+            id: 'h12-l1',
+            titleKm: 'មេរៀនទី ១៖ សន្ធិសញ្ញាសន្តិភាពទីក្រុងប៉ារីស ២៣ តុលា ១៩៩១',
+            titleEn: 'Lesson 1: The Paris Peace Agreements 1991',
+            duration: '28:15',
+            videoPoster: 'https://images.unsplash.com/photo-1461360370896-922624d12aa1?auto=format&fit=crop&w=800&q=80',
+            notes: 'សិក្សាពីកត្តានយោបាយ និងដំណើរការបង្រួបបង្រួមជាតិកម្ពុជា។',
+            keyFormulas: ['កាលបរិច្ឆេទសំខាន់ៗ៖ ៩ វិច្ឆិកា ១៩៥៣ (ឯករាជ្យ), ២៣ តុលា ១៩៩១ (កិច្ចព្រមព្រៀងប៉ារីស)']
+          }
+        ]
+      }
+    ]
+  },
+
+  // 9. Geography (Social Stream)
+  {
+    id: 'geography-12',
+    grade: '12',
+    stream: 'social',
+    nameKm: 'ភូមិវិទ្យា ថ្នាក់ទី១២ (សេដ្ឋកិច្ច និងប្រជាសាស្ត្រ)',
+    nameEn: 'Geography Grade 12 (Cambodia & Regional Economy)',
+    icon: 'Globe',
+    color: '#0284c7',
+    cardClass: 'subject-card-physics',
+    teacher: 'សាស្ត្រាចារ្យ អ៊ុំ សាវី (MoTDAR Educator)',
+    teacherRole: 'អ្នកជំនាញភូមិសាស្ត្រសេដ្ឋកិច្ច និងនគរូបនីយកម្ម',
+    progress: 70,
+    totalChapters: 4,
+    totalLessons: 14,
+    quizzesCount: 6,
+    bannerImg: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=1200&q=80',
+    descriptionKm: 'សិក្សាពីភូមិសាស្ត្ររូបវន្តកម្ពុជា ទន្លេមេគង្គ បឹងទន្លេសាប ប្រជាសាស្ត្រ កសិកម្ម ឧស្សាហកម្ម និងសមាហរណកម្មសេដ្ឋកិច្ចអាស៊ាន។',
+    descriptionEn: 'Grade 12 Geography covering physical geography of Cambodia, Mekong & Tonle Sap ecosystems, agriculture, industry, and ASEAN integration.',
+    chapters: [
+      {
+        id: 'geo-ch1',
+        titleKm: 'ជំពូកទី ១៖ ធនធានធម្មជាតិ និងសេដ្ឋកិច្ចកម្ពុជា',
+        titleEn: 'Chapter 1: Natural Resources & Cambodia Economy',
+        lessons: [
+          {
+            id: 'g12-l1',
+            titleKm: 'មេរៀនទី ១៖ ប្រព័ន្ធទន្លេមេគង្គ និងដីសណ្តទន្លេកម្ពុជា',
+            titleEn: 'Lesson 1: The Mekong River System & Cambodian Floodplains',
+            duration: '26:30',
+            videoPoster: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=800&q=80',
+            notes: 'សិក្សាពីសារៈសំខាន់នៃទន្លេមេគង្គចំពោះវិស័យកសិកម្ម និងជលផលជាតិ។',
+            keyFormulas: ['ក្រឡាផ្ទៃកម្ពុជា៖ ១៨១,០៣៥ គីឡូម៉ែត្រការ៉េ']
+          }
+        ]
+      }
+    ]
+  },
+
+  // 10. Moral & Civics (Social Stream)
+  {
+    id: 'civics-12',
+    grade: '12',
+    stream: 'social',
+    nameKm: 'សីលធម៌ និងពលរដ្ឋវិជ្ជា ថ្នាក់ទី១២',
+    nameEn: 'Moral & Civics Education Grade 12',
+    icon: 'Scale',
+    color: '#854d0e',
+    cardClass: 'subject-card-khmer',
+    teacher: 'សាស្ត្រាចារ្យ ហេង សម្បត្តិ (អ្នកច្បាប់ & សីលធម៌)',
+    teacherRole: 'អ្នកជំនាញការអប់រំពលរដ្ឋ និងនីតិរដ្ឋ MoTDAR',
+    progress: 80,
+    totalChapters: 3,
+    totalLessons: 12,
+    quizzesCount: 5,
+    bannerImg: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=1200&q=80',
+    descriptionKm: 'សិក្សាពីរដ្ឋធម្មនុញ្ញ សិទ្ធិមនុស្ស អភិបាលកិច្ចល្អ នីតិរដ្ឋ សន្តិភាពសង្គម និងកាតព្វកិច្ចពលរដ្ឋក្នុងសង្គមប្រជាធិបតេយ្យ។',
+    descriptionEn: 'Grade 12 Moral & Civics covering the Cambodian Constitution, Human Rights, Good Governance, Rule of Law, and Civic Responsibilities.',
+    chapters: [
+      {
+        id: 'civ-ch1',
+        titleKm: 'ជំពូកទី ១៖ រដ្ឋធម្មនុញ្ញ និងនីតិរដ្ឋ (Constitution & Rule of Law)',
+        titleEn: 'Chapter 1: The Constitution & Rule of Law',
+        lessons: [
+          {
+            id: 'cv12-l1',
+            titleKm: 'មេរៀនទី ១៖ រចនាសម្ព័ន្ធអំណាចរដ្ឋទាំងបី និងសិទ្ធិជាមូលដ្ឋាន',
+            titleEn: 'Lesson 1: The Three State Powers & Fundamental Rights',
+            duration: '24:00',
+            videoPoster: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80',
+            notes: 'អំណាចនីតិបញ្ញត្តិ អំណាចនីតិប្រតិបត្តិ និងអំណាចតុលាការ។',
+            keyFormulas: ['អំណាចរដ្ឋទាំង ៣៖ នីតិបញ្ញត្តិ (សភា) + នីតិប្រតិបត្តិ (រាជរដ្ឋាភិបាល) + តុលាការ']
+          }
+        ]
+      }
+    ]
+  },
+
+  // 11. English for Cambodia (Grade 12)
+  {
+    id: 'english-12',
+    grade: '12',
+    stream: 'social',
+    nameKm: 'ភាសាអង់គ្លេស ថ្នាក់ទី១២ (English for Cambodia Book 12)',
+    nameEn: 'English Language Grade 12 (Grammar, Reading & Writing)',
+    icon: 'Languages',
+    color: '#db2777',
+    cardClass: 'subject-card-english',
+    teacher: 'Mr. David Chea (Senior English Educator)',
+    teacherRole: 'អ្នកសម្របសម្រួលកម្មវិធីភាសាអង់គ្លេសវិទ្យាល័យ MoTDAR',
+    progress: 85,
+    totalChapters: 4,
+    totalLessons: 16,
+    quizzesCount: 8,
+    bannerImg: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=1200&q=80',
+    descriptionKm: 'កម្មវិធីសិក្សាភាសាអង់គ្លេសផ្លូវការ សៀវភៅ English for Cambodia ថ្នាក់ទី១២ បង្រៀនវេយ្យាករណ៍ ការអានអត្ថបទ និងការសរសេរតែងសេចក្តីអង់គ្លេស។',
+    descriptionEn: 'Official MoTDAR Grade 12 English curriculum based on English for Cambodia Book 12 covering grammar, academic reading, and essay writing.',
+    chapters: [
+      {
+        id: 'eng-ch1',
+        titleKm: 'Unit 1: Education, Technology & Modern Society',
+        titleEn: 'Unit 1: Education, Technology & Modern Society',
+        lessons: [
+          {
+            id: 'en12-l1',
+            titleKm: 'Lesson 1: Advanced Relative Clauses & Academic Vocabulary',
+            titleEn: 'Lesson 1: Advanced Relative Clauses & Academic Vocabulary',
+            duration: '25:40',
+            videoPoster: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=800&q=80',
+            notes: 'Master defining and non-defining relative clauses for BacII exam.',
+            keyFormulas: ['Relative Pronouns: Who (People), Which (Things), Whose (Possession)']
+          }
+        ]
+      }
+    ]
+  }
+];

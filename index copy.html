@@ -1,0 +1,1095 @@
+<!DOCTYPE html>
+<html lang="km">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bakong KHQR Payment & Donation - hut_soksitchey1@aclb</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts: Kantumruy Pro, Battambang, Nunito Sans, Outfit -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Battambang:wght@400;700&family=Kantumruy+Pro:wght@400;500;600;700&family=Nunito+Sans:wght@400;600;700;800;900&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- QRCode Canvas Library -->
+    <script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.3/build/qrcode.min.js"></script>
+    <!-- Canvas Confetti -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.9.3/dist/confetti.browser.min.js"></script>
+
+    <style>
+        body {
+            font-family: 'Kantumruy Pro', 'Nunito Sans', sans-serif;
+        }
+        .font-num {
+            font-family: 'Nunito Sans', 'Outfit', sans-serif;
+        }
+        [x-cloak] { display: none !important; }
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+        
+        .modal-backdrop {
+            background-color: rgba(6, 15, 30, 0.75);
+            backdrop-filter: blur(8px);
+        }
+        @keyframes slideUp {
+            from { transform: translateY(100%); }
+            to { transform: translateY(0); }
+        }
+        @keyframes slideDown {
+            from { transform: translateY(0); }
+            to { transform: translateY(100%); }
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: scale(0.96); }
+            to { opacity: 1; transform: scale(1); }
+        }
+        @keyframes fadeOut {
+            from { opacity: 1; transform: scale(1); }
+            to { opacity: 0; transform: scale(0.96); }
+        }
+        .fade-in { animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        .fade-out { animation: fadeOut 0.2s ease-in forwards; }
+        
+        .qr-card {
+            box-shadow: 0 20px 45px -10px rgba(0, 0, 0, 0.15), 0 0 1px 1px rgba(0, 0, 0, 0.05);
+            border-radius: 22px;
+        }
+        .dashed-line {
+            background: linear-gradient(90deg, rgba(160, 174, 192, 0.9) 65%, rgba(255,255,255,0) 0px);
+            background-size: 14px 1.5px;
+            background-position: 50% 100%;
+            background-repeat: repeat-x;
+        }
+        .red-triangle {
+            border-left: 19.5px solid transparent;
+            border-top: 19.5px solid rgb(226, 26, 26);
+            height: 0;
+            width: 0;
+        }
+        .draggable-thumb {
+            width: 44px;
+            height: 4px;
+            background: rgba(255, 255, 255, 0.85);
+            border-radius: 2px;
+        }
+        .no-select {
+            user-select: none;
+            -webkit-user-select: none;
+        }
+        .pulse-dot {
+            box-shadow: 0 0 0 0 rgba(34, 197, 94, 0.7);
+            animation: pulse-green 1.8s infinite cubic-bezier(0.66, 0, 0, 1);
+        }
+        @keyframes pulse-green {
+            to { box-shadow: 0 0 0 8px rgba(34, 197, 94, 0); }
+        }
+    </style>
+</head>
+<body class="bg-slate-900 text-slate-100 min-h-screen flex flex-col items-center justify-between p-4 sm:p-8 font-sans selection:bg-red-500 selection:text-white">
+
+    <!-- Background Ornaments -->
+    <div class="fixed inset-0 pointer-events-none overflow-hidden -z-10">
+        <div class="absolute -top-40 -left-40 w-96 h-96 bg-red-600/20 rounded-full blur-3xl"></div>
+        <div class="absolute top-1/2 -right-40 w-96 h-96 bg-blue-600/15 rounded-full blur-3xl"></div>
+        <div class="absolute -bottom-40 left-1/3 w-96 h-96 bg-indigo-600/15 rounded-full blur-3xl"></div>
+    </div>
+
+    <!-- Top Navigation Header -->
+    <header class="w-full max-w-4xl flex items-center justify-between py-4 border-b border-slate-800">
+        <div class="flex items-center gap-3">
+            <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-red-500 to-red-700 flex items-center justify-center text-white shadow-lg shadow-red-500/30">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect width="18" height="18" x="3" y="3" rx="2"/><path d="M7 7h.01"/><path d="M17 7h.01"/><path d="M7 17h.01"/><path d="M17 17h.01"/>
+                </svg>
+            </div>
+            <div>
+                <h1 class="text-base font-black tracking-wide text-white flex items-center gap-2">
+                    <span>BAKONG KHQR PAY & DONATE</span>
+                    <span class="text-[10px] bg-red-500/20 border border-red-500/40 text-red-400 px-2 py-0.5 rounded-full font-mono">LIVE GATEWAY</span>
+                </h1>
+                <p class="text-xs text-slate-400 font-mono">Merchant: <strong class="text-emerald-400">hut_soksitchey1@aclb</strong></p>
+            </div>
+        </div>
+
+        <div class="flex items-center gap-2">
+            <button 
+                onclick="openKhqrModal()"
+                class="bg-gradient-to-r from-red-600 via-red-500 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold py-2.5 px-5 rounded-xl shadow-lg shadow-red-600/30 transition-all duration-300 hover:scale-105 active:scale-95 flex items-center gap-2 text-sm cursor-pointer"
+            >
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                    <rect x="3" y="3" width="7" height="7" rx="1"/>
+                    <rect x="14" y="3" width="7" height="7" rx="1"/>
+                    <rect x="3" y="14" width="7" height="7" rx="1"/>
+                    <rect x="14" y="14" width="7" height="7" rx="1"/>
+                </svg>
+                <span>បើកផ្ទាំងទូទាត់ (Open KHQR)</span>
+            </button>
+        </div>
+    </header>
+
+    <!-- Main Content Donation Dashboard -->
+    <main class="w-full max-w-4xl my-auto py-8 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        
+        <!-- Left: Donation Configuration & Information -->
+        <div class="lg:col-span-7 space-y-6">
+            
+            <div class="space-y-2">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-300 text-xs">
+                    <span class="w-2 h-2 rounded-full bg-emerald-400 pulse-dot"></span>
+                    <span>ប្រព័ន្ធទូទាត់ និងឧបត្ថម្ភ Bakong KHQR ស្វ័យប្រវត្តិ</span>
+                </div>
+                <h2 class="text-2xl sm:text-3xl font-black text-white leading-tight font-kantumruy">
+                    ចូលរួមឧបត្ថម្ភ និងអភិវឌ្ឍន៍ប្រព័ន្ធ <br class="hidden sm:inline" />
+                    <span class="text-transparent bg-clip-text bg-gradient-to-r from-red-400 via-rose-300 to-amber-300">MoEYS E-Learning National Hub</span>
+                </h2>
+                <p class="text-sm text-slate-400 leading-relaxed">
+                    ស្កេនទូទាត់ដោយផ្ទាល់ជាមួយកម្មវិធីធនាគារនានាក្នុងប្រទេសកម្ពុជា (ABA Mobile, ACLEDA, Wing, Canadia, Bakong App...) តាមរយៈ Bakong Account ID <strong>hut_soksitchey1@aclb</strong> ដោយសុវត្ថិភាពខ្ពស់ និងរហ័សទាន់ចិត្ត។
+                </p>
+            </div>
+
+            <!-- Currency & Preset Amount Picker -->
+            <div class="bg-slate-800/80 border border-slate-700/80 rounded-2xl p-5 space-y-4 shadow-xl backdrop-blur-md">
+                
+                <div class="flex items-center justify-between">
+                    <label class="text-xs font-bold text-slate-300">ជ្រើសរើសរូបិយប័ណ្ណ៖</label>
+                    <div class="flex bg-slate-900 p-1 rounded-xl border border-slate-700 text-xs font-bold">
+                        <button id="btnCurrencyUsd" onclick="setCurrency('USD')" class="px-3.5 py-1.5 rounded-lg bg-red-600 text-white font-mono transition-all">USD ($)</button>
+                        <button id="btnCurrencyKhr" onclick="setCurrency('KHR')" class="px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white font-mono transition-all">KHR (៛)</button>
+                    </div>
+                </div>
+
+                <!-- Preset Buttons -->
+                <div class="space-y-2">
+                    <label class="text-xs font-bold text-slate-300">ចំនួនទឹកប្រាក់ឧបត្ថម្ភរហ័ស (Preset Amounts)៖</label>
+                    <div id="presetsGrid" class="grid grid-cols-4 gap-2">
+                        <!-- Dynamic Presets Loaded via JS -->
+                    </div>
+                </div>
+
+                <!-- Custom Amount Input -->
+                <div class="space-y-1.5">
+                    <label class="text-xs font-bold text-slate-300">ឬបញ្ចូលចំនួនទឹកប្រាក់ដោយខ្លួនឯង៖</label>
+                    <div class="relative">
+                        <input 
+                            type="number" 
+                            id="customAmountInput" 
+                            placeholder="ឧ. 10.00" 
+                            step="0.01" 
+                            min="0.1" 
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-4 py-2.5 text-white font-mono font-bold text-sm focus:outline-none focus:border-red-500 focus:ring-1 focus:ring-red-500 transition-all placeholder:text-slate-600"
+                            oninput="handleCustomAmountChange(this.value)"
+                        />
+                        <span id="currencyBadge" class="absolute right-3.5 top-1/2 -translate-y-1/2 text-xs font-mono font-bold text-slate-400">USD</span>
+                    </div>
+                </div>
+
+                <!-- Donor Name -->
+                <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-1">
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 block mb-1">ឈ្មោះអ្នកឧបត្ថម្ភ៖</label>
+                        <input 
+                            type="text" 
+                            id="donorNameInput" 
+                            value="សិស្សគំរូ" 
+                            placeholder="ឈ្មោះរបស់អ្នក" 
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500"
+                        />
+                    </div>
+                    <div>
+                        <label class="text-[11px] font-bold text-slate-400 block mb-1">ស្លាក Logo កណ្តាល QR៖</label>
+                        <select 
+                            id="logoSelect" 
+                            onchange="updateQrCenterLogo(this.value)"
+                            class="w-full bg-slate-900 border border-slate-700 rounded-xl px-3 py-2 text-xs text-white focus:outline-none focus:border-red-500"
+                        >
+                            <option value="/assets/developer-avatar.jpg">Developer Avatar (Chey)</option>
+                            <option value="/assets/moeys-custom-logo-transparent.png">MoEYS Logo Transparent</option>
+                            <option value="/assets/moeys-crest-transparent.png">National Emblem Crest</option>
+                            <option value="https://checkout.payway.com.kh/images/khqr-icon.svg">Official KHQR Icon</option>
+                        </select>
+                    </div>
+                </div>
+
+                <!-- Open Modal Button -->
+                <button 
+                    onclick="openKhqrModal()"
+                    class="w-full py-3.5 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 text-white font-bold text-sm shadow-lg shadow-red-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                >
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/>
+                    </svg>
+                    <span>ទូទាត់ឧបត្ថម្ភឥឡូវនេះ (<span id="btnPayAmountDisplay">$1.00</span>)</span>
+                </button>
+            </div>
+            
+        </div>
+
+        <!-- Right: Real-Time Live Preview of the KHQR Card -->
+        <div class="lg:col-span-5 flex flex-col items-center justify-center">
+            
+            <div class="text-center mb-3">
+                <span class="text-xs font-mono text-slate-400 font-bold uppercase tracking-wider">
+                    ⚡ Live KHQR Card Preview
+                </span>
+            </div>
+
+            <!-- Authentic Official Bakong KHQR Card -->
+            <div class="rounded-[22px] qr-card h-auto w-[285px] flex flex-col bg-white overflow-hidden text-[rgb(8,27,55)] transition-all duration-300 hover:shadow-2xl">
+                
+                <div>
+                    <!-- Top Red Banner -->
+                    <div class="flex items-center justify-center bg-[rgb(226,26,26)] h-[46px]">
+                        <svg width="68" height="16" viewBox="0 0 60 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                            <path d="M39.006 5.19439V9.59764H34.5318C34.0729 9.59764 33.7288 9.2307 33.7288 8.80731V5.22264C33.7288 4.77103 34.1016 4.43231 34.5318 4.43231H38.1743C38.6619 4.40408 39.006 4.74278 39.006 5.19439Z" fill="white"/>
+                            <path d="M59.9717 6.97176H57.7345C57.7345 4.34676 55.5548 2.20159 52.8875 2.20159C50.7651 2.20159 48.9008 3.55645 48.2699 5.53225C48.1265 6.01209 48.0404 6.49192 48.0404 6.97176V13.9718H47.9831C46.7785 13.9718 45.8033 13.0121 45.8033 11.8266V6.97176H45.832C45.832 5.05241 46.6351 3.21773 48.0691 1.89112C49.3884 0.677406 51.1093 0 52.9162 0C56.8168 0 59.9717 3.13305 59.9717 6.97176Z" fill="white"/>
+                            <path d="M59.9999 13.9718L56.845 14L56.0706 13.2379L54.3497 11.5444L51.9692 9.20166H55.1241L59.9999 13.9718Z" fill="white"/>
+                            <path d="M39.7517 11.7702H33.0117C32.1799 11.7702 31.5203 11.121 31.5203 10.3024V3.66936C31.5203 2.85081 32.1799 2.20159 33.0117 2.20159H39.7517C40.5834 2.20159 41.2431 2.85081 41.2431 3.66936V10.3024L43.4802 12.504V2.14515C43.4802 0.959671 42.505 0 41.3005 0H31.4629C30.2583 0 29.2832 0.959671 29.2832 2.14515V11.8266C29.2832 13.0121 30.2583 13.9718 31.4629 13.9718H41.9888L39.7517 11.7702Z" fill="white"/>
+                            <path d="M12.3614 14H9.20656L2.60996 7.47984V14H0V0H2.60996V6.2379L8.94843 0H12.046L5.16255 6.71772L12.3614 14Z" fill="white"/>
+                            <path d="M24.1492 0H26.7018V14H24.1492V7.93145H16.8643V14H14.3117V0H16.8643V5.84273H24.1492V0Z" fill="white"/>
+                        </svg>
+                    </div>
+                    
+                    <!-- Fold Notch -->
+                    <div class="flex justify-end">
+                        <div class="red-triangle"></div>
+                    </div>
+
+                    <!-- Merchant Info & Amount -->
+                    <div class="dashed-line py-3 px-4 pl-8">
+                        <div class="flex items-center justify-between">
+                            <span class="text-[11px] font-bold text-slate-800 font-mono tracking-wide" id="previewMerchantName">SOKSITCHEY HUT</span>
+                            <span class="text-[9px] bg-slate-100 text-slate-600 px-1.5 py-0.5 rounded font-mono">INDIVIDUAL</span>
+                        </div>
+                        <div class="mt-0.5 font-['Nunito_Sans']">
+                            <div class="flex items-baseline text-lg font-black text-[rgb(8,27,55)] font-num">
+                                <span id="previewAmount">1.00</span>
+                                <span id="previewCurrency" class="text-[10px] font-bold ml-1.5 text-slate-500 font-mono">USD</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Center QR Code with Centered Logo -->
+                <div class="flex justify-center items-center relative py-4 px-3 bg-white">
+                    <img src="https://checkout.payway.com.kh/images/usd-khqr-logo.svg" class="absolute h-auto max-w-[200px] block align-middle opacity-10 pointer-events-none" />
+                    
+                    <div class="relative bg-white rounded-xl shadow-xs p-1">
+                        <canvas id="previewQrCanvas" class="w-[205px] h-[205px] rounded-lg block"></canvas>
+                    </div>
+                </div>
+
+                <!-- Footer Text & Download Button -->
+                <div class="p-3.5 pt-0 bg-white text-center space-y-2 border-t border-slate-100">
+                    <p class="text-[11px] text-slate-500 leading-tight">Scan with <strong>ABA Mobile</strong> or any KHQR Banking App</p>
+                    <button 
+                        onclick="downloadCurrentQr()" 
+                        class="w-full py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold font-mono transition-colors flex items-center justify-center gap-1.5 cursor-pointer"
+                    >
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                        <span>Download KHQR Image</span>
+                    </button>
+                </div>
+            </div>
+
+            <!-- MD5 Hash Info Pill -->
+            <div class="mt-3 text-center">
+                <span class="text-[10.5px] font-mono text-slate-400">
+                    Bakong MD5: <span id="previewMd5" class="text-amber-400 font-bold">51c467e10f8191...</span>
+                </span>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer Copyright & Bypass Indicator -->
+    <footer class="w-full max-w-4xl text-center py-4 border-t border-slate-800 text-xs text-slate-500 font-mono flex flex-col sm:flex-row items-center justify-between gap-2">
+        <div>
+            <span>Bakong Account: <strong class="text-slate-300">hut_soksitchey1@aclb</strong></span>
+        </div>
+        <div class="flex items-center gap-2">
+            <span class="w-2 h-2 rounded-full bg-emerald-400"></span>
+            <span>Bypass Server: <strong class="text-slate-300">http://localhost:3000</strong></span>
+        </div>
+    </footer>
+
+    <!-- ═════════════════ POPUP MODAL (DESKTOP & MOBILE BOTTOM SHEET) ═════════════════ -->
+    <div id="bakongModal" class="hidden fixed z-[9999] inset-0 w-full h-full modal-backdrop overflow-y-auto">
+        <div class="p-0 bg-transparent border-none shadow-none max-w-[420px] w-[95%] my-[3%] mx-auto relative z-[10000]">
+            
+            <!-- ── DESKTOP MODAL ── -->
+            <div id="bakongModalDesktop" class="hidden md:block font-['Nunito_Sans',sans-serif] bg-white text-[rgb(8,27,55)] leading-6 max-w-[400px] my-[5%] mx-auto relative rounded-3xl p-6 shadow-2xl animate-fadeIn border border-slate-100">
+                
+                <div class="px-2">
+                    <div class="pb-4">
+                        <div class="flex justify-between items-center relative">
+                            <div class="flex items-center gap-2">
+                                <span class="w-3 h-3 rounded-full bg-red-600"></span>
+                                <h3 class="text-xl text-[rgb(8,27,55)] m-0 font-black tracking-tight font-kantumruy">BAKONG KHQR</h3>
+                            </div>
+                            <span 
+                                class="close text-slate-400 hover:text-red-500 text-[28px] font-bold cursor-pointer transition-colors duration-200"
+                                onclick="closeKhqrModal()"
+                            >&times;</span>
+                        </div>
+                    </div>
+                    
+                    <div class="flex justify-center items-center">
+                        <div class="rounded-[22px] qr-card w-[285px] flex flex-col bg-white overflow-hidden">
+                            
+                            <!-- Red Header -->
+                            <div class="flex items-center justify-center bg-[rgb(226,26,26)] h-[44px]">
+                                <svg width="62" height="15" viewBox="0 0 60 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                                    <path d="M39.006 5.19439V9.59764H34.5318C34.0729 9.59764 33.7288 9.2307 33.7288 8.80731V5.22264C33.7288 4.77103 34.1016 4.43231 34.5318 4.43231H38.1743C38.6619 4.40408 39.006 4.74278 39.006 5.19439Z" fill="white"/>
+                                    <path d="M59.9717 6.97176H57.7345C57.7345 4.34676 55.5548 2.20159 52.8875 2.20159C50.7651 2.20159 48.9008 3.55645 48.2699 5.53225C48.1265 6.01209 48.0404 6.49192 48.0404 6.97176V13.9718H47.9831C46.7785 13.9718 45.8033 13.0121 45.8033 11.8266V6.97176H45.832C45.832 5.05241 46.6351 3.21773 48.0691 1.89112C49.3884 0.677406 51.1093 0 52.9162 0C56.8168 0 59.9717 3.13305 59.9717 6.97176Z" fill="white"/>
+                                    <path d="M59.9999 13.9718L56.845 14L56.0706 13.2379L54.3497 11.5444L51.9692 9.20166H55.1241L59.9999 13.9718Z" fill="white"/>
+                                    <path d="M39.7517 11.7702H33.0117C32.1799 11.7702 31.5203 11.121 31.5203 10.3024V3.66936C31.5203 2.85081 32.1799 2.20159 33.0117 2.20159H39.7517C40.5834 2.20159 41.2431 2.85081 41.2431 3.66936V10.3024L43.4802 12.504V2.14515C43.4802 0.959671 42.505 0 41.3005 0H31.4629C30.2583 0 29.2832 0.959671 29.2832 2.14515V11.8266C29.2832 13.0121 30.2583 13.9718 31.4629 13.9718H41.9888L39.7517 11.7702Z" fill="white"/>
+                                    <path d="M12.3614 14H9.20656L2.60996 7.47984V14H0V0H2.60996V6.2379L8.94843 0H12.046L5.16255 6.71772L12.3614 14Z" fill="white"/>
+                                    <path d="M24.1492 0H26.7018V14H24.1492V7.93145H16.8643V14H14.3117V0H16.8643V5.84273H24.1492V0Z" fill="white"/>
+                                </svg>
+                            </div>
+
+                            <!-- Red Fold Triangle -->
+                            <div class="flex justify-end">
+                                <div class="red-triangle"></div>
+                            </div>
+
+                            <!-- Merchant Label & Amount -->
+                            <div class="dashed-line py-3 px-4 pl-8">
+                                <span class="text-[11px] font-bold text-slate-800 font-mono">SOKSITCHEY HUT</span>
+                                <div class="mt-0.5 font-['Nunito_Sans']">
+                                    <div class="flex items-baseline text-lg font-black text-black">
+                                        <span id="modalAmount">1.00</span>
+                                        <span id="modalCurrency" class="text-[10px] font-bold ml-1.5 text-slate-500 font-mono">USD</span>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Centered QR Canvas with Center Logo -->
+                            <div class="flex justify-center items-center relative py-4 px-2">
+                                <img src="https://checkout.payway.com.kh/images/usd-khqr-logo.svg" class="absolute h-auto max-w-[200px] block align-middle opacity-10 pointer-events-none" />
+                                <div class="relative bg-white rounded-xl shadow-xs p-1">
+                                    <canvas id="modalQrCanvas" class="w-[205px] h-[205px] rounded-lg block"></canvas>
+                                </div>
+                            </div>
+
+                        </div>
+                    </div>
+
+                    <!-- Live Verification Status Indicator -->
+                    <div id="paymentStatusBox" class="mt-3.5 p-2.5 rounded-xl bg-slate-50 border border-slate-200 text-center space-y-1">
+                        <div class="flex items-center justify-center gap-2">
+                            <span class="w-2.5 h-2.5 rounded-full bg-amber-500 animate-ping"></span>
+                            <span class="text-xs font-bold text-slate-800">កំពុងរង់ចាំការទូទាត់ (Waiting for scan...)</span>
+                        </div>
+                        <p class="text-[10.5px] text-slate-500">ប្រព័ន្ធកំពុងពិនិត្យ MD5 ស្វ័យប្រវត្តិរៀងរាល់ ៣ វិនាទី</p>
+                    </div>
+                    
+                    <!-- Scan instructions & simulate payment button -->
+                    <div class="text-center pt-3 flex flex-col items-center gap-2">
+                        <p class="text-xs text-slate-400 leading-snug">Scan with ABA Mobile, or other Mobile Banking App supporting KHQR</p>
+                        
+                        <div class="flex items-center gap-2 w-full pt-1">
+                            <button 
+                                onclick="downloadCurrentQr()" 
+                                class="flex-1 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold font-mono transition-colors flex items-center justify-center gap-1.5"
+                            >
+                                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+                                <span>Save QR</span>
+                            </button>
+                            <button 
+                                onclick="simulateSuccessfulPayment()" 
+                                class="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold transition-all shadow-md active:scale-95"
+                            >
+                                ✓ Test Confirm
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- ── MOBILE BOTTOM SHEET MODAL ── -->
+            <div id="bakongModalMobile" class="md:hidden font-['Nunito_Sans',sans-serif] bg-transparent text-[rgb(8,27,55)] leading-6 m-0 fixed bottom-0 left-0 right-0 w-full max-h-[92vh] overflow-y-auto z-[10001] h-auto translate-y-full transition-transform duration-500 ease-out">
+                <div class="bg-[rgb(50,50,50)] absolute -top-[100px] left-0 right-0 h-[100px] -z-10"></div>
+                
+                <main class="flex flex-col relative w-full min-h-[420px] mt-0 rounded-t-[28px] shadow-2xl overflow-hidden">
+                    <header class="border-none p-0 left-0 right-0 block relative z-[1000] pointer-events-auto select-none bg-[rgb(226,26,26)] rounded-t-2xl overflow-hidden mb-0 no-select">
+                        <div class="border-0 z-[1001] relative left-0 right-0 m-0 py-2 px-0 cursor-grab w-full h-6 pointer-events-auto touch-pan-y bg-transparent flex items-center justify-center flex-col no-select" id="mobileDragArea">
+                            <div class="draggable-thumb"></div>
+                        </div>
+                    </header>
+                    
+                    <div class="bg-white pb-6">
+                        <div id="redHeaderDraggable" class="bg-[rgb(226,26,26)] h-14 justify-center items-end flex relative cursor-grab touch-pan-y select-none pointer-events-auto -mt-px no-select">
+                            <img src="https://checkout.payway.com.kh/images/khqr-icon.svg" alt="KHQR" class="mb-3 h-auto max-w-[85px] block align-middle pointer-events-none" />
+                        </div>
+                        
+                        <div class="flex justify-end">
+                            <div class="red-triangle"></div>
+                        </div>
+                        
+                        <div>
+                            <div class="flex justify-center items-center -mb-1">
+                                <div class="w-[220px]">
+                                    <span class="text-[11px] text-slate-500 font-mono">SOKSITCHEY HUT</span>
+                                    <div class="mt-0.5">
+                                        <div class="text-[22px] font-black mb-0 relative w-full text-[rgb(8,27,55)] font-num">
+                                            <span id="khqr-amount-mobile">1.00</span>
+                                            <span id="khqr-currency-mobile" class="bottom-[6px] text-[11px] font-bold ml-2 text-slate-500 font-mono">USD</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="bg-[url('https://checkout.payway.com.kh/images/line-divider.svg')] h-px mt-3 w-full bg-no-repeat bg-center opacity-60"></div>
+                        
+                        <!-- Center QR on Mobile with Center Logo -->
+                        <div class="flex justify-center items-center mt-2 relative">
+                            <img src="https://checkout.payway.com.kh/images/usd-khqr-logo.svg" class="absolute h-auto max-w-[240px] block align-middle opacity-10" />
+                            <div class="relative bg-white rounded-2xl shadow-sm p-1">
+                                <canvas id="modalQrCanvasMobile" class="w-[230px] h-[230px] rounded-xl block"></canvas>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-3 mb-2 px-6">
+                            <div class="text-center space-y-3">
+                                <div>
+                                    <p class="text-sm font-black m-0 text-[rgb(8,27,55)]">Scan to Pay</p>
+                                    <p class="text-xs text-slate-400 m-0">with ABA Mobile or other KHQR Banking App</p>
+                                </div>
+                                <div class="flex gap-2">
+                                    <button 
+                                        onclick="downloadCurrentQr()" 
+                                        class="flex-1 py-2.5 rounded-xl bg-slate-100 active:bg-slate-200 text-slate-800 font-bold text-xs flex items-center justify-center gap-2"
+                                    >
+                                        <img src="https://checkout.payway.com.kh/images/download-icon-khqr.svg" class="w-4 h-4" />
+                                        <span class="text-cyan-600 font-bold">Download QR</span>
+                                    </button>
+                                    <button 
+                                        onclick="simulateSuccessfulPayment()" 
+                                        class="flex-1 py-2.5 rounded-xl bg-emerald-600 active:bg-emerald-700 text-white font-bold text-xs"
+                                    >
+                                        ✓ Test Confirm
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </main>
+            </div>
+            
+        </div>
+    </div>
+
+    <!-- ═════════════════ SUCCESS MODAL OVERLAY ═════════════════ -->
+    <div id="successModal" class="hidden fixed z-[10002] inset-0 w-full h-full modal-backdrop flex items-center justify-center p-4">
+        <div class="bg-white rounded-3xl p-6 sm:p-8 max-w-md w-full text-center shadow-2xl border border-slate-100 animate-fadeIn space-y-4">
+            <div class="w-16 h-16 rounded-full bg-emerald-100 text-emerald-600 flex items-center justify-center mx-auto shadow-md">
+                <svg width="36" height="36" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+                    <polyline points="20 6 9 17 4 12"/>
+                </svg>
+            </div>
+
+            <div class="space-y-1">
+                <h3 class="text-xl font-black text-slate-900 font-kantumruy">ការទូទាត់ឧបត្ថម្ភជោគជ័យ!</h3>
+                <p class="text-xs text-slate-500">
+                    សូមថ្លែងអំណរគុណយ៉ាងជ្រាលជ្រៅចំពោះការចូលរួមឧបត្ថម្ភចំនួន 
+                    <strong id="successAmountDisplay" class="text-emerald-600 font-mono font-bold">$1.00</strong>
+                </p>
+            </div>
+
+            <div class="p-3 bg-slate-50 rounded-2xl border border-slate-100 text-left text-xs space-y-1.5 font-mono">
+                <div class="flex justify-between text-slate-600">
+                    <span>Merchant:</span>
+                    <strong class="text-slate-900 font-bold">hut_soksitchey1@aclb</strong>
+                </div>
+                <div class="flex justify-between text-slate-600">
+                    <span>Status:</span>
+                    <span class="text-emerald-600 font-bold">SETTLED / SUCCESS</span>
+                </div>
+                <div class="flex justify-between text-slate-600">
+                    <span>Transaction MD5:</span>
+                    <span id="successMd5Display" class="text-slate-700 text-[10px] truncate max-w-[180px]"></span>
+                </div>
+            </div>
+
+            <button 
+                onclick="closeSuccessModal()" 
+                class="w-full py-3 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs transition-colors cursor-pointer"
+            >
+                បិទផ្ទាំង (Close)
+            </button>
+        </div>
+    </div>
+
+    <!-- ═════════════════ KHQR CORE JAVASCRIPT LOGIC ═════════════════ -->
+    <script>
+        // State
+        let currentCurrency = 'USD';
+        let currentAmount = 1.00;
+        let merchantAccount = 'hut_soksitchey1@aclb';
+        let merchantName = 'SOKSITCHEY HUT';
+        let currentCenterLogo = '/assets/moeys-custom-logo-transparent.png';
+        let currentQrString = '';
+        let currentMd5 = '';
+        let pollTimer = null;
+
+        const presets = {
+            USD: [
+                { val: 0.50, label: '$0.50' },
+                { val: 1.00, label: '$1.00', popular: true },
+                { val: 2.00, label: '$2.00' },
+                { val: 5.00, label: '$5.00' },
+                { val: 10.00, label: '$10.00' },
+                { val: 20.00, label: '$20.00' },
+                { val: 50.00, label: '$50.00' },
+                { val: 100.00, label: '$100.00' }
+            ],
+            KHR: [
+                { val: 2000, label: '2,000 ៛' },
+                { val: 4000, label: '4,000 ៛', popular: true },
+                { val: 8000, label: '8,000 ៛' },
+                { val: 20000, label: '20,000 ៛' },
+                { val: 40000, label: '40,000 ៛' },
+                { val: 80000, label: '80,000 ៛' },
+                { val: 200000, label: '200,000 ៛' },
+                { val: 400000, label: '400,000 ៛' }
+            ]
+        };
+
+        // Standard EMVCo / Bakong TLV Formatter
+        function formatTlv(tag, val) {
+            const str = String(val);
+            const len = String(new TextEncoder().encode(str).length).padStart(2, '0');
+            return `${tag}${len}${str}`;
+        }
+
+        // Standard CRC16-CCITT
+        function calculateCrc16(data) {
+            let crc = 0xFFFF;
+            for (let i = 0; i < data.length; i++) {
+                crc ^= data.charCodeAt(i) << 8;
+                for (let j = 0; j < 8; j++) {
+                    if ((crc & 0x8000) !== 0) {
+                        crc = ((crc << 1) ^ 0x1021) & 0xFFFF;
+                    } else {
+                        crc = (crc << 1) & 0xFFFF;
+                    }
+                }
+            }
+            return crc.toString(16).toUpperCase().padStart(4, '0');
+        }
+
+        // Fast Client-Side MD5 Function
+        function computeMd5(string) {
+            function RotateLeft(lValue, iShiftBits) {
+                return (lValue << iShiftBits) | (lValue >>> (32 - iShiftBits));
+            }
+            function AddUnsigned(lX, lY) {
+                const lX4 = (lX & 0x40000000);
+                const lY4 = (lY & 0x40000000);
+                const lX8 = (lX & 0x80000000);
+                const lY8 = (lY & 0x80000000);
+                const lResult = (lX & 0x3FFFFFFF) + (lY & 0x3FFFFFFF);
+                if (lX4 & lY4) return (lResult ^ 0x80000000 ^ lX8 ^ lY8);
+                if (lX4 | lY4) {
+                    if (lResult & 0x40000000) return (lResult ^ 0xC0000000 ^ lX8 ^ lY8);
+                    return (lResult ^ 0x40000000 ^ lX8 ^ lY8);
+                }
+                return (lResult ^ lX8 ^ lY8);
+            }
+            function F(x, y, z) { return (x & y) | ((~x) & z); }
+            function G(x, y, z) { return (x & z) | (y & (~z)); }
+            function H(x, y, z) { return (x ^ y ^ z); }
+            function I(x, y, z) { return (y ^ (x | (~z))); }
+            function FF(a, b, c, d, x, s, ac) {
+                a = AddUnsigned(a, AddUnsigned(AddUnsigned(F(b, c, d), x), ac));
+                return AddUnsigned(RotateLeft(a, s), b);
+            }
+            function GG(a, b, c, d, x, s, ac) {
+                a = AddUnsigned(a, AddUnsigned(AddUnsigned(G(b, c, d), x), ac));
+                return AddUnsigned(RotateLeft(a, s), b);
+            }
+            function HH(a, b, c, d, x, s, ac) {
+                a = AddUnsigned(a, AddUnsigned(AddUnsigned(H(b, c, d), x), ac));
+                return AddUnsigned(RotateLeft(a, s), b);
+            }
+            function II(a, b, c, d, x, s, ac) {
+                a = AddUnsigned(a, AddUnsigned(AddUnsigned(I(b, c, d), x), ac));
+                return AddUnsigned(RotateLeft(a, s), b);
+            }
+            function ConvertToWordArray(string) {
+                let lWordCount;
+                const lMessageLength = string.length;
+                const lNumberOfWords_temp1 = lMessageLength + 8;
+                const lNumberOfWords_temp2 = (lNumberOfWords_temp1 - (lNumberOfWords_temp1 % 64)) / 64;
+                const lNumberOfWords = (lNumberOfWords_temp2 + 1) * 16;
+                const lWordArray = Array(lNumberOfWords - 1);
+                let lBytePosition = 0;
+                let lByteCount = 0;
+                while (lByteCount < lMessageLength) {
+                    lWordCount = (lByteCount - (lByteCount % 4)) / 4;
+                    lBytePosition = (lByteCount % 4) * 8;
+                    lWordArray[lWordCount] = (lWordArray[lWordCount] | (string.charCodeAt(lByteCount) << lBytePosition));
+                    lByteCount++;
+                }
+                lWordCount = (lByteCount - (lByteCount % 4)) / 4;
+                lBytePosition = (lByteCount % 4) * 8;
+                lWordArray[lWordCount] = lWordArray[lWordCount] | (0x80 << lBytePosition);
+                lWordArray[lNumberOfWords - 2] = lMessageLength << 3;
+                lWordArray[lNumberOfWords - 1] = lMessageLength >>> 29;
+                return lWordArray;
+            }
+            function WordToHex(lValue) {
+                let WordToHexValue = "", WordToHexValue_temp = "", lByte, lCount;
+                for (lCount = 0; lCount <= 3; lCount++) {
+                    lByte = (lValue >>> (lCount * 8)) & 255;
+                    WordToHexValue_temp = "0" + lByte.toString(16);
+                    WordToHexValue = WordToHexValue + WordToHexValue_temp.substr(WordToHexValue_temp.length - 2, 2);
+                }
+                return WordToHexValue;
+            }
+            let x = ConvertToWordArray(unescape(encodeURIComponent(string)));
+            let a = 0x67452301, b = 0xEFCDAB89, c = 0x98BADCFE, d = 0x10325476;
+            for (let k = 0; k < x.length; k += 16) {
+                const AA = a, BB = b, CC = c, DD = d;
+                a = FF(a, b, c, d, x[k + 0], 7, 0xD76AA478);
+                d = FF(d, a, b, c, x[k + 1], 12, 0xE8C7B756);
+                c = FF(c, d, a, b, x[k + 2], 17, 0x242070DB);
+                b = FF(b, c, d, a, x[k + 3], 22, 0xC1BDCEEE);
+                a = FF(a, b, c, d, x[k + 4], 7, 0xF57C0FAF);
+                d = FF(d, a, b, c, x[k + 5], 12, 0x4787C62A);
+                c = FF(c, d, a, b, x[k + 6], 17, 0xA8304613);
+                b = FF(b, c, d, a, x[k + 7], 22, 0xFD469501);
+                a = FF(a, b, c, d, x[k + 8], 7, 0x698098D8);
+                d = FF(d, a, b, c, x[k + 9], 12, 0x8B44F7AF);
+                c = FF(c, d, a, b, x[k + 10], 17, 0xFFFF5BB1);
+                b = FF(b, c, d, a, x[k + 11], 22, 0x895CD7BE);
+                a = FF(a, b, c, d, x[k + 12], 7, 0x6B901122);
+                d = FF(d, a, b, c, x[k + 13], 12, 0xFD987193);
+                c = FF(c, d, a, b, x[k + 14], 17, 0xA679438E);
+                b = FF(b, c, d, a, x[k + 15], 22, 0x49B40821);
+
+                a = GG(a, b, c, d, x[k + 1], 5, 0xF61E2562);
+                d = GG(d, a, b, c, x[k + 6], 9, 0xC040B340);
+                c = GG(c, d, a, b, x[k + 11], 14, 0x265E5A51);
+                b = GG(b, c, d, a, x[k + 0], 20, 0xE9B6C7AA);
+                a = GG(a, b, c, d, x[k + 5], 5, 0xD62F105D);
+                d = GG(d, a, b, c, x[k + 10], 9, 0x2441453);
+                c = GG(c, d, a, b, x[k + 15], 14, 0xD8A1E681);
+                b = GG(b, c, d, a, x[k + 4], 20, 0xE7D3FBC8);
+                a = GG(a, b, c, d, x[k + 9], 5, 0x21E1CDE6);
+                d = GG(d, a, b, c, x[k + 14], 9, 0xC33707D6);
+                c = GG(c, d, a, b, x[k + 3], 14, 0xF4D50D87);
+                b = GG(b, c, d, a, x[k + 8], 20, 0x455A14ED);
+                a = GG(a, b, c, d, x[k + 13], 5, 0xA9E3E905);
+                d = GG(d, a, b, c, x[k + 2], 9, 0xFCEFA3F8);
+                c = GG(c, d, a, b, x[k + 7], 14, 0x676F02D9);
+                b = GG(b, c, d, a, x[k + 12], 20, 0x8D2A4C8A);
+
+                a = HH(a, b, c, d, x[k + 5], 4, 0xFFFA3942);
+                d = HH(d, a, b, c, x[k + 8], 11, 0x8771F681);
+                c = HH(c, d, a, b, x[k + 11], 16, 0x6D9D6122);
+                b = HH(b, c, d, a, x[k + 14], 23, 0xFDE5380C);
+                a = HH(a, b, c, d, x[k + 1], 4, 0xA4BEEA44);
+                d = HH(d, a, b, c, x[k + 4], 11, 0x4BDECFA9);
+                c = HH(c, d, a, b, x[k + 7], 16, 0xF6BB4B60);
+                b = HH(b, c, d, a, x[k + 10], 23, 0xBEBFBC70);
+                a = HH(a, b, c, d, x[k + 13], 4, 0x289B7EC6);
+                d = HH(d, a, b, c, x[k + 0], 11, 0xEAA127FA);
+                c = HH(c, d, a, b, x[k + 3], 16, 0xD4EF3085);
+                b = HH(b, c, d, a, x[k + 6], 23, 0x4881D05);
+                a = HH(a, b, c, d, x[k + 9], 4, 0xD9D4D039);
+                d = HH(d, a, b, c, x[k + 12], 11, 0xE6DB99E5);
+                c = HH(c, d, a, b, x[k + 15], 16, 0x1FA27CF8);
+                b = HH(b, c, d, a, x[k + 2], 23, 0xC4AC5665);
+
+                a = II(a, b, c, d, x[k + 0], 6, 0xF4292244);
+                d = II(d, a, b, c, x[k + 7], 10, 0x432AFF97);
+                c = II(c, d, a, b, x[k + 14], 15, 0xAB9423A7);
+                b = II(b, c, d, a, x[k + 5], 21, 0xFC93A039);
+                a = II(a, b, c, d, x[k + 12], 6, 0x655B59C3);
+                d = II(d, a, b, c, x[k + 3], 10, 0x8F0CCC92);
+                c = II(c, d, a, b, x[k + 10], 15, 0xFFEFF47D);
+                b = II(b, c, d, a, x[k + 1], 21, 0x85845DD1);
+                a = II(a, b, c, d, x[k + 8], 6, 0x6FA87E4F);
+                d = II(d, a, b, c, x[k + 15], 10, 0xFE2CE6E0);
+                c = II(c, d, a, b, x[k + 6], 15, 0xA3014314);
+                b = II(b, c, d, a, x[k + 13], 21, 0x4E0811A1);
+                a = II(a, b, c, d, x[k + 4], 6, 0xF7537E82);
+                d = II(d, a, b, c, x[k + 11], 10, 0xBD3AF235);
+                c = II(c, d, a, b, x[k + 2], 15, 0x2AD7D2BB);
+                b = II(b, c, d, a, x[k + 9], 21, 0xEB86D391);
+
+                a = AddUnsigned(a, AA);
+                b = AddUnsigned(b, BB);
+                c = AddUnsigned(c, CC);
+                d = AddUnsigned(d, DD);
+            }
+            return (WordToHex(a) + WordToHex(b) + WordToHex(c) + WordToHex(d)).toLowerCase();
+        }
+
+        // Build Bakong KHQR String
+        function buildKhqrPayload(amount, currency) {
+            const currCode = currency === 'KHR' ? '116' : '840';
+            const formattedAmt = currency === 'KHR' 
+                ? String(Math.round(amount)) 
+                : Number(amount).toFixed(2);
+
+            const sub00 = formatTlv('00', merchantAccount);
+            const tag29 = formatTlv('29', sub00);
+
+            const raw = 
+                formatTlv('00', '01') +
+                formatTlv('01', '12') +
+                tag29 +
+                formatTlv('52', '5999') +
+                formatTlv('53', currCode) +
+                formatTlv('54', formattedAmt) +
+                formatTlv('58', 'KH') +
+                formatTlv('59', merchantName) +
+                formatTlv('60', 'Phnom Penh') +
+                '6304';
+
+            const crc = calculateCrc16(raw);
+            const khqr = raw + crc;
+            const md5Hash = computeMd5(khqr);
+
+            return { khqr, md5Hash, formattedAmt };
+        }
+
+        // Render Canvas with Center Logo
+        function drawKhqrWithLogo(canvas, qrString, logoUrl) {
+            if (!canvas) return;
+
+            QRCode.toCanvas(canvas, qrString, {
+                width: 320,
+                margin: 2,
+                color: {
+                    dark: '#081b37',
+                    light: '#ffffff'
+                },
+                errorCorrectionLevel: 'H' // 30% error recovery allows center badge overlay
+            }, function (error) {
+                if (error) {
+                    console.error('QR Draw Error:', error);
+                    return;
+                }
+
+                if (!logoUrl) return;
+
+                const ctx = canvas.getContext('2d');
+                const img = new Image();
+                img.crossOrigin = 'anonymous';
+
+                img.onload = function () {
+                    const canvasSize = canvas.width;
+                    const logoSize = Math.round(canvasSize * 0.24); // 24% size
+                    const center = canvasSize / 2;
+                    const x = center - logoSize / 2;
+                    const y = center - logoSize / 2;
+
+                    // Rounded white badge background with soft drop shadow
+                    const badgePadding = 4;
+                    const badgeSize = logoSize + badgePadding * 2;
+                    const badgeX = center - badgeSize / 2;
+                    const badgeY = center - badgeSize / 2;
+                    const radius = 10;
+
+                    ctx.save();
+                    ctx.shadowColor = 'rgba(0, 0, 0, 0.22)';
+                    ctx.shadowBlur = 8;
+                    ctx.shadowOffsetY = 2;
+                    ctx.fillStyle = '#ffffff';
+                    
+                    if (ctx.roundRect) {
+                        ctx.beginPath();
+                        ctx.roundRect(badgeX, badgeY, badgeSize, badgeSize, radius);
+                        ctx.fill();
+                        ctx.strokeStyle = '#e2e8f0';
+                        ctx.lineWidth = 1.5;
+                        ctx.stroke();
+                    } else {
+                        ctx.fillRect(badgeX, badgeY, badgeSize, badgeSize);
+                    }
+                    ctx.restore();
+
+                    // Clip and draw logo image in center
+                    ctx.save();
+                    if (ctx.roundRect) {
+                        ctx.beginPath();
+                        ctx.roundRect(x, y, logoSize, logoSize, radius - 2);
+                        ctx.clip();
+                    }
+                    ctx.drawImage(img, x, y, logoSize, logoSize);
+                    ctx.restore();
+                };
+
+                img.src = logoUrl;
+            });
+        }
+
+        // Update All QR Displays
+        function updateAllQrDisplays() {
+            const { khqr, md5Hash, formattedAmt } = buildKhqrPayload(currentAmount, currentCurrency);
+            currentQrString = khqr;
+            currentMd5 = md5Hash;
+
+            // Update UI Labels
+            const amtDisplay = currentCurrency === 'USD' ? `${formattedAmt}` : `${Number(formattedAmt).toLocaleString()}`;
+            const fullAmtDisplay = currentCurrency === 'USD' ? `$${formattedAmt}` : `${Number(formattedAmt).toLocaleString()} ៛`;
+
+            document.getElementById('previewAmount').textContent = amtDisplay;
+            document.getElementById('previewCurrency').textContent = currentCurrency;
+            document.getElementById('modalAmount').textContent = amtDisplay;
+            document.getElementById('modalCurrency').textContent = currentCurrency;
+            document.getElementById('khqr-amount-mobile').textContent = amtDisplay;
+            document.getElementById('khqr-currency-mobile').textContent = currentCurrency;
+            document.getElementById('btnPayAmountDisplay').textContent = fullAmtDisplay;
+            
+            document.getElementById('previewMd5').textContent = md5Hash.slice(0, 16) + '...';
+            document.getElementById('previewMd5').title = md5Hash;
+
+            // Draw to Preview Canvas, Modal Desktop Canvas, and Mobile Canvas
+            drawKhqrWithLogo(document.getElementById('previewQrCanvas'), khqr, currentCenterLogo);
+            drawKhqrWithLogo(document.getElementById('modalQrCanvas'), khqr, currentCenterLogo);
+            drawKhqrWithLogo(document.getElementById('modalQrCanvasMobile'), khqr, currentCenterLogo);
+        }
+
+        // Render Presets
+        function renderPresets() {
+            const container = document.getElementById('presetsGrid');
+            container.innerHTML = '';
+
+            const list = presets[currentCurrency];
+            list.forEach(p => {
+                const isSelected = (currentAmount === p.val);
+                const btn = document.createElement('button');
+                btn.className = `py-2 px-1 rounded-xl text-xs font-mono font-bold border transition-all cursor-pointer text-center relative ${
+                    isSelected 
+                        ? 'bg-red-600 border-red-500 text-white shadow-md shadow-red-600/30 ring-2 ring-red-400' 
+                        : 'bg-slate-900/90 border-slate-700 text-slate-300 hover:border-slate-500 hover:bg-slate-800'
+                }`;
+                btn.innerHTML = p.label;
+                btn.onclick = () => {
+                    currentAmount = p.val;
+                    document.getElementById('customAmountInput').value = '';
+                    renderPresets();
+                    updateAllQrDisplays();
+                };
+                container.appendChild(btn);
+            });
+        }
+
+        function setCurrency(curr) {
+            currentCurrency = curr;
+            currentAmount = curr === 'USD' ? 1.00 : 4000;
+            document.getElementById('customAmountInput').value = '';
+            document.getElementById('currencyBadge').textContent = curr;
+
+            if (curr === 'USD') {
+                document.getElementById('btnCurrencyUsd').className = 'px-3.5 py-1.5 rounded-lg bg-red-600 text-white font-mono transition-all';
+                document.getElementById('btnCurrencyKhr').className = 'px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white font-mono transition-all';
+            } else {
+                document.getElementById('btnCurrencyKhr').className = 'px-3.5 py-1.5 rounded-lg bg-red-600 text-white font-mono transition-all';
+                document.getElementById('btnCurrencyUsd').className = 'px-3.5 py-1.5 rounded-lg text-slate-400 hover:text-white font-mono transition-all';
+            }
+
+            renderPresets();
+            updateAllQrDisplays();
+        }
+
+        function handleCustomAmountChange(val) {
+            const num = parseFloat(val);
+            if (!isNaN(num) && num > 0) {
+                currentAmount = num;
+                renderPresets();
+                updateAllQrDisplays();
+            }
+        }
+
+        function updateQrCenterLogo(logo) {
+            currentCenterLogo = logo;
+            updateAllQrDisplays();
+        }
+
+        // Download QR as PNG
+        function downloadCurrentQr() {
+            const canvas = document.getElementById('previewQrCanvas');
+            if (!canvas) return;
+
+            const link = document.createElement('a');
+            link.download = `KHQR_HUT_SOKSITCHEY_${currentAmount}_${currentCurrency}.png`;
+            link.href = canvas.toDataURL('image/png');
+            link.click();
+        }
+
+        // Modal Controls
+        const modal = document.getElementById('bakongModal');
+        const desktopModal = document.getElementById('bakongModalDesktop');
+        const mobileModal = document.getElementById('bakongModalMobile');
+        const dragArea = document.getElementById('mobileDragArea');
+        const redHeader = document.getElementById('redHeaderDraggable');
+        
+        let isMobile = window.innerWidth <= 768;
+        function checkIsMobile() { return window.innerWidth <= 768; }
+
+        function openKhqrModal() {
+            isMobile = checkIsMobile();
+            modal.classList.remove('hidden');
+            modal.classList.add('fade-in');
+            
+            updateAllQrDisplays();
+            startPollingBypass();
+
+            if (isMobile) {
+                desktopModal.style.display = 'none';
+                mobileModal.style.display = 'block';
+                setTimeout(() => {
+                    mobileModal.style.transform = 'translateY(0)';
+                }, 10);
+            } else {
+                mobileModal.style.display = 'none';
+                desktopModal.style.display = 'block';
+                desktopModal.classList.add('fade-in');
+            }
+            
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeKhqrModal() {
+            stopPollingBypass();
+            if (isMobile) {
+                mobileModal.style.transform = 'translateY(100%)';
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('fade-in');
+                    mobileModal.style.display = 'none';
+                    document.body.style.overflow = '';
+                }, 350);
+            } else {
+                desktopModal.classList.add('fade-out');
+                setTimeout(() => {
+                    modal.classList.add('hidden');
+                    modal.classList.remove('fade-in');
+                    desktopModal.classList.remove('fade-out');
+                    document.body.style.overflow = '';
+                }, 200);
+            }
+        }
+
+        // Live Bakong Bypass Status Poller
+        function startPollingBypass() {
+            stopPollingBypass();
+            if (!currentMd5) return;
+
+            pollTimer = setInterval(async () => {
+                try {
+                    const response = await fetch(`http://localhost:3000/api/bakong/unofficial/md5=${currentMd5}`, {
+                        method: 'GET',
+                        headers: { 'Accept': 'application/json' }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.responseCode === 0 || data.errorCode === 0 || data.data?.status === 'SUCCESS') {
+                            simulateSuccessfulPayment();
+                        }
+                    }
+                } catch (e) {
+                    // Local server might not be running yet
+                }
+            }, 3000);
+        }
+
+        function stopPollingBypass() {
+            if (pollTimer) {
+                clearInterval(pollTimer);
+                pollTimer = null;
+            }
+        }
+
+        // Simulated or Live Payment Received
+        function simulateSuccessfulPayment() {
+            closeKhqrModal();
+            
+            confetti({
+                particleCount: 150,
+                spread: 90,
+                origin: { y: 0.6 },
+                colors: ['#e11d48', '#22c55e', '#3b82f6', '#f59e0b', '#8b5cf6']
+            });
+
+            document.getElementById('successAmountDisplay').textContent = 
+                currentCurrency === 'USD' ? `$${Number(currentAmount).toFixed(2)}` : `${Number(currentAmount).toLocaleString()} ៛`;
+            document.getElementById('successMd5Display').textContent = currentMd5;
+            
+            document.getElementById('successModal').classList.remove('hidden');
+        }
+
+        function closeSuccessModal() {
+            document.getElementById('successModal').classList.add('hidden');
+        }
+
+        // Event Listeners for Closing
+        modal.addEventListener('click', function(e) {
+            if (e.target === modal) closeKhqrModal();
+        });
+
+        document.addEventListener('keydown', function(e) {
+            if (e.key === 'Escape') {
+                closeKhqrModal();
+                closeSuccessModal();
+            }
+        });
+
+        // Touch Drag for Mobile Sheet
+        let touchStartY = 0;
+        let isDragging = false;
+
+        function handleTouchStart(e) {
+            touchStartY = e.touches[0].clientY;
+            isDragging = true;
+        }
+
+        function handleTouchMove(e) {
+            if (!isDragging) return;
+            const touchCurrentY = e.touches[0].clientY;
+            const deltaY = touchCurrentY - touchStartY;
+            if (deltaY > 0) {
+                const newTransform = Math.min(100, (deltaY / window.innerHeight * 100));
+                mobileModal.style.transition = 'none';
+                mobileModal.style.transform = `translateY(${newTransform}%)`;
+            }
+        }
+
+        function handleTouchEnd(e) {
+            if (!isDragging) return;
+            isDragging = false;
+            const touchEndY = e.changedTouches[0].clientY;
+            const deltaY = touchEndY - touchStartY;
+            mobileModal.style.transition = 'transform 0.35s cubic-bezier(0.4, 0, 0.2, 1)';
+            
+            if (deltaY > 90) {
+                closeKhqrModal();
+            } else {
+                mobileModal.style.transform = 'translateY(0)';
+            }
+        }
+
+        [dragArea, redHeader].forEach(el => {
+            if (el) {
+                el.addEventListener('touchstart', handleTouchStart, { passive: true });
+                el.addEventListener('touchmove', handleTouchMove, { passive: true });
+                el.addEventListener('touchend', handleTouchEnd, { passive: true });
+            }
+        });
+
+        // Initialize on load
+        window.addEventListener('DOMContentLoaded', () => {
+            renderPresets();
+            updateAllQrDisplays();
+        });
+    </script>
+</body>
+</html>
