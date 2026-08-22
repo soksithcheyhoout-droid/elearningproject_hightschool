@@ -37,7 +37,7 @@ function resolveExecutablePath() {
 
 import chromiumPkg from "@sparticuz/chromium";
 
-async function buildLaunchOptions() {
+async function buildLaunchOptions(useProxy = false) {
   const opts = { headless: true, args: ["--no-sandbox", "--disable-gpu", "--disable-dev-shm-usage", "--no-zygote"] };
 
   if (process.env.CHROMIUM_PATH) {
@@ -56,35 +56,36 @@ async function buildLaunchOptions() {
   if (proxyUrl) {
     opts.proxy = { server: proxyUrl };
     console.log(`🇰🇭 [Bakong Proxy] Using Custom Proxy: ${proxyUrl}`);
-  } else if (process.env.KH_PROXY === "true" || process.env.RENDER || process.env.VERCEL || process.platform === 'linux') {
+  } else if (useProxy && KH_PROXIES.length > 0) {
     const idx = Math.floor(Math.random() * KH_PROXIES.length);
     opts.proxy = { server: KH_PROXIES[idx] };
-    console.log(`🇰🇭 [Bakong Proxy] Auto-selected Cambodia SOCKS5 Proxy: ${opts.proxy.server}`);
+    console.log(`🇰🇭 [Bakong Proxy] Using SOCKS5 Proxy Fallback: ${opts.proxy.server}`);
   }
 
   return opts;
 }
 
 async function init(attempt = 0) {
-  console.log(`Launching browser with Cambodia proxy (attempt ${attempt + 1})...`);
+  const useProxy = attempt > 0;
+  console.log(`🚀 Launching Bakong Bypass Browser (attempt ${attempt + 1}, useProxy=${useProxy})...`);
   const t0 = Date.now();
   try {
-    const launchOpts = await buildLaunchOptions();
+    const launchOpts = await buildLaunchOptions(useProxy);
     browser = await chromium.launch(launchOpts);
     page = await browser.newPage();
-    await page.goto(SITE, { waitUntil: "domcontentloaded", timeout: 45000 });
-    await page.waitForTimeout(3000);
+    await page.goto(SITE, { waitUntil: "domcontentloaded", timeout: 25000 });
+    await page.waitForTimeout(2000);
     await getToken().catch(() => {});
     ready = true;
-    console.log(`✅ Bakong Bypass Ready in ${Date.now() - t0} ms`);
+    console.log(`✅ [Bakong Bypass Ready] Connected successfully in ${Date.now() - t0} ms!`);
   } catch (err) {
-    console.warn(`⚠️ [Bakong Proxy Warning]: Attempt ${attempt + 1} failed (${err.message}). Retrying with next Cambodia proxy...`);
+    console.warn(`⚠️ [Bakong Bypass Warning]: Attempt ${attempt + 1} notice (${err.message}). Retrying...`);
     if (browser) {
       await browser.close().catch(() => {});
       browser = null;
     }
     if (attempt < 4) {
-      await new Promise(r => setTimeout(r, 2000));
+      await new Promise(r => setTimeout(r, 1500));
       return init(attempt + 1);
     }
   }
