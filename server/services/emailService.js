@@ -14,8 +14,19 @@ dotenv.config();
 
 import fs from 'fs';
 
-// Create Gmail SMTP transporter (Port 587 STARTTLS + IPv4 forced)
-const createTransporter = () => {
+// Custom strict IPv4 DNS lookup to guarantee zero IPv6 socket attempts
+const ipv4Lookup = (hostname, options, callback) => {
+  dns.lookup(hostname, { family: 4, all: false }, (err, address, family) => {
+    if (err) {
+      // Fallback to direct known Google IPv4 address if DNS fails
+      return callback(null, '142.250.185.108', 4);
+    }
+    callback(null, address, 4);
+  });
+};
+
+// Create Gmail SMTP transporter (Port 587 STARTTLS + Strict IPv4)
+const createTransporter = (port = 587, secure = false) => {
   const user = (process.env.SMTP_USER || process.env.GMAIL_USER || 'soksithcheyhoout@gmail.com').trim();
   const pass = (process.env.SMTP_PASS || process.env.GMAIL_PASS || process.env.GMAIL_APP_PASSWORD || 'hkxlhzduvlkgbeqg').replace(/\s+/g, '');
 
@@ -23,12 +34,12 @@ const createTransporter = () => {
     return null;
   }
 
-  console.log(`📧 [SMTP Config] User: ${user}, Pass: ${'*'.repeat(pass.length)} (${pass.length} chars)`);
-
   return nodemailer.createTransport({
     host: 'smtp.gmail.com',
-    port: 587,
-    secure: false,
+    port,
+    secure,
+    family: 4,
+    lookup: ipv4Lookup,
     auth: {
       user,
       pass
@@ -36,9 +47,9 @@ const createTransporter = () => {
     tls: {
       rejectUnauthorized: false
     },
-    connectionTimeout: 15000,
-    greetingTimeout: 10000,
-    socketTimeout: 15000
+    connectionTimeout: 12000,
+    greetingTimeout: 8000,
+    socketTimeout: 12000
   });
 };
 
@@ -288,28 +299,44 @@ export const sendOtpEmail = async (toEmail, otpCode, purpose = 'login') => {
     });
   }
 
-  try {
-    const info = await transporter.sendMail({
-      from: `"MoTDAR E-Learning" <${senderEmail}>`,
-      to: toEmail,
-      subject: `លេខកូដសម្ងាត់ MoTDAR OTP របស់អ្នកគឺ: ${otpCode}`,
-      text: plainText,
-      html: htmlContent,
-      attachments
-    });
+  const mailOptions = {
+    from: `"MoTDAR E-Learning" <${senderEmail}>`,
+    to: toEmail,
+    subject: `លេខកូដសម្ងាត់ MoTDAR OTP របស់អ្នកគឺ: ${otpCode}`,
+    text: plainText,
+    html: htmlContent,
+    attachments
+  };
 
-    console.log(`✅ [Gmail SMTP Success]: OTP Email sent to ${toEmail} (MessageId: ${info.messageId})`);
+  // Attempt 1: Port 587 STARTTLS (IPv4)
+  try {
+    const info = await transporter.sendMail(mailOptions);
+    console.log(`✅ [Gmail SMTP Success - Port 587]: OTP Email sent to ${toEmail} (MessageId: ${info.messageId})`);
     return {
       success: true,
       sentViaSmtp: true,
       messageId: info.messageId
     };
-  } catch (err) {
-    console.error(`❌ [Gmail SMTP Error]: Failed to send email to ${toEmail}:`, err.message);
-    return {
-      success: false,
-      sentViaSmtp: false,
-      error: err.message
-    };
+  } catch (err587) {
+    console.warn(`⚠️ [Gmail SMTP 587 Warning]: Failed (${err587.message}). Retrying on Port 465 SSL...`);
+    
+    // Attempt 2: Port 465 SSL (IPv4)
+    try {
+      const fallbackTransporter = createTransporter(465, true);
+      const info465 = await fallbackTransporter.sendMail(mailOptions);
+      console.log(`✅ [Gmail SMTP Success - Port 465]: OTP Email sent to ${toEmail} (MessageId: ${info465.messageId})`);
+      return {
+        success: true,
+        sentViaSmtp: true,
+        messageId: info465.messageId
+      };
+    } catch (err465) {
+      console.error(`❌ [Gmail SMTP Error]: All ports failed to send email to ${toEmail}:`, err465.message);
+      return {
+        success: false,
+        sentViaSmtp: false,
+        error: err465.message
+      };
+    }
   }
 };
