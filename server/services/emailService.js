@@ -53,8 +53,94 @@ const createTransporter = (port = 587, secure = false) => {
   });
 };
 
+// Send email via HTTPS API (Port 443 - 100% open on Render Free Tier)
+const sendViaHttpApi = async (toEmail, subject, htmlContent, plainText) => {
+  // 1. Resend API (Free 3,000 emails/month via HTTPS port 443)
+  const resendApiKey = process.env.RESEND_API_KEY;
+  if (resendApiKey) {
+    try {
+      const resp = await fetch('https://api.resend.com/emails', {
+        method: 'POST',
+        headers: {
+          'Authorization': `Bearer ${resendApiKey.trim()}`,
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          from: 'MoTDAR E-Learning <onboarding@resend.dev>',
+          to: [toEmail],
+          subject,
+          html: htmlContent,
+          text: plainText
+        })
+      });
+      const data = await resp.json();
+      if (resp.ok && data.id) {
+        console.log(`✅ [Resend HTTPS Success]: Email sent to ${toEmail} (ID: ${data.id})`);
+        return { success: true, sentViaSmtp: true, messageId: data.id };
+      }
+      console.warn('⚠️ [Resend HTTPS Notice]:', data);
+    } catch (err) {
+      console.warn('⚠️ [Resend HTTPS Error]:', err.message);
+    }
+  }
+
+  // 2. Brevo API (Free 300 emails/day via HTTPS port 443)
+  const brevoApiKey = process.env.BREVO_API_KEY;
+  if (brevoApiKey) {
+    try {
+      const resp = await fetch('https://api.brevo.com/v3/smtp/email', {
+        method: 'POST',
+        headers: {
+          'api-key': brevoApiKey.trim(),
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({
+          sender: { name: 'MoTDAR E-Learning', email: 'soksithcheyhoout@gmail.com' },
+          to: [{ email: toEmail }],
+          subject,
+          htmlContent,
+          textContent: plainText
+        })
+      });
+      const data = await resp.json();
+      if (resp.ok && data.messageId) {
+        console.log(`✅ [Brevo HTTPS Success]: Email sent to ${toEmail} (ID: ${data.messageId})`);
+        return { success: true, sentViaSmtp: true, messageId: data.messageId };
+      }
+      console.warn('⚠️ [Brevo HTTPS Notice]:', data);
+    } catch (err) {
+      console.warn('⚠️ [Brevo HTTPS Error]:', err.message);
+    }
+  }
+
+  // 3. Google Apps Script Webhook (Unlimited Free Gmail Delivery via HTTPS port 443)
+  const googleScriptUrl = process.env.GMAIL_WEBHOOK_URL;
+  if (googleScriptUrl) {
+    try {
+      const resp = await fetch(googleScriptUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          to: toEmail,
+          subject,
+          htmlBody: htmlContent,
+          body: plainText
+        })
+      });
+      if (resp.ok) {
+        console.log(`✅ [Google Apps Script HTTPS Success]: Email sent to ${toEmail}`);
+        return { success: true, sentViaSmtp: true };
+      }
+    } catch (err) {
+      console.warn('⚠️ [Google Apps Script HTTPS Error]:', err.message);
+    }
+  }
+
+  return null;
+};
+
 /**
- * Send 6-Digit OTP Security Code via Gmail
+ * Send 6-Digit OTP Security Code via Gmail / HTTPS
  * @param {string} toEmail - Recipient email address
  * @param {string} otpCode - 6-digit verification code
  * @param {string} purpose - 'login' | 'register' | 'reset'
@@ -299,10 +385,18 @@ export const sendOtpEmail = async (toEmail, otpCode, purpose = 'login') => {
     });
   }
 
+  const subject = `លេខកូដសម្ងាត់ MoTDAR OTP របស់អ្នកគឺ: ${otpCode}`;
+
+  // 1. Try HTTPS API first (Port 443 - Bypasses Render cloud SMTP firewall)
+  const httpResult = await sendViaHttpApi(toEmail, subject, htmlContent, plainText);
+  if (httpResult && httpResult.success) {
+    return httpResult;
+  }
+
   const mailOptions = {
     from: `"MoTDAR E-Learning" <${senderEmail}>`,
     to: toEmail,
-    subject: `លេខកូដសម្ងាត់ MoTDAR OTP របស់អ្នកគឺ: ${otpCode}`,
+    subject,
     text: plainText,
     html: htmlContent,
     attachments
