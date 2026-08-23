@@ -121,13 +121,10 @@ export function showExecutiveSecurityAlert(actionName, reasonDetail) {
         position: relative;
         overflow: hidden;
       ">
-        {/* Ambient Top Glow */}
         <div style="position: absolute; top: 0; left: 0; right: 0; height: 2px; background: linear-gradient(90deg, transparent, #ffd700, transparent); pointer-events: none;"></div>
 
-        {/* ── HEADER ROW ── */}
         <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-bottom: 12px; border-bottom: 1px solid rgba(255, 215, 0, 0.2); padding-bottom: 10px;">
           <div style="display: flex; align-items: center; gap: 10px;">
-            {/* SVG Shield Icon (No Emojis) */}
             <div style="
               width: 36px;
               height: 36px;
@@ -172,7 +169,6 @@ export function showExecutiveSecurityAlert(actionName, reasonDetail) {
           </button>
         </div>
 
-        {/* ── SECURITY ACTION NOTIFICATION ── */}
         <div style="margin-bottom: 12px;">
           <div style="font-size: 13px; font-weight: 700; color: #f8fafc; margin-bottom: 4px; display: flex; align-items: center; gap: 6px;">
             <span style="display: inline-block; width: 7px; height: 7px; border-radius: 50%; background: #ef4444;"></span>
@@ -183,7 +179,6 @@ export function showExecutiveSecurityAlert(actionName, reasonDetail) {
           </div>
         </div>
 
-        {/* ── DETECTED USER TELEMETRY (NO EMOJIS) ── */}
         <div style="
           background: rgba(0, 0, 0, 0.45);
           border: 1px solid rgba(255, 215, 0, 0.22);
@@ -208,7 +203,6 @@ export function showExecutiveSecurityAlert(actionName, reasonDetail) {
           </div>
         </div>
 
-        {/* ── CUSTOM DYNAMIC WAVE REFLECTION BUTTON (DIRECT USER SPECIFICATION) ── */}
         <div style="display: flex; justify-content: center; margin-bottom: 12px;">
           <button
             id="motdar-policy-btn"
@@ -256,7 +250,6 @@ export function showExecutiveSecurityAlert(actionName, reasonDetail) {
           </button>
         </div>
 
-        {/* ── DISMISS PROGRESS BAR ── */}
         <div style="width: 100%; height: 2px; background: rgba(255, 255, 255, 0.1); border-radius: 99px; overflow: hidden;">
           <div id="motdar-sec-bar" style="width: 100%; height: 100%; background: linear-gradient(90deg, #ffd700, #f59e0b); transition: width 0.1s linear;"></div>
         </div>
@@ -291,7 +284,6 @@ export function showExecutiveSecurityAlert(actionName, reasonDetail) {
       policyBtn.onclick = (e) => {
         e.stopPropagation();
         closeAlert();
-        // Dispatch event for App to open Security Policy Modal
         window.dispatchEvent(new CustomEvent('open-security-policy'));
       };
     }
