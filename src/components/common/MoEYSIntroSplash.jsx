@@ -1,25 +1,25 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Music } from 'lucide-react';
+import { X, Music, Volume2 } from 'lucide-react';
 
 const AUDIO_SRC = '/assets/audio/khmer_tea_1.webm';
-const YOUTUBE_VIDEO_ID = 'vAq3g0T_7MI';
 const SONG_TITLE = '(Khmer tea 1) Cambodian Song';
-const START_TIME = 6; // Starts playing immediately at 0:06
-const TOTAL_DURATION = 286; // 4 minutes 46 seconds
+const START_TIME = 6;
+const TOTAL_DURATION = 286;
 
 export default function MoEYSIntroSplash({ onFinish }) {
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(START_TIME);
   const [duration, setDuration] = useState(TOTAL_DURATION);
-  const [isPlaying, setIsPlaying] = useState(true);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [audioUnlocked, setAudioUnlocked] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
-  const [phase, setPhase] = useState(0); // 0=enter, 1=loaded, 2=exit
+  const [phase, setPhase] = useState(0);
 
   const audioRef = useRef(null);
-  const ytPlayerRef = useRef(null);
   const progressTimerRef = useRef(null);
   const isClosingRef = useRef(false);
+  const unlockedRef = useRef(false);
 
   const formatTime = (secs) => {
     if (!secs || isNaN(secs) || secs < 0) return '00:00';
@@ -33,132 +33,79 @@ export default function MoEYSIntroSplash({ onFinish }) {
     isClosingRef.current = true;
     setIsClosing(true);
     setPhase(2);
-
     if (progressTimerRef.current) clearInterval(progressTimerRef.current);
-
     if (audioRef.current) {
-      try {
-        audioRef.current.pause();
-        audioRef.current.src = '';
-      } catch (e) {}
+      try { audioRef.current.pause(); audioRef.current.src = ''; } catch (e) {}
       audioRef.current = null;
     }
-
-    if (ytPlayerRef.current) {
-      try {
-        ytPlayerRef.current.stopVideo?.();
-        ytPlayerRef.current.destroy?.();
-      } catch (e) {}
-      ytPlayerRef.current = null;
-    }
-
-    setTimeout(() => {
-      onFinish?.();
-    }, 600);
+    setTimeout(() => { onFinish?.(); }, 600);
   }, [onFinish]);
+
+  // This function unlocks and unmutes audio — called on first user gesture
+  const unlockAudio = useCallback(() => {
+    if (unlockedRef.current || isClosingRef.current) return;
+    unlockedRef.current = true;
+    setAudioUnlocked(true);
+
+    const audio = audioRef.current;
+    if (!audio) return;
+
+    try {
+      audio.muted = false;
+      audio.volume = 1.0;
+      if (audio.currentTime < START_TIME) audio.currentTime = START_TIME;
+      const p = audio.play();
+      if (p) p.then(() => setIsPlaying(true)).catch(() => {});
+    } catch (e) {}
+  }, []);
 
   useEffect(() => {
     const phaseTimer = setTimeout(() => setPhase(1), 60);
 
-    // 1. Initialize HTML5 Audio
-    const audio = audioRef.current || new Audio(AUDIO_SRC);
+    // 1. Create audio element and start MUTED autoplay immediately (browsers allow this)
+    const audio = new Audio(AUDIO_SRC);
     audioRef.current = audio;
-    audio.src = AUDIO_SRC;
     audio.preload = 'auto';
     audio.currentTime = START_TIME;
-    audio.volume = 1.0;
+    audio.muted = true; // Start muted — browsers allow muted autoplay
+    audio.volume = 0;
 
-    const playHtml5Audio = () => {
+    // Start muted playback immediately so progress tracking is accurate
+    const startMutedPlayback = () => {
       if (!audioRef.current || isClosingRef.current) return;
-      try {
-        audioRef.current.muted = false;
-        audioRef.current.volume = 1.0;
-        const p = audioRef.current.play();
-        if (p !== undefined) {
-          p.then(() => setIsPlaying(true)).catch(() => {});
-        }
-      } catch (e) {}
-    };
-
-    // 2. Initialize YouTube Full-Screen Video Player to unlock unmuted autoplay on Chrome/Edge
-    const initYT = () => {
-      if (ytPlayerRef.current || !window.YT || !window.YT.Player) return;
-      try {
-        ytPlayerRef.current = new window.YT.Player('yt-player-fullscreen', {
-          height: '100%',
-          width: '100%',
-          videoId: YOUTUBE_VIDEO_ID,
-          playerVars: {
-            autoplay: 1,
-            start: START_TIME,
-            controls: 0,
-            disablekb: 1,
-            enablejsapi: 1,
-            fs: 0,
-            modestbranding: 1,
-            playsinline: 1,
-            rel: 0,
-            origin: window.location.origin
-          },
-          events: {
-            onReady: (event) => {
-              if (isClosingRef.current) return;
-              try {
-                event.target.unMute();
-                event.target.setVolume(100);
-                event.target.playVideo();
-                setIsPlaying(true);
-              } catch (e) {}
-            },
-            onStateChange: (event) => {
-              if (event.data === window.YT.PlayerState.PLAYING) {
-                setIsPlaying(true);
-              }
-            }
-          }
-        });
-      } catch (err) {}
-    };
-
-    if (window.YT && window.YT.Player) {
-      initYT();
-    } else {
-      if (!document.getElementById('yt-script-tag')) {
-        const tag = document.createElement('script');
-        tag.id = 'yt-script-tag';
-        tag.src = 'https://www.youtube.com/iframe_api';
-        document.head.appendChild(tag);
-      }
-      const prevCb = window.onYouTubeIframeAPIReady;
-      window.onYouTubeIframeAPIReady = () => {
-        if (typeof prevCb === 'function') prevCb();
-        initYT();
-      };
-    }
-
-    // Try HTML5 Audio immediately
-    playHtml5Audio();
-
-    // 3. Passive event listeners for instant audio un-mute on ANY interaction or mouse motion
-    const handlePassiveActivity = () => {
-      playHtml5Audio();
-      if (ytPlayerRef.current) {
-        try {
-          ytPlayerRef.current.unMute?.();
-          ytPlayerRef.current.playVideo?.();
-        } catch (e) {}
+      audioRef.current.muted = true;
+      audioRef.current.volume = 0;
+      const p = audioRef.current.play();
+      if (p) {
+        p.then(() => {
+          setIsPlaying(true);
+          // Try unmuting immediately (works if browser MEI allows it)
+          try {
+            audioRef.current.muted = false;
+            audioRef.current.volume = 1.0;
+            unlockedRef.current = true;
+            setAudioUnlocked(true);
+          } catch (e) {}
+        }).catch(() => {});
       }
     };
 
-    window.addEventListener('mousemove', handlePassiveActivity, { passive: true });
-    window.addEventListener('pointermove', handlePassiveActivity, { passive: true });
-    window.addEventListener('mouseenter', handlePassiveActivity, { passive: true });
-    window.addEventListener('touchstart', handlePassiveActivity, { passive: true });
-    window.addEventListener('click', handlePassiveActivity, { passive: true });
-    window.addEventListener('keydown', handlePassiveActivity, { passive: true });
-    window.addEventListener('scroll', handlePassiveActivity, { passive: true });
+    startMutedPlayback();
 
-    // 4. Progress and Timer Synchronization
+    // 2. Listen for ANY user gesture to unmute audio
+    const gestureEvents = ['click', 'touchstart', 'touchend', 'keydown', 'pointerdown', 'mousedown'];
+    const onUserGesture = () => {
+      unlockAudio();
+      // Remove all listeners after first unlock
+      gestureEvents.forEach(evt => {
+        document.removeEventListener(evt, onUserGesture, true);
+      });
+    };
+    gestureEvents.forEach(evt => {
+      document.addEventListener(evt, onUserGesture, { once: true, capture: true });
+    });
+
+    // 3. Progress timer
     const startTimeStamp = Date.now();
     const songTotalSeconds = TOTAL_DURATION - START_TIME;
 
@@ -166,18 +113,14 @@ export default function MoEYSIntroSplash({ onFinish }) {
       if (isClosingRef.current) return;
 
       let currentSec = START_TIME;
-      if (audioRef.current && !isNaN(audioRef.current.currentTime) && audioRef.current.currentTime > 0) {
+      if (audioRef.current && !isNaN(audioRef.current.currentTime) && audioRef.current.currentTime > START_TIME) {
         currentSec = audioRef.current.currentTime;
-      } else if (ytPlayerRef.current && typeof ytPlayerRef.current.getCurrentTime === 'function') {
-        const ytSec = ytPlayerRef.current.getCurrentTime() || 0;
-        if (ytSec > 0) currentSec = ytSec;
       } else {
         const elapsed = (Date.now() - startTimeStamp) / 1000;
         currentSec = Math.min(TOTAL_DURATION, START_TIME + elapsed);
       }
 
       setCurrentTime(currentSec);
-
       const effectiveCurrent = Math.max(0, currentSec - START_TIME);
       const pct = Math.min(100, Math.round((effectiveCurrent / songTotalSeconds) * 100));
       setProgress(pct);
@@ -191,31 +134,17 @@ export default function MoEYSIntroSplash({ onFinish }) {
     return () => {
       clearTimeout(phaseTimer);
       if (progressTimerRef.current) clearInterval(progressTimerRef.current);
-      window.removeEventListener('mousemove', handlePassiveActivity);
-      window.removeEventListener('pointermove', handlePassiveActivity);
-      window.removeEventListener('mouseenter', handlePassiveActivity);
-      window.removeEventListener('touchstart', handlePassiveActivity);
-      window.removeEventListener('click', handlePassiveActivity);
-      window.removeEventListener('keydown', handlePassiveActivity);
-      window.removeEventListener('scroll', handlePassiveActivity);
+      gestureEvents.forEach(evt => {
+        document.removeEventListener(evt, onUserGesture, true);
+      });
       if (audioRef.current) {
-        try {
-          audioRef.current.pause();
-          audioRef.current.src = '';
-        } catch (e) {}
-      }
-      if (ytPlayerRef.current) {
-        try {
-          ytPlayerRef.current.stopVideo?.();
-          ytPlayerRef.current.destroy?.();
-        } catch (e) {}
+        try { audioRef.current.pause(); audioRef.current.src = ''; } catch (e) {}
       }
     };
-  }, [handleFinish]);
+  }, [handleFinish, unlockAudio]);
 
   if (typeof document === 'undefined') return null;
 
-  // Circular progress dimensions
   const size = 190;
   const strokeWidth = 2.5;
   const radius = (size - 32) / 2;
@@ -230,43 +159,32 @@ export default function MoEYSIntroSplash({ onFinish }) {
 
   return createPortal(
     <div
-      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999999 }}
+      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999999, cursor: !audioUnlocked ? 'pointer' : 'default' }}
+      onClick={!audioUnlocked ? unlockAudio : undefined}
       className={`flex items-center justify-center font-kantumruy select-none transition-opacity duration-700 bg-slate-950 ${
         isClosing ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
     >
-      {/* 🎵 HTML5 Audio Element */}
-      <audio
-        ref={audioRef}
-        src={AUDIO_SRC}
-        autoPlay
-        playsInline
-        preload="auto"
-        className="hidden"
-      />
+      {/* Hidden audio element */}
+      <audio ref={audioRef} src={AUDIO_SRC} preload="auto" className="hidden" />
 
-      {/* 🎵 Full-Screen YouTube Video Player in Background (Chrome Authorizes Unmuted Autoplay for Viewport Video) */}
-      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-40">
-        <div id="yt-player-fullscreen" className="w-full h-full scale-150 pointer-events-none" />
-      </div>
-
-      {/* ═══════ BRIGHT, VIBRANT WAVING CAMBODIAN FLAG ═══════ */}
+      {/* ═══════ CAMBODIAN FLAG BACKGROUND ═══════ */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <img
           src="/assets/cambodia-flag.gif"
           onError={(e) => { e.currentTarget.src = 'https://media1.tenor.com/m/kDXhibIv45EAAAAC/cambodia-cambodia-flag.gif'; }}
           alt="Cambodia National Flag"
-          className="absolute inset-0 w-full h-full object-cover filter brightness-95 contrast-110 saturate-110 scale-105 select-none pointer-events-none opacity-90"
+          className="absolute inset-0 w-full h-full object-cover filter brightness-95 contrast-110 saturate-110 scale-105 select-none pointer-events-none"
         />
-        <div className="absolute inset-0 bg-slate-950/30" />
+        <div className="absolute inset-0 bg-slate-950/35" />
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-transparent to-slate-950/60" />
       </div>
 
-      {/* Royal Gold Frame with High Visibility */}
+      {/* Royal Gold Frame */}
       <div className="absolute inset-4 sm:inset-7 border border-[#ffd700]/30 rounded-xl pointer-events-none z-10 shadow-[0_0_20px_rgba(0,0,0,0.5)]" />
       <div className="absolute inset-6 sm:inset-10 border border-[#ffd700]/15 rounded-lg pointer-events-none z-10" />
 
-      {/* Corner Royal Accents */}
+      {/* Corner Accents */}
       {[
         'top-3.5 left-3.5 sm:top-6.5 sm:left-6.5',
         'top-3.5 right-3.5 sm:top-6.5 sm:right-6.5 scale-x-[-1]',
@@ -281,120 +199,67 @@ export default function MoEYSIntroSplash({ onFinish }) {
         </div>
       ))}
 
-      {/* ── Skip Button (រំលង ✕) in Top-Right ── */}
+      {/* Skip Button */}
       <button
         type="button"
-        onClick={(e) => {
-          e.stopPropagation();
-          handleFinish();
-        }}
+        onClick={(e) => { e.stopPropagation(); handleFinish(); }}
         className="absolute top-4 right-4 sm:top-7 sm:right-7 z-50 px-3.5 py-1.5 rounded-full border border-white/30 hover:border-amber-300 bg-slate-950/80 hover:bg-slate-900 text-amber-300 hover:text-white text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1.5 backdrop-blur-md shadow-xl hover:scale-105 active:scale-95"
       >
         <span>រំលង</span>
         <X className="w-3.5 h-3.5" />
       </button>
 
-      {/* ═══════ EXECUTIVE NATIONAL EMBLEM & HIGH CONTRAST TYPOGRAPHY ═══════ */}
+      {/* ═══════ MAIN CONTENT ═══════ */}
       <div className={`relative z-20 flex flex-col items-center text-center px-6 max-w-xl mx-auto transition-all duration-700 ease-out ${contentClass}`}>
 
-        {/* Central Seal with Golden Halo */}
+        {/* Central Seal */}
         <div className="relative mb-5 flex items-center justify-center" style={{ width: size, height: size }}>
-          {/* Subtle Ambient Gold Glow */}
           <div className="absolute inset-0 bg-amber-400/20 rounded-full blur-2xl pointer-events-none" />
-
-          {/* SVG Circular Progress Track */}
           <svg width={size} height={size} className="absolute inset-0 -rotate-90">
-            {/* Outer Decorative Track */}
-            <circle
-              cx={size / 2}
-              cy={size / 2}
-              r={radius + 10}
-              fill="none"
-              stroke="#ffd700"
-              strokeWidth="0.5"
-              opacity="0.4"
-            />
-            {/* Base Ring Track */}
-            <circle
-              cx={size / 2}
-              cy={size / 2}
-              r={radius}
-              fill="none"
-              stroke="rgba(0,0,0,0.5)"
-              strokeWidth={strokeWidth}
-            />
-            {/* Glowing Active Gold Progress Ring */}
-            <circle
-              cx={size / 2}
-              cy={size / 2}
-              r={radius}
-              fill="none"
-              stroke="#ffd700"
-              strokeWidth={strokeWidth}
-              strokeLinecap="round"
-              strokeDasharray={circumference}
-              strokeDashoffset={offset}
+            <circle cx={size/2} cy={size/2} r={radius+10} fill="none" stroke="#ffd700" strokeWidth="0.5" opacity="0.4" />
+            <circle cx={size/2} cy={size/2} r={radius} fill="none" stroke="rgba(0,0,0,0.5)" strokeWidth={strokeWidth} />
+            <circle cx={size/2} cy={size/2} r={radius} fill="none" stroke="#ffd700" strokeWidth={strokeWidth}
+              strokeLinecap="round" strokeDasharray={circumference} strokeDashoffset={offset}
               className="transition-all duration-100 ease-out"
               style={{ filter: 'drop-shadow(0 0 8px rgba(255,215,0,0.9))' }}
             />
           </svg>
-
-          {/* Emblem Container with Dark Backing */}
           <div className="w-[110px] h-[110px] sm:w-[125px] sm:h-[125px] flex items-center justify-center p-2 rounded-full bg-slate-950/80 backdrop-blur-md border border-amber-400/50 shadow-[0_4px_25px_rgba(0,0,0,0.9)]">
-            <img
-              src="/assets/moeys-crest-transparent.png"
-              alt="ត្រាជាតិកម្ពុជា"
+            <img src="/assets/moeys-crest-transparent.png" alt="ត្រាជាតិកម្ពុជា"
               className="w-full h-full object-contain filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]"
               onError={(e) => { e.currentTarget.src = '/assets/moeys-custom-logo-transparent.png'; }}
             />
           </div>
-
-          {/* Progress Percentage */}
           <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 bg-slate-950 border border-amber-400 px-3 py-0.5 rounded-full shadow-lg">
-            <span className="text-[11px] font-mono font-black text-amber-300 tracking-wider">
-              {progress}%
-            </span>
+            <span className="text-[11px] font-mono font-black text-amber-300 tracking-wider">{progress}%</span>
           </div>
         </div>
 
-        {/* ── ROYAL HEADINGS ── */}
+        {/* Royal Headings */}
         <div className="space-y-2 mb-4 bg-slate-950/60 p-4 sm:p-5 rounded-2xl border border-white/10 backdrop-blur-md shadow-2xl">
-          {/* Kingdom of Cambodia */}
           <h2 className="font-moul text-xl sm:text-2xl text-amber-300 tracking-wide leading-relaxed drop-shadow-[0_2px_8px_rgba(0,0,0,1)]">
             ព្រះរាជាណាចក្រកម្ពុជា
           </h2>
-
-          {/* National Motto */}
           <p className="text-xs sm:text-sm text-amber-200 font-extrabold tracking-[0.3em] uppercase drop-shadow-[0_2px_6px_rgba(0,0,0,1)]">
             ជាតិ &nbsp;•&nbsp; សាសនា &nbsp;•&nbsp; ព្រះមហាក្សត្រ
           </p>
-
-          {/* Delicate Star Divider */}
           <div className="flex items-center justify-center gap-3 py-1">
             <span className="h-[1px] w-14 sm:w-20 bg-gradient-to-r from-transparent to-amber-400/70" />
-            <svg width="8" height="8" viewBox="0 0 10 10">
-              <path d="M5 0L6.12 3.88L10 5L6.12 6.12L5 10L3.88 6.12L0 5L3.88 3.88Z" fill="#ffd700"/>
-            </svg>
+            <svg width="8" height="8" viewBox="0 0 10 10"><path d="M5 0L6.12 3.88L10 5L6.12 6.12L5 10L3.88 6.12L0 5L3.88 3.88Z" fill="#ffd700"/></svg>
             <span className="h-[1px] w-14 sm:w-20 bg-gradient-to-l from-transparent to-amber-400/70" />
           </div>
-
-          {/* Ministry Title */}
           <h1 className="font-moul text-sm sm:text-base text-white leading-relaxed max-w-md mx-auto drop-shadow-[0_2px_8px_rgba(0,0,0,1)]">
             ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ និងការស្រាវជ្រាវកម្រិតខ្ពស់
           </h1>
-
           <p className="text-[11px] sm:text-xs text-blue-100 tracking-wide font-medium drop-shadow-[0_2px_6px_rgba(0,0,0,1)]">
             Ministry of Talent Development & Advanced Research (MoTDAR)
           </p>
         </div>
 
-        {/* ── LIVE SONG PLAYBACK BADGE ── */}
+        {/* Song Badge */}
         <div className="mb-4 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/80 border border-amber-400/30 text-amber-200 text-xs backdrop-blur-md shadow-lg max-w-full truncate">
           <Music className="w-3.5 h-3.5 text-amber-300 shrink-0" />
-          <span className="font-medium text-[11px] sm:text-xs text-amber-200 truncate">
-            {SONG_TITLE}
-          </span>
-          {/* Animated Equalizer Wave */}
+          <span className="font-medium text-[11px] sm:text-xs text-amber-200 truncate">{SONG_TITLE}</span>
           <div className="flex items-end gap-0.5 h-3 px-1 shrink-0">
             <span className={`w-0.5 bg-amber-400 rounded-full transition-all duration-300 ${isPlaying ? 'h-3 animate-pulse' : 'h-1'}`} />
             <span className={`w-0.5 bg-amber-300 rounded-full transition-all duration-300 ${isPlaying ? 'h-2 animate-bounce' : 'h-1'}`} />
@@ -408,22 +273,28 @@ export default function MoEYSIntroSplash({ onFinish }) {
           )}
         </div>
 
-        {/* ── AUDIO-SYNCED PROGRESS BAR ── */}
+        {/* Subtle "tap anywhere" hint — only shown before audio is unlocked */}
+        {!audioUnlocked && (
+          <div className="mb-3 flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/20 border border-amber-400/40 backdrop-blur-md animate-pulse cursor-pointer">
+            <Volume2 className="w-4 h-4 text-amber-300" />
+            <span className="text-[11px] text-amber-200 font-semibold tracking-wide">
+              ចុចលើអេក្រង់ដើម្បីស្តាប់បទចម្រៀង
+            </span>
+          </div>
+        )}
+
+        {/* Progress Bar */}
         <div className="w-60 sm:w-72 space-y-2">
           <div className="w-full h-2 rounded-full bg-slate-950/80 border border-amber-400/40 overflow-hidden p-[1px] shadow-lg">
             <div
               className="h-full rounded-full transition-all duration-100 ease-out bg-gradient-to-r from-amber-500 via-amber-300 to-amber-400"
-              style={{
-                width: `${progress}%`,
-                boxShadow: '0 0 10px rgba(255,215,0,0.9)'
-              }}
+              style={{ width: `${progress}%`, boxShadow: '0 0 10px rgba(255,215,0,0.9)' }}
             />
           </div>
           <p className="text-[10px] text-amber-200/90 font-semibold tracking-wider drop-shadow-[0_2px_4px_rgba(0,0,0,1)]">
             ប្រព័ន្ធសិក្សាឌីជីថលកម្រិតវិទ្យាល័យជាតិ • E-Learning Platform v2.5
           </p>
         </div>
-
       </div>
     </div>,
     document.body
