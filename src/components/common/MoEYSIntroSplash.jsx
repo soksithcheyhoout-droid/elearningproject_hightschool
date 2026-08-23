@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Volume2, VolumeX, Music } from 'lucide-react';
+import { X, Music } from 'lucide-react';
 
 const AUDIO_SRC = '/assets/audio/khmer_tea_1.webm';
 const SONG_TITLE = '(Khmer tea 1) Cambodian Song';
@@ -11,10 +11,8 @@ export default function MoEYSIntroSplash({ onFinish }) {
   const [currentTime, setCurrentTime] = useState(START_TIME);
   const [duration, setDuration] = useState(286); // ~4:46 default duration
   const [isPlaying, setIsPlaying] = useState(false);
-  const [isMuted, setIsMuted] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [phase, setPhase] = useState(0); // 0=enter, 1=loaded, 2=exit
-  const [requiresGesture, setRequiresGesture] = useState(false);
 
   const audioRef = useRef(null);
   const fallbackIntervalRef = useRef(null);
@@ -72,29 +70,11 @@ export default function MoEYSIntroSplash({ onFinish }) {
     }, 30);
   }, [handleFinish]);
 
-  // Toggle Mute / Unmute
-  const toggleMute = (e) => {
-    e?.stopPropagation?.();
-    if (!audioRef.current) return;
-    try {
-      const nextMuted = !audioRef.current.muted;
-      audioRef.current.muted = nextMuted;
-      setIsMuted(nextMuted);
-      if (!nextMuted && audioRef.current.paused) {
-        audioRef.current.play().catch(() => {});
-      }
-    } catch (err) {
-      console.warn('Toggle mute error:', err);
-    }
-  };
-
-  // User interaction anywhere unlocks audio immediately on strict browser autoplay policies
+  // User interaction anywhere ensures audio is active
   const handleUserInteract = () => {
     if (audioRef.current) {
       try {
         audioRef.current.muted = false;
-        setIsMuted(false);
-        setRequiresGesture(false);
         if (audioRef.current.paused) {
           audioRef.current.play().catch(() => {});
         }
@@ -117,14 +97,11 @@ export default function MoEYSIntroSplash({ onFinish }) {
       audio.play()
         .then(() => {
           setIsPlaying(true);
-          setRequiresGesture(false);
         })
         .catch((err) => {
-          console.warn('Autoplay blocked by browser policy, awaiting user touch/click:', err);
-          setRequiresGesture(true);
-          // Try playing muted if unmuted was blocked
+          console.warn('Autoplay waiting for touch:', err);
+          // If unmuted playback is blocked by policy, play with sound upon first touch
           audio.muted = true;
-          setIsMuted(true);
           audio.play().then(() => setIsPlaying(true)).catch(() => {});
         });
     };
@@ -187,7 +164,7 @@ export default function MoEYSIntroSplash({ onFinish }) {
 
     // Safety timeout: If audio never progresses within 6 seconds, start fallback
     const safetyTimeout = setTimeout(() => {
-      if (audio.paused && !requiresGesture) {
+      if (audio.paused) {
         startFallback();
       }
     }, 6000);
@@ -206,7 +183,7 @@ export default function MoEYSIntroSplash({ onFinish }) {
         audio.src = '';
       } catch (e) {}
     };
-  }, [handleFinish, startFallback, duration, requiresGesture]);
+  }, [handleFinish, startFallback, duration]);
 
   if (typeof document === 'undefined') return null;
 
@@ -262,41 +239,18 @@ export default function MoEYSIntroSplash({ onFinish }) {
         </div>
       ))}
 
-      {/* ── Top Header Controls: Music Status, Mute/Unmute & Skip Button ── */}
-      <div className="absolute top-4 right-4 sm:top-7 sm:right-7 z-50 flex items-center gap-2">
-        {/* Audio Mute / Unmute Button */}
-        <button
-          type="button"
-          onClick={toggleMute}
-          title={isMuted ? 'បើកសំឡេង (Unmute)' : 'បិទសំឡេង (Mute)'}
-          className="px-3 py-1.5 rounded-full border border-white/20 hover:border-amber-300/60 bg-slate-950/75 hover:bg-slate-900/90 text-amber-200 text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1.5 backdrop-blur-md shadow-xl"
-        >
-          {isMuted ? (
-            <>
-              <VolumeX className="w-3.5 h-3.5 text-rose-400" />
-              <span className="hidden sm:inline text-rose-300">បិទសំឡេង</span>
-            </>
-          ) : (
-            <>
-              <Volume2 className="w-3.5 h-3.5 text-amber-300 animate-pulse" />
-              <span className="hidden sm:inline text-amber-200">សំឡេង</span>
-            </>
-          )}
-        </button>
-
-        {/* Skip Button (រំលង ✕) */}
-        <button
-          type="button"
-          onClick={(e) => {
-            e.stopPropagation();
-            handleFinish();
-          }}
-          className="px-3.5 py-1.5 rounded-full border border-white/30 hover:border-amber-300 bg-slate-950/80 hover:bg-slate-900 text-amber-300 hover:text-white text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1.5 backdrop-blur-md shadow-xl hover:scale-105 active:scale-95"
-        >
-          <span>រំលង</span>
-          <X className="w-3.5 h-3.5" />
-        </button>
-      </div>
+      {/* ── Skip Button (រំលង ✕) in Top-Right ── */}
+      <button
+        type="button"
+        onClick={(e) => {
+          e.stopPropagation();
+          handleFinish();
+        }}
+        className="absolute top-4 right-4 sm:top-7 sm:right-7 z-50 px-3.5 py-1.5 rounded-full border border-white/30 hover:border-amber-300 bg-slate-950/80 hover:bg-slate-900 text-amber-300 hover:text-white text-xs font-bold transition-all duration-200 cursor-pointer flex items-center gap-1.5 backdrop-blur-md shadow-xl hover:scale-105 active:scale-95"
+      >
+        <span>រំលង</span>
+        <X className="w-3.5 h-3.5" />
+      </button>
 
       {/* ═══════ EXECUTIVE NATIONAL EMBLEM & HIGH CONTRAST TYPOGRAPHY ═══════ */}
       <div className={`relative z-20 flex flex-col items-center text-center px-6 max-w-xl mx-auto transition-all duration-700 ease-out ${contentClass}`}>
@@ -393,17 +347,17 @@ export default function MoEYSIntroSplash({ onFinish }) {
         </div>
 
         {/* ── LIVE SONG PLAYBACK BADGE ── */}
-        <div className="mb-4 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/80 border border-amber-400/30 text-amber-200 text-xs backdrop-blur-md shadow-lg max-w-full truncate cursor-pointer hover:border-amber-400/60 transition-all">
+        <div className="mb-4 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/80 border border-amber-400/30 text-amber-200 text-xs backdrop-blur-md shadow-lg max-w-full truncate">
           <Music className="w-3.5 h-3.5 text-amber-300 shrink-0" />
           <span className="font-medium text-[11px] sm:text-xs text-amber-200 truncate">
             {SONG_TITLE}
           </span>
           {/* Animated Equalizer Wave */}
           <div className="flex items-end gap-0.5 h-3 px-1 shrink-0">
-            <span className={`w-0.5 bg-amber-400 rounded-full transition-all duration-300 ${isPlaying && !isMuted ? 'h-3 animate-pulse' : 'h-1'}`} />
-            <span className={`w-0.5 bg-amber-300 rounded-full transition-all duration-300 ${isPlaying && !isMuted ? 'h-2 animate-bounce' : 'h-1'}`} />
-            <span className={`w-0.5 bg-amber-400 rounded-full transition-all duration-300 ${isPlaying && !isMuted ? 'h-3.5 animate-pulse' : 'h-1'}`} />
-            <span className={`w-0.5 bg-amber-300 rounded-full transition-all duration-300 ${isPlaying && !isMuted ? 'h-1.5 animate-bounce' : 'h-1'}`} />
+            <span className={`w-0.5 bg-amber-400 rounded-full transition-all duration-300 ${isPlaying ? 'h-3 animate-pulse' : 'h-1'}`} />
+            <span className={`w-0.5 bg-amber-300 rounded-full transition-all duration-300 ${isPlaying ? 'h-2 animate-bounce' : 'h-1'}`} />
+            <span className={`w-0.5 bg-amber-400 rounded-full transition-all duration-300 ${isPlaying ? 'h-3.5 animate-pulse' : 'h-1'}`} />
+            <span className={`w-0.5 bg-amber-300 rounded-full transition-all duration-300 ${isPlaying ? 'h-1.5 animate-bounce' : 'h-1'}`} />
           </div>
           {duration > 0 && (
             <span className="text-[10px] font-mono text-amber-400/90 shrink-0 ml-0.5">
