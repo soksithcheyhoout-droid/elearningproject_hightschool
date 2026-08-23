@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Music } from 'lucide-react';
+import { X, Music, Volume2, Play } from 'lucide-react';
 
 const AUDIO_SRC = '/assets/audio/khmer_tea_1.webm';
 const SONG_TITLE = '(Khmer tea 1) Cambodian Song';
@@ -11,11 +11,11 @@ export default function MoEYSIntroSplash({ onFinish }) {
   const [currentTime, setCurrentTime] = useState(START_TIME);
   const [duration, setDuration] = useState(286); // ~4:46 default duration
   const [isPlaying, setIsPlaying] = useState(false);
+  const [needsClickToPlay, setNeedsClickToPlay] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [phase, setPhase] = useState(0); // 0=enter, 1=loaded, 2=exit
 
   const audioRef = useRef(null);
-  const fallbackIntervalRef = useRef(null);
   const isClosingRef = useRef(false);
 
   const formatTime = (secs) => {
@@ -31,13 +31,10 @@ export default function MoEYSIntroSplash({ onFinish }) {
     setIsClosing(true);
     setPhase(2);
 
-    if (fallbackIntervalRef.current) clearInterval(fallbackIntervalRef.current);
-
     if (audioRef.current) {
       try {
         audioRef.current.pause();
         audioRef.current.src = '';
-        audioRef.current.load();
       } catch (e) {}
       audioRef.current = null;
     }
@@ -47,42 +44,40 @@ export default function MoEYSIntroSplash({ onFinish }) {
     }, 600);
   }, [onFinish]);
 
-  // Fallback animation if audio fails to load
-  const startFallback = useCallback(() => {
-    if (fallbackIntervalRef.current || isClosingRef.current) return;
-    const startTime = Date.now();
-    const fallbackDuration = 6000;
+  // Start playing audio with sound
+  const startAudioPlayback = useCallback(() => {
+    if (!audioRef.current || isClosingRef.current) return;
+    const audio = audioRef.current;
 
-    fallbackIntervalRef.current = setInterval(() => {
-      if (isClosingRef.current) {
-        clearInterval(fallbackIntervalRef.current);
-        return;
+    try {
+      audio.muted = false;
+      if (audio.currentTime < START_TIME) {
+        audio.currentTime = START_TIME;
       }
-      const elapsed = Date.now() - startTime;
-      const raw = elapsed / fallbackDuration;
-      const pct = Math.min(100, Math.round(raw * 100));
-      setProgress(pct);
-
-      if (pct >= 100) {
-        clearInterval(fallbackIntervalRef.current);
-        setTimeout(() => handleFinish(), 350);
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise
+          .then(() => {
+            setIsPlaying(true);
+            setNeedsClickToPlay(false);
+          })
+          .catch((err) => {
+            console.warn('Autoplay blocked by browser policy:', err);
+            setNeedsClickToPlay(true);
+          });
       }
-    }, 30);
-  }, [handleFinish]);
-
-  // User interaction anywhere ensures audio is active
-  const handleUserInteract = () => {
-    if (audioRef.current) {
-      try {
-        audioRef.current.muted = false;
-        if (audioRef.current.paused) {
-          audioRef.current.play().catch(() => {});
-        }
-      } catch (e) {}
+    } catch (err) {
+      console.warn('Play error:', err);
+      setNeedsClickToPlay(true);
     }
+  }, []);
+
+  // User click / touch anywhere on the screen unlocks audio immediately
+  const handleUserInteract = () => {
+    startAudioPlayback();
   };
 
-  // Initialize Instant High-Performance Audio
+  // Initialize High-Performance Audio
   useEffect(() => {
     const phaseTimer = setTimeout(() => setPhase(1), 60);
 
@@ -92,32 +87,18 @@ export default function MoEYSIntroSplash({ onFinish }) {
     audio.preload = 'auto';
     audio.currentTime = START_TIME;
 
-    // Direct Instant Play
-    const attemptPlay = () => {
-      audio.play()
-        .then(() => {
-          setIsPlaying(true);
-        })
-        .catch((err) => {
-          console.warn('Autoplay waiting for touch:', err);
-          // If unmuted playback is blocked by policy, play with sound upon first touch
-          audio.muted = true;
-          audio.play().then(() => setIsPlaying(true)).catch(() => {});
-        });
-    };
-
     const handleLoadedMetadata = () => {
       if (audio.duration && !isNaN(audio.duration)) {
         setDuration(audio.duration);
       }
-      try {
+      if (audio.currentTime < START_TIME) {
         audio.currentTime = START_TIME;
-      } catch (e) {}
-      attemptPlay();
+      }
+      startAudioPlayback();
     };
 
     const handleCanPlay = () => {
-      attemptPlay();
+      startAudioPlayback();
     };
 
     const handleTimeUpdate = () => {
@@ -147,32 +128,36 @@ export default function MoEYSIntroSplash({ onFinish }) {
 
     const handleError = (e) => {
       console.warn('Audio playback error:', e);
-      startFallback();
     };
 
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('canplay', handleCanPlay);
     audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('play', () => setIsPlaying(true));
+    audio.addEventListener('play', () => {
+      setIsPlaying(true);
+      setNeedsClickToPlay(false);
+    });
     audio.addEventListener('pause', () => setIsPlaying(false));
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('error', handleError);
 
-    // Initial load call
+    // Initial attempt to load and play
     audio.load();
-    attemptPlay();
+    startAudioPlayback();
 
-    // Safety timeout: If audio never progresses within 6 seconds, start fallback
-    const safetyTimeout = setTimeout(() => {
-      if (audio.paused) {
-        startFallback();
-      }
-    }, 6000);
+    // Global listener on window for immediate audio unlock on first interaction
+    const unlockAudio = () => {
+      startAudioPlayback();
+    };
+    window.addEventListener('click', unlockAudio, { once: true });
+    window.addEventListener('touchstart', unlockAudio, { once: true });
+    window.addEventListener('keydown', unlockAudio, { once: true });
 
     return () => {
       clearTimeout(phaseTimer);
-      clearTimeout(safetyTimeout);
-      if (fallbackIntervalRef.current) clearInterval(fallbackIntervalRef.current);
+      window.removeEventListener('click', unlockAudio);
+      window.removeEventListener('touchstart', unlockAudio);
+      window.removeEventListener('keydown', unlockAudio);
       audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
       audio.removeEventListener('canplay', handleCanPlay);
       audio.removeEventListener('timeupdate', handleTimeUpdate);
@@ -183,7 +168,7 @@ export default function MoEYSIntroSplash({ onFinish }) {
         audio.src = '';
       } catch (e) {}
     };
-  }, [handleFinish, startFallback, duration]);
+  }, [handleFinish, startAudioPlayback, duration]);
 
   if (typeof document === 'undefined') return null;
 
@@ -204,7 +189,7 @@ export default function MoEYSIntroSplash({ onFinish }) {
     <div
       onClick={handleUserInteract}
       style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999999 }}
-      className={`flex items-center justify-center font-kantumruy select-none transition-opacity duration-700 bg-slate-950 ${
+      className={`flex items-center justify-center font-kantumruy select-none transition-opacity duration-700 bg-slate-950 cursor-pointer ${
         isClosing ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
     >
@@ -346,25 +331,34 @@ export default function MoEYSIntroSplash({ onFinish }) {
           </p>
         </div>
 
-        {/* ── LIVE SONG PLAYBACK BADGE ── */}
-        <div className="mb-4 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/80 border border-amber-400/30 text-amber-200 text-xs backdrop-blur-md shadow-lg max-w-full truncate">
-          <Music className="w-3.5 h-3.5 text-amber-300 shrink-0" />
-          <span className="font-medium text-[11px] sm:text-xs text-amber-200 truncate">
-            {SONG_TITLE}
-          </span>
-          {/* Animated Equalizer Wave */}
-          <div className="flex items-end gap-0.5 h-3 px-1 shrink-0">
-            <span className={`w-0.5 bg-amber-400 rounded-full transition-all duration-300 ${isPlaying ? 'h-3 animate-pulse' : 'h-1'}`} />
-            <span className={`w-0.5 bg-amber-300 rounded-full transition-all duration-300 ${isPlaying ? 'h-2 animate-bounce' : 'h-1'}`} />
-            <span className={`w-0.5 bg-amber-400 rounded-full transition-all duration-300 ${isPlaying ? 'h-3.5 animate-pulse' : 'h-1'}`} />
-            <span className={`w-0.5 bg-amber-300 rounded-full transition-all duration-300 ${isPlaying ? 'h-1.5 animate-bounce' : 'h-1'}`} />
-          </div>
-          {duration > 0 && (
-            <span className="text-[10px] font-mono text-amber-400/90 shrink-0 ml-0.5">
-              {formatTime(currentTime)} / {formatTime(duration)}
+        {/* ── LIVE SONG PLAYBACK BADGE OR CLICK TO PLAY PROMPT ── */}
+        {needsClickToPlay ? (
+          <div className="mb-4 flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/20 border border-amber-400 text-amber-300 text-xs backdrop-blur-md shadow-[0_0_20px_rgba(245,158,11,0.4)] animate-pulse">
+            <Volume2 className="w-4 h-4 text-amber-300 animate-bounce" />
+            <span className="font-bold text-xs">
+              🔊 ចុចលើអេក្រង់ដើម្បីបើកសំឡេងបទភ្លេង (Click to Play)
             </span>
-          )}
-        </div>
+          </div>
+        ) : (
+          <div className="mb-4 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/80 border border-amber-400/30 text-amber-200 text-xs backdrop-blur-md shadow-lg max-w-full truncate">
+            <Music className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+            <span className="font-medium text-[11px] sm:text-xs text-amber-200 truncate">
+              {SONG_TITLE}
+            </span>
+            {/* Animated Equalizer Wave */}
+            <div className="flex items-end gap-0.5 h-3 px-1 shrink-0">
+              <span className={`w-0.5 bg-amber-400 rounded-full transition-all duration-300 ${isPlaying ? 'h-3 animate-pulse' : 'h-1'}`} />
+              <span className={`w-0.5 bg-amber-300 rounded-full transition-all duration-300 ${isPlaying ? 'h-2 animate-bounce' : 'h-1'}`} />
+              <span className={`w-0.5 bg-amber-400 rounded-full transition-all duration-300 ${isPlaying ? 'h-3.5 animate-pulse' : 'h-1'}`} />
+              <span className={`w-0.5 bg-amber-300 rounded-full transition-all duration-300 ${isPlaying ? 'h-1.5 animate-bounce' : 'h-1'}`} />
+            </div>
+            {duration > 0 && (
+              <span className="text-[10px] font-mono text-amber-400/90 shrink-0 ml-0.5">
+                {formatTime(currentTime)} / {formatTime(duration)}
+              </span>
+            )}
+          </div>
+        )}
 
         {/* ── AUDIO-SYNCED PROGRESS BAR ── */}
         <div className="w-60 sm:w-72 space-y-2">
