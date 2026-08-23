@@ -35,7 +35,8 @@ import {
   Crown,
   Radio,
   Users,
-  Building2
+  Building2,
+  LogIn
 } from 'lucide-react';
 import { useAuth, computeLevelData } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
