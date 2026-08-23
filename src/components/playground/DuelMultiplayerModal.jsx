@@ -31,7 +31,11 @@ import {
   Trophy,
   Flame,
   LogOut,
-  UserX
+  UserX,
+  Crown,
+  Radio,
+  Users,
+  Building2
 } from 'lucide-react';
 import { useAuth, computeLevelData } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
@@ -921,32 +925,38 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   });
 
   return createPortal(
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-1.5 sm:p-4 md:p-6 bg-slate-950/90 backdrop-blur-md animate-fade-in font-kantumruy overflow-y-auto">
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-1.5 sm:p-4 md:p-6 bg-slate-950/92 backdrop-blur-xl animate-fade-in font-kantumruy overflow-y-auto">
       
       {/* Main Container */}
-      <div className="bg-[#0b1329] border border-slate-800 rounded-2xl sm:rounded-3xl w-full max-w-4xl max-h-[96vh] sm:max-h-[92vh] flex flex-col shadow-2xl overflow-hidden text-slate-100 relative my-auto">
+      <div className="bg-gradient-to-b from-[#0a1128] via-[#070c1e] to-[#040814] border border-slate-700/80 rounded-2xl sm:rounded-3xl w-full max-w-4xl max-h-[96vh] sm:max-h-[92vh] flex flex-col shadow-[0_25px_80px_rgba(0,0,0,0.95)] overflow-hidden text-slate-100 relative my-auto ring-1 ring-white/10">
         
+        {/* Dynamic Ambient Backlights */}
+        <div className="absolute -top-28 -left-28 w-80 h-80 bg-cyan-500/20 rounded-full blur-[110px] pointer-events-none" />
+        <div className="absolute -top-28 -right-28 w-80 h-80 bg-rose-500/20 rounded-full blur-[110px] pointer-events-none" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-indigo-500/10 rounded-full blur-[130px] pointer-events-none" />
+
         {/* Top Header */}
-        <header className="px-3 sm:px-6 py-2.5 sm:py-4 bg-[#080e1e] border-b border-slate-800/80 flex items-center justify-between flex-shrink-0 gap-2">
-          <div className="flex items-center gap-2 sm:gap-3.5 min-w-0">
-            <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 flex-shrink-0">
-              <Swords className="w-4 h-4 sm:w-5 sm:h-5" />
+        <header className="px-3.5 sm:px-6 py-3 sm:py-4 bg-[#050a17]/90 backdrop-blur-xl border-b border-indigo-500/20 flex items-center justify-between flex-shrink-0 gap-2 relative z-10">
+          <div className="flex items-center gap-2.5 sm:gap-3.5 min-w-0">
+            <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-2xl bg-gradient-to-br from-indigo-500/30 via-purple-500/20 to-cyan-500/20 border border-indigo-400/50 flex items-center justify-center text-indigo-300 shadow-[0_0_20px_rgba(99,102,241,0.35)] flex-shrink-0">
+              <Swords className="w-4 h-4 sm:w-5 sm:h-5 drop-shadow-[0_0_8px_rgba(99,102,241,0.8)]" />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                <span className="text-[9.5px] sm:text-[11px] font-semibold text-indigo-400 uppercase tracking-wider truncate">
+                <span className="text-[10px] sm:text-xs font-black tracking-wider uppercase bg-gradient-to-r from-cyan-400 via-indigo-300 to-purple-300 bg-clip-text text-transparent flex items-center gap-1">
+                  <Zap className="w-3 h-3 text-cyan-400 fill-cyan-400" />
                   1v1 Arena • First to 6 Correct
                 </span>
-                <span className="text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded-full bg-slate-800 text-slate-300 font-medium border border-slate-700">
+                <span className="text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/15 text-indigo-300 font-bold border border-indigo-500/30">
                   {game?.subject || 'វិទ្យាសាស្ត្រ'}
                 </span>
                 {isOvertime && (
-                  <span className="text-[9px] sm:text-[10px] px-1.5 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/40 animate-pulse flex items-center gap-1">
-                    <Flame className="w-2.5 h-2.5" /> OVERTIME
+                  <span className="text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full bg-rose-500/25 text-rose-300 font-bold border border-rose-500/50 animate-pulse flex items-center gap-1">
+                    <Flame className="w-2.5 h-2.5 fill-rose-400" /> OVERTIME
                   </span>
                 )}
               </div>
-              <h2 className="text-xs sm:text-base font-bold text-white leading-tight truncate">
+              <h2 className="text-sm sm:text-lg font-black text-white leading-tight truncate drop-shadow-sm mt-0.5">
                 {game?.titleKm || 'សង្វៀនប្រកួតល្បឿនបន្តផ្ទាល់'}
               </h2>
             </div>
@@ -954,10 +964,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
           <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
             {currentStep === 'battle' && (
-              <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg flex items-center justify-center font-mono font-bold text-xs border ${
+              <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center font-mono font-black text-xs border ${
                 secondsLeft <= 4 
-                  ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 animate-pulse' 
-                  : 'bg-slate-800 text-slate-200 border-slate-700'
+                  ? 'bg-rose-500/25 text-rose-300 border-rose-500/50 animate-pulse' 
+                  : 'bg-slate-800/80 text-slate-200 border-slate-700'
               }`}>
                 {secondsLeft}s
               </div>
@@ -966,19 +976,19 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             <button
               type="button"
               onClick={() => setSoundEnabled(!soundEnabled)}
-              className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-slate-800/60 hover:bg-slate-800 text-slate-400 hover:text-slate-200 border border-slate-700/60 flex items-center justify-center transition-colors cursor-pointer"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-800/70 hover:bg-slate-700/80 text-slate-300 hover:text-white border border-slate-700/80 flex items-center justify-center transition-all cursor-pointer shadow-xs"
               title="Toggle Audio"
             >
-              {soundEnabled ? <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-400" /> : <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4" />}
+              {soundEnabled ? <Volume2 className="w-4 h-4 text-indigo-400 drop-shadow-[0_0_6px_rgba(99,102,241,0.6)]" /> : <VolumeX className="w-4 h-4 text-slate-500" />}
             </button>
 
             <button
               type="button"
               onClick={handleCloseModal}
-              className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg bg-slate-800/60 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 border border-slate-700/60 flex items-center justify-center transition-colors cursor-pointer"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-800/70 hover:bg-rose-500/25 text-slate-400 hover:text-rose-300 border border-slate-700/80 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer shadow-xs"
               title="Leave Room & Close"
             >
-              <X className="w-4 h-4 sm:w-4 sm:h-4" />
+              <X className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
             </button>
           </div>
         </header>
@@ -987,13 +997,13 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
         {/* STEP 1: MATCH LOBBY & STAGING */}
         {/* ========================================================================= */}
         {currentStep === 'lobby' && (
-          <div className="p-3 sm:p-6 md:p-8 flex-1 flex flex-col justify-between overflow-y-auto space-y-4 sm:space-y-6 animate-fade-in">
+          <div className="p-3.5 sm:p-6 md:p-8 flex-1 flex flex-col justify-between overflow-y-auto space-y-5 sm:space-y-7 animate-fade-in relative z-10">
             
-            {/* Top Control Bar: Tab Toggle & Room Code */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-2.5 sm:gap-4 bg-[#0e1730] p-2.5 sm:p-4 rounded-xl sm:rounded-2xl border border-slate-800">
+            {/* Top Control Bar: Tab Toggle & Room Code Deck */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#0a1228]/80 backdrop-blur-md p-3 sm:p-4 rounded-2xl border border-indigo-500/20 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
               
-              {/* Room Code & Quick Share */}
-              <div className="flex items-center gap-2 sm:gap-3 w-full sm:w-auto flex-wrap sm:flex-nowrap">
+              {/* Room Code & Quick Share Actions */}
+              <div className="flex items-center gap-2 sm:gap-2.5 w-full sm:w-auto flex-wrap sm:flex-nowrap">
                 <button
                   type="button"
                   onClick={() => {
@@ -1001,49 +1011,54 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
                   }}
-                  className="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 px-2.5 py-1.5 rounded-xl bg-[#080e1e] hover:bg-slate-800 border border-slate-700 hover:border-indigo-500 text-xs font-mono transition-colors cursor-pointer"
+                  className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-2 rounded-xl bg-gradient-to-r from-amber-500/15 via-amber-400/10 to-amber-500/15 hover:from-amber-500/25 hover:to-amber-500/25 border border-amber-400/40 hover:border-amber-400 text-xs font-mono transition-all cursor-pointer shadow-[0_0_15px_rgba(245,158,11,0.15)] group"
                   title="ចុចដើម្បីចម្លងលេខកូដ (Click to copy code)"
                 >
-                  <span className="text-slate-400">PIN:</span>
-                  <strong className="text-amber-400 font-bold tracking-wider">#{roomCode}</strong>
+                  <span className="text-slate-400 font-sans text-[11px] font-bold">PIN:</span>
+                  <strong className="text-amber-300 font-black tracking-wider text-sm">#{roomCode}</strong>
+                  <span className="text-[10px] text-amber-400/80 bg-amber-400/15 px-1.5 py-0.5 rounded border border-amber-400/30 group-hover:bg-amber-400/30">
+                    {copied ? 'Copied!' : 'Copy'}
+                  </span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleCopyLink}
-                  className="px-2.5 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-medium border border-slate-700 flex items-center gap-1.5 transition-colors cursor-pointer"
+                  className="px-3 py-2 rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-200 text-xs font-bold border border-slate-700/80 hover:border-indigo-500/50 flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
                 >
                   {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
                   <span>{copied ? 'បានចម្លង' : 'Copy Link'}</span>
                 </button>
 
-                <button
-                  type="button"
-                  onClick={handleShareTelegram}
-                  className="p-1.5 rounded-xl bg-[#229ED9]/15 hover:bg-[#229ED9]/25 text-[#229ED9] border border-[#229ED9]/30 transition-colors cursor-pointer"
-                  title="Share Telegram"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                </button>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={handleShareTelegram}
+                    className="p-2 rounded-xl bg-[#229ED9]/15 hover:bg-[#229ED9]/25 text-[#229ED9] border border-[#229ED9]/30 transition-all cursor-pointer hover:scale-105 shadow-xs"
+                    title="Share to Telegram"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={handleShareFacebook}
-                  className="p-1.5 rounded-xl bg-[#1877F2]/15 hover:bg-[#1877F2]/25 text-[#1877F2] border border-[#1877F2]/30 transition-colors cursor-pointer"
-                  title="Share Facebook"
-                >
-                  <Share2 className="w-3.5 h-3.5" />
-                </button>
+                  <button
+                    type="button"
+                    onClick={handleShareFacebook}
+                    className="p-2 rounded-xl bg-[#1877F2]/15 hover:bg-[#1877F2]/25 text-[#1877F2] border border-[#1877F2]/30 transition-all cursor-pointer hover:scale-105 shadow-xs"
+                    title="Share to Facebook"
+                  >
+                    <Share2 className="w-3.5 h-3.5" />
+                  </button>
+                </div>
               </div>
 
               {/* Tab Switcher: Host vs Join */}
-              <div className="flex items-center p-1 rounded-xl bg-[#080e1e] border border-slate-800 w-full sm:w-auto">
+              <div className="flex items-center p-1 rounded-xl bg-[#060b17] border border-slate-800/90 w-full sm:w-auto shadow-inner">
                 <button
                   type="button"
                   onClick={() => setTab('host')}
-                  className={`flex-1 sm:flex-initial px-4 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                  className={`flex-1 sm:flex-initial px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     tab === 'host'
-                      ? 'bg-indigo-600 text-white shadow-sm'
+                      ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]'
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
@@ -1053,9 +1068,9 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                 <button
                   type="button"
                   onClick={() => setTab('join')}
-                  className={`flex-1 sm:flex-initial px-4 py-1.5 rounded-lg text-xs font-semibold transition-all cursor-pointer ${
+                  className={`flex-1 sm:flex-initial px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
                     tab === 'join'
-                      ? 'bg-indigo-600 text-white shadow-sm'
+                      ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]'
                       : 'text-slate-400 hover:text-slate-200'
                   }`}
                 >
@@ -1067,20 +1082,20 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
             {/* TAB: JOIN BY PIN */}
             {tab === 'join' && (
-              <div className="max-w-md mx-auto my-auto w-full p-6 sm:p-8 bg-[#0e1730] rounded-2xl border border-slate-800 text-center space-y-4 animate-fade-in">
-                <div className="w-12 h-12 rounded-xl bg-indigo-600/15 text-indigo-400 flex items-center justify-center mx-auto border border-indigo-500/20">
-                  <KeyRound className="w-6 h-6" />
+              <div className="max-w-md mx-auto my-auto w-full p-6 sm:p-8 bg-gradient-to-b from-[#0d1736] to-[#070e22] rounded-3xl border border-indigo-500/30 text-center space-y-5 shadow-[0_15px_50px_rgba(0,0,0,0.6)] animate-fade-in">
+                <div className="w-14 h-14 rounded-2xl bg-indigo-600/20 text-indigo-400 flex items-center justify-center mx-auto border border-indigo-500/30 shadow-[0_0_20px_rgba(99,102,241,0.3)]">
+                  <KeyRound className="w-7 h-7" />
                 </div>
                 <div className="space-y-1">
-                  <h3 className="text-base font-bold text-white">ចូលរួមបន្ទប់ប្រកួត</h3>
+                  <h3 className="text-lg font-black text-white">ចូលរួមបន្ទប់ប្រកួត (Join Match)</h3>
                   <p className="text-xs text-slate-400">
                     បញ្ចូលលេខកូដបន្ទប់ ៦ ខ្ទង់ដែលទទួលបានពីមិត្តភក្តិរបស់អ្នក
                   </p>
                 </div>
 
                 <div className="space-y-3">
-                  <div className="relative flex items-center justify-center max-w-[260px] mx-auto bg-[#080e1e] border border-slate-700 rounded-xl px-4 focus-within:border-indigo-500 shadow-inner">
-                    <span className="text-xl font-mono font-bold text-amber-400 select-none mr-2">#</span>
+                  <div className="relative flex items-center justify-center max-w-[280px] mx-auto bg-[#050a17] border-2 border-indigo-500/40 rounded-2xl px-4 focus-within:border-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.15)]">
+                    <span className="text-2xl font-mono font-black text-amber-400 select-none mr-2">#</span>
                     <input
                       type="text"
                       maxLength={6}
@@ -1096,11 +1111,11 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                         if (joinError) setJoinError('');
                       }}
                       placeholder="754926"
-                      className="w-full font-mono text-2xl font-bold tracking-widest bg-transparent py-2.5 text-indigo-300 placeholder:text-slate-600 focus:outline-none text-center"
+                      className="w-full font-mono text-3xl font-black tracking-widest bg-transparent py-3 text-cyan-300 placeholder:text-slate-700 focus:outline-none text-center"
                       autoFocus
                     />
                   </div>
-                  {joinError && <p className="text-xs text-rose-400">{joinError}</p>}
+                  {joinError && <p className="text-xs text-rose-400 font-bold">{joinError}</p>}
 
                   <div className="flex justify-center">
                     <button
@@ -1120,7 +1135,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                           }
                         } catch (e) {}
                       }}
-                      className="text-[11px] text-indigo-400 hover:text-indigo-300 underline cursor-pointer"
+                      className="text-xs text-indigo-400 hover:text-indigo-300 font-bold underline cursor-pointer"
                     >
                       បិទភ្ជាប់កូដពី Clipboard (Paste Code)
                     </button>
@@ -1130,83 +1145,114 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                 <button
                   type="button"
                   onClick={handleJoinWithCode}
-                  className="w-full py-2.5 rounded-xl bg-indigo-600 hover:bg-indigo-500 text-white font-semibold text-xs transition-colors cursor-pointer"
+                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-black text-sm transition-all shadow-[0_0_25px_rgba(99,102,241,0.4)] cursor-pointer active:scale-98"
                 >
                   ចូលរួមការប្រកួត (Join Match)
                 </button>
               </div>
             )}
 
-            {/* TAB: HOST / HEAD-TO-HEAD MATCHUP */}
+            {/* TAB: HOST / HEAD-TO-HEAD ESPORTS SHOWCASE */}
             {tab === 'host' && (
               <div className="space-y-6 my-auto">
                 
-                {/* 2-Player Matchup Showcase */}
-                <div className="grid grid-cols-1 md:grid-cols-11 gap-4 items-center">
+                {/* 2-Player Head-to-Head Arena Showcase */}
+                <div className="grid grid-cols-1 md:grid-cols-11 gap-3.5 sm:gap-4 items-stretch relative">
                   
-                  {/* Left Side: Host */}
-                  <div className="md:col-span-5 bg-[#0e1730] p-5 rounded-2xl border border-slate-800 relative">
-                    <div className="flex items-center justify-between pb-3 border-b border-slate-800/80 mb-4">
-                      <span className="text-[11px] font-semibold text-indigo-400 uppercase tracking-wider flex items-center gap-1.5">
-                        <Shield className="w-3.5 h-3.5" /> ម្ចាស់បន្ទប់ (Host / Admin)
+                  {/* Left Fighter Card: Host (Blue / Cyan Cyber Corner) */}
+                  <div className="md:col-span-5 bg-gradient-to-b from-[#0c1836] via-[#091228] to-[#070d1e] p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-cyan-500/30 shadow-[0_10px_35px_rgba(6,182,212,0.12)] relative overflow-hidden flex flex-col justify-between group">
+                    {/* Top Cyan Light Accent */}
+                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-70" />
+
+                    <div className="flex items-center justify-between pb-3 border-b border-cyan-500/20 mb-3.5">
+                      <span className="text-[11px] font-black text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <Crown className="w-3.5 h-3.5 text-amber-400 fill-amber-400 drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]" /> 
+                        ម្ចាស់បន្ទប់ (HOST)
                       </span>
-                      <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                      <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
                         <Check className="w-3 h-3" /> រួចរាល់
                       </span>
                     </div>
 
                     {hostPlayer ? (
                       <div className="flex items-center gap-3.5">
-                        <PlayerAvatarWithFrame
-                          avatar={hostPlayer.avatar}
-                          frame={hostPlayer.avatarFrame || hostPlayer.avatar_frame}
-                          size="md"
-                        />
+                        <div className="relative">
+                          <PlayerAvatarWithFrame
+                            avatar={hostPlayer.avatar}
+                            frame={hostPlayer.avatarFrame || hostPlayer.avatar_frame}
+                            size="md"
+                          />
+                        </div>
 
                         <div className="min-w-0 flex-1">
-                          <h4 className="text-sm font-bold text-white truncate">
+                          <h4 className="text-sm sm:text-base font-black text-white truncate drop-shadow-sm">
                             {hostPlayer.name || 'សុខ វិបុល'}
                           </h4>
-                          <p className="text-xs text-slate-400 truncate mt-0.5">
-                            {hostPlayer.school || 'វិទ្យាល័យជាតិ'}
+                          <p className="text-xs text-cyan-300/80 truncate mt-0.5 font-medium flex items-center gap-1">
+                            <Building2 className="w-3 h-3 flex-shrink-0 text-cyan-400" />
+                            <span className="truncate">{hostPlayer.school || 'វិទ្យាល័យជាតិ'}</span>
                           </p>
-                          <div className="flex items-center gap-2 mt-1 text-[11px] text-indigo-300 font-mono">
-                            <span>Lv.{hostPlayer.level || 1}</span>
-                            <span>•</span>
-                            <span>{hostPlayer.xp || 500} XP</span>
+                          <div className="flex items-center gap-2 mt-1.5">
+                            <span className="px-2 py-0.5 rounded-md bg-cyan-500/15 border border-cyan-500/30 text-[10px] font-black text-cyan-300">
+                              Lv.{hostPlayer.level || 1}
+                            </span>
+                            <span className="px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-[10px] font-black text-amber-300">
+                              ⭐ {(hostPlayer.xp || 500).toLocaleString()} XP
+                            </span>
                           </div>
                         </div>
                       </div>
                     ) : (
-                      <div className="py-4 text-center text-slate-400 text-xs flex items-center justify-center gap-2">
-                        <Loader2 className="w-4 h-4 animate-spin text-indigo-400" />
+                      <div className="py-6 text-center text-slate-400 text-xs flex items-center justify-center gap-2">
+                        <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
                         <span>កំពុងទាញយកទិន្នន័យ...</span>
                       </div>
                     )}
                   </div>
 
-                  {/* Center: VS Emblem */}
-                  <div className="md:col-span-1 flex flex-col items-center justify-center py-2">
-                    <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center font-bold text-xs text-indigo-400 shadow-inner">
-                      VS
+                  {/* Center: VS Energy Reactor */}
+                  <div className="md:col-span-1 flex flex-row md:flex-col items-center justify-center py-2 relative">
+                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-rose-600 p-[1.5px] shadow-[0_0_25px_rgba(168,85,247,0.45)] animate-pulse flex-shrink-0">
+                      <div className="w-full h-full bg-[#070d1e] rounded-2xl flex flex-col items-center justify-center">
+                        <span className="font-black text-sm sm:text-base tracking-tight bg-gradient-to-r from-cyan-400 via-purple-300 to-rose-400 bg-clip-text text-transparent drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]">
+                          VS
+                        </span>
+                      </div>
                     </div>
                   </div>
 
-                  {/* Right Side: Challenger (Opponent) with Admin KICK Button */}
-                  <div className="md:col-span-5 bg-[#0e1730] p-5 rounded-2xl border border-slate-800 relative">
-                    <div className="flex items-center justify-between pb-3 border-b border-slate-800/80 mb-4">
-                      <span className="text-[11px] font-semibold text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
-                        <Swords className="w-3.5 h-3.5" /> គូប្រជែង (Challenger)
+                  {/* Right Fighter Card: Challenger (Red / Crimson Cyber Corner) */}
+                  <div className={`md:col-span-5 p-4 sm:p-5 rounded-2xl sm:rounded-3xl relative overflow-hidden flex flex-col justify-between transition-all ${
+                    challengerPlayer
+                      ? 'bg-gradient-to-b from-[#220c1d] via-[#150713] to-[#0a0309] border border-rose-500/30 shadow-[0_10px_35px_rgba(244,63,94,0.12)]'
+                      : 'bg-[#0a1228]/50 border-2 border-dashed border-rose-500/30 hover:border-rose-400 hover:bg-rose-500/5 cursor-pointer shadow-[0_0_25px_rgba(244,63,94,0.06)]'
+                  }`}
+                  onClick={() => {
+                    if (!challengerPlayer) {
+                      fetchStudents();
+                      setShowInviteModal(true);
+                    }
+                  }}
+                  >
+                    {/* Top Rose Light Accent */}
+                    {challengerPlayer && (
+                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-rose-400 to-transparent opacity-70" />
+                    )}
+
+                    <div className="flex items-center justify-between pb-3 border-b border-rose-500/20 mb-3.5">
+                      <span className="text-[11px] font-black text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+                        <Swords className="w-3.5 h-3.5 text-rose-400" /> 
+                        គូប្រជែង (CHALLENGER)
                       </span>
                       {challengerPlayer ? (
                         <div className="flex items-center gap-2">
                           {isChallengerReady ? (
-                            <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 flex items-center gap-1">
+                            <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
                               <Check className="w-3 h-3" /> រួចរាល់ (Ready)
                             </span>
                           ) : (
-                            <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-amber-500/15 text-amber-400 border border-amber-500/30 flex items-center gap-1">
-                              <Clock className="w-3 h-3" /> មិនទាន់រួចរាល់ (Not Ready)
+                            <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1 animate-pulse">
+                              <Clock className="w-3 h-3" /> កំពុងរៀបចំ...
                             </span>
                           )}
 
@@ -1214,17 +1260,20 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                           {isHost && (
                             <button
                               type="button"
-                              onClick={handleKickChallenger}
-                              className="px-2 py-0.5 rounded-lg bg-rose-500/15 hover:bg-rose-500/25 text-rose-300 hover:text-rose-200 border border-rose-500/30 text-[10px] font-bold flex items-center gap-1 transition-colors cursor-pointer"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleKickChallenger();
+                              }}
+                              className="px-2 py-0.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/35 text-rose-300 hover:text-white border border-rose-500/40 text-[10px] font-bold flex items-center gap-1 transition-all cursor-pointer shadow-xs"
                               title="បណ្តេញគូប្រជែងចេញ (Kick Player)"
                             >
-                              <UserX className="w-3 h-3 text-rose-400" />
-                              <span>បណ្តេញចេញ (Kick)</span>
+                              <UserX className="w-3 h-3" />
+                              <span>Kick</span>
                             </button>
                           )}
                         </div>
                       ) : (
-                        <span className="text-[10px] font-medium px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700">
+                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
                           រង់ចាំ
                         </span>
                       )}
@@ -1232,53 +1281,57 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
                     {challengerPlayer ? (
                       <div className="flex items-center gap-3.5">
-                        <PlayerAvatarWithFrame
-                          avatar={challengerPlayer.avatar}
-                          frame={challengerPlayer.avatarFrame || challengerPlayer.avatar_frame}
-                          size="md"
-                        />
+                        <div className="relative">
+                          <PlayerAvatarWithFrame
+                            avatar={challengerPlayer.avatar}
+                            frame={challengerPlayer.avatarFrame || challengerPlayer.avatar_frame}
+                            size="md"
+                          />
+                        </div>
 
                         <div className="min-w-0 flex-1">
-                          <h4 className="text-sm font-bold text-white truncate">
+                          <h4 className="text-sm sm:text-base font-black text-white truncate drop-shadow-sm">
                             {challengerPlayer.name}
                           </h4>
-                          <p className="text-xs text-slate-400 truncate mt-0.5">
-                            {challengerPlayer.school}
+                          <p className="text-xs text-rose-300/80 truncate mt-0.5 font-medium flex items-center gap-1">
+                            <Building2 className="w-3 h-3 flex-shrink-0 text-rose-400" />
+                            <span className="truncate">{challengerPlayer.school}</span>
                           </p>
-                          <div className="flex items-center gap-2 mt-1 text-[11px] text-rose-300 font-mono">
-                            <span>Lv.{challengerPlayer.level || 1}</span>
-                            <span>•</span>
-                            <span>{challengerPlayer.xp || 500} XP</span>
+                          <div className="flex items-center gap-2 mt-1.5">
+                            <span className="px-2 py-0.5 rounded-md bg-rose-500/15 border border-rose-500/30 text-[10px] font-black text-rose-300">
+                              Lv.{challengerPlayer.level || 1}
+                            </span>
+                            <span className="px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-[10px] font-black text-amber-300">
+                              ⭐ {(challengerPlayer.xp || 500).toLocaleString()} XP
+                            </span>
                           </div>
                         </div>
                       </div>
                     ) : (
-                      <div 
-                        onClick={() => {
-                          fetchStudents();
-                          setShowInviteModal(true);
-                        }}
-                        className="py-3.5 px-4 rounded-xl border border-dashed border-slate-700 hover:border-indigo-500/50 hover:bg-indigo-500/5 transition-all text-center cursor-pointer flex flex-col items-center justify-center gap-1.5"
-                      >
-                        <UserPlus className="w-5 h-5 text-indigo-400" />
-                        <span className="text-xs font-semibold text-slate-200">
-                          ចុចទីនេះដើម្បីអញ្ជើញសិស្សពិតប្រាកដ
-                        </span>
-                        <span className="text-[10px] text-slate-400">
-                          ឬចែករំលែកលេខកូដ #{roomCode} ឱ្យមិត្តភក្តិចូលរួម
-                        </span>
+                      <div className="py-3 px-2 text-center flex flex-col items-center justify-center gap-2">
+                        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-rose-500/20 to-purple-600/20 border border-rose-400/40 text-rose-300 flex items-center justify-center shadow-[0_0_15px_rgba(244,63,94,0.25)]">
+                          <UserPlus className="w-5 h-5 animate-pulse" />
+                        </div>
+                        <div>
+                          <span className="text-xs font-black bg-gradient-to-r from-rose-300 via-pink-200 to-amber-300 bg-clip-text text-transparent block">
+                            ✨ ចុចទីនេះដើម្បីអញ្ជើញសិស្សពិតប្រាកដ
+                          </span>
+                          <span className="text-[10px] text-slate-400 block mt-0.5">
+                            ឬចែករំលែកលេខកូដ <strong className="text-amber-400">#{roomCode}</strong> ឱ្យមិត្តភក្តិចូលរួម
+                          </span>
+                        </div>
                       </div>
                     )}
                   </div>
 
                 </div>
 
-                {/* Primary Action Button Bar */}
+                {/* Primary Action Command Station */}
                 <div className="flex flex-col items-center gap-3 pt-2">
                   
                   {/* Warning notice when Host tries to start without ready opponent */}
                   {isHost && hostWarningNotice && (
-                    <div className="w-full max-w-md p-3 bg-rose-500/15 border border-rose-500/30 rounded-xl text-rose-300 text-xs font-medium text-center flex items-center justify-center gap-2 animate-fade-in">
+                    <div className="w-full max-w-md p-3 bg-rose-500/20 border border-rose-500/40 rounded-2xl text-rose-300 text-xs font-bold text-center flex items-center justify-center gap-2 animate-fade-in shadow-[0_0_15px_rgba(244,63,94,0.2)]">
                       <AlertTriangle className="w-4 h-4 text-rose-400 flex-shrink-0" />
                       <span>{hostWarningNotice}</span>
                     </div>
@@ -1289,44 +1342,44 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                     <button
                       type="button"
                       onClick={handleStartDuel}
-                      className={`w-full sm:w-auto px-10 py-3.5 rounded-xl font-bold text-sm shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 ${
+                      className={`w-full sm:w-auto px-12 py-3.5 rounded-2xl font-black text-sm shadow-xl transition-all flex items-center justify-center gap-2.5 cursor-pointer active:scale-98 ${
                         challengerPlayer && isChallengerReady
-                          ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/25 ring-2 ring-emerald-500/50'
-                          : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/25'
+                          ? 'bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600 text-slate-950 shadow-[0_0_35px_rgba(16,185,129,0.5)] ring-2 ring-emerald-300 hover:scale-[1.02]'
+                          : 'bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white shadow-[0_0_25px_rgba(99,102,241,0.35)]'
                       }`}
                     >
-                      <Play className="w-4 h-4 fill-white" />
+                      <Play className={`w-4 h-4 ${challengerPlayer && isChallengerReady ? 'fill-slate-950' : 'fill-white'}`} />
                       <span>ចាប់ផ្តើមការប្រកួត (Start Match)</span>
                     </button>
                   ) : (
                     // Challenger view: READY UP BUTTON
-                    <div className="flex flex-col items-center gap-2 w-full sm:w-auto">
+                    <div className="flex flex-col items-center gap-2.5 w-full sm:w-auto">
                       <button
                         type="button"
                         onClick={handleToggleReady}
-                        className={`w-full sm:w-auto px-10 py-3.5 rounded-xl font-bold text-sm shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 ${
+                        className={`w-full sm:w-auto px-12 py-3.5 rounded-2xl font-black text-sm shadow-xl transition-all flex items-center justify-center gap-2.5 cursor-pointer active:scale-98 ${
                           isChallengerReady
-                            ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/25 ring-2 ring-emerald-400/50'
-                            : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/25'
+                            ? 'bg-gradient-to-r from-emerald-500 via-teal-400 to-emerald-600 text-slate-950 shadow-[0_0_35px_rgba(16,185,129,0.5)] ring-2 ring-emerald-300 hover:scale-[1.02]'
+                            : 'bg-gradient-to-r from-indigo-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white shadow-[0_0_25px_rgba(99,102,241,0.35)]'
                         }`}
                       >
                         {isChallengerReady ? (
                           <>
-                            <CheckCircle2 className="w-4 h-4 text-white" />
-                            <span>រួចរាល់ហើយ! (Ready - Waiting for Admin)</span>
+                            <CheckCircle2 className="w-4 h-4 text-slate-950" />
+                            <span>រួចរាល់ហើយ! (Ready - Waiting for Host)</span>
                           </>
                         ) : (
                           <>
-                            <Check className="w-4 h-4" />
+                            <Zap className="w-4 h-4 fill-white" />
                             <span>ចុចទីនេះដើម្បីត្រៀមខ្លួនរួចរាល់ (Click to Ready)</span>
                           </>
                         )}
                       </button>
 
                       {isChallengerReady && (
-                        <span className="text-[11px] text-emerald-400 font-medium flex items-center gap-1.5 animate-pulse">
-                          <Loader2 className="w-3 h-3 animate-spin" />
-                          កំពុងរង់ចាំម្ចាស់បន្ទប់ (Admin) ចាប់ផ្តើមការប្រកួត...
+                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1.5 animate-pulse">
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          កំពុងរង់ចាំម្ចាស់បន្ទប់ (Host) ចុចចាប់ផ្តើមការប្រកួត...
                         </span>
                       )}
                     </div>
@@ -1336,7 +1389,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                   <button
                     type="button"
                     onClick={handleCloseModal}
-                    className="w-full sm:w-auto px-8 py-2.5 rounded-xl font-semibold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 bg-rose-600/15 hover:bg-rose-600/30 text-rose-400 hover:text-rose-300 border border-rose-500/30 hover:border-rose-500/50"
+                    className="w-full sm:w-auto px-8 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 bg-rose-600/15 hover:bg-rose-600/30 text-rose-300 hover:text-white border border-rose-500/30 hover:border-rose-500/50"
                   >
                     <LogOut className="w-3.5 h-3.5" />
                     <span>ចាកចេញពីបន្ទប់ (Leave Room)</span>
