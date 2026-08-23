@@ -2,21 +2,21 @@ import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import { X, Volume2, VolumeX, Music } from 'lucide-react';
 
-const YOUTUBE_VIDEO_ID = 'vAq3g0T_7MI'; // (Khmer tea 1 ) Cambodian Song
+const AUDIO_SRC = '/assets/audio/khmer_tea_1.webm';
 const SONG_TITLE = '(Khmer tea 1) Cambodian Song';
-const START_TIME = 6; // Starts playing at 0:06 as requested
+const START_TIME = 6; // Starts playing immediately at 0:06
 
 export default function MoEYSIntroSplash({ onFinish }) {
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(START_TIME);
-  const [duration, setDuration] = useState(0);
+  const [duration, setDuration] = useState(286); // ~4:46 default duration
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [phase, setPhase] = useState(0); // 0=enter, 1=loaded, 2=exit
+  const [requiresGesture, setRequiresGesture] = useState(false);
 
-  const playerRef = useRef(null);
-  const progressIntervalRef = useRef(null);
+  const audioRef = useRef(null);
   const fallbackIntervalRef = useRef(null);
   const isClosingRef = useRef(false);
 
@@ -33,22 +33,15 @@ export default function MoEYSIntroSplash({ onFinish }) {
     setIsClosing(true);
     setPhase(2);
 
-    // Stop and cleanup YouTube audio player
-    if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
     if (fallbackIntervalRef.current) clearInterval(fallbackIntervalRef.current);
 
-    if (playerRef.current) {
+    if (audioRef.current) {
       try {
-        if (typeof playerRef.current.stopVideo === 'function') {
-          playerRef.current.stopVideo();
-        }
-        if (typeof playerRef.current.destroy === 'function') {
-          playerRef.current.destroy();
-        }
-      } catch (e) {
-        // Safe ignore
-      }
-      playerRef.current = null;
+        audioRef.current.pause();
+        audioRef.current.src = '';
+        audioRef.current.load();
+      } catch (e) {}
+      audioRef.current = null;
     }
 
     setTimeout(() => {
@@ -56,7 +49,7 @@ export default function MoEYSIntroSplash({ onFinish }) {
     }, 600);
   }, [onFinish]);
 
-  // Fallback animation if YouTube is blocked or fails to load
+  // Fallback animation if audio fails to load
   const startFallback = useCallback(() => {
     if (fallbackIntervalRef.current || isClosingRef.current) return;
     const startTime = Date.now();
@@ -82,188 +75,138 @@ export default function MoEYSIntroSplash({ onFinish }) {
   // Toggle Mute / Unmute
   const toggleMute = (e) => {
     e?.stopPropagation?.();
-    if (!playerRef.current) return;
+    if (!audioRef.current) return;
     try {
-      if (isMuted) {
-        playerRef.current.unMute();
-        playerRef.current.playVideo();
-        setIsMuted(false);
-      } else {
-        playerRef.current.mute();
-        setIsMuted(true);
+      const nextMuted = !audioRef.current.muted;
+      audioRef.current.muted = nextMuted;
+      setIsMuted(nextMuted);
+      if (!nextMuted && audioRef.current.paused) {
+        audioRef.current.play().catch(() => {});
       }
     } catch (err) {
       console.warn('Toggle mute error:', err);
     }
   };
 
-  // User interaction anywhere unlocks audio on strict browser policies
+  // User interaction anywhere unlocks audio immediately on strict browser autoplay policies
   const handleUserInteract = () => {
-    if (playerRef.current) {
+    if (audioRef.current) {
       try {
-        if (typeof playerRef.current.unMute === 'function') {
-          playerRef.current.unMute();
-          playerRef.current.setVolume(100);
-        }
-        if (typeof playerRef.current.playVideo === 'function') {
-          playerRef.current.playVideo();
-        }
+        audioRef.current.muted = false;
         setIsMuted(false);
-      } catch (e) {
-        // Safe ignore
-      }
+        setRequiresGesture(false);
+        if (audioRef.current.paused) {
+          audioRef.current.play().catch(() => {});
+        }
+      } catch (e) {}
     }
   };
 
-  // Load YouTube IFrame API and Initialize Player
+  // Initialize Instant High-Performance Audio
   useEffect(() => {
     const phaseTimer = setTimeout(() => setPhase(1), 60);
 
-    let isMounted = true;
+    const audio = new Audio();
+    audioRef.current = audio;
+    audio.src = AUDIO_SRC;
+    audio.preload = 'auto';
+    audio.currentTime = START_TIME;
 
-    const initPlayer = () => {
-      if (!isMounted || playerRef.current || !window.YT || !window.YT.Player) return;
-
-      try {
-        playerRef.current = new window.YT.Player('yt-splash-audio-player', {
-          height: '1',
-          width: '1',
-          videoId: YOUTUBE_VIDEO_ID,
-          playerVars: {
-            autoplay: 1,
-            start: START_TIME,
-            controls: 0,
-            disablekb: 1,
-            enablejsapi: 1,
-            fs: 0,
-            iv_load_policy: 3,
-            modestbranding: 1,
-            playsinline: 1,
-            rel: 0,
-            origin: window.location.origin
-          },
-          events: {
-            onReady: (event) => {
-              if (!isMounted || isClosingRef.current) return;
-              try {
-                event.target.seekTo(START_TIME, true);
-                event.target.unMute();
-                event.target.setVolume(100);
-                event.target.playVideo();
-              } catch (e) {
-                console.warn('Autoplay error:', e);
-              }
-            },
-            onStateChange: (event) => {
-              if (!isMounted || isClosingRef.current) return;
-
-              // YT.PlayerState.PLAYING = 1
-              if (event.data === window.YT.PlayerState.PLAYING) {
-                setIsPlaying(true);
-                setIsMuted(event.target.isMuted ? event.target.isMuted() : false);
-                const dur = event.target.getDuration ? event.target.getDuration() : 0;
-                if (dur > 0) setDuration(dur);
-              }
-              // YT.PlayerState.PAUSED = 2
-              else if (event.data === window.YT.PlayerState.PAUSED) {
-                setIsPlaying(false);
-              }
-              // YT.PlayerState.ENDED = 0
-              else if (event.data === window.YT.PlayerState.ENDED) {
-                setProgress(100);
-                setTimeout(() => handleFinish(), 400);
-              }
-            },
-            onError: (err) => {
-              console.warn('YouTube audio player error:', err);
-              startFallback();
-            }
-          }
+    // Direct Instant Play
+    const attemptPlay = () => {
+      audio.play()
+        .then(() => {
+          setIsPlaying(true);
+          setRequiresGesture(false);
+        })
+        .catch((err) => {
+          console.warn('Autoplay blocked by browser policy, awaiting user touch/click:', err);
+          setRequiresGesture(true);
+          // Try playing muted if unmuted was blocked
+          audio.muted = true;
+          setIsMuted(true);
+          audio.play().then(() => setIsPlaying(true)).catch(() => {});
         });
-      } catch (err) {
-        console.warn('Failed to instantiate YouTube player:', err);
-        startFallback();
+    };
+
+    const handleLoadedMetadata = () => {
+      if (audio.duration && !isNaN(audio.duration)) {
+        setDuration(audio.duration);
+      }
+      try {
+        audio.currentTime = START_TIME;
+      } catch (e) {}
+      attemptPlay();
+    };
+
+    const handleCanPlay = () => {
+      attemptPlay();
+    };
+
+    const handleTimeUpdate = () => {
+      if (isClosingRef.current) return;
+      const curr = audio.currentTime || START_TIME;
+      const dur = audio.duration || duration || 286;
+
+      setCurrentTime(curr);
+      if (dur > START_TIME) {
+        setDuration(dur);
+        const effectiveCurrent = Math.max(0, curr - START_TIME);
+        const effectiveTotal = Math.max(1, dur - START_TIME);
+        const pct = Math.min(100, Math.round((effectiveCurrent / effectiveTotal) * 100));
+        setProgress(pct);
+
+        if (curr >= dur - 0.4) {
+          setProgress(100);
+          handleFinish();
+        }
       }
     };
 
-    // Check if YouTube API is already on window
-    if (window.YT && window.YT.Player) {
-      initPlayer();
-    } else {
-      const existingScript = document.getElementById('youtube-iframe-api');
-      if (!existingScript) {
-        const tag = document.createElement('script');
-        tag.id = 'youtube-iframe-api';
-        tag.src = 'https://www.youtube.com/iframe_api';
-        const firstScriptTag = document.getElementsByTagName('script')[0];
-        if (firstScriptTag && firstScriptTag.parentNode) {
-          firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-        } else {
-          document.head.appendChild(tag);
-        }
-      }
+    const handleEnded = () => {
+      setProgress(100);
+      setTimeout(() => handleFinish(), 400);
+    };
 
-      const prevCallback = window.onYouTubeIframeAPIReady;
-      window.onYouTubeIframeAPIReady = () => {
-        if (typeof prevCallback === 'function') prevCallback();
-        if (isMounted) initPlayer();
-      };
-    }
+    const handleError = (e) => {
+      console.warn('Audio playback error:', e);
+      startFallback();
+    };
 
-    // Safety timeout: If YT player takes more than 5 seconds without ready, start fallback
+    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
+    audio.addEventListener('canplay', handleCanPlay);
+    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('play', () => setIsPlaying(true));
+    audio.addEventListener('pause', () => setIsPlaying(false));
+    audio.addEventListener('ended', handleEnded);
+    audio.addEventListener('error', handleError);
+
+    // Initial load call
+    audio.load();
+    attemptPlay();
+
+    // Safety timeout: If audio never progresses within 6 seconds, start fallback
     const safetyTimeout = setTimeout(() => {
-      if (!playerRef.current) {
+      if (audio.paused && !requiresGesture) {
         startFallback();
       }
-    }, 5000);
-
-    // Poll current time and sync progress with audio playback from START_TIME
-    progressIntervalRef.current = setInterval(() => {
-      if (!playerRef.current || isClosingRef.current) return;
-      try {
-        if (typeof playerRef.current.getCurrentTime === 'function' && typeof playerRef.current.getDuration === 'function') {
-          const curr = playerRef.current.getCurrentTime() || 0;
-          const dur = playerRef.current.getDuration() || 0;
-
-          if (dur > START_TIME) {
-            setDuration(dur);
-            setCurrentTime(curr);
-
-            const effectiveCurrent = Math.max(0, curr - START_TIME);
-            const effectiveTotal = Math.max(1, dur - START_TIME);
-            const pct = Math.min(100, Math.round((effectiveCurrent / effectiveTotal) * 100));
-            setProgress(pct);
-
-            if (curr >= dur - 0.4) {
-              setProgress(100);
-              handleFinish();
-            }
-          }
-        }
-      } catch (e) {
-        // Safe ignore
-      }
-    }, 100);
+    }, 6000);
 
     return () => {
-      isMounted = false;
       clearTimeout(phaseTimer);
       clearTimeout(safetyTimeout);
-      if (progressIntervalRef.current) clearInterval(progressIntervalRef.current);
       if (fallbackIntervalRef.current) clearInterval(fallbackIntervalRef.current);
-      if (playerRef.current) {
-        try {
-          if (typeof playerRef.current.stopVideo === 'function') {
-            playerRef.current.stopVideo();
-          }
-          if (typeof playerRef.current.destroy === 'function') {
-            playerRef.current.destroy();
-          }
-        } catch (e) {}
-        playerRef.current = null;
-      }
+      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
+      audio.removeEventListener('canplay', handleCanPlay);
+      audio.removeEventListener('timeupdate', handleTimeUpdate);
+      audio.removeEventListener('ended', handleEnded);
+      audio.removeEventListener('error', handleError);
+      try {
+        audio.pause();
+        audio.src = '';
+      } catch (e) {}
     };
-  }, [handleFinish, startFallback]);
+  }, [handleFinish, startFallback, duration, requiresGesture]);
 
   if (typeof document === 'undefined') return null;
 
@@ -288,20 +231,6 @@ export default function MoEYSIntroSplash({ onFinish }) {
         isClosing ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
     >
-      {/* Hidden YouTube Iframe Player Container for Background Audio */}
-      <div
-        id="yt-splash-audio-player"
-        style={{
-          position: 'absolute',
-          width: '1px',
-          height: '1px',
-          opacity: 0.01,
-          pointerEvents: 'none',
-          top: '-100px',
-          left: '-100px'
-        }}
-      />
-
       {/* ═══════ BRIGHT, VIBRANT WAVING CAMBODIAN FLAG ═══════ */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <img
@@ -464,17 +393,17 @@ export default function MoEYSIntroSplash({ onFinish }) {
         </div>
 
         {/* ── LIVE SONG PLAYBACK BADGE ── */}
-        <div className="mb-4 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/80 border border-amber-400/30 text-amber-200 text-xs backdrop-blur-md shadow-lg max-w-full truncate">
+        <div className="mb-4 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/80 border border-amber-400/30 text-amber-200 text-xs backdrop-blur-md shadow-lg max-w-full truncate cursor-pointer hover:border-amber-400/60 transition-all">
           <Music className="w-3.5 h-3.5 text-amber-300 shrink-0" />
           <span className="font-medium text-[11px] sm:text-xs text-amber-200 truncate">
             {SONG_TITLE}
           </span>
           {/* Animated Equalizer Wave */}
           <div className="flex items-end gap-0.5 h-3 px-1 shrink-0">
-            <span className={`w-0.5 bg-amber-400 rounded-full transition-all duration-300 ${isPlaying ? 'h-3 animate-pulse' : 'h-1'}`} />
-            <span className={`w-0.5 bg-amber-300 rounded-full transition-all duration-300 ${isPlaying ? 'h-2 animate-bounce' : 'h-1'}`} />
-            <span className={`w-0.5 bg-amber-400 rounded-full transition-all duration-300 ${isPlaying ? 'h-3.5 animate-pulse' : 'h-1'}`} />
-            <span className={`w-0.5 bg-amber-300 rounded-full transition-all duration-300 ${isPlaying ? 'h-1.5 animate-bounce' : 'h-1'}`} />
+            <span className={`w-0.5 bg-amber-400 rounded-full transition-all duration-300 ${isPlaying && !isMuted ? 'h-3 animate-pulse' : 'h-1'}`} />
+            <span className={`w-0.5 bg-amber-300 rounded-full transition-all duration-300 ${isPlaying && !isMuted ? 'h-2 animate-bounce' : 'h-1'}`} />
+            <span className={`w-0.5 bg-amber-400 rounded-full transition-all duration-300 ${isPlaying && !isMuted ? 'h-3.5 animate-pulse' : 'h-1'}`} />
+            <span className={`w-0.5 bg-amber-300 rounded-full transition-all duration-300 ${isPlaying && !isMuted ? 'h-1.5 animate-bounce' : 'h-1'}`} />
           </div>
           {duration > 0 && (
             <span className="text-[10px] font-mono text-amber-400/90 shrink-0 ml-0.5">
