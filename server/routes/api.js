@@ -28,6 +28,16 @@ import {
 
 const router = express.Router();
 
+// 0. Health Check Endpoint (Ultra-fast keep-alive for UptimeRobot / Ping)
+router.get('/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    system: 'MoTDAR National E-Learning API',
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString()
+  });
+});
+
 // 1. Authentication Routes
 router.post('/auth/register', register);
 router.post('/auth/login', login);
