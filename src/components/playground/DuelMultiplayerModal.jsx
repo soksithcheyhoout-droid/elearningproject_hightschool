@@ -1153,90 +1153,127 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             {tab === 'host' && (
               <div className="space-y-6 my-auto">
                 
-                {/* 2-Player Grand Vertical Esports Fighter Podiums */}
+                {/* 2-Player Cyber Championship Battle Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-11 gap-4 sm:gap-6 items-stretch relative">
                   
-                  {/* Left Fighter Card: Host (Blue / Cyan Cyber Corner) */}
-                  <div className="md:col-span-5 bg-gradient-to-b from-[#0e1c3d]/90 via-[#0a142c]/95 to-[#060d1e] p-5 sm:p-6 rounded-3xl border-2 border-cyan-500/40 shadow-[0_0_35px_rgba(6,182,212,0.18)] relative overflow-hidden flex flex-col items-center justify-between text-center min-h-[300px] sm:min-h-[320px] group transition-all">
-                    {/* Cyber Grid Texture Overlay */}
-                    <div className="absolute inset-0 bg-[radial-gradient(#06b6d4_1px,transparent_1px)] [background-size:16px_16px] opacity-10 pointer-events-none" />
+                  {/* ========================================================================= */}
+                  {/* LEFT CARD: BLUE CORNER (HOST / COMMANDER) */}
+                  {/* ========================================================================= */}
+                  <div className="md:col-span-5 bg-gradient-to-b from-[#0d1b3a] via-[#081226] to-[#040914] rounded-3xl border border-cyan-500/40 shadow-[0_15px_45px_rgba(6,182,212,0.22)] relative overflow-hidden flex flex-col justify-between text-center min-h-[340px] sm:min-h-[360px] group transition-all">
                     
-                    {/* Top Neon Ambient Sweep */}
-                    <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent" />
+                    {/* Top Cyber Glow Beam & Corner Accents */}
+                    <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent shadow-[0_0_15px_rgba(6,182,212,0.8)]" />
+                    <div className="absolute top-2 left-2 w-2.5 h-2.5 border-t-2 border-l-2 border-cyan-400/60 rounded-tl pointer-events-none" />
+                    <div className="absolute top-2 right-2 w-2.5 h-2.5 border-t-2 border-r-2 border-cyan-400/60 rounded-tr pointer-events-none" />
+                    <div className="absolute bottom-2 left-2 w-2.5 h-2.5 border-b-2 border-l-2 border-cyan-400/60 rounded-bl pointer-events-none" />
+                    <div className="absolute bottom-2 right-2 w-2.5 h-2.5 border-b-2 border-r-2 border-cyan-400/60 rounded-br pointer-events-none" />
+                    <div className="absolute inset-0 bg-[radial-gradient(#06b6d4_1px,transparent_1px)] [background-size:20px_20px] opacity-15 pointer-events-none" />
 
-                    {/* Top Role & Status Header */}
-                    <div className="w-full flex items-center justify-between pb-3 border-b border-cyan-500/20 relative z-10">
-                      <span className="text-[11px] font-black text-cyan-300 uppercase tracking-widest flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/30">
-                        <Crown className="w-3.5 h-3.5 text-amber-400 fill-amber-400 drop-shadow-[0_0_8px_rgba(245,158,11,0.9)]" /> 
-                        ROOM LEADER (HOST)
-                      </span>
-                      <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1 shadow-[0_0_12px_rgba(16,185,129,0.3)]">
-                        <Check className="w-3.5 h-3.5 text-emerald-400" /> រួចរាល់
+                    {/* Top Championship Ribbon */}
+                    <div className="w-full px-4 py-3 bg-[#060e20]/80 backdrop-blur-md border-b border-cyan-500/30 flex items-center justify-between relative z-10">
+                      <div className="flex items-center gap-1.5 text-left">
+                        <span className="w-2 h-2 rounded-full bg-cyan-400 animate-ping" />
+                        <span className="text-[11px] font-black text-cyan-300 uppercase tracking-widest flex items-center gap-1">
+                          <Crown className="w-3.5 h-3.5 text-amber-400 fill-amber-400 drop-shadow-[0_0_8px_rgba(245,158,11,0.9)]" /> 
+                          BLUE CORNER • HOST
+                        </span>
+                      </div>
+                      <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1 shadow-[0_0_12px_rgba(16,185,129,0.35)]">
+                        <Check className="w-3 h-3 text-emerald-400" /> READY
                       </span>
                     </div>
 
-                    {/* Center Hero Avatar Podium */}
+                    {/* Center Hero Stage (Avatar & Character Display) */}
                     {hostPlayer ? (
-                      <div className="my-auto py-2 flex flex-col items-center relative z-10 w-full">
-                        {/* Avatar with Halo Base */}
-                        <div className="relative mb-3">
-                          <div className="absolute -inset-2 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full blur-md opacity-50 group-hover:opacity-80 transition-opacity" />
-                          <PlayerAvatarWithFrame
-                            avatar={hostPlayer.avatar}
-                            frame={hostPlayer.avatarFrame || hostPlayer.avatar_frame}
-                            size="lg"
-                            className="relative z-10 scale-105"
-                          />
-                          {/* Floating Level Badge */}
-                          <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 border border-cyan-300/80 text-[10px] font-black text-white shadow-[0_0_10px_rgba(6,182,212,0.6)] z-20 whitespace-nowrap">
+                      <div className="p-4 sm:p-5 my-auto flex flex-col items-center relative z-10 w-full">
+                        
+                        {/* 3D Cyber Pedestal Base */}
+                        <div className="relative mb-3.5">
+                          {/* Outer Rotating Energy Ring */}
+                          <div className="absolute -inset-3.5 rounded-full border border-cyan-400/30 border-dashed animate-spin-slow opacity-60 pointer-events-none" style={{ animationDuration: '20s' }} />
+                          <div className="absolute -inset-2 bg-gradient-to-tr from-cyan-500/40 via-indigo-600/30 to-cyan-400/40 rounded-full blur-lg opacity-70 group-hover:opacity-100 transition-opacity" />
+                          
+                          <div className="relative z-10 p-1 rounded-full bg-[#050b18] border-2 border-cyan-400/60 shadow-[0_0_25px_rgba(6,182,212,0.4)]">
+                            <PlayerAvatarWithFrame
+                              avatar={hostPlayer.avatar}
+                              frame={hostPlayer.avatarFrame || hostPlayer.avatar_frame}
+                              size="lg"
+                              className="scale-105"
+                            />
+                          </div>
+
+                          {/* Floating Cyber Level Badge */}
+                          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-gradient-to-r from-cyan-600 via-indigo-600 to-blue-600 border border-cyan-300 text-[10px] font-black text-white shadow-[0_0_15px_rgba(6,182,212,0.8)] z-20 whitespace-nowrap flex items-center gap-1">
+                            <Zap className="w-2.5 h-2.5 fill-cyan-300 text-cyan-300" />
                             LV.{hostPlayer.level || 1}
                           </div>
                         </div>
 
-                        {/* Name & School */}
-                        <h3 className="text-base sm:text-lg font-black text-white tracking-tight drop-shadow-md truncate max-w-[200px] sm:max-w-[240px] mt-1">
-                          {hostPlayer.name || 'សុខ វិបុល'}
-                        </h3>
-                        <p className="text-xs text-cyan-200/80 font-medium flex items-center gap-1 mt-0.5 truncate max-w-[220px]">
-                          <Building2 className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
-                          <span className="truncate">{hostPlayer.school || 'វិទ្យាល័យជាតិ'}</span>
-                        </p>
-
-                        {/* Stats Chips */}
-                        <div className="flex items-center justify-center gap-2 mt-2.5 w-full">
-                          <span className="px-3 py-1 rounded-xl bg-amber-500/15 border border-amber-400/30 text-amber-300 text-xs font-black flex items-center gap-1 shadow-xs">
-                            ⭐ {(hostPlayer.xp || 500).toLocaleString()} XP
-                          </span>
+                        {/* Player Name & School Nameplate */}
+                        <div className="space-y-1 w-full max-w-[240px]">
+                          <h3 className="text-base sm:text-lg font-black text-white tracking-wide uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] truncate">
+                            {hostPlayer.name || 'សុខ វិបុល'}
+                          </h3>
+                          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-cyan-500/10 border border-cyan-500/20 text-cyan-200 text-xs font-medium max-w-full">
+                            <Building2 className="w-3 h-3 text-cyan-400 flex-shrink-0" />
+                            <span className="truncate">{hostPlayer.school || 'វិទ្យាល័យជាតិ'}</span>
+                          </div>
                         </div>
+
+                        {/* Esports Mini HUD Stats Bar */}
+                        <div className="flex items-center justify-center gap-2 mt-3.5 w-full">
+                          <div className="px-3 py-1 rounded-xl bg-[#060c1c] border border-amber-400/40 text-amber-300 text-xs font-black flex items-center gap-1.5 shadow-[0_0_10px_rgba(245,158,11,0.15)]">
+                            <Trophy className="w-3 h-3 text-amber-400" />
+                            <span>{(hostPlayer.xp || 500).toLocaleString()} XP</span>
+                          </div>
+                          <div className="px-3 py-1 rounded-xl bg-[#060c1c] border border-cyan-400/40 text-cyan-300 text-xs font-bold flex items-center gap-1">
+                            <Zap className="w-3 h-3 text-cyan-400" />
+                            <span>PRO FIGHTER</span>
+                          </div>
+                        </div>
+
                       </div>
                     ) : (
-                      <div className="my-auto py-8 text-center text-slate-400 text-xs flex flex-col items-center justify-center gap-2 relative z-10">
-                        <Loader2 className="w-6 h-6 animate-spin text-cyan-400" />
+                      <div className="my-auto py-10 text-center text-slate-400 text-xs flex flex-col items-center justify-center gap-2 relative z-10">
+                        <Loader2 className="w-7 h-7 animate-spin text-cyan-400" />
                         <span>កំពុងទាញយកទិន្នន័យ...</span>
                       </div>
                     )}
+
+                    {/* Bottom Status Banner */}
+                    <div className="w-full py-1.5 bg-[#050b18]/90 border-t border-cyan-500/20 text-[10px] font-bold text-cyan-400/90 uppercase tracking-widest">
+                      CHAMPIONSHIP ARENA • SEAT #1
+                    </div>
                   </div>
 
-                  {/* Center: VS Energy Reactor */}
+                  {/* ========================================================================= */}
+                  {/* CENTER: VS ENERGY CLASH REACTOR CORE */}
+                  {/* ========================================================================= */}
                   <div className="md:col-span-1 flex flex-row md:flex-col items-center justify-center py-2 relative my-auto">
                     <div className="relative group">
-                      <div className="absolute -inset-2 bg-gradient-to-r from-cyan-500 via-purple-600 to-rose-500 rounded-2xl blur-lg opacity-70 animate-pulse" />
-                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#080f24] border-2 border-indigo-400/60 flex flex-col items-center justify-center relative z-10 shadow-[0_0_25px_rgba(99,102,241,0.5)]">
-                        <span className="font-black text-base sm:text-xl tracking-wider bg-gradient-to-br from-cyan-300 via-purple-300 to-rose-400 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(168,85,247,0.9)]">
+                      {/* Energy Flare Aura */}
+                      <div className="absolute -inset-3 bg-gradient-to-r from-cyan-500 via-purple-600 to-rose-500 rounded-3xl blur-xl opacity-80 animate-pulse" />
+                      
+                      {/* 3D Battle Diamond Core */}
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#070e22] border-2 border-indigo-400/70 flex flex-col items-center justify-center relative z-10 shadow-[0_0_30px_rgba(168,85,247,0.7)] group-hover:scale-110 transition-transform">
+                        <Swords className="w-3.5 h-3.5 text-indigo-300 drop-shadow-[0_0_6px_rgba(99,102,241,0.8)] -mb-0.5" />
+                        <span className="font-black text-base sm:text-xl tracking-wider bg-gradient-to-br from-cyan-300 via-white to-rose-400 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(168,85,247,0.9)]">
                           VS
                         </span>
-                        <span className="text-[8px] font-black text-indigo-300 uppercase tracking-widest -mt-0.5">
-                          DUEL
+                        <span className="text-[7.5px] font-black text-indigo-300 uppercase tracking-widest">
+                          CLASH
                         </span>
                       </div>
                     </div>
                   </div>
 
-                  {/* Right Fighter Card: Challenger (Red / Crimson Cyber Corner) */}
-                  <div className={`md:col-span-5 p-5 sm:p-6 rounded-3xl relative overflow-hidden flex flex-col items-center justify-between text-center min-h-[300px] sm:min-h-[320px] transition-all group ${
+                  {/* ========================================================================= */}
+                  {/* RIGHT CARD: RED CORNER (CHALLENGER / RIVAL) */}
+                  {/* ========================================================================= */}
+                  <div className={`md:col-span-5 rounded-3xl relative overflow-hidden flex flex-col justify-between text-center min-h-[340px] sm:min-h-[360px] transition-all group ${
                     challengerPlayer
-                      ? 'bg-gradient-to-b from-[#2a0e24]/90 via-[#190817]/95 to-[#0e030c] border-2 border-rose-500/40 shadow-[0_0_35px_rgba(244,63,94,0.18)]'
-                      : 'bg-gradient-to-b from-[#101933]/60 via-[#0a1124]/70 to-[#060b17] border-2 border-dashed border-rose-500/35 hover:border-rose-400 hover:bg-rose-500/5 cursor-pointer shadow-[0_0_30px_rgba(244,63,94,0.08)]'
+                      ? 'bg-gradient-to-b from-[#2d0e26] via-[#1b0818] to-[#0c030b] border border-rose-500/40 shadow-[0_15px_45px_rgba(244,63,94,0.22)]'
+                      : 'bg-gradient-to-b from-[#1b122c] via-[#100b1e] to-[#080511] border-2 border-rose-500/40 shadow-[0_15px_45px_rgba(244,63,94,0.18)] hover:border-rose-400 cursor-pointer'
                   }`}
                   onClick={() => {
                     if (!challengerPlayer) {
@@ -1245,34 +1282,37 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                     }
                   }}
                   >
-                    {/* Cyber Grid Texture Overlay */}
-                    <div className="absolute inset-0 bg-[radial-gradient(#f43f5e_1px,transparent_1px)] [background-size:16px_16px] opacity-10 pointer-events-none" />
+                    {/* Top Cyber Glow Beam & Corner Accents */}
+                    <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-transparent via-rose-400 to-transparent shadow-[0_0_15px_rgba(244,63,94,0.8)]" />
+                    <div className="absolute top-2 left-2 w-2.5 h-2.5 border-t-2 border-l-2 border-rose-400/60 rounded-tl pointer-events-none" />
+                    <div className="absolute top-2 right-2 w-2.5 h-2.5 border-t-2 border-r-2 border-rose-400/60 rounded-tr pointer-events-none" />
+                    <div className="absolute bottom-2 left-2 w-2.5 h-2.5 border-b-2 border-l-2 border-rose-400/60 rounded-bl pointer-events-none" />
+                    <div className="absolute bottom-2 right-2 w-2.5 h-2.5 border-b-2 border-r-2 border-rose-400/60 rounded-br pointer-events-none" />
+                    <div className="absolute inset-0 bg-[radial-gradient(#f43f5e_1px,transparent_1px)] [background-size:20px_20px] opacity-15 pointer-events-none" />
 
-                    {/* Top Neon Ambient Sweep */}
-                    {challengerPlayer && (
-                      <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-transparent via-rose-400 to-transparent" />
-                    )}
-
-                    {/* Top Header */}
-                    <div className="w-full flex items-center justify-between pb-3 border-b border-rose-500/20 relative z-10">
-                      <span className="text-[11px] font-black text-rose-300 uppercase tracking-widest flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-500/10 border border-rose-500/30">
-                        <Swords className="w-3.5 h-3.5 text-rose-400" /> 
-                        CHALLENGER
-                      </span>
+                    {/* Top Championship Ribbon */}
+                    <div className="w-full px-4 py-3 bg-[#150613]/80 backdrop-blur-md border-b border-rose-500/30 flex items-center justify-between relative z-10">
+                      <div className="flex items-center gap-1.5 text-left">
+                        <span className="w-2 h-2 rounded-full bg-rose-400 animate-ping" />
+                        <span className="text-[11px] font-black text-rose-300 uppercase tracking-widest flex items-center gap-1">
+                          <Swords className="w-3.5 h-3.5 text-rose-400" /> 
+                          RED CORNER • CHALLENGER
+                        </span>
+                      </div>
 
                       {challengerPlayer ? (
                         <div className="flex items-center gap-2">
                           {isChallengerReady ? (
-                            <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1 shadow-[0_0_12px_rgba(16,185,129,0.3)]">
-                              <Check className="w-3.5 h-3.5 text-emerald-400" /> រួចរាល់
+                            <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1 shadow-[0_0_12px_rgba(16,185,129,0.35)]">
+                              <Check className="w-3 h-3 text-emerald-400" /> READY
                             </span>
                           ) : (
-                            <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1 animate-pulse">
-                              <Clock className="w-3.5 h-3.5" /> មិនទាន់ Ready
+                            <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1 animate-pulse">
+                              <Clock className="w-3 h-3" /> PREPARING
                             </span>
                           )}
 
-                          {/* Kick Button for Host */}
+                          {/* Admin Kick button */}
                           {isHost && (
                             <button
                               type="button"
@@ -1288,70 +1328,106 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                           )}
                         </div>
                       ) : (
-                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
-                          រង់ចាំគូប្រជែង
+                        <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-slate-800/90 text-slate-300 border border-slate-700">
+                          AWAITING RIVAL
                         </span>
                       )}
                     </div>
 
                     {/* Center Content */}
                     {challengerPlayer ? (
-                      <div className="my-auto py-2 flex flex-col items-center relative z-10 w-full">
-                        {/* Avatar with Halo Base */}
-                        <div className="relative mb-3">
-                          <div className="absolute -inset-2 bg-gradient-to-r from-rose-500 to-amber-600 rounded-full blur-md opacity-50 group-hover:opacity-80 transition-opacity" />
-                          <PlayerAvatarWithFrame
-                            avatar={challengerPlayer.avatar}
-                            frame={challengerPlayer.avatarFrame || challengerPlayer.avatar_frame}
-                            size="lg"
-                            className="relative z-10 scale-105"
-                          />
-                          {/* Floating Level Badge */}
-                          <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-rose-600 to-pink-600 border border-rose-300/80 text-[10px] font-black text-white shadow-[0_0_10px_rgba(244,63,94,0.6)] z-20 whitespace-nowrap">
+                      /* Occupied Challenger Fighter Stage */
+                      <div className="p-4 sm:p-5 my-auto flex flex-col items-center relative z-10 w-full">
+                        
+                        {/* 3D Cyber Pedestal Base */}
+                        <div className="relative mb-3.5">
+                          {/* Outer Rotating Energy Ring */}
+                          <div className="absolute -inset-3.5 rounded-full border border-rose-400/30 border-dashed animate-spin-slow opacity-60 pointer-events-none" style={{ animationDuration: '20s' }} />
+                          <div className="absolute -inset-2 bg-gradient-to-tr from-rose-500/40 via-purple-600/30 to-amber-400/40 rounded-full blur-lg opacity-70 group-hover:opacity-100 transition-opacity" />
+                          
+                          <div className="relative z-10 p-1 rounded-full bg-[#12040f] border-2 border-rose-400/60 shadow-[0_0_25px_rgba(244,63,94,0.4)]">
+                            <PlayerAvatarWithFrame
+                              avatar={challengerPlayer.avatar}
+                              frame={challengerPlayer.avatarFrame || challengerPlayer.avatar_frame}
+                              size="lg"
+                              className="scale-105"
+                            />
+                          </div>
+
+                          {/* Floating Cyber Level Badge */}
+                          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-gradient-to-r from-rose-600 via-purple-600 to-pink-600 border border-rose-300 text-[10px] font-black text-white shadow-[0_0_15px_rgba(244,63,94,0.8)] z-20 whitespace-nowrap flex items-center gap-1">
+                            <Zap className="w-2.5 h-2.5 fill-rose-300 text-rose-300" />
                             LV.{challengerPlayer.level || 1}
                           </div>
                         </div>
 
-                        {/* Name & School */}
-                        <h3 className="text-base sm:text-lg font-black text-white tracking-tight drop-shadow-md truncate max-w-[200px] sm:max-w-[240px] mt-1">
-                          {challengerPlayer.name}
-                        </h3>
-                        <p className="text-xs text-rose-200/80 font-medium flex items-center gap-1 mt-0.5 truncate max-w-[220px]">
-                          <Building2 className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
-                          <span className="truncate">{challengerPlayer.school}</span>
-                        </p>
-
-                        {/* Stats Chips */}
-                        <div className="flex items-center justify-center gap-2 mt-2.5 w-full">
-                          <span className="px-3 py-1 rounded-xl bg-amber-500/15 border border-amber-400/30 text-amber-300 text-xs font-black flex items-center gap-1 shadow-xs">
-                            ⭐ {(challengerPlayer.xp || 500).toLocaleString()} XP
-                          </span>
-                        </div>
-                      </div>
-                    ) : (
-                      /* Empty Summoning Pod */
-                      <div className="my-auto py-6 flex flex-col items-center justify-center text-center relative z-10 w-full">
-                        {/* Animated Summoning Ring */}
-                        <div className="relative mb-3">
-                          <div className="absolute -inset-3 bg-gradient-to-r from-rose-500/30 via-purple-500/20 to-rose-500/30 rounded-full blur-lg animate-pulse" />
-                          <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-full bg-[#070e22] border-2 border-dashed border-rose-400/50 flex items-center justify-center relative z-10 group-hover:scale-105 group-hover:border-rose-400 transition-all shadow-[0_0_25px_rgba(244,63,94,0.25)]">
-                            <UserPlus className="w-8 h-8 text-rose-300 animate-bounce" />
+                        {/* Player Name & School Nameplate */}
+                        <div className="space-y-1 w-full max-w-[240px]">
+                          <h3 className="text-base sm:text-lg font-black text-white tracking-wide uppercase drop-shadow-[0_2px_10px_rgba(0,0,0,0.9)] truncate">
+                            {challengerPlayer.name}
+                          </h3>
+                          <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-rose-500/10 border border-rose-500/20 text-rose-200 text-xs font-medium max-w-full">
+                            <Building2 className="w-3 h-3 text-rose-400 flex-shrink-0" />
+                            <span className="truncate">{challengerPlayer.school}</span>
                           </div>
                         </div>
 
-                        <span className="text-sm font-black bg-gradient-to-r from-rose-300 via-pink-200 to-amber-300 bg-clip-text text-transparent block">
-                          ✨ ចុចទីនេះដើម្បីអញ្ជើញសិស្ស
-                        </span>
-                        <span className="text-[11px] text-slate-400 block mt-1">
-                          ឬចែករំលែកកូដ <strong className="text-amber-300 font-mono">#{roomCode}</strong> ឱ្យមិត្តភក្តិចូលរួម
-                        </span>
-                        
-                        <div className="mt-3 px-4 py-1.5 rounded-xl bg-gradient-to-r from-rose-600 to-purple-600 text-white font-black text-xs shadow-[0_0_15px_rgba(244,63,94,0.4)] group-hover:scale-105 transition-transform flex items-center gap-1.5">
-                          <UserPlus className="w-3.5 h-3.5" />
-                          <span>អញ្ជើញមិត្តភក្តិ (INVITE)</span>
+                        {/* Esports Mini HUD Stats Bar */}
+                        <div className="flex items-center justify-center gap-2 mt-3.5 w-full">
+                          <div className="px-3 py-1 rounded-xl bg-[#12040f] border border-amber-400/40 text-amber-300 text-xs font-black flex items-center gap-1.5 shadow-[0_0_10px_rgba(245,158,11,0.15)]">
+                            <Trophy className="w-3 h-3 text-amber-400" />
+                            <span>{(challengerPlayer.xp || 500).toLocaleString()} XP</span>
+                          </div>
+                          <div className="px-3 py-1 rounded-xl bg-[#12040f] border border-rose-400/40 text-rose-300 text-xs font-bold flex items-center gap-1">
+                            <Flame className="w-3 h-3 text-rose-400" />
+                            <span>CHALLENGER</span>
+                          </div>
                         </div>
+
+                      </div>
+                    ) : (
+                      /* Empty Holographic Summoning Nexus */
+                      <div className="p-4 sm:p-5 my-auto flex flex-col items-center justify-center text-center relative z-10 w-full">
+                        
+                        {/* Animated Hologram Portal */}
+                        <div className="relative mb-3.5">
+                          <div className="absolute -inset-4 bg-gradient-to-tr from-rose-500/25 via-purple-600/20 to-cyan-400/20 rounded-full blur-xl animate-pulse" />
+                          
+                          <div className="w-22 h-22 sm:w-24 sm:h-24 rounded-full bg-[#0d071a] border-2 border-rose-400/50 flex flex-col items-center justify-center relative z-10 group-hover:scale-105 group-hover:border-rose-400 transition-all shadow-[0_0_30px_rgba(244,63,94,0.3)]">
+                            <div className="w-12 h-12 rounded-full bg-rose-500/15 border border-rose-400/40 flex items-center justify-center">
+                              <UserPlus className="w-6 h-6 text-rose-300 animate-bounce" />
+                            </div>
+                          </div>
+
+                          {/* Portal Status Tag */}
+                          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-[#0d071a] border border-rose-400/60 text-[9px] font-black text-rose-300 shadow-[0_0_10px_rgba(244,63,94,0.5)] z-20 whitespace-nowrap">
+                            SLOT OPEN
+                          </div>
+                        </div>
+
+                        {/* Title & Prompt */}
+                        <div className="space-y-1">
+                          <h4 className="text-sm sm:text-base font-black bg-gradient-to-r from-rose-300 via-pink-200 to-amber-300 bg-clip-text text-transparent">
+                            ✨ អញ្ជើញសិស្សពិតប្រាកដចូលរួម
+                          </h4>
+                          <p className="text-[11px] text-slate-400 max-w-[240px]">
+                            ចុចទីនេះដើម្បីផ្ញើការអញ្ជើញ ឬចែករំលែកកូដ <strong className="text-amber-300 font-mono">#{roomCode}</strong>
+                          </p>
+                        </div>
+
+                        {/* Glowing Summon Button */}
+                        <div className="mt-3.5 px-5 py-2 rounded-2xl bg-gradient-to-r from-rose-600 via-purple-600 to-indigo-600 hover:from-rose-500 hover:to-indigo-500 text-white font-black text-xs shadow-[0_0_20px_rgba(244,63,94,0.45)] group-hover:scale-105 transition-transform flex items-center gap-2 cursor-pointer">
+                          <UserPlus className="w-3.5 h-3.5" />
+                          <span>អញ្ជើញកីឡាករ (INVITE PLAYER)</span>
+                        </div>
+
                       </div>
                     )}
+
+                    {/* Bottom Status Banner */}
+                    <div className="w-full py-1.5 bg-[#0c030b]/90 border-t border-rose-500/20 text-[10px] font-bold text-rose-400/90 uppercase tracking-widest">
+                      CHAMPIONSHIP ARENA • SEAT #2
+                    </div>
                   </div>
 
                 </div>
