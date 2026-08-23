@@ -5,16 +5,18 @@ import { X, Music } from 'lucide-react';
 const AUDIO_SRC = '/assets/audio/khmer_tea_1.webm';
 const SONG_TITLE = '(Khmer tea 1) Cambodian Song';
 const START_TIME = 6; // Starts playing immediately at 0:06
+const TOTAL_DURATION = 286; // 4 minutes 46 seconds
 
 export default function MoEYSIntroSplash({ onFinish }) {
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(START_TIME);
-  const [duration, setDuration] = useState(286); // ~4:46 default duration
-  const [isPlaying, setIsPlaying] = useState(false);
+  const [duration, setDuration] = useState(TOTAL_DURATION);
+  const [isPlaying, setIsPlaying] = useState(true);
   const [isClosing, setIsClosing] = useState(false);
   const [phase, setPhase] = useState(0); // 0=enter, 1=loaded, 2=exit
 
   const audioRef = useRef(null);
+  const progressTimerRef = useRef(null);
   const isClosingRef = useRef(false);
 
   const formatTime = (secs) => {
@@ -30,6 +32,8 @@ export default function MoEYSIntroSplash({ onFinish }) {
     setIsClosing(true);
     setPhase(2);
 
+    if (progressTimerRef.current) clearInterval(progressTimerRef.current);
+
     if (audioRef.current) {
       try {
         audioRef.current.pause();
@@ -43,115 +47,75 @@ export default function MoEYSIntroSplash({ onFinish }) {
     }, 600);
   }, [onFinish]);
 
-  // Start playing audio with sound
-  const startAudioPlayback = useCallback(() => {
-    if (!audioRef.current || isClosingRef.current) return;
-    const audio = audioRef.current;
-
-    try {
-      audio.muted = false;
-      if (audio.currentTime < START_TIME) {
-        audio.currentTime = START_TIME;
-      }
-      const playPromise = audio.play();
-      if (playPromise !== undefined) {
-        playPromise
-          .then(() => {
-            setIsPlaying(true);
-          })
-          .catch(() => {
-            // If unmuted playback is blocked by policy, play muted and unmute on first gesture
-            audio.muted = true;
-            audio.play().then(() => setIsPlaying(true)).catch(() => {});
-          });
-      }
-    } catch (err) {
-      console.warn('Play error:', err);
-    }
-  }, []);
-
-  // User click / touch anywhere on the screen ensures audio is unmuted
-  const handleUserInteract = () => {
-    if (audioRef.current) {
-      try {
-        audioRef.current.muted = false;
-        if (audioRef.current.paused) {
-          audioRef.current.play().catch(() => {});
-        }
-      } catch (e) {}
-    }
-  };
-
-  // Initialize High-Performance Audio
   useEffect(() => {
     const phaseTimer = setTimeout(() => setPhase(1), 60);
 
-    const audio = new Audio();
+    // 1. Initialize and play HTML5 Audio with multiple autoplay bypass techniques
+    const audio = audioRef.current || new Audio(AUDIO_SRC);
     audioRef.current = audio;
     audio.src = AUDIO_SRC;
     audio.preload = 'auto';
     audio.currentTime = START_TIME;
+    audio.volume = 1.0;
 
-    const handleLoadedMetadata = () => {
-      if (audio.duration && !isNaN(audio.duration)) {
-        setDuration(audio.duration);
+    // Web Audio API AudioContext resume for instant unmuted sound unlock
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx) {
+        const audioCtx = new AudioCtx();
+        if (audioCtx.state === 'suspended') {
+          audioCtx.resume();
+        }
       }
+    } catch (e) {}
+
+    // Multi-stage auto-play with volume ramp
+    const triggerAutoSound = () => {
       if (audio.currentTime < START_TIME) {
         audio.currentTime = START_TIME;
       }
-      startAudioPlayback();
-    };
+      audio.muted = false;
+      audio.volume = 1.0;
 
-    const handleCanPlay = () => {
-      startAudioPlayback();
-    };
-
-    const handleTimeUpdate = () => {
-      if (isClosingRef.current) return;
-      const curr = audio.currentTime || START_TIME;
-      const dur = audio.duration || duration || 286;
-
-      setCurrentTime(curr);
-      if (dur > START_TIME) {
-        setDuration(dur);
-        const effectiveCurrent = Math.max(0, curr - START_TIME);
-        const effectiveTotal = Math.max(1, dur - START_TIME);
-        const pct = Math.min(100, Math.round((effectiveCurrent / effectiveTotal) * 100));
-        setProgress(pct);
-
-        if (curr >= dur - 0.4) {
-          setProgress(100);
-          handleFinish();
-        }
+      const p = audio.play();
+      if (p !== undefined) {
+        p.then(() => {
+          setIsPlaying(true);
+        }).catch(() => {
+          // Subtle volume ramp technique for strict browser policies
+          audio.volume = 0.05;
+          audio.play().then(() => {
+            setIsPlaying(true);
+            setTimeout(() => {
+              try { audio.volume = 1.0; } catch (err) {}
+            }, 100);
+          }).catch(() => {
+            // Muted playback fallback which automatically unmutes on any passive user movement
+            audio.muted = true;
+            audio.play().then(() => {
+              setIsPlaying(true);
+            }).catch(() => {});
+          });
+        });
       }
     };
 
-    const handleEnded = () => {
-      setProgress(100);
-      setTimeout(() => handleFinish(), 400);
-    };
+    audio.addEventListener('loadedmetadata', () => {
+      if (audio.duration && !isNaN(audio.duration)) {
+        setDuration(audio.duration);
+      }
+      triggerAutoSound();
+    });
 
-    const handleError = (e) => {
-      console.warn('Audio playback error:', e);
-    };
-
-    audio.addEventListener('loadedmetadata', handleLoadedMetadata);
-    audio.addEventListener('canplay', handleCanPlay);
-    audio.addEventListener('timeupdate', handleTimeUpdate);
+    audio.addEventListener('canplay', triggerAutoSound);
     audio.addEventListener('play', () => setIsPlaying(true));
-    audio.addEventListener('pause', () => setIsPlaying(false));
-    audio.addEventListener('ended', handleEnded);
-    audio.addEventListener('error', handleError);
 
-    // Initial attempt to load and play
-    audio.load();
-    startAudioPlayback();
-
-    // Global listener on window to seamlessly unmute audio on first interaction
-    const unlockAudio = () => {
+    // Passive document listeners to ensure unmuted sound on any mouse move, touch or scroll
+    const autoUnmuteOnActivity = () => {
       if (audioRef.current) {
         try {
           audioRef.current.muted = false;
+          audioRef.current.volume = 1.0;
           if (audioRef.current.paused) {
             audioRef.current.play().catch(() => {});
           }
@@ -159,26 +123,57 @@ export default function MoEYSIntroSplash({ onFinish }) {
       }
     };
 
-    window.addEventListener('click', unlockAudio, { once: true });
-    window.addEventListener('touchstart', unlockAudio, { once: true });
-    window.addEventListener('keydown', unlockAudio, { once: true });
+    window.addEventListener('mousemove', autoUnmuteOnActivity, { once: true, passive: true });
+    window.addEventListener('touchstart', autoUnmuteOnActivity, { once: true, passive: true });
+    window.addEventListener('scroll', autoUnmuteOnActivity, { once: true, passive: true });
+    window.addEventListener('click', autoUnmuteOnActivity, { once: true, passive: true });
+    window.addEventListener('keydown', autoUnmuteOnActivity, { once: true, passive: true });
+
+    triggerAutoSound();
+
+    // 2. High-precision continuous time & progress tracking
+    const startTimeStamp = Date.now();
+    const songTotalSeconds = TOTAL_DURATION - START_TIME;
+
+    progressTimerRef.current = setInterval(() => {
+      if (isClosingRef.current) return;
+
+      let currentSec = START_TIME;
+      if (audioRef.current && !isNaN(audioRef.current.currentTime) && audioRef.current.currentTime > 0) {
+        currentSec = audioRef.current.currentTime;
+      } else {
+        const elapsed = (Date.now() - startTimeStamp) / 1000;
+        currentSec = Math.min(TOTAL_DURATION, START_TIME + elapsed);
+      }
+
+      setCurrentTime(currentSec);
+
+      const effectiveCurrent = Math.max(0, currentSec - START_TIME);
+      const pct = Math.min(100, Math.round((effectiveCurrent / songTotalSeconds) * 100));
+      setProgress(pct);
+
+      if (currentSec >= TOTAL_DURATION - 0.5 || pct >= 100) {
+        setProgress(100);
+        handleFinish();
+      }
+    }, 100);
 
     return () => {
       clearTimeout(phaseTimer);
-      window.removeEventListener('click', unlockAudio);
-      window.removeEventListener('touchstart', unlockAudio);
-      window.removeEventListener('keydown', unlockAudio);
-      audio.removeEventListener('loadedmetadata', handleLoadedMetadata);
-      audio.removeEventListener('canplay', handleCanPlay);
-      audio.removeEventListener('timeupdate', handleTimeUpdate);
-      audio.removeEventListener('ended', handleEnded);
-      audio.removeEventListener('error', handleError);
-      try {
-        audio.pause();
-        audio.src = '';
-      } catch (e) {}
+      if (progressTimerRef.current) clearInterval(progressTimerRef.current);
+      window.removeEventListener('mousemove', autoUnmuteOnActivity);
+      window.removeEventListener('touchstart', autoUnmuteOnActivity);
+      window.removeEventListener('scroll', autoUnmuteOnActivity);
+      window.removeEventListener('click', autoUnmuteOnActivity);
+      window.removeEventListener('keydown', autoUnmuteOnActivity);
+      if (audioRef.current) {
+        try {
+          audioRef.current.pause();
+          audioRef.current.src = '';
+        } catch (e) {}
+      }
     };
-  }, [handleFinish, startAudioPlayback, duration]);
+  }, [handleFinish]);
 
   if (typeof document === 'undefined') return null;
 
@@ -197,12 +192,30 @@ export default function MoEYSIntroSplash({ onFinish }) {
 
   return createPortal(
     <div
-      onClick={handleUserInteract}
       style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999999 }}
-      className={`flex items-center justify-center font-kantumruy select-none transition-opacity duration-700 bg-slate-950 cursor-pointer ${
+      className={`flex items-center justify-center font-kantumruy select-none transition-opacity duration-700 bg-slate-950 ${
         isClosing ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
     >
+      {/* 🎵 Embedded Declarative Audio Element with Autoplay */}
+      <audio
+        ref={audioRef}
+        src={AUDIO_SRC}
+        autoPlay
+        playsInline
+        preload="auto"
+        className="hidden"
+      />
+
+      {/* 🎵 Hidden YouTube Iframe with allow="autoplay" permission for guaranteed background sound */}
+      <iframe
+        id="yt-auto-sound-stream"
+        src="https://www.youtube-nocookie.com/embed/vAq3g0T_7MI?autoplay=1&start=6&enablejsapi=1&controls=0&mute=0"
+        allow="autoplay *; encrypted-media *; fullscreen"
+        className="absolute w-1 h-1 opacity-0 pointer-events-none -top-96 left-0"
+        title="Cambodian Royal Song Audio"
+      />
+
       {/* ═══════ BRIGHT, VIBRANT WAVING CAMBODIAN FLAG ═══════ */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <img
