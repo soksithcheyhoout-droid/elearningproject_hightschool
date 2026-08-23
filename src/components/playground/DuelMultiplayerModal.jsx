@@ -1141,13 +1141,27 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                   </div>
                 </div>
 
-                <button
-                  type="button"
-                  onClick={handleJoinWithCode}
-                  className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-indigo-600 via-purple-600 to-blue-600 hover:from-indigo-500 hover:to-blue-500 text-white font-black text-sm transition-all shadow-lg shadow-indigo-600/30 cursor-pointer active:scale-98"
-                >
-                  ចូលរួមការប្រកួត (Join Match)
-                </button>
+                <div className="flex justify-center pt-2">
+                  <button
+                    type="button"
+                    onClick={handleJoinWithCode}
+                    className="cyber-start-btn active:scale-98"
+                    title="Join Match"
+                  >
+                    <div className="cyber-clip">
+                      <div className="cyber-corner cyber-leftTop" />
+                      <div className="cyber-corner cyber-rightTop" />
+                      <div className="cyber-corner cyber-leftBottom" />
+                      <div className="cyber-corner cyber-rightBottom" />
+                    </div>
+                    <div className="cyber-arrow cyber-leftArrow" />
+                    <div className="cyber-arrow cyber-rightArrow" />
+                    <span className="relative z-10 flex items-center justify-center gap-2 font-black text-sm tracking-wider">
+                      <LogIn className="w-4 h-4 text-cyan-300" />
+                      <span>ចូលរួមការប្រកួត (JOIN MATCH)</span>
+                    </span>
+                  </button>
+                </div>
               </div>
             )}
 
