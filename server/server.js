@@ -48,6 +48,16 @@ if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
 }
 
+// Health Check & Keep-Alive Ping Endpoint (for UptimeRobot / Cron services)
+app.get('/api/health', (req, res) => {
+  res.status(200).json({
+    status: 'ok',
+    system: 'MoTDAR E-Learning Engine',
+    uptime: Math.floor(process.uptime()),
+    timestamp: new Date().toISOString()
+  });
+});
+
 // API Routes
 app.use('/api', apiRoutes);
 
