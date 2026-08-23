@@ -217,7 +217,7 @@ export default function MoEYSIntroSplash({ onFinish }) {
             />
           </div>
           <p className="text-[10px] text-amber-200 font-semibold tracking-wider drop-shadow-[0_2px_4px_rgba(0,0,0,1)]">
-            ប្រព័ន្ធសិក្សាឌីជីថលកម្រិតវិទ្យាល័យជាតិ • E-Learning Platform v2.5
+            ប្រព័ន្ធសិក្សាឌីជីថលកម្រិតវិទ្យាល័យជាតិ • E-Learning Platform v2.5 (Beta Testing Phase)
           </p>
         </div>
 

@@ -297,28 +297,42 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
       }`}
     >
       
-      {/* 1. Flush Top-Right MoEYS Blue Contact Ribbon */}
+      {/* 1. Official MoTDAR Top Utility & Beta Testing Notice Ribbon */}
       <div 
-        className={`absolute top-0 right-0 z-10 transition-all duration-300 hidden md:block ${
-          isScrolled ? '-translate-y-full opacity-0 pointer-events-none' : 'translate-y-0 opacity-100'
+        className={`w-full bg-gradient-to-r from-[#00224d] via-[#004080] to-[#00224d] text-white py-1 px-3 sm:px-6 text-[10.5px] sm:text-[11px] font-medium transition-all duration-300 select-none border-b border-amber-400/25 ${
+          isScrolled ? 'hidden' : 'block'
         }`}
       >
-        <div className="bg-[#0060b2] text-white px-5 py-0.5 rounded-bl-2xl flex items-center gap-3 text-[10px] font-medium shadow-2xs">
-          <a 
-            href="tel:+85566901800" 
-            className="flex items-center gap-1.5 hover:text-amber-200 transition-colors"
-          >
-            <Phone className="w-2.5 h-2.5 text-amber-300" />
-            <span>+855 66 901 800</span>
-          </a>
-          <span className="text-white/40">|</span>
-          <a 
-            href="mailto:info@motdar.gov.kh" 
-            className="flex items-center gap-1.5 hover:text-amber-200 transition-colors"
-          >
-            <Mail className="w-2.5 h-2.5 text-amber-300" />
-            <span>info@motdar.gov.kh</span>
-          </a>
+        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-3">
+          <div className="flex items-center gap-2 min-w-0">
+            <span className="bg-amber-400 text-slate-950 px-2 py-0.5 rounded-full text-[9px] sm:text-[9.5px] font-black uppercase tracking-wider shadow-xs flex-shrink-0 flex items-center gap-1">
+              <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping" />
+              BETA TEST
+            </span>
+            <span className="text-amber-200 font-semibold truncate text-[10px] sm:text-[11px]">
+              {lang === 'km' 
+                ? 'ប្រព័ន្ធកំពុងស្ថិតក្នុងដំណាក់កាលសាកល្បងបច្ចេកវិទ្យា (Beta Phase) • រាល់មុខងារទាំងអស់បើកដំណើរការឥតគិតថ្លៃ!' 
+                : 'National E-Learning platform is currently in Beta Testing • All premium features are active & free!'}
+            </span>
+          </div>
+
+          <div className="flex items-center gap-3 text-[10px] sm:text-[10.5px] text-slate-200 flex-shrink-0">
+            <a 
+              href="tel:+85566901800" 
+              className="flex items-center gap-1 hover:text-amber-300 transition-colors"
+            >
+              <Phone className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-300" />
+              <span>+855 66 901 800</span>
+            </a>
+            <span className="text-white/30 hidden sm:inline">|</span>
+            <a 
+              href="mailto:info@motdar.gov.kh" 
+              className="hidden sm:flex items-center gap-1 hover:text-amber-300 transition-colors"
+            >
+              <Mail className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-300" />
+              <span>info@motdar.gov.kh</span>
+            </a>
+          </div>
         </div>
       </div>
 

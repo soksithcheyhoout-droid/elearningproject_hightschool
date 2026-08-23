@@ -107,8 +107,9 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
                 />
                 <span>{t('ministryName') || (lang === 'km' ? 'ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ និងការស្រាវជ្រាវកម្រិតខ្ពស់' : 'Ministry of Talent Development & Advanced Research')}</span>
               </div>
-              <span className="bg-amber-400 text-slate-950 text-xs font-black px-3 py-1 rounded-full shadow-xs">
-                {lang === 'km' ? 'សម័យប្រឡង ១០-១១ សីហា' : 'Exam Dates: Aug 10-11'}
+              <span className="bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 text-xs font-black px-3.5 py-1 rounded-full shadow-xs flex items-center gap-1.5 border border-amber-300">
+                <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping" />
+                {lang === 'km' ? 'កំណែសាកល្បង BETA TEST v2.5' : 'BETA TESTING v2.5'}
               </span>
               <span className="bg-white/15 text-blue-100 text-xs font-semibold px-3 py-1 rounded-full border border-white/20 hidden sm:inline-flex">
                 {lang === 'km' ? 'ថ្នាក់ទី១០ ទី១១ ទី១២' : 'Grades 10, 11, 12'}

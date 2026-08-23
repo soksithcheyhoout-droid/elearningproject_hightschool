@@ -101,8 +101,9 @@ export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor }) {
             {lang === 'km' ? 'ម៉ឺនុយចម្បង' : 'Main Menu'}
           </span>
         </div>
-        <span className="text-[9.5px] font-extrabold text-[#005baa] bg-blue-50 border border-blue-200/60 px-2 py-0.5 rounded-full font-mono shadow-2xs">
-          v2.5
+        <span className="text-[9.5px] font-extrabold text-amber-800 bg-amber-50 border border-amber-300 px-2 py-0.5 rounded-full font-mono shadow-2xs flex items-center gap-1">
+          <span className="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse" />
+          v2.5 BETA
         </span>
       </div>
 
