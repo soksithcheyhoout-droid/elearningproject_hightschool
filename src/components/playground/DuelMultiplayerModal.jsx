@@ -53,7 +53,7 @@ const PlayerAvatarWithFrame = ({ avatar, frame, size = 'md', className = '' }) =
   const dim = sizeClasses[size] || sizeClasses.md;
 
   return (
-    <div className={`relative ${dim} flex items-center justify-center flex-shrink-0 ${className}`}>
+    <div className={`relative ${dim} flex items-center justify-center flex-shrink-0 isolate ${className}`}>
       {/* Circular Avatar */}
       <div className={`w-[82%] h-[82%] rounded-full overflow-hidden bg-slate-900 shadow-md ${frameSrc ? '' : 'border border-slate-700'}`}>
         <img
@@ -73,7 +73,7 @@ const PlayerAvatarWithFrame = ({ avatar, frame, size = 'md', className = '' }) =
         <img
           src={frameSrc}
           alt="Frame"
-          className="absolute inset-0 w-full h-full object-contain pointer-events-none scale-110 drop-shadow-md z-10"
+          className="absolute inset-0 w-full h-full object-contain pointer-events-none scale-110 drop-shadow-md z-[1]"
           onError={(e) => {
             const current = e.currentTarget.src;
             if (current.endsWith('.png')) {
@@ -896,16 +896,19 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     const currentId = student?.id;
     const currentUsername = (student?.username || student?.nickname || '').trim().toLowerCase();
     const currentEmail = (student?.email || '').trim().toLowerCase();
+    const currentName = (student?.full_name || student?.fullName || student?.name || '').trim().toLowerCase();
 
     const uId = u.id;
     const uUsername = (u.username || u.nickname || '').trim().toLowerCase();
     const uEmail = (u.email || '').trim().toLowerCase();
     const uName = (u.full_name || u.name || '').trim().toLowerCase();
 
-    // Check if u is the current user
+    // Check if u is the current user (by ID, username, email, or full name)
     const isSelf = (currentId && uId && String(currentId) === String(uId)) ||
                    (currentUsername && uUsername && currentUsername === uUsername) ||
-                   (currentEmail && uEmail && currentEmail === uEmail);
+                   (currentEmail && uEmail && currentEmail === uEmail) ||
+                   (currentName && uName && currentName === uName) ||
+                   (student?.studentId && u.student_id && String(student.studentId) === String(u.student_id));
 
     const query = inviteSearch.trim().toLowerCase();
     if (!query) return !isSelf;
@@ -1730,8 +1733,8 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
       {/* INVITE REAL REGISTERED STUDENTS MODAL WITH REAL-TIME APPROVAL */}
       {/* ========================================================================= */}
       {showInviteModal && !challengerPlayer && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center p-4 bg-slate-950/40 backdrop-blur-[1px] animate-fade-in font-kantumruy">
-          <div className="bg-[#0e1730] border border-slate-800 rounded-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[85vh] shadow-2xl">
+        <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in font-kantumruy isolate">
+          <div className="bg-[#0e1730] border border-slate-700/80 rounded-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[85vh] shadow-[0_25px_60px_rgba(0,0,0,0.8)] relative z-10">
             
             {/* Modal Header */}
             <div className="px-5 py-4 bg-[#080e1e] border-b border-slate-800 flex items-center justify-between">
