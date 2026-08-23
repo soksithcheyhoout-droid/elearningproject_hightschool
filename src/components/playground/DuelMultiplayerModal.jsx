@@ -1,31 +1,31 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
 import confetti from 'canvas-confetti';
-import { 
-  Swords, 
-  Copy, 
-  Check, 
-  Play, 
-  RotateCcw, 
-  X, 
-  Volume2, 
-  VolumeX, 
-  Triangle, 
-  Diamond, 
-  Circle, 
-  Square, 
-  CheckCircle2, 
-  XCircle, 
-  Shield, 
-  Loader2, 
-  UserPlus, 
-  Share2, 
-  Search, 
-  Send, 
-  UserCheck, 
-  KeyRound, 
-  AlertTriangle, 
-  Clock, 
+import {
+  Swords,
+  Copy,
+  Check,
+  Play,
+  RotateCcw,
+  X,
+  Volume2,
+  VolumeX,
+  Triangle,
+  Diamond,
+  Circle,
+  Square,
+  CheckCircle2,
+  XCircle,
+  Shield,
+  Loader2,
+  UserPlus,
+  Share2,
+  Search,
+  Send,
+  UserCheck,
+  KeyRound,
+  AlertTriangle,
+  Clock,
   Zap,
   Sparkles,
   Trophy,
@@ -281,7 +281,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
       if (soundEnabled) playSound.victory();
       try {
         confetti({ particleCount: 140, spread: 80, origin: { y: 0.6 } });
-      } catch (e) {}
+      } catch (e) { }
       addXP(myCorrectCount >= opponentCorrectCount ? (game?.xpReward ? game.xpReward + 350 : 500) : 150);
       return;
     }
@@ -305,7 +305,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     if (isHost) {
       try {
         await api.nextTurn(roomCode, extra);
-      } catch (e) {}
+      } catch (e) { }
     }
   }, [currentQIndex, questions.length, activeTurn, isHost, roomCode, hostCorrectCount, challengerCorrectCount, myCorrectCount, opponentCorrectCount, soundEnabled, addXP, game]);
 
@@ -596,7 +596,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             setInvitedStudentsMap(map);
           }
         }
-      } catch (e) {}
+      } catch (e) { }
     }, 700);
 
     return () => {
@@ -642,7 +642,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     if (soundEnabled) playSound.click();
     try {
       await api.updateArenaRoom(roomCode, { challengerReady: nextVal });
-    } catch (e) {}
+    } catch (e) { }
   };
 
   // Admin Kicks Challenger
@@ -653,23 +653,23 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     hostKickedRef.current = true; // Flag so poller doesn't re-fire opponent-left
     try {
       await api.kickChallenger(roomCode, kickedId);
-    } catch (e) {}
+    } catch (e) { }
     setChallengerPlayer(null);
     setIsChallengerReady(false);
-    
+
     // Fully reset ALL invite tracking state
     setInvitedStudentsMap({});
     setDeclinedCooldowns({});
     setShowInviteModal(false);
     setInviteFeedback('');
-    
+
     // Clear localStorage invites for this room
     try {
       const active = JSON.parse(localStorage.getItem('khmer_elearn_invites') || '[]');
       const cleaned = active.filter(i => i.roomCode !== roomCode);
       localStorage.setItem('khmer_elearn_invites', JSON.stringify(cleaned));
-    } catch (e) {}
-    
+    } catch (e) { }
+
     setHostWarningNotice('បានបណ្តេញគូប្រជែងចេញពីបន្ទប់ប្រកួតរួចរាល់');
     setTimeout(() => setHostWarningNotice(''), 3000);
   };
@@ -694,7 +694,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
         game?.subject || 'គណិតវិទ្យា',
         game?.titleKm || '1v1 Academic Arena'
       );
-    } catch (e) {}
+    } catch (e) { }
   };
 
   // Host Triggers Duel with Ready Validation
@@ -727,7 +727,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
       if (res && res.bothReady) {
         startCountdown(freshQuestions);
       }
-    } catch (e) {}
+    } catch (e) { }
   };
 
   // Player Leaves Room & Closes Modal Window
@@ -735,7 +735,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     if (soundEnabled) playSound.click();
     try {
       await api.leaveArenaRoom(roomCode, student?.id, student?.username);
-    } catch (e) {}
+    } catch (e) { }
 
     // Full state cleanup
     setChallengerPlayer(null);
@@ -747,13 +747,13 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     setShowInviteModal(false);
     setInviteFeedback('');
     setHostWarningNotice('');
-    
+
     // Clear localStorage invites for this room
     try {
       const active = JSON.parse(localStorage.getItem('khmer_elearn_invites') || '[]');
       const cleaned = active.filter(i => i.roomCode !== roomCode);
       localStorage.setItem('khmer_elearn_invites', JSON.stringify(cleaned));
-    } catch (e) {}
+    } catch (e) { }
 
     if (typeof onClose === 'function') {
       onClose();
@@ -765,7 +765,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     if (soundEnabled) playSound.click();
     try {
       await api.leaveArenaRoom(roomCode, student?.id, student?.username);
-    } catch (e) {}
+    } catch (e) { }
 
     // Full state cleanup
     setChallengerPlayer(null);
@@ -778,13 +778,13 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     setInviteFeedback('');
     setHostWarningNotice('');
     setOpponentLeftNotice('');
-    
+
     // Clear localStorage invites for this room
     try {
       const active = JSON.parse(localStorage.getItem('khmer_elearn_invites') || '[]');
       const cleaned = active.filter(i => i.roomCode !== roomCode);
       localStorage.setItem('khmer_elearn_invites', JSON.stringify(cleaned));
-    } catch (e) {}
+    } catch (e) { }
 
     setCurrentStep('lobby');
     setTab('host');
@@ -806,7 +806,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
     try {
       api.submitTurnAnswer(roomCode, isHost, -1, false, 0, true);
-    } catch (e) {}
+    } catch (e) { }
 
     triggerTurnEndCountdown(timeoutResult);
   }, [turnStatus, currentStep, isMyTurn, activeTurn, hostCorrectCount, challengerCorrectCount, roomCode, isHost, triggerTurnEndCountdown]);
@@ -868,7 +868,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     // Sync turn result with backend room
     try {
       await api.submitTurnAnswer(roomCode, isHost, idx, isCorrect, pointsEarned, false);
-    } catch (e) {}
+    } catch (e) { }
   };
 
   const handleCopyLink = () => {
@@ -909,10 +909,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
     // Check if u is the current user (by ID, username, email, or full name)
     const isSelf = (currentId && uId && String(currentId) === String(uId)) ||
-                   (currentUsername && uUsername && currentUsername === uUsername) ||
-                   (currentEmail && uEmail && currentEmail === uEmail) ||
-                   (currentName && uName && currentName === uName) ||
-                   (student?.studentId && u.student_id && String(student.studentId) === String(u.student_id));
+      (currentUsername && uUsername && currentUsername === uUsername) ||
+      (currentEmail && uEmail && currentEmail === uEmail) ||
+      (currentName && uName && currentName === uName) ||
+      (student?.studentId && u.student_id && String(student.studentId) === String(u.student_id));
 
     const query = inviteSearch.trim().toLowerCase();
     if (!query) return !isSelf;
@@ -926,10 +926,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
   return createPortal(
     <div className="fixed inset-0 z-[99999] flex items-center justify-center p-1.5 sm:p-4 md:p-6 bg-slate-950/92 backdrop-blur-xl animate-fade-in font-kantumruy overflow-y-auto">
-      
+
       {/* Main Container */}
       <div className="bg-gradient-to-b from-[#0a1128] via-[#070c1e] to-[#040814] border border-slate-700/80 rounded-2xl sm:rounded-3xl w-full max-w-4xl max-h-[96vh] sm:max-h-[92vh] flex flex-col shadow-[0_25px_80px_rgba(0,0,0,0.95)] overflow-hidden text-slate-100 relative my-auto ring-1 ring-white/10">
-        
+
         {/* Dynamic Ambient Backlights */}
         <div className="absolute -top-28 -left-28 w-80 h-80 bg-cyan-500/20 rounded-full blur-[110px] pointer-events-none" />
         <div className="absolute -top-28 -right-28 w-80 h-80 bg-rose-500/20 rounded-full blur-[110px] pointer-events-none" />
@@ -964,11 +964,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
           <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
             {currentStep === 'battle' && (
-              <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center font-mono font-black text-xs border ${
-                secondsLeft <= 4 
-                  ? 'bg-rose-500/25 text-rose-300 border-rose-500/50 animate-pulse' 
+              <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center font-mono font-black text-xs border ${secondsLeft <= 4
+                  ? 'bg-rose-500/25 text-rose-300 border-rose-500/50 animate-pulse'
                   : 'bg-slate-800/80 text-slate-200 border-slate-700'
-              }`}>
+                }`}>
                 {secondsLeft}s
               </div>
             )}
@@ -998,10 +997,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
         {/* ========================================================================= */}
         {currentStep === 'lobby' && (
           <div className="p-3.5 sm:p-6 md:p-8 flex-1 flex flex-col justify-between overflow-y-auto space-y-5 sm:space-y-7 animate-fade-in relative z-10">
-            
+
             {/* Top Control Bar: Tab Toggle & Room Code Deck */}
             <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#0a1228]/80 backdrop-blur-md p-3 sm:p-4 rounded-2xl border border-indigo-500/20 shadow-[0_4px_20px_rgba(0,0,0,0.4)]">
-              
+
               {/* Room Code & Quick Share Actions */}
               <div className="flex items-center gap-2 sm:gap-2.5 w-full sm:w-auto flex-wrap sm:flex-nowrap">
                 <button
@@ -1056,11 +1055,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                 <button
                   type="button"
                   onClick={() => setTab('host')}
-                  className={`flex-1 sm:flex-initial px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    tab === 'host'
+                  className={`flex-1 sm:flex-initial px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${tab === 'host'
                       ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]'
                       : 'text-slate-400 hover:text-slate-200'
-                  }`}
+                    }`}
                 >
                   បន្ទប់ប្រកួត (Lobby)
                 </button>
@@ -1068,11 +1066,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                 <button
                   type="button"
                   onClick={() => setTab('join')}
-                  className={`flex-1 sm:flex-initial px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    tab === 'join'
+                  className={`flex-1 sm:flex-initial px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${tab === 'join'
                       ? 'bg-gradient-to-r from-indigo-600 to-blue-600 text-white shadow-[0_0_15px_rgba(99,102,241,0.4)]'
                       : 'text-slate-400 hover:text-slate-200'
-                  }`}
+                    }`}
                 >
                   បញ្ចូលកូដបន្ទប់ (Join)
                 </button>
@@ -1133,7 +1130,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                             setJoinCodeInput(val);
                             if (joinError) setJoinError('');
                           }
-                        } catch (e) {}
+                        } catch (e) { }
                       }}
                       className="text-xs text-indigo-400 hover:text-indigo-300 font-bold underline cursor-pointer"
                     >
@@ -1156,76 +1153,90 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             {tab === 'host' && (
               <div className="space-y-6 my-auto">
                 
-                {/* 2-Player Head-to-Head Arena Showcase */}
-                <div className="grid grid-cols-1 md:grid-cols-11 gap-3.5 sm:gap-4 items-stretch relative">
+                {/* 2-Player Grand Vertical Esports Fighter Podiums */}
+                <div className="grid grid-cols-1 md:grid-cols-11 gap-4 sm:gap-6 items-stretch relative">
                   
                   {/* Left Fighter Card: Host (Blue / Cyan Cyber Corner) */}
-                  <div className="md:col-span-5 bg-gradient-to-b from-[#0c1836] via-[#091228] to-[#070d1e] p-4 sm:p-5 rounded-2xl sm:rounded-3xl border border-cyan-500/30 shadow-[0_10px_35px_rgba(6,182,212,0.12)] relative overflow-hidden flex flex-col justify-between group">
-                    {/* Top Cyan Light Accent */}
-                    <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-cyan-400 to-transparent opacity-70" />
+                  <div className="md:col-span-5 bg-gradient-to-b from-[#0e1c3d]/90 via-[#0a142c]/95 to-[#060d1e] p-5 sm:p-6 rounded-3xl border-2 border-cyan-500/40 shadow-[0_0_35px_rgba(6,182,212,0.18)] relative overflow-hidden flex flex-col items-center justify-between text-center min-h-[300px] sm:min-h-[320px] group transition-all">
+                    {/* Cyber Grid Texture Overlay */}
+                    <div className="absolute inset-0 bg-[radial-gradient(#06b6d4_1px,transparent_1px)] [background-size:16px_16px] opacity-10 pointer-events-none" />
+                    
+                    {/* Top Neon Ambient Sweep */}
+                    <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-transparent via-cyan-400 to-transparent" />
 
-                    <div className="flex items-center justify-between pb-3 border-b border-cyan-500/20 mb-3.5">
-                      <span className="text-[11px] font-black text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
-                        <Crown className="w-3.5 h-3.5 text-amber-400 fill-amber-400 drop-shadow-[0_0_6px_rgba(245,158,11,0.8)]" /> 
-                        ម្ចាស់បន្ទប់ (HOST)
+                    {/* Top Role & Status Header */}
+                    <div className="w-full flex items-center justify-between pb-3 border-b border-cyan-500/20 relative z-10">
+                      <span className="text-[11px] font-black text-cyan-300 uppercase tracking-widest flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-cyan-500/10 border border-cyan-500/30">
+                        <Crown className="w-3.5 h-3.5 text-amber-400 fill-amber-400 drop-shadow-[0_0_8px_rgba(245,158,11,0.9)]" /> 
+                        ROOM LEADER (HOST)
                       </span>
-                      <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
-                        <Check className="w-3 h-3" /> រួចរាល់
+                      <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1 shadow-[0_0_12px_rgba(16,185,129,0.3)]">
+                        <Check className="w-3.5 h-3.5 text-emerald-400" /> រួចរាល់
                       </span>
                     </div>
 
+                    {/* Center Hero Avatar Podium */}
                     {hostPlayer ? (
-                      <div className="flex items-center gap-3.5">
-                        <div className="relative">
+                      <div className="my-auto py-2 flex flex-col items-center relative z-10 w-full">
+                        {/* Avatar with Halo Base */}
+                        <div className="relative mb-3">
+                          <div className="absolute -inset-2 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-full blur-md opacity-50 group-hover:opacity-80 transition-opacity" />
                           <PlayerAvatarWithFrame
                             avatar={hostPlayer.avatar}
                             frame={hostPlayer.avatarFrame || hostPlayer.avatar_frame}
-                            size="md"
+                            size="lg"
+                            className="relative z-10 scale-105"
                           />
+                          {/* Floating Level Badge */}
+                          <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 border border-cyan-300/80 text-[10px] font-black text-white shadow-[0_0_10px_rgba(6,182,212,0.6)] z-20 whitespace-nowrap">
+                            LV.{hostPlayer.level || 1}
+                          </div>
                         </div>
 
-                        <div className="min-w-0 flex-1">
-                          <h4 className="text-sm sm:text-base font-black text-white truncate drop-shadow-sm">
-                            {hostPlayer.name || 'សុខ វិបុល'}
-                          </h4>
-                          <p className="text-xs text-cyan-300/80 truncate mt-0.5 font-medium flex items-center gap-1">
-                            <Building2 className="w-3 h-3 flex-shrink-0 text-cyan-400" />
-                            <span className="truncate">{hostPlayer.school || 'វិទ្យាល័យជាតិ'}</span>
-                          </p>
-                          <div className="flex items-center gap-2 mt-1.5">
-                            <span className="px-2 py-0.5 rounded-md bg-cyan-500/15 border border-cyan-500/30 text-[10px] font-black text-cyan-300">
-                              Lv.{hostPlayer.level || 1}
-                            </span>
-                            <span className="px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-[10px] font-black text-amber-300">
-                              ⭐ {(hostPlayer.xp || 500).toLocaleString()} XP
-                            </span>
-                          </div>
+                        {/* Name & School */}
+                        <h3 className="text-base sm:text-lg font-black text-white tracking-tight drop-shadow-md truncate max-w-[200px] sm:max-w-[240px] mt-1">
+                          {hostPlayer.name || 'សុខ វិបុល'}
+                        </h3>
+                        <p className="text-xs text-cyan-200/80 font-medium flex items-center gap-1 mt-0.5 truncate max-w-[220px]">
+                          <Building2 className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
+                          <span className="truncate">{hostPlayer.school || 'វិទ្យាល័យជាតិ'}</span>
+                        </p>
+
+                        {/* Stats Chips */}
+                        <div className="flex items-center justify-center gap-2 mt-2.5 w-full">
+                          <span className="px-3 py-1 rounded-xl bg-amber-500/15 border border-amber-400/30 text-amber-300 text-xs font-black flex items-center gap-1 shadow-xs">
+                            ⭐ {(hostPlayer.xp || 500).toLocaleString()} XP
+                          </span>
                         </div>
                       </div>
                     ) : (
-                      <div className="py-6 text-center text-slate-400 text-xs flex items-center justify-center gap-2">
-                        <Loader2 className="w-4 h-4 animate-spin text-cyan-400" />
+                      <div className="my-auto py-8 text-center text-slate-400 text-xs flex flex-col items-center justify-center gap-2 relative z-10">
+                        <Loader2 className="w-6 h-6 animate-spin text-cyan-400" />
                         <span>កំពុងទាញយកទិន្នន័យ...</span>
                       </div>
                     )}
                   </div>
 
                   {/* Center: VS Energy Reactor */}
-                  <div className="md:col-span-1 flex flex-row md:flex-col items-center justify-center py-2 relative">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-600 to-rose-600 p-[1.5px] shadow-[0_0_25px_rgba(168,85,247,0.45)] animate-pulse flex-shrink-0">
-                      <div className="w-full h-full bg-[#070d1e] rounded-2xl flex flex-col items-center justify-center">
-                        <span className="font-black text-sm sm:text-base tracking-tight bg-gradient-to-r from-cyan-400 via-purple-300 to-rose-400 bg-clip-text text-transparent drop-shadow-[0_0_8px_rgba(168,85,247,0.8)]">
+                  <div className="md:col-span-1 flex flex-row md:flex-col items-center justify-center py-2 relative my-auto">
+                    <div className="relative group">
+                      <div className="absolute -inset-2 bg-gradient-to-r from-cyan-500 via-purple-600 to-rose-500 rounded-2xl blur-lg opacity-70 animate-pulse" />
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-[#080f24] border-2 border-indigo-400/60 flex flex-col items-center justify-center relative z-10 shadow-[0_0_25px_rgba(99,102,241,0.5)]">
+                        <span className="font-black text-base sm:text-xl tracking-wider bg-gradient-to-br from-cyan-300 via-purple-300 to-rose-400 bg-clip-text text-transparent drop-shadow-[0_0_10px_rgba(168,85,247,0.9)]">
                           VS
+                        </span>
+                        <span className="text-[8px] font-black text-indigo-300 uppercase tracking-widest -mt-0.5">
+                          DUEL
                         </span>
                       </div>
                     </div>
                   </div>
 
                   {/* Right Fighter Card: Challenger (Red / Crimson Cyber Corner) */}
-                  <div className={`md:col-span-5 p-4 sm:p-5 rounded-2xl sm:rounded-3xl relative overflow-hidden flex flex-col justify-between transition-all ${
+                  <div className={`md:col-span-5 p-5 sm:p-6 rounded-3xl relative overflow-hidden flex flex-col items-center justify-between text-center min-h-[300px] sm:min-h-[320px] transition-all group ${
                     challengerPlayer
-                      ? 'bg-gradient-to-b from-[#220c1d] via-[#150713] to-[#0a0309] border border-rose-500/30 shadow-[0_10px_35px_rgba(244,63,94,0.12)]'
-                      : 'bg-[#0a1228]/50 border-2 border-dashed border-rose-500/30 hover:border-rose-400 hover:bg-rose-500/5 cursor-pointer shadow-[0_0_25px_rgba(244,63,94,0.06)]'
+                      ? 'bg-gradient-to-b from-[#2a0e24]/90 via-[#190817]/95 to-[#0e030c] border-2 border-rose-500/40 shadow-[0_0_35px_rgba(244,63,94,0.18)]'
+                      : 'bg-gradient-to-b from-[#101933]/60 via-[#0a1124]/70 to-[#060b17] border-2 border-dashed border-rose-500/35 hover:border-rose-400 hover:bg-rose-500/5 cursor-pointer shadow-[0_0_30px_rgba(244,63,94,0.08)]'
                   }`}
                   onClick={() => {
                     if (!challengerPlayer) {
@@ -1234,29 +1245,34 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                     }
                   }}
                   >
-                    {/* Top Rose Light Accent */}
+                    {/* Cyber Grid Texture Overlay */}
+                    <div className="absolute inset-0 bg-[radial-gradient(#f43f5e_1px,transparent_1px)] [background-size:16px_16px] opacity-10 pointer-events-none" />
+
+                    {/* Top Neon Ambient Sweep */}
                     {challengerPlayer && (
-                      <div className="absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-transparent via-rose-400 to-transparent opacity-70" />
+                      <div className="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-transparent via-rose-400 to-transparent" />
                     )}
 
-                    <div className="flex items-center justify-between pb-3 border-b border-rose-500/20 mb-3.5">
-                      <span className="text-[11px] font-black text-rose-400 uppercase tracking-wider flex items-center gap-1.5">
+                    {/* Top Header */}
+                    <div className="w-full flex items-center justify-between pb-3 border-b border-rose-500/20 relative z-10">
+                      <span className="text-[11px] font-black text-rose-300 uppercase tracking-widest flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-rose-500/10 border border-rose-500/30">
                         <Swords className="w-3.5 h-3.5 text-rose-400" /> 
-                        គូប្រជែង (CHALLENGER)
+                        CHALLENGER
                       </span>
+
                       {challengerPlayer ? (
                         <div className="flex items-center gap-2">
                           {isChallengerReady ? (
-                            <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1 shadow-[0_0_10px_rgba(16,185,129,0.2)]">
-                              <Check className="w-3 h-3" /> រួចរាល់ (Ready)
+                            <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 flex items-center gap-1 shadow-[0_0_12px_rgba(16,185,129,0.3)]">
+                              <Check className="w-3.5 h-3.5 text-emerald-400" /> រួចរាល់
                             </span>
                           ) : (
-                            <span className="text-[10px] font-black px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1 animate-pulse">
-                              <Clock className="w-3 h-3" /> កំពុងរៀបចំ...
+                            <span className="text-[10px] font-black px-2.5 py-1 rounded-full bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1 animate-pulse">
+                              <Clock className="w-3.5 h-3.5" /> មិនទាន់ Ready
                             </span>
                           )}
 
-                          {/* Admin KICK button */}
+                          {/* Kick Button for Host */}
                           {isHost && (
                             <button
                               type="button"
@@ -1264,61 +1280,75 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                                 e.stopPropagation();
                                 handleKickChallenger();
                               }}
-                              className="px-2 py-0.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/35 text-rose-300 hover:text-white border border-rose-500/40 text-[10px] font-bold flex items-center gap-1 transition-all cursor-pointer shadow-xs"
-                              title="បណ្តេញគូប្រជែងចេញ (Kick Player)"
+                              className="px-2 py-0.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 hover:text-white border border-rose-500/40 text-[10px] font-bold transition-all cursor-pointer shadow-xs"
+                              title="បណ្តេញចេញ (Kick Player)"
                             >
-                              <UserX className="w-3 h-3" />
-                              <span>Kick</span>
+                              <UserX className="w-3.5 h-3.5" />
                             </button>
                           )}
                         </div>
                       ) : (
-                        <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
-                          រង់ចាំ
+                        <span className="text-[10px] font-bold px-2.5 py-1 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                          រង់ចាំគូប្រជែង
                         </span>
                       )}
                     </div>
 
+                    {/* Center Content */}
                     {challengerPlayer ? (
-                      <div className="flex items-center gap-3.5">
-                        <div className="relative">
+                      <div className="my-auto py-2 flex flex-col items-center relative z-10 w-full">
+                        {/* Avatar with Halo Base */}
+                        <div className="relative mb-3">
+                          <div className="absolute -inset-2 bg-gradient-to-r from-rose-500 to-amber-600 rounded-full blur-md opacity-50 group-hover:opacity-80 transition-opacity" />
                           <PlayerAvatarWithFrame
                             avatar={challengerPlayer.avatar}
                             frame={challengerPlayer.avatarFrame || challengerPlayer.avatar_frame}
-                            size="md"
+                            size="lg"
+                            className="relative z-10 scale-105"
                           />
+                          {/* Floating Level Badge */}
+                          <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-rose-600 to-pink-600 border border-rose-300/80 text-[10px] font-black text-white shadow-[0_0_10px_rgba(244,63,94,0.6)] z-20 whitespace-nowrap">
+                            LV.{challengerPlayer.level || 1}
+                          </div>
                         </div>
 
-                        <div className="min-w-0 flex-1">
-                          <h4 className="text-sm sm:text-base font-black text-white truncate drop-shadow-sm">
-                            {challengerPlayer.name}
-                          </h4>
-                          <p className="text-xs text-rose-300/80 truncate mt-0.5 font-medium flex items-center gap-1">
-                            <Building2 className="w-3 h-3 flex-shrink-0 text-rose-400" />
-                            <span className="truncate">{challengerPlayer.school}</span>
-                          </p>
-                          <div className="flex items-center gap-2 mt-1.5">
-                            <span className="px-2 py-0.5 rounded-md bg-rose-500/15 border border-rose-500/30 text-[10px] font-black text-rose-300">
-                              Lv.{challengerPlayer.level || 1}
-                            </span>
-                            <span className="px-2 py-0.5 rounded-md bg-amber-500/15 border border-amber-500/30 text-[10px] font-black text-amber-300">
-                              ⭐ {(challengerPlayer.xp || 500).toLocaleString()} XP
-                            </span>
-                          </div>
+                        {/* Name & School */}
+                        <h3 className="text-base sm:text-lg font-black text-white tracking-tight drop-shadow-md truncate max-w-[200px] sm:max-w-[240px] mt-1">
+                          {challengerPlayer.name}
+                        </h3>
+                        <p className="text-xs text-rose-200/80 font-medium flex items-center gap-1 mt-0.5 truncate max-w-[220px]">
+                          <Building2 className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
+                          <span className="truncate">{challengerPlayer.school}</span>
+                        </p>
+
+                        {/* Stats Chips */}
+                        <div className="flex items-center justify-center gap-2 mt-2.5 w-full">
+                          <span className="px-3 py-1 rounded-xl bg-amber-500/15 border border-amber-400/30 text-amber-300 text-xs font-black flex items-center gap-1 shadow-xs">
+                            ⭐ {(challengerPlayer.xp || 500).toLocaleString()} XP
+                          </span>
                         </div>
                       </div>
                     ) : (
-                      <div className="py-3 px-2 text-center flex flex-col items-center justify-center gap-2">
-                        <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-rose-500/20 to-purple-600/20 border border-rose-400/40 text-rose-300 flex items-center justify-center shadow-[0_0_15px_rgba(244,63,94,0.25)]">
-                          <UserPlus className="w-5 h-5 animate-pulse" />
+                      /* Empty Summoning Pod */
+                      <div className="my-auto py-6 flex flex-col items-center justify-center text-center relative z-10 w-full">
+                        {/* Animated Summoning Ring */}
+                        <div className="relative mb-3">
+                          <div className="absolute -inset-3 bg-gradient-to-r from-rose-500/30 via-purple-500/20 to-rose-500/30 rounded-full blur-lg animate-pulse" />
+                          <div className="w-20 h-20 sm:w-22 sm:h-22 rounded-full bg-[#070e22] border-2 border-dashed border-rose-400/50 flex items-center justify-center relative z-10 group-hover:scale-105 group-hover:border-rose-400 transition-all shadow-[0_0_25px_rgba(244,63,94,0.25)]">
+                            <UserPlus className="w-8 h-8 text-rose-300 animate-bounce" />
+                          </div>
                         </div>
-                        <div>
-                          <span className="text-xs font-black bg-gradient-to-r from-rose-300 via-pink-200 to-amber-300 bg-clip-text text-transparent block">
-                            ✨ ចុចទីនេះដើម្បីអញ្ជើញសិស្សពិតប្រាកដ
-                          </span>
-                          <span className="text-[10px] text-slate-400 block mt-0.5">
-                            ឬចែករំលែកលេខកូដ <strong className="text-amber-400">#{roomCode}</strong> ឱ្យមិត្តភក្តិចូលរួម
-                          </span>
+
+                        <span className="text-sm font-black bg-gradient-to-r from-rose-300 via-pink-200 to-amber-300 bg-clip-text text-transparent block">
+                          ✨ ចុចទីនេះដើម្បីអញ្ជើញសិស្ស
+                        </span>
+                        <span className="text-[11px] text-slate-400 block mt-1">
+                          ឬចែករំលែកកូដ <strong className="text-amber-300 font-mono">#{roomCode}</strong> ឱ្យមិត្តភក្តិចូលរួម
+                        </span>
+                        
+                        <div className="mt-3 px-4 py-1.5 rounded-xl bg-gradient-to-r from-rose-600 to-purple-600 text-white font-black text-xs shadow-[0_0_15px_rgba(244,63,94,0.4)] group-hover:scale-105 transition-transform flex items-center gap-1.5">
+                          <UserPlus className="w-3.5 h-3.5" />
+                          <span>អញ្ជើញមិត្តភក្តិ (INVITE)</span>
                         </div>
                       </div>
                     )}
@@ -1446,14 +1476,13 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
         {/* ========================================================================= */}
         {currentStep === 'battle' && (
           <div className="p-5 sm:p-7 flex-1 flex flex-col justify-between overflow-y-auto space-y-4 animate-fade-in">
-            
+
             {/* Top Score HUD with First to 6 Correct Progress */}
             <div className="grid grid-cols-11 gap-3 items-center bg-[#0e1730] p-3.5 rounded-2xl border border-slate-800">
-              
+
               {/* Host HUD */}
-              <div className={`col-span-5 flex items-center gap-3 p-2 rounded-xl transition-all ${
-                activeTurn === 'host' ? 'bg-indigo-950/50 border border-indigo-500/60 shadow-md ring-1 ring-indigo-500/30' : 'opacity-70'
-              }`}>
+              <div className={`col-span-5 flex items-center gap-3 p-2 rounded-xl transition-all ${activeTurn === 'host' ? 'bg-indigo-950/50 border border-indigo-500/60 shadow-md ring-1 ring-indigo-500/30' : 'opacity-70'
+                }`}>
                 <PlayerAvatarWithFrame
                   avatar={hostPlayer?.avatar}
                   frame={hostPlayer?.avatarFrame || hostPlayer?.avatar_frame}
@@ -1479,11 +1508,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                     </span>
                     <div className="flex-1 h-1.5 bg-slate-900 rounded-full overflow-hidden flex gap-0.5">
                       {[...Array(6)].map((_, i) => (
-                        <div 
-                          key={i} 
-                          className={`flex-1 h-full rounded-full transition-all duration-300 ${
-                            i < hostCorrectCount ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' : 'bg-slate-800'
-                          }`} 
+                        <div
+                          key={i}
+                          className={`flex-1 h-full rounded-full transition-all duration-300 ${i < hostCorrectCount ? 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.8)]' : 'bg-slate-800'
+                            }`}
                         />
                       ))}
                     </div>
@@ -1500,9 +1528,8 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
               </div>
 
               {/* Challenger HUD */}
-              <div className={`col-span-5 flex items-center gap-3 p-2 rounded-xl text-right transition-all ${
-                activeTurn === 'challenger' ? 'bg-rose-950/50 border border-rose-500/60 shadow-md ring-1 ring-rose-500/30' : 'opacity-70'
-              }`}>
+              <div className={`col-span-5 flex items-center gap-3 p-2 rounded-xl text-right transition-all ${activeTurn === 'challenger' ? 'bg-rose-950/50 border border-rose-500/60 shadow-md ring-1 ring-rose-500/30' : 'opacity-70'
+                }`}>
                 <div className="min-w-0 flex-1">
                   <div className="flex items-center justify-between text-xs font-semibold">
                     <span className="text-rose-400 font-mono font-bold">{!isHost ? myScore : opponentScore} pts</span>
@@ -1520,11 +1547,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                   <div className="flex items-center gap-1.5 mt-1.5">
                     <div className="flex-1 h-1.5 bg-slate-900 rounded-full overflow-hidden flex gap-0.5">
                       {[...Array(6)].map((_, i) => (
-                        <div 
-                          key={i} 
-                          className={`flex-1 h-full rounded-full transition-all duration-300 ${
-                            i < challengerCorrectCount ? 'bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.8)]' : 'bg-slate-800'
-                          }`} 
+                        <div
+                          key={i}
+                          className={`flex-1 h-full rounded-full transition-all duration-300 ${i < challengerCorrectCount ? 'bg-rose-400 shadow-[0_0_8px_rgba(251,113,133,0.8)]' : 'bg-slate-800'
+                            }`}
                         />
                       ))}
                     </div>
@@ -1544,11 +1570,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             </div>
 
             {/* Turn Announcement Banner */}
-            <div className={`p-2.5 rounded-xl border text-center text-xs font-semibold flex items-center justify-center gap-2 transition-all ${
-              isMyTurn 
-                ? 'bg-indigo-500/15 border-indigo-500/40 text-indigo-200 shadow-sm ring-1 ring-indigo-500/30' 
+            <div className={`p-2.5 rounded-xl border text-center text-xs font-semibold flex items-center justify-center gap-2 transition-all ${isMyTurn
+                ? 'bg-indigo-500/15 border-indigo-500/40 text-indigo-200 shadow-sm ring-1 ring-indigo-500/30'
                 : 'bg-slate-900 border-slate-800 text-slate-400'
-            }`}>
+              }`}>
               {isMyTurn ? (
                 <>
                   <Zap className="w-4 h-4 text-amber-400 animate-bounce" />
@@ -1577,12 +1602,12 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
               {currentQ.options.map((option, idx) => {
                 const config = BUTTON_CONFIGS[idx % 4];
                 const IconComponent = config.icon;
-                
+
                 const isSelectedByPlayer = turnResult && turnResult.selectedIdx === idx;
                 const isCorrectOption = idx === currentQ.answer;
 
                 let btnStyle = 'bg-[#0e1730] border-slate-800 hover:border-slate-700 text-slate-200';
-                
+
                 if (turnStatus === 'turn_ended') {
                   // After turn is submitted: reveal results immediately!
                   if (isCorrectOption) {
@@ -1605,9 +1630,8 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                     type="button"
                     disabled={!isMyTurn || turnStatus === 'turn_ended'}
                     onClick={() => handleSelectOption(idx)}
-                    className={`p-4 rounded-xl border flex items-center gap-3 transition-all text-left ${
-                      isMyTurn && turnStatus === 'playing' ? 'cursor-pointer hover:border-indigo-400 hover:bg-slate-800/80 active:scale-98' : ''
-                    } ${btnStyle}`}
+                    className={`p-4 rounded-xl border flex items-center gap-3 transition-all text-left ${isMyTurn && turnStatus === 'playing' ? 'cursor-pointer hover:border-indigo-400 hover:bg-slate-800/80 active:scale-98' : ''
+                      } ${btnStyle}`}
                   >
                     <div className="w-8 h-8 rounded-lg bg-slate-900 border border-slate-700 flex items-center justify-center flex-shrink-0 text-slate-300">
                       <IconComponent className="w-4 h-4" />
@@ -1634,8 +1658,8 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                 <div className="flex items-center gap-2 text-slate-300">
                   <Sparkles className="w-4 h-4 text-amber-400" />
                   <span>
-                    {isMyTurn 
-                      ? 'ចុចលើជម្រើសមួយដើម្បីឆ្លើយ (15s)...' 
+                    {isMyTurn
+                      ? 'ចុចលើជម្រើសមួយដើម្បីឆ្លើយ (15s)...'
                       : `កំពុងរង់ចាំ ${activePlayerName} ជ្រើសរើសចម្លើយ...`}
                   </span>
                 </div>
@@ -1672,7 +1696,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
         {/* ========================================================================= */}
         {currentStep === 'results' && (
           <div className="p-8 sm:p-10 flex-1 flex flex-col justify-center items-center text-center space-y-6 animate-fade-in my-auto">
-            
+
             {/* Opponent Left Warning Banner */}
             {opponentLeftNotice && (
               <div className="w-full max-w-md p-3 bg-rose-500/20 border border-rose-500/40 rounded-xl text-rose-300 text-xs font-semibold flex items-center justify-center gap-2 animate-fade-in shadow-md">
@@ -1703,10 +1727,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             </div>
 
             <h3 className="text-xl sm:text-2xl font-bold text-white">
-              {myScore > opponentScore || myCorrectCount > opponentCorrectCount 
-                ? 'អ្នកបានទទួលជ័យជម្នះ (Victory) 🏆' 
-                : myScore === opponentScore && myCorrectCount === opponentCorrectCount 
-                  ? 'លទ្ធផលស្មើគ្នា (Draw)' 
+              {myScore > opponentScore || myCorrectCount > opponentCorrectCount
+                ? 'អ្នកបានទទួលជ័យជម្នះ (Victory) 🏆'
+                : myScore === opponentScore && myCorrectCount === opponentCorrectCount
+                  ? 'លទ្ធផលស្មើគ្នា (Draw)'
                   : 'គូប្រជែងបានទទួលជ័យជម្នះ (Defeat)'}
             </h3>
 
@@ -1734,19 +1758,18 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
             {/* Rematch & Exit Action Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-md">
-              
+
               {/* Play Again (Rematch) Button */}
               <button
                 type="button"
                 disabled={myRematchRequested}
                 onClick={handleRequestRematch}
-                className={`w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-xs shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 ${
-                  myRematchRequested
+                className={`w-full sm:w-auto px-6 py-3 rounded-xl font-bold text-xs shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 ${myRematchRequested
                     ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 cursor-wait'
                     : opponentRematchRequested
                       ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/25 ring-2 ring-emerald-400/50'
                       : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/25'
-                }`}
+                  }`}
               >
                 {myRematchRequested ? (
                   <>
@@ -1788,7 +1811,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
       {showInviteModal && !challengerPlayer && (
         <div className="fixed inset-0 z-[999999] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md animate-fade-in font-kantumruy isolate">
           <div className="bg-[#0e1730] border border-slate-700/80 rounded-2xl w-full max-w-lg overflow-hidden flex flex-col max-h-[85vh] shadow-[0_25px_60px_rgba(0,0,0,0.8)] relative z-10">
-            
+
             {/* Modal Header */}
             <div className="px-5 py-4 bg-[#080e1e] border-b border-slate-800 flex items-center justify-between">
               <div className="flex items-center gap-2.5">
@@ -1818,7 +1841,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
             {/* Body */}
             <div className="p-5 space-y-4 overflow-y-auto">
-              
+
               {/* Search */}
               <div className="relative">
                 <Search className="w-4 h-4 text-slate-400 absolute left-3 top-2.5" />
