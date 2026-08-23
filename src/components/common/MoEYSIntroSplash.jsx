@@ -80,13 +80,13 @@ export default function MoEYSIntroSplash({ onFinish }) {
       } catch (e) {}
     };
 
-    // 2. Initialize YouTube Iframe Player in Active Viewport (Bypasses Browser Autoplay Restrictions)
+    // 2. Initialize YouTube Full-Screen Video Player to unlock unmuted autoplay on Chrome/Edge
     const initYT = () => {
       if (ytPlayerRef.current || !window.YT || !window.YT.Player) return;
       try {
-        ytPlayerRef.current = new window.YT.Player('yt-player-in-view', {
-          height: '2',
-          width: '2',
+        ytPlayerRef.current = new window.YT.Player('yt-player-fullscreen', {
+          height: '100%',
+          width: '100%',
           videoId: YOUTUBE_VIDEO_ID,
           playerVars: {
             autoplay: 1,
@@ -95,6 +95,7 @@ export default function MoEYSIntroSplash({ onFinish }) {
             disablekb: 1,
             enablejsapi: 1,
             fs: 0,
+            modestbranding: 1,
             playsinline: 1,
             rel: 0,
             origin: window.location.origin
@@ -138,7 +139,7 @@ export default function MoEYSIntroSplash({ onFinish }) {
     // Try HTML5 Audio immediately
     playHtml5Audio();
 
-    // 3. Passive event listeners for instant audio un-mute on ANY user hover / touch / interaction
+    // 3. Passive event listeners for instant audio un-mute on ANY interaction or mouse motion
     const handlePassiveActivity = () => {
       playHtml5Audio();
       if (ytPlayerRef.current) {
@@ -244,20 +245,10 @@ export default function MoEYSIntroSplash({ onFinish }) {
         className="hidden"
       />
 
-      {/* 🎵 YouTube Player In Active Viewport Rectangle (Grants Full Autoplay Sound in Chrome/Edge) */}
-      <div
-        id="yt-player-in-view"
-        style={{
-          position: 'absolute',
-          top: 0,
-          left: 0,
-          width: '2px',
-          height: '2px',
-          opacity: 0.01,
-          pointerEvents: 'none',
-          zIndex: 1
-        }}
-      />
+      {/* 🎵 Full-Screen YouTube Video Player in Background (Chrome Authorizes Unmuted Autoplay for Viewport Video) */}
+      <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none opacity-40">
+        <div id="yt-player-fullscreen" className="w-full h-full scale-150 pointer-events-none" />
+      </div>
 
       {/* ═══════ BRIGHT, VIBRANT WAVING CAMBODIAN FLAG ═══════ */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
@@ -265,9 +256,9 @@ export default function MoEYSIntroSplash({ onFinish }) {
           src="/assets/cambodia-flag.gif"
           onError={(e) => { e.currentTarget.src = 'https://media1.tenor.com/m/kDXhibIv45EAAAAC/cambodia-cambodia-flag.gif'; }}
           alt="Cambodia National Flag"
-          className="absolute inset-0 w-full h-full object-cover filter brightness-95 contrast-110 saturate-110 scale-105 select-none pointer-events-none"
+          className="absolute inset-0 w-full h-full object-cover filter brightness-95 contrast-110 saturate-110 scale-105 select-none pointer-events-none opacity-90"
         />
-        <div className="absolute inset-0 bg-slate-950/35" />
+        <div className="absolute inset-0 bg-slate-950/30" />
         <div className="absolute inset-0 bg-gradient-to-b from-slate-950/40 via-transparent to-slate-950/60" />
       </div>
 
