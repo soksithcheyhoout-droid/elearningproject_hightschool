@@ -3,6 +3,7 @@ import { createPortal } from 'react-dom';
 import { X, Music } from 'lucide-react';
 
 const AUDIO_SRC = '/assets/audio/khmer_tea_1.webm';
+const YOUTUBE_VIDEO_ID = 'vAq3g0T_7MI';
 const SONG_TITLE = '(Khmer tea 1) Cambodian Song';
 const START_TIME = 6; // Starts playing immediately at 0:06
 const TOTAL_DURATION = 286; // 4 minutes 46 seconds
@@ -16,6 +17,7 @@ export default function MoEYSIntroSplash({ onFinish }) {
   const [phase, setPhase] = useState(0); // 0=enter, 1=loaded, 2=exit
 
   const audioRef = useRef(null);
+  const ytPlayerRef = useRef(null);
   const progressTimerRef = useRef(null);
   const isClosingRef = useRef(false);
 
@@ -42,6 +44,14 @@ export default function MoEYSIntroSplash({ onFinish }) {
       audioRef.current = null;
     }
 
+    if (ytPlayerRef.current) {
+      try {
+        ytPlayerRef.current.stopVideo?.();
+        ytPlayerRef.current.destroy?.();
+      } catch (e) {}
+      ytPlayerRef.current = null;
+    }
+
     setTimeout(() => {
       onFinish?.();
     }, 600);
@@ -50,7 +60,7 @@ export default function MoEYSIntroSplash({ onFinish }) {
   useEffect(() => {
     const phaseTimer = setTimeout(() => setPhase(1), 60);
 
-    // 1. Initialize and play HTML5 Audio with multiple autoplay bypass techniques
+    // 1. Initialize HTML5 Audio
     const audio = audioRef.current || new Audio(AUDIO_SRC);
     audioRef.current = audio;
     audio.src = AUDIO_SRC;
@@ -58,80 +68,96 @@ export default function MoEYSIntroSplash({ onFinish }) {
     audio.currentTime = START_TIME;
     audio.volume = 1.0;
 
-    // Web Audio API AudioContext resume for instant unmuted sound unlock
-    try {
-      const AudioCtx = window.AudioContext || window.webkitAudioContext;
-      if (AudioCtx) {
-        const audioCtx = new AudioCtx();
-        if (audioCtx.state === 'suspended') {
-          audioCtx.resume();
+    const playHtml5Audio = () => {
+      if (!audioRef.current || isClosingRef.current) return;
+      try {
+        audioRef.current.muted = false;
+        audioRef.current.volume = 1.0;
+        const p = audioRef.current.play();
+        if (p !== undefined) {
+          p.then(() => setIsPlaying(true)).catch(() => {});
         }
-      }
-    } catch (e) {}
-
-    // Multi-stage auto-play with volume ramp
-    const triggerAutoSound = () => {
-      if (audio.currentTime < START_TIME) {
-        audio.currentTime = START_TIME;
-      }
-      audio.muted = false;
-      audio.volume = 1.0;
-
-      const p = audio.play();
-      if (p !== undefined) {
-        p.then(() => {
-          setIsPlaying(true);
-        }).catch(() => {
-          // Subtle volume ramp technique for strict browser policies
-          audio.volume = 0.05;
-          audio.play().then(() => {
-            setIsPlaying(true);
-            setTimeout(() => {
-              try { audio.volume = 1.0; } catch (err) {}
-            }, 100);
-          }).catch(() => {
-            // Muted playback fallback which automatically unmutes on any passive user movement
-            audio.muted = true;
-            audio.play().then(() => {
-              setIsPlaying(true);
-            }).catch(() => {});
-          });
-        });
-      }
+      } catch (e) {}
     };
 
-    audio.addEventListener('loadedmetadata', () => {
-      if (audio.duration && !isNaN(audio.duration)) {
-        setDuration(audio.duration);
-      }
-      triggerAutoSound();
-    });
-
-    audio.addEventListener('canplay', triggerAutoSound);
-    audio.addEventListener('play', () => setIsPlaying(true));
-
-    // Passive document listeners to ensure unmuted sound on any mouse move, touch or scroll
-    const autoUnmuteOnActivity = () => {
-      if (audioRef.current) {
-        try {
-          audioRef.current.muted = false;
-          audioRef.current.volume = 1.0;
-          if (audioRef.current.paused) {
-            audioRef.current.play().catch(() => {});
+    // 2. Initialize YouTube Iframe Player in Active Viewport (Bypasses Browser Autoplay Restrictions)
+    const initYT = () => {
+      if (ytPlayerRef.current || !window.YT || !window.YT.Player) return;
+      try {
+        ytPlayerRef.current = new window.YT.Player('yt-player-in-view', {
+          height: '2',
+          width: '2',
+          videoId: YOUTUBE_VIDEO_ID,
+          playerVars: {
+            autoplay: 1,
+            start: START_TIME,
+            controls: 0,
+            disablekb: 1,
+            enablejsapi: 1,
+            fs: 0,
+            playsinline: 1,
+            rel: 0,
+            origin: window.location.origin
+          },
+          events: {
+            onReady: (event) => {
+              if (isClosingRef.current) return;
+              try {
+                event.target.unMute();
+                event.target.setVolume(100);
+                event.target.playVideo();
+                setIsPlaying(true);
+              } catch (e) {}
+            },
+            onStateChange: (event) => {
+              if (event.data === window.YT.PlayerState.PLAYING) {
+                setIsPlaying(true);
+              }
+            }
           }
+        });
+      } catch (err) {}
+    };
+
+    if (window.YT && window.YT.Player) {
+      initYT();
+    } else {
+      if (!document.getElementById('yt-script-tag')) {
+        const tag = document.createElement('script');
+        tag.id = 'yt-script-tag';
+        tag.src = 'https://www.youtube.com/iframe_api';
+        document.head.appendChild(tag);
+      }
+      const prevCb = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => {
+        if (typeof prevCb === 'function') prevCb();
+        initYT();
+      };
+    }
+
+    // Try HTML5 Audio immediately
+    playHtml5Audio();
+
+    // 3. Passive event listeners for instant audio un-mute on ANY user hover / touch / interaction
+    const handlePassiveActivity = () => {
+      playHtml5Audio();
+      if (ytPlayerRef.current) {
+        try {
+          ytPlayerRef.current.unMute?.();
+          ytPlayerRef.current.playVideo?.();
         } catch (e) {}
       }
     };
 
-    window.addEventListener('mousemove', autoUnmuteOnActivity, { once: true, passive: true });
-    window.addEventListener('touchstart', autoUnmuteOnActivity, { once: true, passive: true });
-    window.addEventListener('scroll', autoUnmuteOnActivity, { once: true, passive: true });
-    window.addEventListener('click', autoUnmuteOnActivity, { once: true, passive: true });
-    window.addEventListener('keydown', autoUnmuteOnActivity, { once: true, passive: true });
+    window.addEventListener('mousemove', handlePassiveActivity, { passive: true });
+    window.addEventListener('pointermove', handlePassiveActivity, { passive: true });
+    window.addEventListener('mouseenter', handlePassiveActivity, { passive: true });
+    window.addEventListener('touchstart', handlePassiveActivity, { passive: true });
+    window.addEventListener('click', handlePassiveActivity, { passive: true });
+    window.addEventListener('keydown', handlePassiveActivity, { passive: true });
+    window.addEventListener('scroll', handlePassiveActivity, { passive: true });
 
-    triggerAutoSound();
-
-    // 2. High-precision continuous time & progress tracking
+    // 4. Progress and Timer Synchronization
     const startTimeStamp = Date.now();
     const songTotalSeconds = TOTAL_DURATION - START_TIME;
 
@@ -141,6 +167,9 @@ export default function MoEYSIntroSplash({ onFinish }) {
       let currentSec = START_TIME;
       if (audioRef.current && !isNaN(audioRef.current.currentTime) && audioRef.current.currentTime > 0) {
         currentSec = audioRef.current.currentTime;
+      } else if (ytPlayerRef.current && typeof ytPlayerRef.current.getCurrentTime === 'function') {
+        const ytSec = ytPlayerRef.current.getCurrentTime() || 0;
+        if (ytSec > 0) currentSec = ytSec;
       } else {
         const elapsed = (Date.now() - startTimeStamp) / 1000;
         currentSec = Math.min(TOTAL_DURATION, START_TIME + elapsed);
@@ -161,15 +190,23 @@ export default function MoEYSIntroSplash({ onFinish }) {
     return () => {
       clearTimeout(phaseTimer);
       if (progressTimerRef.current) clearInterval(progressTimerRef.current);
-      window.removeEventListener('mousemove', autoUnmuteOnActivity);
-      window.removeEventListener('touchstart', autoUnmuteOnActivity);
-      window.removeEventListener('scroll', autoUnmuteOnActivity);
-      window.removeEventListener('click', autoUnmuteOnActivity);
-      window.removeEventListener('keydown', autoUnmuteOnActivity);
+      window.removeEventListener('mousemove', handlePassiveActivity);
+      window.removeEventListener('pointermove', handlePassiveActivity);
+      window.removeEventListener('mouseenter', handlePassiveActivity);
+      window.removeEventListener('touchstart', handlePassiveActivity);
+      window.removeEventListener('click', handlePassiveActivity);
+      window.removeEventListener('keydown', handlePassiveActivity);
+      window.removeEventListener('scroll', handlePassiveActivity);
       if (audioRef.current) {
         try {
           audioRef.current.pause();
           audioRef.current.src = '';
+        } catch (e) {}
+      }
+      if (ytPlayerRef.current) {
+        try {
+          ytPlayerRef.current.stopVideo?.();
+          ytPlayerRef.current.destroy?.();
         } catch (e) {}
       }
     };
@@ -197,7 +234,7 @@ export default function MoEYSIntroSplash({ onFinish }) {
         isClosing ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
     >
-      {/* 🎵 Embedded Declarative Audio Element with Autoplay */}
+      {/* 🎵 HTML5 Audio Element */}
       <audio
         ref={audioRef}
         src={AUDIO_SRC}
@@ -207,13 +244,19 @@ export default function MoEYSIntroSplash({ onFinish }) {
         className="hidden"
       />
 
-      {/* 🎵 Hidden YouTube Iframe with allow="autoplay" permission for guaranteed background sound */}
-      <iframe
-        id="yt-auto-sound-stream"
-        src="https://www.youtube-nocookie.com/embed/vAq3g0T_7MI?autoplay=1&start=6&enablejsapi=1&controls=0&mute=0"
-        allow="autoplay *; encrypted-media *; fullscreen"
-        className="absolute w-1 h-1 opacity-0 pointer-events-none -top-96 left-0"
-        title="Cambodian Royal Song Audio"
+      {/* 🎵 YouTube Player In Active Viewport Rectangle (Grants Full Autoplay Sound in Chrome/Edge) */}
+      <div
+        id="yt-player-in-view"
+        style={{
+          position: 'absolute',
+          top: 0,
+          left: 0,
+          width: '2px',
+          height: '2px',
+          opacity: 0.01,
+          pointerEvents: 'none',
+          zIndex: 1
+        }}
       />
 
       {/* ═══════ BRIGHT, VIBRANT WAVING CAMBODIAN FLAG ═══════ */}
