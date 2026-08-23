@@ -968,20 +968,23 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
                         <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-cyan-600 group-hover:translate-x-1 transition-transform" />
                       </button>
 
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setIsUserMenuOpen(false);
-                          onOpenAdminLogin?.();
-                        }}
-                        className="w-full px-3 py-2 rounded-xl text-xs font-bold text-amber-700 hover:bg-amber-50/80 transition-all flex items-center justify-between group cursor-pointer border border-amber-200/60"
-                      >
-                        <div className="flex items-center gap-2.5">
-                          <ShieldCheck className="w-4 h-4 text-amber-600" />
-                          <span>{adminSession ? '👑 ផ្ទាំងគ្រប់គ្រង Super Admin' : 'ចូលគណនី Super Admin'}</span>
-                        </div>
-                        <ArrowRight className="w-3.5 h-3.5 text-amber-500 group-hover:translate-x-1 transition-transform" />
-                      </button>
+                      {/* 🛡️ Only display Super Admin Portal link if the current user is an Admin or in an active Admin session */}
+                      {Boolean(adminSession || student?.role === 'superadmin' || student?.isAdmin) && (
+                        <button
+                          type="button"
+                          onClick={() => {
+                            setIsUserMenuOpen(false);
+                            onOpenAdminLogin?.();
+                          }}
+                          className="w-full px-3 py-2 rounded-xl text-xs font-bold text-amber-700 hover:bg-amber-50/80 transition-all flex items-center justify-between group cursor-pointer border border-amber-200/60"
+                        >
+                          <div className="flex items-center gap-2.5">
+                            <ShieldCheck className="w-4 h-4 text-amber-600" />
+                            <span>{adminSession ? (lang === 'km' ? '👑 ផ្ទាំងគ្រប់គ្រង Super Admin' : '👑 Super Admin Dashboard') : (lang === 'km' ? 'ចូលគណនី Super Admin' : 'Super Admin Login')}</span>
+                          </div>
+                          <ArrowRight className="w-3.5 h-3.5 text-amber-500 group-hover:translate-x-1 transition-transform" />
+                        </button>
+                      )}
                     </div>
 
                     {/* 🚪 PROMINENT LOGOUT BUTTON INSIDE ACCOUNT MENU */}
