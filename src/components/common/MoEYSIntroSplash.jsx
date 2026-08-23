@@ -4,16 +4,16 @@ import { X, Volume2, VolumeX, Music } from 'lucide-react';
 
 const YOUTUBE_VIDEO_ID = 'vAq3g0T_7MI'; // (Khmer tea 1 ) Cambodian Song
 const SONG_TITLE = '(Khmer tea 1) Cambodian Song';
+const START_TIME = 6; // Starts playing at 0:06 as requested
 
 export default function MoEYSIntroSplash({ onFinish }) {
   const [progress, setProgress] = useState(0);
-  const [currentTime, setCurrentTime] = useState(0);
+  const [currentTime, setCurrentTime] = useState(START_TIME);
   const [duration, setDuration] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [phase, setPhase] = useState(0); // 0=enter, 1=loaded, 2=exit
-  const [ytReady, setYtReady] = useState(false);
 
   const playerRef = useRef(null);
   const progressIntervalRef = useRef(null);
@@ -131,6 +131,7 @@ export default function MoEYSIntroSplash({ onFinish }) {
           videoId: YOUTUBE_VIDEO_ID,
           playerVars: {
             autoplay: 1,
+            start: START_TIME,
             controls: 0,
             disablekb: 1,
             enablejsapi: 1,
@@ -144,8 +145,8 @@ export default function MoEYSIntroSplash({ onFinish }) {
           events: {
             onReady: (event) => {
               if (!isMounted || isClosingRef.current) return;
-              setYtReady(true);
               try {
+                event.target.seekTo(START_TIME, true);
                 event.target.unMute();
                 event.target.setVolume(100);
                 event.target.playVideo();
@@ -216,7 +217,7 @@ export default function MoEYSIntroSplash({ onFinish }) {
       }
     }, 5000);
 
-    // Poll current time and sync progress with audio playback
+    // Poll current time and sync progress with audio playback from START_TIME
     progressIntervalRef.current = setInterval(() => {
       if (!playerRef.current || isClosingRef.current) return;
       try {
@@ -224,10 +225,13 @@ export default function MoEYSIntroSplash({ onFinish }) {
           const curr = playerRef.current.getCurrentTime() || 0;
           const dur = playerRef.current.getDuration() || 0;
 
-          if (dur > 0) {
+          if (dur > START_TIME) {
             setDuration(dur);
             setCurrentTime(curr);
-            const pct = Math.min(100, Math.round((curr / dur) * 100));
+
+            const effectiveCurrent = Math.max(0, curr - START_TIME);
+            const effectiveTotal = Math.max(1, dur - START_TIME);
+            const pct = Math.min(100, Math.round((effectiveCurrent / effectiveTotal) * 100));
             setProgress(pct);
 
             if (curr >= dur - 0.4) {
@@ -500,4 +504,3 @@ export default function MoEYSIntroSplash({ onFinish }) {
     document.body
   );
 }
-
