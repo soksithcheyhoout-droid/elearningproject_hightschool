@@ -26,6 +26,7 @@ import AdminLoginView from './components/admin/AdminLoginView';
 import MoEYSIntroSplash from './components/common/MoEYSIntroSplash';
 import MinistryDonationModal from './components/common/MinistryDonationModal';
 import HumanVoiceStudioModal from './components/common/HumanVoiceStudioModal';
+import SecurityPolicyModal from './components/modals/SecurityPolicyModal';
 import { curriculumData } from './data/curriculumData';
 import { quizData } from './data/quizData';
 import { useAuth } from './context/AuthContext';
@@ -88,6 +89,13 @@ function MainApp() {
   const [showIntroSplash, setShowIntroSplash] = useState(true);
   const [isDonationModalOpen, setIsDonationModalOpen] = useState(false);
   const [isVoiceStudioOpen, setIsVoiceStudioOpen] = useState(false);
+  const [isSecurityPolicyOpen, setIsSecurityPolicyOpen] = useState(false);
+
+  useEffect(() => {
+    const handleOpenPolicy = () => setIsSecurityPolicyOpen(true);
+    window.addEventListener('open-security-policy', handleOpenPolicy);
+    return () => window.removeEventListener('open-security-policy', handleOpenPolicy);
+  }, []);
 
   const handleSplashFinish = () => {
     setShowIntroSplash(false);
@@ -523,6 +531,12 @@ function MainApp() {
           onClose={() => setIsVoiceStudioOpen(false)}
         />
       )}
+
+      {/* MoTDAR Cybersecurity & Asset Protection Policy Modal */}
+      <SecurityPolicyModal
+        isOpen={isSecurityPolicyOpen}
+        onClose={() => setIsSecurityPolicyOpen(false)}
+      />
 
       {/* Level Up Golden Celebratory Modal */}
       {levelUpToast && (
