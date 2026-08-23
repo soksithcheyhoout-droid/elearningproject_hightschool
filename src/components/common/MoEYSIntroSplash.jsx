@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Music, Volume2, Play } from 'lucide-react';
+import { X, Music } from 'lucide-react';
 
 const AUDIO_SRC = '/assets/audio/khmer_tea_1.webm';
 const SONG_TITLE = '(Khmer tea 1) Cambodian Song';
@@ -11,7 +11,6 @@ export default function MoEYSIntroSplash({ onFinish }) {
   const [currentTime, setCurrentTime] = useState(START_TIME);
   const [duration, setDuration] = useState(286); // ~4:46 default duration
   const [isPlaying, setIsPlaying] = useState(false);
-  const [needsClickToPlay, setNeedsClickToPlay] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [phase, setPhase] = useState(0); // 0=enter, 1=loaded, 2=exit
 
@@ -59,22 +58,28 @@ export default function MoEYSIntroSplash({ onFinish }) {
         playPromise
           .then(() => {
             setIsPlaying(true);
-            setNeedsClickToPlay(false);
           })
-          .catch((err) => {
-            console.warn('Autoplay blocked by browser policy:', err);
-            setNeedsClickToPlay(true);
+          .catch(() => {
+            // If unmuted playback is blocked by policy, play muted and unmute on first gesture
+            audio.muted = true;
+            audio.play().then(() => setIsPlaying(true)).catch(() => {});
           });
       }
     } catch (err) {
       console.warn('Play error:', err);
-      setNeedsClickToPlay(true);
     }
   }, []);
 
-  // User click / touch anywhere on the screen unlocks audio immediately
+  // User click / touch anywhere on the screen ensures audio is unmuted
   const handleUserInteract = () => {
-    startAudioPlayback();
+    if (audioRef.current) {
+      try {
+        audioRef.current.muted = false;
+        if (audioRef.current.paused) {
+          audioRef.current.play().catch(() => {});
+        }
+      } catch (e) {}
+    }
   };
 
   // Initialize High-Performance Audio
@@ -133,10 +138,7 @@ export default function MoEYSIntroSplash({ onFinish }) {
     audio.addEventListener('loadedmetadata', handleLoadedMetadata);
     audio.addEventListener('canplay', handleCanPlay);
     audio.addEventListener('timeupdate', handleTimeUpdate);
-    audio.addEventListener('play', () => {
-      setIsPlaying(true);
-      setNeedsClickToPlay(false);
-    });
+    audio.addEventListener('play', () => setIsPlaying(true));
     audio.addEventListener('pause', () => setIsPlaying(false));
     audio.addEventListener('ended', handleEnded);
     audio.addEventListener('error', handleError);
@@ -145,10 +147,18 @@ export default function MoEYSIntroSplash({ onFinish }) {
     audio.load();
     startAudioPlayback();
 
-    // Global listener on window for immediate audio unlock on first interaction
+    // Global listener on window to seamlessly unmute audio on first interaction
     const unlockAudio = () => {
-      startAudioPlayback();
+      if (audioRef.current) {
+        try {
+          audioRef.current.muted = false;
+          if (audioRef.current.paused) {
+            audioRef.current.play().catch(() => {});
+          }
+        } catch (e) {}
+      }
     };
+
     window.addEventListener('click', unlockAudio, { once: true });
     window.addEventListener('touchstart', unlockAudio, { once: true });
     window.addEventListener('keydown', unlockAudio, { once: true });
@@ -331,34 +341,25 @@ export default function MoEYSIntroSplash({ onFinish }) {
           </p>
         </div>
 
-        {/* ── LIVE SONG PLAYBACK BADGE OR CLICK TO PLAY PROMPT ── */}
-        {needsClickToPlay ? (
-          <div className="mb-4 flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/20 border border-amber-400 text-amber-300 text-xs backdrop-blur-md shadow-[0_0_20px_rgba(245,158,11,0.4)] animate-pulse">
-            <Volume2 className="w-4 h-4 text-amber-300 animate-bounce" />
-            <span className="font-bold text-xs">
-              🔊 ចុចលើអេក្រង់ដើម្បីបើកសំឡេងបទភ្លេង (Click to Play)
-            </span>
+        {/* ── LIVE SONG PLAYBACK BADGE ── */}
+        <div className="mb-4 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/80 border border-amber-400/30 text-amber-200 text-xs backdrop-blur-md shadow-lg max-w-full truncate">
+          <Music className="w-3.5 h-3.5 text-amber-300 shrink-0" />
+          <span className="font-medium text-[11px] sm:text-xs text-amber-200 truncate">
+            {SONG_TITLE}
+          </span>
+          {/* Animated Equalizer Wave */}
+          <div className="flex items-end gap-0.5 h-3 px-1 shrink-0">
+            <span className={`w-0.5 bg-amber-400 rounded-full transition-all duration-300 ${isPlaying ? 'h-3 animate-pulse' : 'h-1'}`} />
+            <span className={`w-0.5 bg-amber-300 rounded-full transition-all duration-300 ${isPlaying ? 'h-2 animate-bounce' : 'h-1'}`} />
+            <span className={`w-0.5 bg-amber-400 rounded-full transition-all duration-300 ${isPlaying ? 'h-3.5 animate-pulse' : 'h-1'}`} />
+            <span className={`w-0.5 bg-amber-300 rounded-full transition-all duration-300 ${isPlaying ? 'h-1.5 animate-bounce' : 'h-1'}`} />
           </div>
-        ) : (
-          <div className="mb-4 flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-slate-950/80 border border-amber-400/30 text-amber-200 text-xs backdrop-blur-md shadow-lg max-w-full truncate">
-            <Music className="w-3.5 h-3.5 text-amber-300 shrink-0" />
-            <span className="font-medium text-[11px] sm:text-xs text-amber-200 truncate">
-              {SONG_TITLE}
+          {duration > 0 && (
+            <span className="text-[10px] font-mono text-amber-400/90 shrink-0 ml-0.5">
+              {formatTime(currentTime)} / {formatTime(duration)}
             </span>
-            {/* Animated Equalizer Wave */}
-            <div className="flex items-end gap-0.5 h-3 px-1 shrink-0">
-              <span className={`w-0.5 bg-amber-400 rounded-full transition-all duration-300 ${isPlaying ? 'h-3 animate-pulse' : 'h-1'}`} />
-              <span className={`w-0.5 bg-amber-300 rounded-full transition-all duration-300 ${isPlaying ? 'h-2 animate-bounce' : 'h-1'}`} />
-              <span className={`w-0.5 bg-amber-400 rounded-full transition-all duration-300 ${isPlaying ? 'h-3.5 animate-pulse' : 'h-1'}`} />
-              <span className={`w-0.5 bg-amber-300 rounded-full transition-all duration-300 ${isPlaying ? 'h-1.5 animate-bounce' : 'h-1'}`} />
-            </div>
-            {duration > 0 && (
-              <span className="text-[10px] font-mono text-amber-400/90 shrink-0 ml-0.5">
-                {formatTime(currentTime)} / {formatTime(duration)}
-              </span>
-            )}
-          </div>
-        )}
+          )}
+        </div>
 
         {/* ── AUDIO-SYNCED PROGRESS BAR ── */}
         <div className="w-60 sm:w-72 space-y-2">
