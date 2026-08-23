@@ -1,25 +1,105 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react';
 import { createPortal } from 'react-dom';
-import { X, Music, Volume2 } from 'lucide-react';
+import { X, Music } from 'lucide-react';
 
 const AUDIO_SRC = '/assets/audio/khmer_tea_1.webm';
 const SONG_TITLE = '(Khmer tea 1) Cambodian Song';
 const START_TIME = 6;
 const TOTAL_DURATION = 286;
 
-export default function MoEYSIntroSplash({ onFinish }) {
+// ═══════════════════════════════════════════════════════════════════
+// PHASE 1: WELCOME GATE — Beautiful royal entrance that captures
+//          the user gesture Chrome requires for unmuted audio.
+//          Once they click "ចូលមើល" (Enter), audio starts instantly.
+// ═══════════════════════════════════════════════════════════════════
+function WelcomeGate({ onEnter }) {
+  const [show, setShow] = useState(false);
+
+  useEffect(() => {
+    const t = setTimeout(() => setShow(true), 80);
+    return () => clearTimeout(t);
+  }, []);
+
+  return (
+    <div
+      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999999 }}
+      className="flex items-center justify-center bg-slate-950 select-none"
+    >
+      {/* Cambodia Flag Background */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        <img
+          src="/assets/cambodia-flag.gif"
+          onError={(e) => { e.currentTarget.src = 'https://media1.tenor.com/m/kDXhibIv45EAAAAC/cambodia-cambodia-flag.gif'; }}
+          alt="Cambodia Flag"
+          className="absolute inset-0 w-full h-full object-cover brightness-90 contrast-110 saturate-110 scale-105"
+        />
+        <div className="absolute inset-0 bg-slate-950/50" />
+        <div className="absolute inset-0 bg-gradient-to-b from-slate-950/60 via-transparent to-slate-950/70" />
+      </div>
+
+      {/* Royal Gold Frame */}
+      <div className="absolute inset-4 sm:inset-7 border border-[#ffd700]/25 rounded-xl pointer-events-none z-10" />
+
+      {/* Content */}
+      <div className={`relative z-20 flex flex-col items-center text-center px-8 transition-all duration-700 ease-out ${
+        show ? 'opacity-100 scale-100 translate-y-0' : 'opacity-0 scale-95 translate-y-4'
+      }`}>
+        {/* Emblem */}
+        <div className="w-28 h-28 sm:w-36 sm:h-36 mb-6 p-3 rounded-full bg-slate-950/70 backdrop-blur-md border border-amber-400/40 shadow-[0_4px_30px_rgba(0,0,0,0.8)]">
+          <img
+            src="/assets/moeys-crest-transparent.png"
+            alt="ត្រាជាតិកម្ពុជា"
+            className="w-full h-full object-contain drop-shadow-[0_4px_12px_rgba(0,0,0,0.9)]"
+            onError={(e) => { e.currentTarget.src = '/assets/moeys-custom-logo-transparent.png'; }}
+          />
+        </div>
+
+        {/* Welcome Text */}
+        <h1 className="font-moul text-2xl sm:text-3xl text-amber-300 mb-2 drop-shadow-[0_2px_10px_rgba(0,0,0,1)]">
+          សូមស្វាគមន៍
+        </h1>
+        <p className="text-sm sm:text-base text-amber-200/90 mb-1 font-semibold drop-shadow-[0_2px_6px_rgba(0,0,0,1)]">
+          ប្រព័ន្ធសិក្សាឌីជីថលកម្រិតវិទ្យាល័យជាតិ
+        </p>
+        <p className="text-xs text-blue-100/80 mb-8 drop-shadow-[0_2px_6px_rgba(0,0,0,1)]">
+          E-Learning Platform v2.5
+        </p>
+
+        {/* ENTER BUTTON — This captures the user gesture for audio */}
+        <button
+          type="button"
+          onClick={onEnter}
+          className="group relative px-10 py-3.5 rounded-full bg-gradient-to-r from-amber-600 via-amber-500 to-amber-600 text-slate-950 font-bold text-base sm:text-lg tracking-wider shadow-[0_4px_25px_rgba(255,215,0,0.4)] hover:shadow-[0_6px_35px_rgba(255,215,0,0.6)] transition-all duration-300 hover:scale-105 active:scale-95 cursor-pointer border border-amber-300/50"
+        >
+          <span className="relative z-10 flex items-center gap-2">
+            🎵 ចូលមើល
+          </span>
+          <div className="absolute inset-0 rounded-full bg-gradient-to-r from-amber-400 via-amber-300 to-amber-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        </button>
+
+        <p className="text-[10px] text-amber-200/50 mt-4">
+          Ministry of Talent Development & Advanced Research
+        </p>
+      </div>
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// PHASE 2: MAIN SPLASH — Plays audio with sound immediately
+//          because user already clicked in the Welcome Gate.
+// ═══════════════════════════════════════════════════════════════════
+function MainSplash({ onFinish }) {
   const [progress, setProgress] = useState(0);
   const [currentTime, setCurrentTime] = useState(START_TIME);
   const [duration, setDuration] = useState(TOTAL_DURATION);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [audioUnlocked, setAudioUnlocked] = useState(false);
   const [isClosing, setIsClosing] = useState(false);
   const [phase, setPhase] = useState(0);
 
   const audioRef = useRef(null);
   const progressTimerRef = useRef(null);
   const isClosingRef = useRef(false);
-  const unlockedRef = useRef(false);
 
   const formatTime = (secs) => {
     if (!secs || isNaN(secs) || secs < 0) return '00:00';
@@ -41,77 +121,32 @@ export default function MoEYSIntroSplash({ onFinish }) {
     setTimeout(() => { onFinish?.(); }, 600);
   }, [onFinish]);
 
-  // This function unlocks and unmutes audio — called on first user gesture
-  const unlockAudio = useCallback(() => {
-    if (unlockedRef.current || isClosingRef.current) return;
-    unlockedRef.current = true;
-    setAudioUnlocked(true);
-
-    const audio = audioRef.current;
-    if (!audio) return;
-
-    try {
-      audio.muted = false;
-      audio.volume = 1.0;
-      if (audio.currentTime < START_TIME) audio.currentTime = START_TIME;
-      const p = audio.play();
-      if (p) p.then(() => setIsPlaying(true)).catch(() => {});
-    } catch (e) {}
-  }, []);
-
   useEffect(() => {
     const phaseTimer = setTimeout(() => setPhase(1), 60);
 
-    // 1. Create audio element and start MUTED autoplay immediately (browsers allow this)
+    // Audio plays IMMEDIATELY with sound — user gesture was captured in WelcomeGate
     const audio = new Audio(AUDIO_SRC);
     audioRef.current = audio;
     audio.preload = 'auto';
     audio.currentTime = START_TIME;
-    audio.muted = true; // Start muted — browsers allow muted autoplay
-    audio.volume = 0;
+    audio.volume = 1.0;
+    audio.muted = false;
 
-    // Start muted playback immediately so progress tracking is accurate
-    const startMutedPlayback = () => {
-      if (!audioRef.current || isClosingRef.current) return;
-      audioRef.current.muted = true;
-      audioRef.current.volume = 0;
-      const p = audioRef.current.play();
-      if (p) {
-        p.then(() => {
-          setIsPlaying(true);
-          // Try unmuting immediately (works if browser MEI allows it)
-          try {
-            audioRef.current.muted = false;
-            audioRef.current.volume = 1.0;
-            unlockedRef.current = true;
-            setAudioUnlocked(true);
-          } catch (e) {}
-        }).catch(() => {});
-      }
-    };
-
-    startMutedPlayback();
-
-    // 2. Listen for ANY user gesture to unmute audio
-    const gestureEvents = ['click', 'touchstart', 'touchend', 'keydown', 'pointerdown', 'mousedown'];
-    const onUserGesture = () => {
-      unlockAudio();
-      // Remove all listeners after first unlock
-      gestureEvents.forEach(evt => {
-        document.removeEventListener(evt, onUserGesture, true);
+    const p = audio.play();
+    if (p) {
+      p.then(() => setIsPlaying(true)).catch(() => {
+        // Fallback: try muted
+        audio.muted = true;
+        audio.play().then(() => setIsPlaying(true)).catch(() => {});
       });
-    };
-    gestureEvents.forEach(evt => {
-      document.addEventListener(evt, onUserGesture, { once: true, capture: true });
-    });
+    }
 
-    // 3. Progress timer
+    // Progress timer
     const startTimeStamp = Date.now();
     const songTotalSeconds = TOTAL_DURATION - START_TIME;
 
     progressTimerRef.current = setInterval(() => {
       if (isClosingRef.current) return;
-
       let currentSec = START_TIME;
       if (audioRef.current && !isNaN(audioRef.current.currentTime) && audioRef.current.currentTime > START_TIME) {
         currentSec = audioRef.current.currentTime;
@@ -119,12 +154,10 @@ export default function MoEYSIntroSplash({ onFinish }) {
         const elapsed = (Date.now() - startTimeStamp) / 1000;
         currentSec = Math.min(TOTAL_DURATION, START_TIME + elapsed);
       }
-
       setCurrentTime(currentSec);
       const effectiveCurrent = Math.max(0, currentSec - START_TIME);
       const pct = Math.min(100, Math.round((effectiveCurrent / songTotalSeconds) * 100));
       setProgress(pct);
-
       if (currentSec >= TOTAL_DURATION - 0.5 || pct >= 100) {
         setProgress(100);
         handleFinish();
@@ -134,16 +167,11 @@ export default function MoEYSIntroSplash({ onFinish }) {
     return () => {
       clearTimeout(phaseTimer);
       if (progressTimerRef.current) clearInterval(progressTimerRef.current);
-      gestureEvents.forEach(evt => {
-        document.removeEventListener(evt, onUserGesture, true);
-      });
       if (audioRef.current) {
         try { audioRef.current.pause(); audioRef.current.src = ''; } catch (e) {}
       }
     };
-  }, [handleFinish, unlockAudio]);
-
-  if (typeof document === 'undefined') return null;
+  }, [handleFinish]);
 
   const size = 190;
   const strokeWidth = 2.5;
@@ -157,18 +185,14 @@ export default function MoEYSIntroSplash({ onFinish }) {
       ? 'opacity-0 scale-95 -translate-y-2'
       : 'opacity-0 scale-95 translate-y-3';
 
-  return createPortal(
+  return (
     <div
-      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999999, cursor: !audioUnlocked ? 'pointer' : 'default' }}
-      onClick={!audioUnlocked ? unlockAudio : undefined}
+      style={{ position: 'fixed', top: 0, left: 0, right: 0, bottom: 0, zIndex: 999999 }}
       className={`flex items-center justify-center font-kantumruy select-none transition-opacity duration-700 bg-slate-950 ${
         isClosing ? 'opacity-0 pointer-events-none' : 'opacity-100'
       }`}
     >
-      {/* Hidden audio element */}
-      <audio ref={audioRef} src={AUDIO_SRC} preload="auto" className="hidden" />
-
-      {/* ═══════ CAMBODIAN FLAG BACKGROUND ═══════ */}
+      {/* Cambodia Flag Background */}
       <div className="absolute inset-0 z-0 overflow-hidden pointer-events-none">
         <img
           src="/assets/cambodia-flag.gif"
@@ -209,9 +233,8 @@ export default function MoEYSIntroSplash({ onFinish }) {
         <X className="w-3.5 h-3.5" />
       </button>
 
-      {/* ═══════ MAIN CONTENT ═══════ */}
+      {/* Main Content */}
       <div className={`relative z-20 flex flex-col items-center text-center px-6 max-w-xl mx-auto transition-all duration-700 ease-out ${contentClass}`}>
-
         {/* Central Seal */}
         <div className="relative mb-5 flex items-center justify-center" style={{ width: size, height: size }}>
           <div className="absolute inset-0 bg-amber-400/20 rounded-full blur-2xl pointer-events-none" />
@@ -273,16 +296,6 @@ export default function MoEYSIntroSplash({ onFinish }) {
           )}
         </div>
 
-        {/* Subtle "tap anywhere" hint — only shown before audio is unlocked */}
-        {!audioUnlocked && (
-          <div className="mb-3 flex items-center gap-2 px-4 py-2 rounded-full bg-amber-500/20 border border-amber-400/40 backdrop-blur-md animate-pulse cursor-pointer">
-            <Volume2 className="w-4 h-4 text-amber-300" />
-            <span className="text-[11px] text-amber-200 font-semibold tracking-wide">
-              ចុចលើអេក្រង់ដើម្បីស្តាប់បទចម្រៀង
-            </span>
-          </div>
-        )}
-
         {/* Progress Bar */}
         <div className="w-60 sm:w-72 space-y-2">
           <div className="w-full h-2 rounded-full bg-slate-950/80 border border-amber-400/40 overflow-hidden p-[1px] shadow-lg">
@@ -296,7 +309,33 @@ export default function MoEYSIntroSplash({ onFinish }) {
           </p>
         </div>
       </div>
-    </div>,
+    </div>
+  );
+}
+
+// ═══════════════════════════════════════════════════════════════════
+// MAIN EXPORT: Two-phase splash
+//   Phase 1: WelcomeGate (user clicks "ចូលមើល")
+//   Phase 2: MainSplash (audio plays with sound instantly)
+// ═══════════════════════════════════════════════════════════════════
+export default function MoEYSIntroSplash({ onFinish }) {
+  const [gateOpen, setGateOpen] = useState(false);
+
+  const handleEnterGate = useCallback(() => {
+    setGateOpen(true);
+  }, []);
+
+  if (typeof document === 'undefined') return null;
+
+  if (!gateOpen) {
+    return createPortal(
+      <WelcomeGate onEnter={handleEnterGate} />,
+      document.body
+    );
+  }
+
+  return createPortal(
+    <MainSplash onFinish={onFinish} />,
     document.body
   );
 }
