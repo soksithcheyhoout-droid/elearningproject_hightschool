@@ -73,30 +73,11 @@ export function initSecurityProtection() {
     }
   });
 
-  // 4. Debugger Protection (Freezes execution if DevTools is opened via browser menu)
-  const applyDebuggerTrap = () => {
+  // 4. Console Protection Notice (Non-blocking)
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
     try {
-      const startTime = performance.now();
-      // eslint-disable-next-line no-debugger
-      debugger;
-      const endTime = performance.now();
-      if (endTime - startTime > 100) {
-        console.clear();
-      }
-    } catch (err) {}
-  };
-
-  // Run periodic debugger check in production
-  if (process.env.NODE_ENV === 'production' || window.location.hostname !== 'localhost') {
-    setInterval(applyDebuggerTrap, 1000);
-  }
-
-  // 5. Console Auto-Purge
-  if (process.env.NODE_ENV === 'production' || window.location.hostname !== 'localhost') {
-    setInterval(() => {
-      try {
-        console.clear();
-      } catch (e) {}
-    }, 4000);
+      console.log('%cMoTDAR National E-Learning Platform', 'color: #f59e0b; font-size: 16px; font-weight: bold;');
+      console.log('%cProtected Academic Learning Portal - MoEYS Cambodia', 'color: #94a3b8; font-size: 12px;');
+    } catch (e) {}
   }
 }

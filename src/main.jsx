@@ -60,7 +60,7 @@ class ErrorBoundary extends Component {
   }
 }
 
-// Clean up third-party injected extension widgets
+// Clean up third-party injected extension widgets on initial load
 if (typeof window !== 'undefined') {
   const cleanExtensionNodes = () => {
     try {
@@ -81,8 +81,8 @@ if (typeof window !== 'undefined') {
     } catch (e) {}
   };
 
-  window.addEventListener('DOMContentLoaded', cleanExtensionNodes);
-  setInterval(cleanExtensionNodes, 1500);
+  window.addEventListener('DOMContentLoaded', cleanExtensionNodes, { once: true });
+  setTimeout(cleanExtensionNodes, 1000);
 }
 
 createRoot(document.getElementById('root')).render(

@@ -18,7 +18,7 @@ export default function MoEYSIntroSplash({ onFinish }) {
     const phaseTimer = setTimeout(() => setPhase(1), 60);
 
     const startTime = Date.now();
-    const duration = 2400;
+    const duration = 1400;
 
     const interval = setInterval(() => {
       const elapsed = Date.now() - startTime;

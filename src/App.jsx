@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense, lazy } from 'react';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -8,24 +8,27 @@ import Footer from './components/layout/Footer';
 import HeroSection from './components/home/HeroSection';
 import SubjectGrid from './components/home/SubjectGrid';
 import FeaturedLiveSection from './components/home/FeaturedLiveSection';
-import ClassroomView from './components/classroom/ClassroomView';
-import BacIIHubView from './components/exam/BacIIHubView';
-import QuizModal from './components/exam/QuizModal';
-import DigitalLibraryView from './components/library/DigitalLibraryView';
-import VirtualLabView from './components/lab/VirtualLabView';
-import PlaygroundArenaView from './components/playground/PlaygroundArenaView';
-import StudentDashboardView from './components/dashboard/StudentDashboardView';
-import StudentMessengerView from './components/chat/StudentMessengerView';
-import DuelMultiplayerModal from './components/playground/DuelMultiplayerModal';
-import AITutorModal from './components/ai/AITutorModal';
-import LoginView from './components/auth/LoginView';
-import GlobalSearchModal from './components/search/GlobalSearchModal';
-import AdminLoginModal from './components/admin/AdminLoginModal';
-import AdminDashboardView from './components/admin/AdminDashboardView';
-import AdminLoginView from './components/admin/AdminLoginView';
-import MoEYSIntroSplash from './components/common/MoEYSIntroSplash';
-import MinistryDonationModal from './components/common/MinistryDonationModal';
-import HumanVoiceStudioModal from './components/common/HumanVoiceStudioModal';
+import RouteSkeleton from './components/common/RouteSkeleton';
+
+// Code-split dynamic views & heavy components for instant initial page rendering
+const ClassroomView = lazy(() => import('./components/classroom/ClassroomView'));
+const BacIIHubView = lazy(() => import('./components/exam/BacIIHubView'));
+const QuizModal = lazy(() => import('./components/exam/QuizModal'));
+const DigitalLibraryView = lazy(() => import('./components/library/DigitalLibraryView'));
+const VirtualLabView = lazy(() => import('./components/lab/VirtualLabView'));
+const PlaygroundArenaView = lazy(() => import('./components/playground/PlaygroundArenaView'));
+const StudentDashboardView = lazy(() => import('./components/dashboard/StudentDashboardView'));
+const StudentMessengerView = lazy(() => import('./components/chat/StudentMessengerView'));
+const DuelMultiplayerModal = lazy(() => import('./components/playground/DuelMultiplayerModal'));
+const AITutorModal = lazy(() => import('./components/ai/AITutorModal'));
+const LoginView = lazy(() => import('./components/auth/LoginView'));
+const GlobalSearchModal = lazy(() => import('./components/search/GlobalSearchModal'));
+const AdminLoginModal = lazy(() => import('./components/admin/AdminLoginModal'));
+const AdminDashboardView = lazy(() => import('./components/admin/AdminDashboardView'));
+const AdminLoginView = lazy(() => import('./components/admin/AdminLoginView'));
+const MoEYSIntroSplash = lazy(() => import('./components/common/MoEYSIntroSplash'));
+const MinistryDonationModal = lazy(() => import('./components/common/MinistryDonationModal'));
+const HumanVoiceStudioModal = lazy(() => import('./components/common/HumanVoiceStudioModal'));
 import { curriculumData } from './data/curriculumData';
 import { quizData } from './data/quizData';
 import { useAuth } from './context/AuthContext';
@@ -84,12 +87,22 @@ function MainApp() {
   const [incomingInvite, setIncomingInvite] = useState(null);
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
-  // Grand MoEYS Entrance Intro Splash Animation State (Always plays on website open)
-  const [showIntroSplash, setShowIntroSplash] = useState(true);
+  // Grand MoEYS Entrance Intro Splash Animation State (Session-Aware for instant repeat navigation)
+  const [showIntroSplash, setShowIntroSplash] = useState(() => {
+    if (typeof window === 'undefined') return false;
+    try {
+      return !sessionStorage.getItem('motdar_splash_viewed');
+    } catch (e) {
+      return false;
+    }
+  });
   const [isDonationModalOpen, setIsDonationModalOpen] = useState(false);
   const [isVoiceStudioOpen, setIsVoiceStudioOpen] = useState(false);
 
   const handleSplashFinish = () => {
+    try {
+      sessionStorage.setItem('motdar_splash_viewed', 'true');
+    } catch (e) {}
     setShowIntroSplash(false);
   };
 
@@ -223,30 +236,34 @@ function MainApp() {
   if (activeTab === 'admin') {
     if (!adminSession) {
       return (
-        <AdminLoginView
-          onAdminLoginSuccess={(adm) => {
-            setAdminSession(adm);
-            setTabAndUrl('admin');
-          }}
-          onBackToStudentPortal={() => setTabAndUrl('home')}
-        />
+        <Suspense fallback={<RouteSkeleton title="កំពុងបើកផ្ទាំងគ្រប់គ្រងរដ្ឋបាល..." />}>
+          <AdminLoginView
+            onAdminLoginSuccess={(adm) => {
+              setAdminSession(adm);
+              setTabAndUrl('admin');
+            }}
+            onBackToStudentPortal={() => setTabAndUrl('home')}
+          />
+        </Suspense>
       );
     }
 
     return (
       <div className="min-h-screen bg-[#071322] text-slate-100 font-kantumruy">
-        <AdminDashboardView
-          admin={adminSession}
-          onLogout={() => {
-            localStorage.removeItem('motdar_admin_session');
-            setAdminSession(null);
-            setTabAndUrl('admin');
-          }}
-          onSwitchToStudentView={() => {
-            setTabAndUrl('home');
-            window.scrollTo({ top: 0, behavior: 'smooth' });
-          }}
-        />
+        <Suspense fallback={<RouteSkeleton title="កំពុងផ្ទុកប្រព័ន្ធគ្រប់គ្រង MoTDAR Super Admin..." />}>
+          <AdminDashboardView
+            admin={adminSession}
+            onLogout={() => {
+              localStorage.removeItem('motdar_admin_session');
+              setAdminSession(null);
+              setTabAndUrl('admin');
+            }}
+            onSwitchToStudentView={() => {
+              setTabAndUrl('home');
+              window.scrollTo({ top: 0, behavior: 'smooth' });
+            }}
+          />
+        </Suspense>
       </div>
     );
   }
@@ -254,12 +271,12 @@ function MainApp() {
   // 2. If user is not logged in as student and not on /admin, show the Student Portal Login
   if (!isAuthenticated && activeTab !== 'admin') {
     return (
-      <>
+      <Suspense fallback={<RouteSkeleton title="កំពុងរៀបចំទម្រង់ចូលគណនី..." />}>
         {showIntroSplash && (
           <MoEYSIntroSplash onFinish={handleSplashFinish} />
         )}
         <LoginView />
-      </>
+      </Suspense>
     );
   }
 
@@ -304,92 +321,94 @@ function MainApp() {
         {/* Dynamic Center Canvas View */}
         <main className={`flex-1 flex flex-col min-w-0 ${activeTab === 'chat' ? 'h-[calc(100dvh-60px)] sm:h-[calc(100vh-80px)] min-h-0 overflow-hidden p-0' : 'overflow-x-hidden pb-16 md:pb-0'}`}>
           
-          {/* HOME TAB */}
-          {activeTab === 'home' && (
-            <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-6 space-y-6 sm:space-y-8 animate-fadeIn">
-              <HeroSection
-                onStartLearning={handleStartLearning}
-                onExploreBacII={handleExploreBacII}
-              />
-              
-              <FeaturedLiveSection 
-                onSelectSubject={handleSelectSubject} 
-                onStartQuiz={handleExploreBacII}
-              />
-
-              <SubjectGrid onSelectSubject={handleSelectSubject} showHeroBanner={false} />
-            </div>
-          )}
-
-          {/* NATIONAL CURRICULUM COURSES TAB */}
-          {activeTab === 'courses' && (
-            <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-8 space-y-6 animate-fadeIn">
-              <SubjectGrid onSelectSubject={handleSelectSubject} showHeroBanner={true} />
-            </div>
-          )}
-
-          {/* CLASSROOM VIEW */}
-          {activeTab === 'classroom' && (
-            <div className="animate-fadeIn">
-              <ClassroomView
-                subject={selectedSubject}
-                onBack={() => setActiveTab('courses')}
-                onOpenAITutor={() => setIsAITutorOpen(true)}
-              />
-            </div>
-          )}
-
-          {/* BAC II MASTER HUB TAB */}
-          {activeTab === 'bacii' && (
-            <div className="animate-fadeIn">
-              <BacIIHubView />
-            </div>
-          )}
-
-          {/* STUDENT MESSENGER CHAT TAB */}
-          {activeTab === 'chat' && (
-            <div className="animate-fadeIn flex-1 flex flex-col h-full min-h-0">
-              <StudentMessengerView 
-                onLaunchDuelGame={() => setIsDuelOpen(true)} 
-                onBack={() => setTabAndUrl('home')}
-              />
-            </div>
-          )}
-
-          {/* DIGITAL LIBRARY TAB */}
-          {activeTab === 'library' && (
-            <div className="animate-fadeIn">
-              <DigitalLibraryView />
-            </div>
-          )}
-
-          {/* VIRTUAL STEM LAB TAB */}
-          {activeTab === 'lab' && (
-            <div className="animate-fadeIn">
-              <VirtualLabView />
-            </div>
-          )}
-
-          {/* ACADEMIC PLAYGROUND ARENA TAB */}
-          {activeTab === 'playground' && (
-            <div className="animate-fadeIn">
-              <PlaygroundArenaView />
-            </div>
-          )}
-
-          {/* STUDENT DASHBOARD TAB */}
-          {activeTab === 'dashboard' && (
-            <div className="animate-fadeIn">
-              {isAuthenticated && student ? (
-                <StudentDashboardView setActiveTab={setTabAndUrl} />
-              ) : (
-                <LoginView 
-                  onLoginSuccess={() => setTabAndUrl('dashboard')}
-                  onCancel={() => setTabAndUrl('home')}
+          <Suspense fallback={<RouteSkeleton />}>
+            {/* HOME TAB */}
+            {activeTab === 'home' && (
+              <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-6 space-y-6 sm:space-y-8 animate-fadeIn">
+                <HeroSection
+                  onStartLearning={handleStartLearning}
+                  onExploreBacII={handleExploreBacII}
                 />
-              )}
-            </div>
-          )}
+                
+                <FeaturedLiveSection 
+                  onSelectSubject={handleSelectSubject} 
+                  onStartQuiz={handleExploreBacII}
+                />
+
+                <SubjectGrid onSelectSubject={handleSelectSubject} showHeroBanner={false} />
+              </div>
+            )}
+
+            {/* NATIONAL CURRICULUM COURSES TAB */}
+            {activeTab === 'courses' && (
+              <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-8 space-y-6 animate-fadeIn">
+                <SubjectGrid onSelectSubject={handleSelectSubject} showHeroBanner={true} />
+              </div>
+            )}
+
+            {/* CLASSROOM VIEW */}
+            {activeTab === 'classroom' && (
+              <div className="animate-fadeIn">
+                <ClassroomView
+                  subject={selectedSubject}
+                  onBack={() => setActiveTab('courses')}
+                  onOpenAITutor={() => setIsAITutorOpen(true)}
+                />
+              </div>
+            )}
+
+            {/* BAC II MASTER HUB TAB */}
+            {activeTab === 'bacii' && (
+              <div className="animate-fadeIn">
+                <BacIIHubView />
+              </div>
+            )}
+
+            {/* STUDENT MESSENGER CHAT TAB */}
+            {activeTab === 'chat' && (
+              <div className="animate-fadeIn flex-1 flex flex-col h-full min-h-0">
+                <StudentMessengerView 
+                  onLaunchDuelGame={() => setIsDuelOpen(true)} 
+                  onBack={() => setTabAndUrl('home')}
+                />
+              </div>
+            )}
+
+            {/* DIGITAL LIBRARY TAB */}
+            {activeTab === 'library' && (
+              <div className="animate-fadeIn">
+                <DigitalLibraryView />
+              </div>
+            )}
+
+            {/* VIRTUAL STEM LAB TAB */}
+            {activeTab === 'lab' && (
+              <div className="animate-fadeIn">
+                <VirtualLabView />
+              </div>
+            )}
+
+            {/* ACADEMIC PLAYGROUND ARENA TAB */}
+            {activeTab === 'playground' && (
+              <div className="animate-fadeIn">
+                <PlaygroundArenaView />
+              </div>
+            )}
+
+            {/* STUDENT DASHBOARD TAB */}
+            {activeTab === 'dashboard' && (
+              <div className="animate-fadeIn">
+                {isAuthenticated && student ? (
+                  <StudentDashboardView setActiveTab={setTabAndUrl} />
+                ) : (
+                  <LoginView 
+                    onLoginSuccess={() => setTabAndUrl('dashboard')}
+                    onCancel={() => setTabAndUrl('home')}
+                  />
+                )}
+              </div>
+            )}
+          </Suspense>
 
           {/* Footer (Hidden on Chat Tab to provide full-height live messaging experience) */}
           {activeTab !== 'chat' && <Footer setActiveTab={setActiveTab} />}
@@ -458,71 +477,73 @@ function MainApp() {
         </div>
       )}
 
-      {/* Global Modals */}
-      {isAITutorOpen && (
-        <AITutorModal
-          isOpen={isAITutorOpen}
-          onClose={() => setIsAITutorOpen(false)}
-          initialPrompt={aiTutorInitialPrompt}
-          onNavigate={(tab) => {
-            setTabAndUrl(tab);
-            setIsAITutorOpen(false);
-          }}
-        />
-      )}
+      {/* Global Modals wrapped in Suspense */}
+      <Suspense fallback={null}>
+        {isAITutorOpen && (
+          <AITutorModal
+            isOpen={isAITutorOpen}
+            onClose={() => setIsAITutorOpen(false)}
+            initialPrompt={aiTutorInitialPrompt}
+            onNavigate={(tab) => {
+              setTabAndUrl(tab);
+              setIsAITutorOpen(false);
+            }}
+          />
+        )}
 
-      {activeQuizModal && (
-        <QuizModal
-          quiz={quizData.find(q => q.id === activeQuizModal)}
-          isOpen={!!activeQuizModal}
-          onClose={() => setActiveQuizModal(null)}
-        />
-      )}
+        {activeQuizModal && (
+          <QuizModal
+            quiz={quizData.find(q => q.id === activeQuizModal)}
+            isOpen={!!activeQuizModal}
+            onClose={() => setActiveQuizModal(null)}
+          />
+        )}
 
-      {/* 1v1 Speed Quiz Arena Multiplayer Duel Modal */}
-      {isDuelOpen && (
-        <DuelMultiplayerModal
-          isOpen={isDuelOpen}
-          onClose={() => {
-            setIsDuelOpen(false);
-            setDuelRoomCode(null);
-            setDuelHostStudent(null);
-          }}
-          initialRoomCode={duelRoomCode}
-          initialHostStudent={duelHostStudent}
-        />
-      )}
+        {/* 1v1 Speed Quiz Arena Multiplayer Duel Modal */}
+        {isDuelOpen && (
+          <DuelMultiplayerModal
+            isOpen={isDuelOpen}
+            onClose={() => {
+              setIsDuelOpen(false);
+              setDuelRoomCode(null);
+              setDuelHostStudent(null);
+            }}
+            initialRoomCode={duelRoomCode}
+            initialHostStudent={duelHostStudent}
+          />
+        )}
 
-      {/* Global Search Popover Modal */}
-      {isSearchModalOpen && (
-        <GlobalSearchModal
-          isOpen={isSearchModalOpen}
-          onClose={() => setIsSearchModalOpen(false)}
-          onNavigate={(tab, payload) => {
-            setIsSearchModalOpen(false);
-            if (tab === 'classroom' && payload) {
-              setSelectedSubject(payload);
-            }
-            setTabAndUrl(tab);
-          }}
-        />
-      )}
+        {/* Global Search Popover Modal */}
+        {isSearchModalOpen && (
+          <GlobalSearchModal
+            isOpen={isSearchModalOpen}
+            onClose={() => setIsSearchModalOpen(false)}
+            onNavigate={(tab, payload) => {
+              setIsSearchModalOpen(false);
+              if (tab === 'classroom' && payload) {
+                setSelectedSubject(payload);
+              }
+              setTabAndUrl(tab);
+            }}
+          />
+        )}
 
-      {/* MoTDAR National Education & Talent Fund Donation Modal */}
-      {isDonationModalOpen && (
-        <MinistryDonationModal
-          isOpen={isDonationModalOpen}
-          onClose={() => setIsDonationModalOpen(false)}
-        />
-      )}
+        {/* MoTDAR National Education & Talent Fund Donation Modal */}
+        {isDonationModalOpen && (
+          <MinistryDonationModal
+            isOpen={isDonationModalOpen}
+            onClose={() => setIsDonationModalOpen(false)}
+          />
+        )}
 
-      {/* Human Voice Studio Modal */}
-      {isVoiceStudioOpen && (
-        <HumanVoiceStudioModal
-          isOpen={isVoiceStudioOpen}
-          onClose={() => setIsVoiceStudioOpen(false)}
-        />
-      )}
+        {/* Human Voice Studio Modal */}
+        {isVoiceStudioOpen && (
+          <HumanVoiceStudioModal
+            isOpen={isVoiceStudioOpen}
+            onClose={() => setIsVoiceStudioOpen(false)}
+          />
+        )}
+      </Suspense>
 
       {/* Level Up Golden Celebratory Modal */}
       {levelUpToast && (

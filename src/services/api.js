@@ -6,6 +6,21 @@
 const API_BASE = '/api';
 const UPLOADS_BASE = '';
 
+// High-Performance In-Memory SWR Cache for sub-millisecond tab switching
+const apiCache = new Map();
+
+export const clearApiCache = (key) => {
+  if (key) apiCache.delete(key);
+  else apiCache.clear();
+};
+
+// Instant Non-Blocking Health Probe (Wakes up Render free-tier dyno immediately)
+if (typeof window !== 'undefined') {
+  setTimeout(() => {
+    fetch(`${API_BASE}/health`, { cache: 'no-store' }).catch(() => {});
+  }, 100);
+}
+
 export const api = {
   // Format avatar URL
   formatAvatarUrl: (avatarPath) => {
@@ -237,10 +252,23 @@ export const api = {
 
   // 6. Leaderboard & Registered Students
   getLeaderboard: async () => {
+    const cacheKey = 'leaderboard_cache';
+    const cached = apiCache.get(cacheKey);
+    const now = Date.now();
+    if (cached && (now - cached.ts < 10000)) {
+      return cached.data;
+    }
+
     try {
       const res = await fetch(`${API_BASE}/leaderboard`);
-      return await res.json();
+      if (res.ok) {
+        const data = await res.json();
+        apiCache.set(cacheKey, { data, ts: now });
+        return data;
+      }
+      return cached?.data || { leaderboard: [] };
     } catch (err) {
+      if (cached?.data) return cached.data;
       console.warn('[API Leaderboard Warning]:', err.message);
       return { leaderboard: [] };
     }
@@ -329,6 +357,14 @@ export const api = {
       };
     };
 
+    // 0. Check in-memory cache
+    const cacheKey = 'students_cache';
+    const cached = apiCache.get(cacheKey);
+    const now = Date.now();
+    if (cached && (now - cached.ts < 8000)) {
+      return cached.data;
+    }
+
     // 1. Fetch from backend server (Database is THE ONLY source of truth)
     try {
       const res = await fetch(`${API_BASE}/students`);
@@ -336,7 +372,9 @@ export const api = {
         const data = await res.json();
         if (data && Array.isArray(data.students) && data.students.length > 0) {
           const students = data.students.map(s => normalize(s));
-          return { students };
+          const result = { students };
+          apiCache.set(cacheKey, { data: result, ts: now });
+          return result;
         }
       }
     } catch (err) {}
