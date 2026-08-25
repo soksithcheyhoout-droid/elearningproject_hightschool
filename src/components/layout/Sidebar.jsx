@@ -160,8 +160,8 @@ export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor }) {
           </div>
           <div className="text-[10px] text-slate-600 font-semibold space-y-0.5">
             <p>
-              <a href="tel:0977416126" className="hover:text-[#005baa] font-mono font-bold">
-                {lang === 'km' ? 'ទូរស័ព្ទ / Telegram: 097 741 6126' : 'Hotline: 097 741 6126'}
+              <a href="https://t.me/kaixite" target="_blank" rel="noopener noreferrer" className="hover:text-[#005baa] font-mono font-bold">
+                {lang === 'km' ? 'Telegram: @kaixite (097 741 6126)' : 'Telegram: @kaixite (097 741 6126)'}
               </a>
             </p>
             <p className="text-[9.5px] text-slate-500 truncate font-mono">

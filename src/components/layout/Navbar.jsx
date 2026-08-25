@@ -328,14 +328,14 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
             </a>
             <span className="text-white/30 hidden sm:inline">|</span>
             <a 
-              href="https://t.me/+855977416126" 
+              href="https://t.me/kaixite" 
               target="_blank"
               rel="noopener noreferrer"
               className="hidden md:flex items-center gap-1 hover:text-cyan-300 transition-colors font-mono font-bold"
-              title="Telegram: 097 741 6126"
+              title="Telegram: @kaixite"
             >
               <Send className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-cyan-400" />
-              <span>Telegram: 097 741 6126</span>
+              <span>Telegram: @kaixite</span>
             </a>
             <span className="text-white/30 hidden md:inline">|</span>
             <a 

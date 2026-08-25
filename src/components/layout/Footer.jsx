@@ -35,8 +35,8 @@ export default function Footer({ setActiveTab }) {
               </h4>
               <p className="text-xs text-slate-600 leading-relaxed mt-0.5">
                 {lang === 'km' 
-                  ? 'បើមានបញ្ហាបច្ចេកទេស ឬកំហុសឆ្គងក្នុងប្រព័ន្ធ សូមទាក់ទងមកកាន់ Gmail ឬ Telegram តាមរយៈលេខ 097 741 6126' 
-                  : 'If you encounter any technical issues, bugs, or errors, please contact via Gmail or Telegram at 097 741 6126'}
+                  ? 'បើមានបញ្ហាបច្ចេកទេស ឬកំហុសឆ្គងក្នុងប្រព័ន្ធ សូមទាក់ទងមកកាន់ Gmail ឬ Telegram @kaixite តាមរយៈលេខ 097 741 6126' 
+                  : 'If you encounter any technical issues, bugs, or errors, please contact via Gmail or Telegram @kaixite at 097 741 6126'}
               </p>
             </div>
           </div>
@@ -53,14 +53,14 @@ export default function Footer({ setActiveTab }) {
             </a>
 
             <a
-              href="https://t.me/+855977416126"
+              href="https://t.me/kaixite"
               target="_blank"
               rel="noopener noreferrer"
               className="px-3.5 py-1.5 rounded-xl bg-[#229ED9] hover:bg-[#1e8bc0] text-white font-bold text-xs flex items-center gap-1.5 shadow-2xs transition-all hover:scale-102"
-              title="Open Telegram"
+              title="Open Telegram @kaixite"
             >
               <Send className="w-3.5 h-3.5" />
-              <span>Telegram: 097 741 6126</span>
+              <span>Telegram: @kaixite</span>
             </a>
 
             <a
@@ -175,12 +175,12 @@ export default function Footer({ setActiveTab }) {
               <div className="flex items-center gap-2">
                 <Send className="w-4 h-4 text-[#229ED9] flex-shrink-0" />
                 <a 
-                  href="https://t.me/+855977416126" 
+                  href="https://t.me/kaixite" 
                   target="_blank" 
                   rel="noopener noreferrer"
                   className="hover:text-[#229ED9] font-mono font-bold"
                 >
-                  Telegram: 097 741 6126
+                  Telegram: @kaixite
                 </a>
               </div>
               <div className="flex items-center gap-2">
