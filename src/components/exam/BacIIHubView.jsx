@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo } from 'react';
 import { createPortal } from 'react-dom';
 import { 
   GraduationCap, 
@@ -30,6 +30,18 @@ import { useLanguage } from '../../context/LanguageContext';
 import api from '../../services/api';
 import QuizModal from './QuizModal';
 
+const MASTER_SUBJECT_DEFINITIONS = [
+  { key: 'math', stream: 'science', nameKm: 'គណិតវិទ្យា', nameEn: 'Mathematics' },
+  { key: 'physics', stream: 'science', nameKm: 'រូបវិទ្យា', nameEn: 'Physics' },
+  { key: 'chemistry', stream: 'science', nameKm: 'គីមីវិទ្យា', nameEn: 'Chemistry' },
+  { key: 'biology', stream: 'science', nameKm: 'ជីវវិទ្យា', nameEn: 'Biology' },
+  { key: 'khmer', stream: 'social', nameKm: 'អក្សរសាស្ត្រខ្មែរ', nameEn: 'Khmer Literature' },
+  { key: 'history', stream: 'social', nameKm: 'ប្រវត្តិវិទ្យា', nameEn: 'History' },
+  { key: 'geography', stream: 'social', nameKm: 'ភូមិវិទ្យា', nameEn: 'Geography' },
+  { key: 'civics', stream: 'social', nameKm: 'សីលធម៌-ពលរដ្ឋ', nameEn: 'Civics & Morals' },
+  { key: 'english', stream: 'all', nameKm: 'ភាសាអង់គ្លេស', nameEn: 'English' }
+];
+
 export default function BacIIHubView() {
   const { t, lang } = useLanguage();
   const [selectedStream, setSelectedStream] = useState('all'); // 'all' | 'science' | 'social'
@@ -57,25 +69,46 @@ export default function BacIIHubView() {
     return () => clearInterval(interval);
   }, []);
 
-  const allPapers = [...adminExams, ...bacIIData];
+  const allPapers = useMemo(() => [...adminExams, ...bacIIData], [adminExams]);
   const ITEMS_PER_PAGE = 8;
 
-  // Available unique years in dataset (sorted descending)
-  const availableYears = ['all', ...Array.from(new Set(allPapers.map(p => p.year))).sort((a, b) => b - a)];
+  // Total Stream Counts
+  const scienceCount = useMemo(() => allPapers.filter(p => p.stream === 'science').length, [allPapers]);
+  const socialCount = useMemo(() => allPapers.filter(p => p.stream === 'social').length, [allPapers]);
 
-  // Subject quick list
-  const subjectList = [
-    { key: 'all', nameKm: 'មុខវិជ្ជាទាំងអស់', nameEn: 'All Subjects' },
-    { key: 'math', nameKm: 'គណិតវិទ្យា', nameEn: 'Mathematics' },
-    { key: 'physics', nameKm: 'រូបវិទ្យា', nameEn: 'Physics' },
-    { key: 'chemistry', nameKm: 'គីមីវិទ្យា', nameEn: 'Chemistry' },
-    { key: 'biology', nameKm: 'ជីវវិទ្យា', nameEn: 'Biology' },
-    { key: 'khmer', nameKm: 'អក្សរសាស្ត្រខ្មែរ', nameEn: 'Khmer Literature' },
-    { key: 'history', nameKm: 'ប្រវត្តិវិទ្យា', nameEn: 'History' },
-    { key: 'geography', nameKm: 'ភូមិវិទ្យា', nameEn: 'Geography' },
-    { key: 'civics', nameKm: 'សីលធម៌-ពលរដ្ឋ', nameEn: 'Moral & Civics' },
-    { key: 'english', nameKm: 'ភាសាអង់គ្លេស', nameEn: 'English' }
-  ];
+  // Dynamic Subject List matching the currently selected stream
+  const visibleSubjectList = useMemo(() => {
+    const streamFiltered = allPapers.filter(p => selectedStream === 'all' || p.stream === selectedStream || p.stream === 'all');
+    const availableKeys = new Set(streamFiltered.map(p => p.subjectKey));
+
+    const matchedSubs = MASTER_SUBJECT_DEFINITIONS.filter(s => availableKeys.has(s.key));
+    return [
+      { key: 'all', nameKm: 'មុខវិជ្ជាទាំងអស់', nameEn: 'All Subjects' },
+      ...matchedSubs
+    ];
+  }, [allPapers, selectedStream]);
+
+  // Handle Stream Selection with Auto-Reset of mismatched Subject
+  const handleSelectStream = (newStream) => {
+    setSelectedStream(newStream);
+    setCurrentPage(1);
+
+    // If a specific subject is selected, check if it's valid in the new stream
+    if (selectedSubjectKey !== 'all') {
+      const validForNewStream = allPapers.some(p => 
+        (newStream === 'all' || p.stream === newStream || p.stream === 'all') &&
+        p.subjectKey === selectedSubjectKey
+      );
+      if (!validForNewStream) {
+        setSelectedSubjectKey('all');
+      }
+    }
+  };
+
+  // Available unique years in dataset (sorted descending)
+  const availableYears = useMemo(() => {
+    return ['all', ...Array.from(new Set(allPapers.map(p => p.year))).sort((a, b) => b - a)];
+  }, [allPapers]);
 
   // Prevent background scrolling when solution modal is open
   useEffect(() => {
@@ -94,42 +127,45 @@ export default function BacIIHubView() {
     setCurrentPage(1);
   }, [selectedStream, selectedYear, selectedSubjectKey, searchQuery]);
 
-  const filteredQuizzes = quizData.filter(quiz => {
-    if (selectedStream === 'all') return true;
-    return quiz.stream === selectedStream || quiz.stream === 'all';
-  });
+  const filteredQuizzes = useMemo(() => {
+    return quizData.filter(quiz => {
+      if (selectedStream === 'all') return true;
+      return quiz.stream === selectedStream || quiz.stream === 'all';
+    });
+  }, [selectedStream]);
 
-  const filteredPapers = allPapers.filter(paper => {
-    const matchesStream = selectedStream === 'all' || paper.stream === selectedStream || paper.stream === 'all';
-    const matchesYear = selectedYear === 'all' || paper.year === selectedYear;
-    const matchesSub = selectedSubjectKey === 'all' || paper.subjectKey === selectedSubjectKey;
-    
-    let matchesSearch = true;
-    if (searchQuery.trim()) {
-      const q = searchQuery.toLowerCase();
-      matchesSearch = (
-        paper.paperTitleKm.toLowerCase().includes(q) ||
-        paper.paperTitleEn.toLowerCase().includes(q) ||
-        paper.subject.toLowerCase().includes(q) ||
-        paper.year.includes(q) ||
-        paper.exercises.some(ex => 
-          ex.titleKm.toLowerCase().includes(q) || 
-          ex.problemText.toLowerCase().includes(q)
-        )
-      );
-    }
+  const filteredPapers = useMemo(() => {
+    return allPapers.filter(paper => {
+      const matchesStream = selectedStream === 'all' || paper.stream === selectedStream || paper.stream === 'all';
+      const matchesYear = selectedYear === 'all' || paper.year === selectedYear;
+      const matchesSub = selectedSubjectKey === 'all' || paper.subjectKey === selectedSubjectKey;
+      
+      let matchesSearch = true;
+      if (searchQuery.trim()) {
+        const q = searchQuery.toLowerCase();
+        matchesSearch = (
+          paper.paperTitleKm.toLowerCase().includes(q) ||
+          paper.paperTitleEn.toLowerCase().includes(q) ||
+          paper.subject.toLowerCase().includes(q) ||
+          paper.year.includes(q) ||
+          paper.exercises.some(ex => 
+            ex.titleKm.toLowerCase().includes(q) || 
+            ex.problemText.toLowerCase().includes(q)
+          )
+        );
+      }
 
-    return matchesStream && matchesYear && matchesSub && matchesSearch;
-  });
+      return matchesStream && matchesYear && matchesSub && matchesSearch;
+    });
+  }, [allPapers, selectedStream, selectedYear, selectedSubjectKey, searchQuery]);
 
   const totalPages = Math.ceil(filteredPapers.length / ITEMS_PER_PAGE) || 1;
-  const paginatedPapers = filteredPapers.slice(
-    (currentPage - 1) * ITEMS_PER_PAGE,
-    currentPage * ITEMS_PER_PAGE
-  );
-
-  const scienceCount = allPapers.filter(p => p.stream === 'science').length;
-  const socialCount = allPapers.filter(p => p.stream === 'social').length;
+  const paginatedPapers = useMemo(() => {
+    return filteredPapers.slice(
+      (currentPage - 1) * ITEMS_PER_PAGE,
+      currentPage * ITEMS_PER_PAGE
+    );
+  }, [filteredPapers, currentPage]);
 
   return (
     <div className="space-y-8 font-kantumruy">
@@ -169,7 +205,7 @@ export default function BacIIHubView() {
         </div>
       </div>
 
-      {/* DUAL-STREAM SWITCHER & YEAR FILTERS */}
+      {/* DUAL-STREAM SWITCHER & DYNAMIC FILTERS */}
       <div className="bg-white/95 backdrop-blur-md p-4 sm:p-5 rounded-3xl border border-slate-200 shadow-sm space-y-4">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
           <div className="flex items-center gap-2">
@@ -180,7 +216,7 @@ export default function BacIIHubView() {
               {lang === 'km' ? 'ជ្រើសរើសផ្នែកជំនាញប្រឡងបាក់ឌុប' : 'Select Examination Stream'}
             </h2>
           </div>
-          <span className="text-[11px] font-bold text-slate-500">
+          <span className="text-[11px] font-bold text-slate-600 bg-slate-100 px-3 py-1 rounded-xl border border-slate-200">
             {lang === 'km' ? `វិញ្ញាសាសរុប៖ ${allPapers.length} (វិទ្យាសាស្ត្រ៖ ${scienceCount}, សង្គម៖ ${socialCount})` : `Total Papers: ${allPapers.length} (Science: ${scienceCount}, Social: ${socialCount})`}
           </span>
         </div>
@@ -190,7 +226,7 @@ export default function BacIIHubView() {
           
           <button
             type="button"
-            onClick={() => setSelectedStream('all')}
+            onClick={() => handleSelectStream('all')}
             className={`p-3.5 rounded-2xl border transition-all flex items-center justify-center gap-2.5 cursor-pointer font-bold ${
               selectedStream === 'all'
                 ? 'bg-gradient-to-r from-[#003366] to-[#005baa] text-white border-[#003366] shadow-md ring-2 ring-blue-500/30 scale-[1.01]'
@@ -203,7 +239,7 @@ export default function BacIIHubView() {
 
           <button
             type="button"
-            onClick={() => setSelectedStream('social')}
+            onClick={() => handleSelectStream('social')}
             className={`p-3.5 rounded-2xl border transition-all flex items-center justify-center gap-2.5 cursor-pointer font-bold ${
               selectedStream === 'social'
                 ? 'bg-gradient-to-r from-amber-600 to-amber-700 text-white border-amber-600 shadow-md ring-2 ring-amber-400/40 scale-[1.01]'
@@ -216,7 +252,7 @@ export default function BacIIHubView() {
 
           <button
             type="button"
-            onClick={() => setSelectedStream('science')}
+            onClick={() => handleSelectStream('science')}
             className={`p-3.5 rounded-2xl border transition-all flex items-center justify-center gap-2.5 cursor-pointer font-bold ${
               selectedStream === 'science'
                 ? 'bg-gradient-to-r from-[#005baa] to-[#0284c7] text-white border-[#005baa] shadow-md ring-2 ring-blue-400/40 scale-[1.01]'
@@ -229,7 +265,7 @@ export default function BacIIHubView() {
 
         </div>
 
-        {/* Multi-Year Horizontal Carousel Selector */}
+        {/* Multi-Year Horizontal Carousel Selector with Dynamic Stream Counts */}
         <div className="space-y-1.5 pt-2 border-t border-slate-100">
           <label className="text-[11px] font-bold text-slate-500 block">
             {lang === 'km' ? 'ជ្រើសរើសឆ្នាំប្រឡង (Filter by Exam Year):' : 'Filter by Exam Year:'}
@@ -237,15 +273,16 @@ export default function BacIIHubView() {
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-bold scrollbar-none">
             {availableYears.map((yr) => {
               const isSelected = selectedYear === yr;
-              const count = yr === 'all' 
-                ? allPapers.length 
-                : allPapers.filter(p => p.year === yr).length;
+              const count = yr === 'all'
+                ? allPapers.filter(p => selectedStream === 'all' || p.stream === selectedStream || p.stream === 'all').length
+                : allPapers.filter(p => (selectedStream === 'all' || p.stream === selectedStream || p.stream === 'all') && p.year === yr).length;
+
               return (
                 <button
                   key={yr}
                   type="button"
                   onClick={() => setSelectedYear(yr)}
-                  className={`px-3 py-1.5 rounded-xl transition-all flex-shrink-0 flex items-center gap-1 cursor-pointer font-bold ${
+                  className={`px-3 py-1.5 rounded-xl transition-all flex-shrink-0 flex items-center gap-1.5 cursor-pointer font-bold ${
                     isSelected
                       ? 'bg-[#005baa] text-white shadow-xs'
                       : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/60'
@@ -262,26 +299,39 @@ export default function BacIIHubView() {
           </div>
         </div>
 
-        {/* Subject Filter Pills */}
+        {/* Dynamic Subject Filter Pills - Synced to Selected Stream! */}
         <div className="space-y-1.5 pt-2 border-t border-slate-100">
-          <label className="text-[11px] font-bold text-slate-500 block">
-            {lang === 'km' ? 'ជ្រើសរើសមុខវិជ្ជា (Filter by Subject):' : 'Filter by Subject:'}
-          </label>
+          <div className="flex items-center justify-between">
+            <label className="text-[11px] font-bold text-slate-500 block">
+              {lang === 'km' ? 'ជ្រើសរើសមុខវិជ្ជា (Filter by Subject):' : 'Filter by Subject:'}
+            </label>
+            <span className="text-[10.5px] text-slate-400 font-medium">
+              {visibleSubjectList.length - 1} {lang === 'km' ? 'មុខវិជ្ជាក្នុងផ្នែកនេះ' : 'Subjects Available'}
+            </span>
+          </div>
+
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-bold scrollbar-none">
-            {subjectList.map((sub) => {
+            {visibleSubjectList.map((sub) => {
               const isSelected = selectedSubjectKey === sub.key;
+              const subCount = sub.key === 'all'
+                ? allPapers.filter(p => (selectedStream === 'all' || p.stream === selectedStream || p.stream === 'all') && (selectedYear === 'all' || p.year === selectedYear)).length
+                : allPapers.filter(p => (selectedStream === 'all' || p.stream === selectedStream || p.stream === 'all') && (selectedYear === 'all' || p.year === selectedYear) && p.subjectKey === sub.key).length;
+
               return (
                 <button
                   key={sub.key}
                   type="button"
                   onClick={() => setSelectedSubjectKey(sub.key)}
-                  className={`px-3 py-1.5 rounded-xl transition-all flex-shrink-0 flex items-center gap-1 cursor-pointer font-bold ${
+                  className={`px-3 py-1.5 rounded-xl transition-all flex-shrink-0 flex items-center gap-1.5 cursor-pointer font-bold ${
                     isSelected
                       ? 'bg-[#003366] text-white shadow-xs'
                       : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200/60'
                   }`}
                 >
                   <span>{lang === 'km' ? sub.nameKm : sub.nameEn}</span>
+                  <span className={`text-[9.5px] px-1.5 py-0.2 rounded-full ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600'}`}>
+                    {subCount}
+                  </span>
                 </button>
               );
             })}
