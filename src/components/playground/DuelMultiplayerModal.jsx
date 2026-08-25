@@ -97,6 +97,214 @@ const PlayerAvatarWithFrame = ({ avatar, frame, name = '', size = 'md', classNam
   );
 };
 
+// Bespoke Professional Grade Themes (Grades 1 to 12)
+const GRADE_THEMES = {
+  '1': {
+    grade: '1',
+    nameKm: 'ថ្នាក់ទី ១',
+    levelTitle: 'បឋមសិក្សា (Primary Level 1)',
+    shortLevel: 'បឋមសិក្សា',
+    tagIcon: '🌱',
+    pillActive: 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/40 border-emerald-300 ring-2 ring-emerald-400/50 scale-105',
+    pillHover: 'hover:border-emerald-400/60 hover:text-emerald-300 hover:bg-emerald-950/40',
+    boxBg: 'bg-gradient-to-br from-[#062018]/95 via-[#061712]/95 to-[#030e0b]/95',
+    boxBorder: 'border-emerald-500/40 shadow-emerald-950/50 ring-1 ring-emerald-500/20',
+    accentText: 'text-emerald-400',
+    accentBg: 'bg-emerald-500/15',
+    badgeClass: 'text-emerald-300 bg-emerald-500/20 border-emerald-400/50 shadow-emerald-500/20',
+    headerBadge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
+    headerIconBox: 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-400',
+    glowBg: 'bg-emerald-500/20'
+  },
+  '2': {
+    grade: '2',
+    nameKm: 'ថ្នាក់ទី ២',
+    levelTitle: 'បឋមសិក្សា (Primary Level 2)',
+    shortLevel: 'បឋមសិក្សា',
+    tagIcon: '🌿',
+    pillActive: 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-lg shadow-teal-500/40 border-teal-300 ring-2 ring-teal-400/50 scale-105',
+    pillHover: 'hover:border-teal-400/60 hover:text-teal-300 hover:bg-teal-950/40',
+    boxBg: 'bg-gradient-to-br from-[#051f22]/95 via-[#05171a]/95 to-[#030d0f]/95',
+    boxBorder: 'border-teal-500/40 shadow-teal-950/50 ring-1 ring-teal-500/20',
+    accentText: 'text-teal-400',
+    accentBg: 'bg-teal-500/15',
+    badgeClass: 'text-teal-300 bg-teal-500/20 border-teal-400/50 shadow-teal-500/20',
+    headerBadge: 'bg-teal-500/20 text-teal-300 border-teal-500/40',
+    headerIconBox: 'bg-teal-500/20 border border-teal-500/40 text-teal-400',
+    glowBg: 'bg-teal-500/20'
+  },
+  '3': {
+    grade: '3',
+    nameKm: 'ថ្នាក់ទី ៣',
+    levelTitle: 'បឋមសិក្សា (Primary Level 3)',
+    shortLevel: 'បឋមសិក្សា',
+    tagIcon: '🌊',
+    pillActive: 'bg-gradient-to-r from-cyan-500 to-sky-500 text-white shadow-lg shadow-cyan-500/40 border-cyan-300 ring-2 ring-cyan-400/50 scale-105',
+    pillHover: 'hover:border-cyan-400/60 hover:text-cyan-300 hover:bg-cyan-950/40',
+    boxBg: 'bg-gradient-to-br from-[#041e2b]/95 via-[#041620]/95 to-[#020b12]/95',
+    boxBorder: 'border-cyan-500/40 shadow-cyan-950/50 ring-1 ring-cyan-500/20',
+    accentText: 'text-cyan-400',
+    accentBg: 'bg-cyan-500/15',
+    badgeClass: 'text-cyan-300 bg-cyan-500/20 border-cyan-400/50 shadow-cyan-500/20',
+    headerBadge: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40',
+    headerIconBox: 'bg-cyan-500/20 border border-cyan-500/40 text-cyan-400',
+    glowBg: 'bg-cyan-500/20'
+  },
+  '4': {
+    grade: '4',
+    nameKm: 'ថ្នាក់ទី ៤',
+    levelTitle: 'បឋមសិក្សា (Primary Level 4)',
+    shortLevel: 'បឋមសិក្សា',
+    tagIcon: '☀️',
+    pillActive: 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-lg shadow-sky-500/40 border-sky-300 ring-2 ring-sky-400/50 scale-105',
+    pillHover: 'hover:border-sky-400/60 hover:text-sky-300 hover:bg-sky-950/40',
+    boxBg: 'bg-gradient-to-br from-[#061d36]/95 via-[#051528]/95 to-[#030c17]/95',
+    boxBorder: 'border-sky-500/40 shadow-sky-950/50 ring-1 ring-sky-500/20',
+    accentText: 'text-sky-400',
+    accentBg: 'bg-sky-500/15',
+    badgeClass: 'text-sky-300 bg-sky-500/20 border-sky-400/50 shadow-sky-500/20',
+    headerBadge: 'bg-sky-500/20 text-sky-300 border-sky-500/40',
+    headerIconBox: 'bg-sky-500/20 border border-sky-500/40 text-sky-400',
+    glowBg: 'bg-sky-500/20'
+  },
+  '5': {
+    grade: '5',
+    nameKm: 'ថ្នាក់ទី ៥',
+    levelTitle: 'បឋមសិក្សា (Primary Level 5)',
+    shortLevel: 'បឋមសិក្សា',
+    tagIcon: '📘',
+    pillActive: 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/40 border-blue-300 ring-2 ring-blue-400/50 scale-105',
+    pillHover: 'hover:border-blue-400/60 hover:text-blue-300 hover:bg-blue-950/40',
+    boxBg: 'bg-gradient-to-br from-[#091840]/95 via-[#07112d]/95 to-[#040a1c]/95',
+    boxBorder: 'border-blue-500/40 shadow-blue-950/50 ring-1 ring-blue-500/20',
+    accentText: 'text-blue-400',
+    accentBg: 'bg-blue-500/15',
+    badgeClass: 'text-blue-300 bg-blue-500/20 border-blue-400/50 shadow-blue-500/20',
+    headerBadge: 'bg-blue-500/20 text-blue-300 border-blue-500/40',
+    headerIconBox: 'bg-blue-500/20 border border-blue-500/40 text-blue-400',
+    glowBg: 'bg-blue-500/20'
+  },
+  '6': {
+    grade: '6',
+    nameKm: 'ថ្នាក់ទី ៦',
+    levelTitle: 'បឋមសិក្សា (Primary Graduate)',
+    shortLevel: 'បញ្ចប់បឋម',
+    tagIcon: '🎓',
+    pillActive: 'bg-gradient-to-r from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-500/40 border-indigo-300 ring-2 ring-indigo-400/50 scale-105',
+    pillHover: 'hover:border-indigo-400/60 hover:text-indigo-300 hover:bg-indigo-950/40',
+    boxBg: 'bg-gradient-to-br from-[#121142]/95 via-[#0d0c30]/95 to-[#07061d]/95',
+    boxBorder: 'border-indigo-500/40 shadow-indigo-950/50 ring-1 ring-indigo-500/20',
+    accentText: 'text-indigo-400',
+    accentBg: 'bg-indigo-500/15',
+    badgeClass: 'text-indigo-300 bg-indigo-500/20 border-indigo-400/50 shadow-indigo-500/20',
+    headerBadge: 'bg-indigo-500/20 text-indigo-300 border-indigo-500/40',
+    headerIconBox: 'bg-indigo-500/20 border border-indigo-500/40 text-indigo-400',
+    glowBg: 'bg-indigo-500/20'
+  },
+  '7': {
+    grade: '7',
+    nameKm: 'ថ្នាក់ទី ៧',
+    levelTitle: 'អនុវិទ្យាល័យ (Secondary Level 7)',
+    shortLevel: 'អនុវិទ្យាល័យ',
+    tagIcon: '🔮',
+    pillActive: 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/40 border-violet-300 ring-2 ring-violet-400/50 scale-105',
+    pillHover: 'hover:border-violet-400/60 hover:text-violet-300 hover:bg-violet-950/40',
+    boxBg: 'bg-gradient-to-br from-[#1c103f]/95 via-[#140b2e]/95 to-[#0b061c]/95',
+    boxBorder: 'border-violet-500/40 shadow-violet-950/50 ring-1 ring-violet-500/20',
+    accentText: 'text-violet-400',
+    accentBg: 'bg-violet-500/15',
+    badgeClass: 'text-violet-300 bg-violet-500/20 border-violet-400/50 shadow-violet-500/20',
+    headerBadge: 'bg-violet-500/20 text-violet-300 border-violet-500/40',
+    headerIconBox: 'bg-violet-500/20 border border-violet-500/40 text-violet-400',
+    glowBg: 'bg-violet-500/20'
+  },
+  '8': {
+    grade: '8',
+    nameKm: 'ថ្នាក់ទី ៨',
+    levelTitle: 'អនុវិទ្យាល័យ (Secondary Level 8)',
+    shortLevel: 'អនុវិទ្យាល័យ',
+    tagIcon: '⚡',
+    pillActive: 'bg-gradient-to-r from-fuchsia-500 to-pink-600 text-white shadow-lg shadow-fuchsia-500/40 border-fuchsia-300 ring-2 ring-fuchsia-400/50 scale-105',
+    pillHover: 'hover:border-fuchsia-400/60 hover:text-fuchsia-300 hover:bg-fuchsia-950/40',
+    boxBg: 'bg-gradient-to-br from-[#280d32]/95 via-[#1c0924]/95 to-[#100515]/95',
+    boxBorder: 'border-fuchsia-500/40 shadow-fuchsia-950/50 ring-1 ring-fuchsia-500/20',
+    accentText: 'text-fuchsia-400',
+    accentBg: 'bg-fuchsia-500/15',
+    badgeClass: 'text-fuchsia-300 bg-fuchsia-500/20 border-fuchsia-400/50 shadow-fuchsia-500/20',
+    headerBadge: 'bg-fuchsia-500/20 text-fuchsia-300 border-fuchsia-500/40',
+    headerIconBox: 'bg-fuchsia-500/20 border border-fuchsia-500/40 text-fuchsia-400',
+    glowBg: 'bg-fuchsia-500/20'
+  },
+  '9': {
+    grade: '9',
+    nameKm: 'ថ្នាក់ទី ៩',
+    levelTitle: 'អនុវិទ្យាល័យ (Diploma / ឌីប្លូម)',
+    shortLevel: 'ប្រឡងឌីប្លូម',
+    tagIcon: '🔥',
+    pillActive: 'bg-gradient-to-r from-rose-500 via-red-500 to-orange-500 text-white shadow-lg shadow-rose-500/40 border-rose-300 ring-2 ring-rose-400/50 scale-105',
+    pillHover: 'hover:border-rose-400/60 hover:text-rose-300 hover:bg-rose-950/40',
+    boxBg: 'bg-gradient-to-br from-[#300d1a]/95 via-[#220912]/95 to-[#13050a]/95',
+    boxBorder: 'border-rose-500/40 shadow-rose-950/50 ring-1 ring-rose-500/20',
+    accentText: 'text-rose-400',
+    accentBg: 'bg-rose-500/15',
+    badgeClass: 'text-rose-300 bg-rose-500/20 border-rose-400/50 shadow-rose-500/20',
+    headerBadge: 'bg-rose-500/20 text-rose-300 border-rose-500/40',
+    headerIconBox: 'bg-rose-500/20 border border-rose-500/40 text-rose-400',
+    glowBg: 'bg-rose-500/20'
+  },
+  '10': {
+    grade: '10',
+    nameKm: 'ថ្នាក់ទី ១០',
+    levelTitle: 'វិទ្យាល័យ (High School Foundation)',
+    shortLevel: 'វិទ្យាល័យ',
+    tagIcon: '🚀',
+    pillActive: 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-500/40 border-amber-300 ring-2 ring-amber-400/50 scale-105',
+    pillHover: 'hover:border-amber-400/60 hover:text-amber-300 hover:bg-amber-950/40',
+    boxBg: 'bg-gradient-to-br from-[#2c1908]/95 via-[#1f1105]/95 to-[#120a03]/95',
+    boxBorder: 'border-amber-500/40 shadow-amber-950/50 ring-1 ring-amber-500/20',
+    accentText: 'text-amber-400',
+    accentBg: 'bg-amber-500/15',
+    badgeClass: 'text-amber-300 bg-amber-500/20 border-amber-400/50 shadow-amber-500/20',
+    headerBadge: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
+    headerIconBox: 'bg-amber-500/20 border border-amber-500/40 text-amber-400',
+    glowBg: 'bg-amber-500/20'
+  },
+  '11': {
+    grade: '11',
+    nameKm: 'ថ្នាក់ទី ១១',
+    levelTitle: 'វិទ្យាល័យ (Pre-Baccalaureate)',
+    shortLevel: 'ត្រៀមបាក់ឌុប',
+    tagIcon: '💎',
+    pillActive: 'bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 text-white shadow-lg shadow-cyan-500/45 border-cyan-200 ring-2 ring-cyan-400/60 scale-105',
+    pillHover: 'hover:border-cyan-400/60 hover:text-cyan-300 hover:bg-cyan-950/40',
+    boxBg: 'bg-gradient-to-br from-[#082238]/95 via-[#061828]/95 to-[#030e17]/95',
+    boxBorder: 'border-cyan-500/50 shadow-cyan-950/50 ring-1 ring-cyan-500/30',
+    accentText: 'text-cyan-400',
+    accentBg: 'bg-cyan-500/15',
+    badgeClass: 'text-cyan-300 bg-cyan-500/20 border-cyan-400/50 shadow-cyan-500/20',
+    headerBadge: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40',
+    headerIconBox: 'bg-cyan-500/20 border border-cyan-500/40 text-cyan-400',
+    glowBg: 'bg-cyan-500/20'
+  },
+  '12': {
+    grade: '12',
+    nameKm: 'ថ្នាក់ទី ១២',
+    levelTitle: 'វិទ្យាល័យ (National Bac II / បាក់ឌុប)',
+    shortLevel: 'បាក់ឌុបថ្នាក់ជាតិ',
+    tagIcon: '👑',
+    pillActive: 'bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 text-white shadow-lg shadow-purple-500/50 border-amber-200 ring-2 ring-amber-400/70 scale-105',
+    pillHover: 'hover:border-purple-400/60 hover:text-purple-300 hover:bg-purple-950/40',
+    boxBg: 'bg-gradient-to-br from-[#240e3f]/95 via-[#18092c]/95 to-[#0e051a]/95',
+    boxBorder: 'border-purple-500/50 shadow-purple-950/50 ring-1 ring-amber-400/30',
+    accentText: 'text-amber-300',
+    accentBg: 'bg-gradient-to-r from-amber-400/15 via-rose-500/15 to-purple-500/15',
+    badgeClass: 'text-amber-300 bg-amber-400/20 border-amber-400/50 shadow-amber-400/30',
+    headerBadge: 'bg-gradient-to-r from-amber-400/20 via-rose-500/20 to-purple-600/20 text-amber-300 border-amber-400/50',
+    headerIconBox: 'bg-gradient-to-r from-amber-500/20 to-purple-500/20 border border-amber-400/40 text-amber-300',
+    glowBg: 'bg-purple-500/25'
+  }
+};
+
 export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = null, initialHost = null }) {
   const { student, addXP } = useAuth();
   const levelInfo = computeLevelData(student?.xp || 3568);
@@ -215,6 +423,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   // Grade and Stream Customization (Grades 1 to 12)
   const [selectedGrade, setSelectedGrade] = useState(() => String(student?.grade || game?.grade || '12'));
   const [selectedStream, setSelectedStream] = useState(() => (student?.stream || game?.stream || 'science'));
+  const currentTheme = GRADE_THEMES[String(selectedGrade)] || GRADE_THEMES['12'];
 
   // Synchronized Questions Pool (Loaded by Grade and Stream with 24-question deep pool)
   const [questions, setQuestions] = useState(() => getRandomizedGameQuestions(game, 24, student?.grade || '12', student?.stream || 'science'));
@@ -977,23 +1186,24 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
       {/* Main Container: Clean Frosted Glass Sanctuary */}
       <div className="bg-[#0b1120]/95 border border-slate-700/60 rounded-3xl w-full max-w-4xl max-h-[96vh] sm:max-h-[92vh] flex flex-col shadow-[0_25px_80px_rgba(0,0,0,0.85)] overflow-hidden text-slate-100 relative my-auto">
         
-        {/* Subtle Ambient Glows */}
-        <div className="absolute -top-32 -left-32 w-80 h-80 bg-blue-600/15 rounded-full blur-[100px] pointer-events-none" />
+        {/* Subtle Dynamic Ambient Glows */}
+        <div className={`absolute -top-32 -left-32 w-80 h-80 rounded-full blur-[100px] pointer-events-none transition-colors duration-500 ${currentTheme.glowBg}`} />
         <div className="absolute -top-32 -right-32 w-80 h-80 bg-purple-600/15 rounded-full blur-[100px] pointer-events-none" />
 
         {/* Header */}
-        <header className="px-4 sm:px-7 py-3.5 sm:py-4 bg-[#080d1a]/80 backdrop-blur-md border-b border-slate-800 flex items-center justify-between flex-shrink-0 gap-3 relative z-10">
+        <header className="px-4 sm:px-7 py-3.5 sm:py-4 bg-[#080d1a]/85 backdrop-blur-md border-b border-slate-800 flex items-center justify-between flex-shrink-0 gap-3 relative z-10 transition-colors duration-300">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-10 h-10 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 flex items-center justify-center text-indigo-400 flex-shrink-0 shadow-xs">
+            <div className={`w-10 h-10 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm transition-all duration-300 ${currentTheme.headerIconBox}`}>
               <Swords className="w-5 h-5" />
             </div>
             <div className="min-w-0">
               <div className="flex items-center gap-2 flex-wrap">
-                <span className="text-[11px] font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-1">
+                <span className={`text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 transition-colors duration-300 ${currentTheme.accentText}`}>
                   1v1 Arena • First to 6 Correct
                 </span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/40">
-                  ថ្នាក់ទី {selectedGrade} • {selectedGrade >= 11 ? (selectedStream === 'science' ? 'វិទ្យាសាស្ត្រពិត' : 'វិទ្យាសាស្ត្រសង្គម') : 'ចំណេះទូទៅ'}
+                <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold border transition-all duration-300 flex items-center gap-1 shadow-xs ${currentTheme.headerBadge}`}>
+                  <span>{currentTheme.tagIcon}</span>
+                  <span>ថ្នាក់ទី {selectedGrade} • {selectedGrade >= 11 ? (selectedStream === 'science' ? 'វិទ្យាសាស្ត្រពិត' : 'វិទ្យាសាស្ត្រសង្គម') : currentTheme.shortLevel}</span>
                 </span>
                 {isOvertime && (
                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/40 animate-pulse flex items-center gap-1">
@@ -1208,64 +1418,77 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
               <div className="space-y-6 my-auto">
                 
                 {/* Grade & Stream Customization Box (Grades 1 to 12) */}
-                <div className="bg-[#0b1328]/95 p-4 sm:p-5 rounded-2xl border border-indigo-500/30 shadow-lg space-y-3.5">
+                <div className={`p-4 sm:p-5 rounded-2xl border transition-all duration-300 shadow-xl relative overflow-hidden space-y-3.5 ${currentTheme.boxBg} ${currentTheme.boxBorder}`}>
                   
+                  {/* Dynamic Ambient Background Glow */}
+                  <div className={`absolute -right-16 -bottom-16 w-56 h-56 rounded-full blur-[80px] pointer-events-none opacity-40 transition-colors duration-500 ${currentTheme.glowBg}`} />
+
                   {/* Grade Selector (1 to 12) */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 relative z-10">
                     <div className="flex items-center gap-2">
-                      <GraduationCap className="w-4 h-4 text-indigo-400" />
+                      <GraduationCap className={`w-4 h-4 transition-colors duration-300 ${currentTheme.accentText}`} />
                       <span className="text-xs font-bold text-slate-200">
                         កម្រិតថ្នាក់សិក្សា (Grade Level):
                       </span>
-                      <span className="text-xs font-black text-amber-300 bg-amber-400/10 px-2.5 py-0.5 rounded-lg border border-amber-400/20">
-                        ថ្នាក់ទី {selectedGrade}
+                      <span className={`text-xs font-black px-2.5 py-0.5 rounded-lg border transition-all duration-300 flex items-center gap-1.5 shadow-sm ${currentTheme.badgeClass}`}>
+                        <span>{currentTheme.tagIcon}</span>
+                        <span>ថ្នាក់ទី {selectedGrade}</span>
+                        <span className="text-[10px] opacity-80 font-normal">({currentTheme.shortLevel})</span>
                       </span>
                     </div>
 
-                    {/* Grade Pills */}
+                    {/* Grade Pills (Each with bespoke active & hover styling) */}
                     <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
-                      {['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'].map((g) => (
-                        <button
-                          key={g}
-                          type="button"
-                          disabled={!isHost}
-                          onClick={() => handleSelectGrade(g)}
-                          className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex-shrink-0 ${
-                            selectedGrade === g
-                              ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-600/30 border border-indigo-400/50 scale-105'
-                              : 'bg-slate-800/80 text-slate-400 hover:text-slate-200 hover:bg-slate-700 border border-slate-700/60'
-                          } ${!isHost ? 'opacity-70 cursor-not-allowed' : ''}`}
-                        >
-                          ទី {g}
-                        </button>
-                      ))}
+                      {['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'].map((g) => {
+                        const theme = GRADE_THEMES[g] || GRADE_THEMES['12'];
+                        const isActive = selectedGrade === g;
+                        return (
+                          <button
+                            key={g}
+                            type="button"
+                            disabled={!isHost}
+                            onClick={() => handleSelectGrade(g)}
+                            className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all duration-200 cursor-pointer flex-shrink-0 flex items-center gap-1 ${
+                              isActive
+                                ? theme.pillActive
+                                : `bg-slate-900/80 text-slate-400 border border-slate-700/60 ${theme.pillHover}`
+                            } ${!isHost ? 'opacity-70 cursor-not-allowed' : ''}`}
+                            title={`ថ្នាក់ទី ${g} • ${theme.levelTitle}`}
+                          >
+                            <span>ទី {g}</span>
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
                   {/* Stream Track: Grade 11-12 Selection vs Under 11 General Foundation */}
                   {(selectedGrade === '11' || selectedGrade === '12') ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 border-t border-slate-800">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 border-t border-slate-700/50 relative z-10">
                       {/* Science Stream */}
                       <button
                         type="button"
                         disabled={!isHost}
                         onClick={() => handleSelectStream('science')}
-                        className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                        className={`p-3 rounded-xl border text-left transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 ${
                           selectedStream === 'science'
-                            ? 'bg-gradient-to-r from-cyan-950/60 to-indigo-950/60 border-cyan-500/60 shadow-md shadow-cyan-950/40 ring-1 ring-cyan-500/40'
-                            : 'bg-[#080e1e] border-slate-800 hover:border-slate-700 opacity-70 hover:opacity-100'
+                            ? 'bg-gradient-to-r from-cyan-950/70 via-indigo-950/70 to-blue-950/70 border-cyan-400/70 shadow-lg shadow-cyan-950/60 ring-2 ring-cyan-500/50 scale-[1.01]'
+                            : 'bg-slate-900/60 border-slate-800/80 hover:border-slate-700 opacity-70 hover:opacity-100'
                         } ${!isHost ? 'opacity-70 cursor-not-allowed' : ''}`}
                       >
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-lg bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 flex items-center justify-center flex-shrink-0">
+                          <div className="w-8 h-8 rounded-lg bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 flex items-center justify-center flex-shrink-0 shadow-inner">
                             <Atom className="w-4 h-4" />
                           </div>
                           <div>
-                            <h5 className="text-xs font-black text-white">ថ្នាក់វិទ្យាសាស្ត្រពិត (Natural Science)</h5>
-                            <p className="text-[10px] text-slate-400">គណិតវិទ្យា, រូបវិទ្យា, គីមីវិទ្យា, ជីវវិទ្យា</p>
+                            <h5 className="text-xs font-black text-white flex items-center gap-1.5">
+                              <span>ថ្នាក់វិទ្យាសាស្ត្រពិត (Natural Science)</span>
+                              {selectedStream === 'science' && <span className="text-[9px] px-1.5 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold">ជ្រើសរើស</span>}
+                            </h5>
+                            <p className="text-[10px] text-slate-300">គណិតវិទ្យា, រូបវិទ្យា, គីមីវិទ្យា, ជីវវិទ្យា</p>
                           </div>
                         </div>
-                        {selectedStream === 'science' && <CheckCircle2 className="w-4 h-4 text-cyan-400 flex-shrink-0" />}
+                        {selectedStream === 'science' && <CheckCircle2 className="w-4.5 h-4.5 text-cyan-400 flex-shrink-0" />}
                       </button>
 
                       {/* Social Stream */}
@@ -1273,32 +1496,35 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                         type="button"
                         disabled={!isHost}
                         onClick={() => handleSelectStream('social')}
-                        className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                        className={`p-3 rounded-xl border text-left transition-all duration-200 cursor-pointer flex items-center justify-between gap-3 ${
                           selectedStream === 'social'
-                            ? 'bg-gradient-to-r from-amber-950/60 to-purple-950/60 border-amber-500/60 shadow-md shadow-amber-950/40 ring-1 ring-amber-500/40'
-                            : 'bg-[#080e1e] border-slate-800 hover:border-slate-700 opacity-70 hover:opacity-100'
+                            ? 'bg-gradient-to-r from-amber-950/70 via-rose-950/70 to-purple-950/70 border-amber-400/70 shadow-lg shadow-amber-950/60 ring-2 ring-amber-500/50 scale-[1.01]'
+                            : 'bg-slate-900/60 border-slate-800/80 hover:border-slate-700 opacity-70 hover:opacity-100'
                         } ${!isHost ? 'opacity-70 cursor-not-allowed' : ''}`}
                       >
                         <div className="flex items-center gap-2.5">
-                          <div className="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center flex-shrink-0">
+                          <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-400/40 text-amber-300 flex items-center justify-center flex-shrink-0 shadow-inner">
                             <BookOpen className="w-4 h-4" />
                           </div>
                           <div>
-                            <h5 className="text-xs font-black text-white">ថ្នាក់វិទ្យាសាស្ត្រសង្គម (Social Science)</h5>
-                            <p className="text-[10px] text-slate-400">ភាសាខ្មែរ, ប្រវត្តិវិទ្យា, ភូមិវិទ្យា, ពលរដ្ឋ</p>
+                            <h5 className="text-xs font-black text-white flex items-center gap-1.5">
+                              <span>ថ្នាក់វិទ្យាសាស្ត្រសង្គម (Social Science)</span>
+                              {selectedStream === 'social' && <span className="text-[9px] px-1.5 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold">ជ្រើសរើស</span>}
+                            </h5>
+                            <p className="text-[10px] text-slate-300">ភាសាខ្មែរ, ប្រវត្តិវិទ្យា, ភូមិវិទ្យា, ពលរដ្ឋ</p>
                           </div>
                         </div>
-                        {selectedStream === 'social' && <CheckCircle2 className="w-4 h-4 text-amber-400 flex-shrink-0" />}
+                        {selectedStream === 'social' && <CheckCircle2 className="w-4.5 h-4.5 text-amber-400 flex-shrink-0" />}
                       </button>
                     </div>
                   ) : (
-                    <div className="pt-2 border-t border-slate-800 flex items-center justify-between gap-2 text-xs">
-                      <div className="flex items-center gap-2 text-emerald-300">
-                        <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
-                        <span className="font-semibold">ថ្នាក់មូលដ្ឋានទូទៅ (General Foundation)</span>
+                    <div className="pt-2.5 border-t border-slate-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs relative z-10">
+                      <div className={`flex items-center gap-2 font-bold ${currentTheme.accentText}`}>
+                        <span className="text-sm">{currentTheme.tagIcon}</span>
+                        <span>ថ្នាក់មូលដ្ឋានទូទៅ • {currentTheme.levelTitle}</span>
                       </div>
-                      <span className="text-[10px] text-slate-400">
-                        សំណួរចម្រុះវិទ្យាសាស្ត្រពិត & វិទ្យាសាស្ត្រសង្គម (Science & Social)
+                      <span className="text-[10px] text-slate-300 bg-slate-900/70 px-2.5 py-1 rounded-lg border border-slate-700/60">
+                        សំណួរចម្រុះវិទ្យាសាស្ត្រពិត & វិទ្យាសាស្ត្រសង្គម (Science & Social Foundation)
                       </span>
                     </div>
                   )}
@@ -1584,16 +1810,17 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             <div className="absolute top-1/2 right-1/4 translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-rose-500/10 rounded-full blur-[100px] pointer-events-none" />
 
             {/* Top Match Title Ribbon */}
-            <div className="inline-flex flex-col sm:flex-row items-center gap-2 px-5 py-2 rounded-2xl bg-gradient-to-r from-[#0b1328] via-[#151336] to-[#0b1328] border border-indigo-500/40 shadow-xl">
+            <div className={`inline-flex flex-col sm:flex-row items-center gap-2 px-5 py-2 rounded-2xl border shadow-xl transition-all duration-300 ${currentTheme.boxBg} ${currentTheme.boxBorder}`}>
               <div className="flex items-center gap-2">
-                <Swords className="w-4 h-4 text-indigo-400 animate-pulse" />
-                <span className="text-xs font-black uppercase tracking-wider text-indigo-200">
+                <Swords className={`w-4 h-4 animate-pulse ${currentTheme.accentText}`} />
+                <span className="text-xs font-black uppercase tracking-wider text-white">
                   1v1 DUEL ARENA • ថ្នាក់ទី {selectedGrade}
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <span className="text-[11px] px-2.5 py-0.5 rounded-lg bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-400/30">
-                  {selectedGrade >= 11 ? (selectedStream === 'science' ? 'វិទ្យាសាស្ត្រពិត (Science)' : 'វិទ្យាសាស្ត្រសង្គម (Social)') : 'ចំណេះទូទៅ (General)'}
+                <span className={`text-[11px] px-2.5 py-0.5 rounded-lg font-bold border transition-all duration-300 flex items-center gap-1 ${currentTheme.badgeClass}`}>
+                  <span>{currentTheme.tagIcon}</span>
+                  <span>{selectedGrade >= 11 ? (selectedStream === 'science' ? 'វិទ្យាសាស្ត្រពិត (Science)' : 'វិទ្យាសាស្ត្រសង្គម (Social)') : `${currentTheme.shortLevel} (General)`}</span>
                 </span>
                 <span className="text-[10px] px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 font-black border border-amber-400/30">
                   +500 XP
