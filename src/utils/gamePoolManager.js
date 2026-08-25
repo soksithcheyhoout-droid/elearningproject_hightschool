@@ -1,5 +1,6 @@
 import { playgroundGamesData } from '../data/playgroundGamesData';
 import { quizData } from '../data/quizData';
+import { arenaMasterQuestionBank } from '../data/arenaMasterQuestionBank';
 
 /**
  * Fisher-Yates Shuffle array in-place and return new copy
@@ -38,23 +39,58 @@ export function shuffleQuestionOptions(question) {
 
 /**
  * Generate a randomized pool of unique questions for a game session
+ * @param {Object} game - Game metadata
+ * @param {number} count - Number of questions to return
+ * @param {string|number} grade - Grade level '1' to '12'
+ * @param {string} stream - 'science' | 'social' | 'general'
  */
-export function getRandomizedGameQuestions(game, count = 6) {
+export function getRandomizedGameQuestions(game, count = 20, grade = '12', stream = 'science') {
   let pool = [];
+  const targetGrade = String(grade || game?.grade || '12');
+  const isHighSchoolTrack = targetGrade === '11' || targetGrade === '12';
+  const targetStream = isHighSchoolTrack ? (stream || game?.stream || 'science') : 'general';
 
-  // 1. Gather all questions from the same subject / stream from playgroundGamesData
-  if (game?.subjectKey) {
-    const matchingGames = playgroundGamesData.filter(
-      (g) => g.subjectKey === game.subjectKey || g.stream === game.stream
-    );
-    matchingGames.forEach((g) => {
-      if (Array.isArray(g.questions)) {
-        pool.push(...g.questions);
+  // 1. Harvest from arenaMasterQuestionBank by Grade & Stream
+  if (Array.isArray(arenaMasterQuestionBank)) {
+    arenaMasterQuestionBank.forEach((item) => {
+      if (!item || !item.q) return;
+
+      if (isHighSchoolTrack) {
+        // For Grade 11-12: Must match exact grade and chosen stream
+        if (item.grade === targetGrade && item.stream === targetStream) {
+          pool.push(item);
+        } else if (item.stream === targetStream) {
+          // Secondary fallback from matching stream
+          pool.push(item);
+        }
+      } else {
+        // Under Grade 11 (Grades 1-10): Randomize both Science & Social
+        const itemGradeNum = parseInt(item.grade, 10);
+        const targetGradeNum = parseInt(targetGrade, 10);
+
+        if (item.grade === targetGrade) {
+          pool.push(item);
+        } else if (!isNaN(itemGradeNum) && !isNaN(targetGradeNum) && itemGradeNum <= 10) {
+          pool.push(item);
+        }
       }
     });
   }
 
-  // 2. Also harvest questions from quizData if available
+  // 2. Gather from playgroundGamesData by matching stream / subject
+  if (Array.isArray(playgroundGamesData)) {
+    playgroundGamesData.forEach((g) => {
+      if (isHighSchoolTrack) {
+        if (g.stream === targetStream || (game?.subjectKey && g.subjectKey === game.subjectKey)) {
+          if (Array.isArray(g.questions)) pool.push(...g.questions);
+        }
+      } else {
+        if (Array.isArray(g.questions)) pool.push(...g.questions);
+      }
+    });
+  }
+
+  // 3. Harvest from quizData
   if (Array.isArray(quizData)) {
     quizData.forEach((q) => {
       if (q && q.question && Array.isArray(q.options)) {
@@ -64,15 +100,6 @@ export function getRandomizedGameQuestions(game, count = 6) {
           answer: q.correctAnswer ?? 0,
           explanation: q.explanation || 'ចម្លើយត្រឹមត្រូវតាមកម្រងវិញ្ញាសា'
         });
-      }
-    });
-  }
-
-  // 3. Fallback to global playground pool if needed
-  if (pool.length < count) {
-    playgroundGamesData.forEach((g) => {
-      if (Array.isArray(g.questions)) {
-        pool.push(...g.questions);
       }
     });
   }

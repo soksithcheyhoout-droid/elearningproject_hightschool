@@ -391,11 +391,13 @@ export const api = {
   },
 
   // 7. Arena Real-Time Multiplayer Rooms
-  createArenaRoom: async (roomCode, gameId, subject, hostStudent, questions = []) => {
+  createArenaRoom: async (roomCode, gameId, subject, hostStudent, questions, grade = '12', stream = 'science') => {
     const roomState = {
       roomCode,
       gameId,
       subject,
+      grade,
+      stream,
       host: hostStudent,
       challenger: null,
       challengerReady: false,
@@ -416,7 +418,7 @@ export const api = {
       const res = await fetch(`${API_BASE}/arena/room/create`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ roomCode, gameId, subject, hostStudent, questions })
+        body: JSON.stringify({ roomCode, gameId, subject, hostStudent, questions, grade, stream })
       });
       return await res.json();
     } catch (err) {

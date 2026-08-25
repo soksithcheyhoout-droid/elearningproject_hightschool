@@ -21,7 +21,7 @@ setInterval(() => {
 
 export const createOrGetRoom = (req, res) => {
   try {
-    const { roomCode, gameId, subject, hostStudent, questions } = req.body;
+    const { roomCode, gameId, subject, hostStudent, questions, grade, stream } = req.body;
     if (!roomCode || !hostStudent) {
       return res.status(400).json({ error: 'Room code and host student are required' });
     }
@@ -32,6 +32,8 @@ export const createOrGetRoom = (req, res) => {
         roomCode,
         gameId: gameId || 'sci-m-01',
         subject: subject || 'គណិតវិទ្យា',
+        grade: grade || '12',
+        stream: stream || 'science',
         host: hostStudent,
         challenger: null,
         challengerReady: false,
@@ -54,11 +56,13 @@ export const createOrGetRoom = (req, res) => {
       };
       activeRooms.set(roomCode, room);
     } else {
-      // Keep host updated with latest profile data!
+      // Keep host and settings updated!
       if (hostStudent) {
         room.host = hostStudent;
       }
-      if ((!room.questions || room.questions.length === 0) && Array.isArray(questions) && questions.length > 0) {
+      if (grade) room.grade = grade;
+      if (stream) room.stream = stream;
+      if (Array.isArray(questions) && questions.length > 0) {
         room.questions = questions;
       }
       room.lastActive = Date.now();

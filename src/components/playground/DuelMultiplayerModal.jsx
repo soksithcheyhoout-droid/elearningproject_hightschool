@@ -36,7 +36,12 @@ import {
   Radio,
   Users,
   Building2,
-  LogIn
+  LogIn,
+  Atom,
+  BookOpen,
+  GraduationCap,
+  Award,
+  Layers
 } from 'lucide-react';
 import { useAuth, computeLevelData } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
@@ -207,8 +212,12 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     }
   }, [challengerPlayer]);
 
-  // Synchronized Questions Pool
-  const [questions, setQuestions] = useState(() => getRandomizedGameQuestions(game, 12));
+  // Grade and Stream Customization (Grades 1 to 12)
+  const [selectedGrade, setSelectedGrade] = useState(() => String(student?.grade || game?.grade || '12'));
+  const [selectedStream, setSelectedStream] = useState(() => (student?.stream || game?.stream || 'science'));
+
+  // Synchronized Questions Pool (Loaded by Grade and Stream with 24-question deep pool)
+  const [questions, setQuestions] = useState(() => getRandomizedGameQuestions(game, 24, student?.grade || '12', student?.stream || 'science'));
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [myScore, setMyScore] = useState(0);
   const [opponentScore, setOpponentScore] = useState(0);
@@ -269,6 +278,25 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     isHost: isHost
   };
 
+  // Grade & Stream Handlers for Host
+  const handleSelectGrade = (newGrade) => {
+    if (!isHost) return;
+    const gStr = String(newGrade);
+    setSelectedGrade(gStr);
+    const newStream = (gStr === '11' || gStr === '12') ? selectedStream : 'general';
+    const newPool = getRandomizedGameQuestions(game, 24, gStr, newStream);
+    setQuestions(newPool);
+    api.createArenaRoom(roomCode, game?.id || 'sci-m-01', game?.subject || 'គណិតវិទ្យា', currentStudentPayload, newPool, gStr, newStream);
+  };
+
+  const handleSelectStream = (newStream) => {
+    if (!isHost) return;
+    setSelectedStream(newStream);
+    const newPool = getRandomizedGameQuestions(game, 24, selectedGrade, newStream);
+    setQuestions(newPool);
+    api.createArenaRoom(roomCode, game?.id || 'sci-m-01', game?.subject || 'គណិតវិទ្យា', currentStudentPayload, newPool, selectedGrade, newStream);
+  };
+
   // Switch to next turn & question
   const handleSwitchToNextTurn = useCallback(async () => {
     clearTimeout(autoNextTimerRef.current);
@@ -289,7 +317,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     // Prepare next question
     let extra = [];
     if (currentQIndex + 1 >= questions.length) {
-      extra = getRandomizedGameQuestions(game, 10);
+      extra = getRandomizedGameQuestions(game, 15, selectedGrade, selectedStream);
       setQuestions((prev) => [...prev, ...extra]);
     }
 
@@ -446,16 +474,18 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
           if (res && res.success && res.room) {
             if (res.room.host) setHostPlayer(res.room.host);
             if (res.room.challenger) setChallengerPlayer(res.room.challenger);
+            if (res.room.grade) setSelectedGrade(String(res.room.grade));
+            if (res.room.stream) setSelectedStream(res.room.stream);
             if (Array.isArray(res.room.questions) && res.room.questions.length > 0) {
               setQuestions(res.room.questions);
             }
           }
         });
     } else if (isHost && student) {
-      const initialPool = getRandomizedGameQuestions(game, 12);
+      const initialPool = getRandomizedGameQuestions(game, 24, selectedGrade, selectedStream);
       setQuestions(initialPool);
 
-      api.createArenaRoom(roomCode, game?.id || 'sci-m-01', game?.subject || 'គណិតវិទ្យា', currentStudentPayload, initialPool)
+      api.createArenaRoom(roomCode, game?.id || 'sci-m-01', game?.subject || 'គណិតវិទ្យា', currentStudentPayload, initialPool, selectedGrade, selectedStream)
         .then((res) => {
           if (res && res.room && res.room.host) {
             setHostPlayer(res.room.host);
@@ -477,6 +507,9 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
         // Synchronize Host & Challenger
         if (!isHost && room.host) setHostPlayer(room.host);
+        if (!isHost && room.grade) setSelectedGrade(String(room.grade));
+        if (!isHost && room.stream) setSelectedStream(room.stream);
+
         if (room.challenger) {
           setChallengerPlayer(room.challenger);
           hostKickedRef.current = false; // New challenger joined — reset kick flag
@@ -959,8 +992,8 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                 <span className="text-[11px] font-bold text-indigo-400 uppercase tracking-wider flex items-center gap-1">
                   1v1 Arena • First to 6 Correct
                 </span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-slate-800 text-slate-300 font-semibold border border-slate-700">
-                  {game?.subject || 'វិទ្យាសាស្ត្រ'}
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-300 font-semibold border border-indigo-500/40">
+                  ថ្នាក់ទី {selectedGrade} • {selectedGrade >= 11 ? (selectedStream === 'science' ? 'វិទ្យាសាស្ត្រពិត' : 'វិទ្យាសាស្ត្រសង្គម') : 'ចំណេះទូទៅ'}
                 </span>
                 {isOvertime && (
                   <span className="text-[10px] px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/40 animate-pulse flex items-center gap-1">
@@ -1172,6 +1205,103 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             {tab === 'host' && (
               <div className="space-y-6 my-auto">
                 
+                {/* Grade & Stream Customization Box (Grades 1 to 12) */}
+                <div className="bg-[#0b1328]/95 p-4 sm:p-5 rounded-2xl border border-indigo-500/30 shadow-lg space-y-3.5">
+                  
+                  {/* Grade Selector (1 to 12) */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+                    <div className="flex items-center gap-2">
+                      <GraduationCap className="w-4 h-4 text-indigo-400" />
+                      <span className="text-xs font-bold text-slate-200">
+                        កម្រិតថ្នាក់សិក្សា (Grade Level):
+                      </span>
+                      <span className="text-xs font-black text-amber-300 bg-amber-400/10 px-2.5 py-0.5 rounded-lg border border-amber-400/20">
+                        ថ្នាក់ទី {selectedGrade}
+                      </span>
+                    </div>
+
+                    {/* Grade Pills */}
+                    <div className="flex items-center gap-1.5 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+                      {['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'].map((g) => (
+                        <button
+                          key={g}
+                          type="button"
+                          disabled={!isHost}
+                          onClick={() => handleSelectGrade(g)}
+                          className={`px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer flex-shrink-0 ${
+                            selectedGrade === g
+                              ? 'bg-gradient-to-r from-indigo-600 to-purple-600 text-white shadow-md shadow-indigo-600/30 border border-indigo-400/50 scale-105'
+                              : 'bg-slate-800/80 text-slate-400 hover:text-slate-200 hover:bg-slate-700 border border-slate-700/60'
+                          } ${!isHost ? 'opacity-70 cursor-not-allowed' : ''}`}
+                        >
+                          ទី {g}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+
+                  {/* Stream Track: Grade 11-12 Selection vs Under 11 General Foundation */}
+                  {(selectedGrade === '11' || selectedGrade === '12') ? (
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 pt-2 border-t border-slate-800">
+                      {/* Science Stream */}
+                      <button
+                        type="button"
+                        disabled={!isHost}
+                        onClick={() => handleSelectStream('science')}
+                        className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                          selectedStream === 'science'
+                            ? 'bg-gradient-to-r from-cyan-950/60 to-indigo-950/60 border-cyan-500/60 shadow-md shadow-cyan-950/40 ring-1 ring-cyan-500/40'
+                            : 'bg-[#080e1e] border-slate-800 hover:border-slate-700 opacity-70 hover:opacity-100'
+                        } ${!isHost ? 'opacity-70 cursor-not-allowed' : ''}`}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-lg bg-cyan-500/15 border border-cyan-500/30 text-cyan-400 flex items-center justify-center flex-shrink-0">
+                            <Atom className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-black text-white">ថ្នាក់វិទ្យាសាស្ត្រពិត (Natural Science)</h5>
+                            <p className="text-[10px] text-slate-400">គណិតវិទ្យា, រូបវិទ្យា, គីមីវិទ្យា, ជីវវិទ្យា</p>
+                          </div>
+                        </div>
+                        {selectedStream === 'science' && <CheckCircle2 className="w-4 h-4 text-cyan-400 flex-shrink-0" />}
+                      </button>
+
+                      {/* Social Stream */}
+                      <button
+                        type="button"
+                        disabled={!isHost}
+                        onClick={() => handleSelectStream('social')}
+                        className={`p-3 rounded-xl border text-left transition-all cursor-pointer flex items-center justify-between gap-3 ${
+                          selectedStream === 'social'
+                            ? 'bg-gradient-to-r from-amber-950/60 to-purple-950/60 border-amber-500/60 shadow-md shadow-amber-950/40 ring-1 ring-amber-500/40'
+                            : 'bg-[#080e1e] border-slate-800 hover:border-slate-700 opacity-70 hover:opacity-100'
+                        } ${!isHost ? 'opacity-70 cursor-not-allowed' : ''}`}
+                      >
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-8 h-8 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center flex-shrink-0">
+                            <BookOpen className="w-4 h-4" />
+                          </div>
+                          <div>
+                            <h5 className="text-xs font-black text-white">ថ្នាក់វិទ្យាសាស្ត្រសង្គម (Social Science)</h5>
+                            <p className="text-[10px] text-slate-400">ភាសាខ្មែរ, ប្រវត្តិវិទ្យា, ភូមិវិទ្យា, ពលរដ្ឋ</p>
+                          </div>
+                        </div>
+                        {selectedStream === 'social' && <CheckCircle2 className="w-4 h-4 text-amber-400 flex-shrink-0" />}
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="pt-2 border-t border-slate-800 flex items-center justify-between gap-2 text-xs">
+                      <div className="flex items-center gap-2 text-emerald-300">
+                        <Sparkles className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="font-semibold">ថ្នាក់មូលដ្ឋានទូទៅ (General Foundation)</span>
+                      </div>
+                      <span className="text-[10px] text-slate-400">
+                        សំណួរចម្រុះវិទ្យាសាស្ត្រពិត & វិទ្យាសាស្ត្រសង្គម (Science & Social)
+                      </span>
+                    </div>
+                  )}
+                </div>
+
                 {/* 2-Player Modern Matchup Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-11 gap-4 sm:gap-6 items-stretch relative">
                   
@@ -1448,85 +1578,94 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
           <div className="p-4 sm:p-8 md:p-10 flex-1 flex flex-col justify-center items-center text-center space-y-6 sm:space-y-8 animate-fade-in my-auto relative overflow-hidden">
             
             {/* Background Battle Beams */}
-            <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-cyan-500/15 rounded-full blur-[90px] pointer-events-none" />
-            <div className="absolute top-1/2 right-1/4 translate-x-1/2 -translate-y-1/2 w-72 h-72 bg-rose-500/15 rounded-full blur-[90px] pointer-events-none" />
+            <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-cyan-500/10 rounded-full blur-[100px] pointer-events-none" />
+            <div className="absolute top-1/2 right-1/4 translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-rose-500/10 rounded-full blur-[100px] pointer-events-none" />
 
             {/* Top Match Title Ribbon */}
-            <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-gradient-to-r from-indigo-950/90 via-purple-950/90 to-indigo-950/90 border border-indigo-500/40 shadow-lg shadow-indigo-950/50">
-              <Swords className="w-3.5 h-3.5 text-indigo-300 animate-pulse" />
-              <span className="text-[11px] sm:text-xs font-black uppercase tracking-widest text-indigo-200">
-                1v1 Duel Arena • First to 6 Correct Wins
-              </span>
-              <span className="text-[10px] px-2 py-0.2 rounded-full bg-amber-500/20 text-amber-300 font-bold border border-amber-400/30">
-                +500 XP
-              </span>
+            <div className="inline-flex flex-col sm:flex-row items-center gap-2 px-5 py-2 rounded-2xl bg-gradient-to-r from-[#0b1328] via-[#151336] to-[#0b1328] border border-indigo-500/40 shadow-xl">
+              <div className="flex items-center gap-2">
+                <Swords className="w-4 h-4 text-indigo-400 animate-pulse" />
+                <span className="text-xs font-black uppercase tracking-wider text-indigo-200">
+                  1v1 DUEL ARENA • ថ្នាក់ទី {selectedGrade}
+                </span>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[11px] px-2.5 py-0.5 rounded-lg bg-indigo-500/20 text-indigo-300 font-bold border border-indigo-400/30">
+                  {selectedGrade >= 11 ? (selectedStream === 'science' ? 'វិទ្យាសាស្ត្រពិត (Science)' : 'វិទ្យាសាស្ត្រសង្គម (Social)') : 'ចំណេះទូទៅ (General)'}
+                </span>
+                <span className="text-[10px] px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 font-black border border-amber-400/30">
+                  +500 XP
+                </span>
+              </div>
             </div>
 
             {/* 3-Column VS Arena Stage */}
-            <div className="grid grid-cols-1 md:grid-cols-11 gap-4 sm:gap-6 items-center w-full max-w-3xl relative z-10">
+            <div className="grid grid-cols-1 md:grid-cols-11 gap-4 sm:gap-6 items-center w-full max-w-4xl relative z-10">
               
-              {/* Host Hero Card (Left) */}
-              <div className="md:col-span-4 bg-gradient-to-b from-[#0f1d3d]/90 to-[#080f24]/90 p-5 sm:p-6 rounded-3xl border border-cyan-500/40 shadow-2xl shadow-cyan-950/40 relative flex flex-col items-center text-center group">
-                <div className="w-full flex items-center justify-between pb-2.5 mb-2 border-b border-cyan-500/20">
-                  <span className="text-[11px] font-bold text-cyan-300 flex items-center gap-1">
-                    <Crown className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                    HOST
+              {/* Host Hero Card (Left, Blue/Cyan Corner) */}
+              <div className="md:col-span-4 bg-gradient-to-b from-[#0e1d3e]/95 to-[#081024]/95 p-6 rounded-3xl border-2 border-cyan-500/40 shadow-2xl shadow-cyan-950/50 relative flex flex-col items-center text-center">
+                <div className="w-full flex items-center justify-between pb-3 mb-3 border-b border-cyan-500/20">
+                  <span className="text-xs font-black text-cyan-300 flex items-center gap-1.5 uppercase tracking-wider">
+                    <Crown className="w-4 h-4 text-amber-400 fill-amber-400" />
+                    BLUE CORNER
                   </span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40 flex items-center gap-1">
-                    <Check className="w-3 h-3 text-emerald-400" /> READY
+                  <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-black border border-emerald-500/40 flex items-center gap-1">
+                    <Check className="w-3.5 h-3.5 text-emerald-400" /> READY
                   </span>
                 </div>
 
-                <div className="relative my-2">
-                  <div className="absolute inset-0 rounded-full bg-cyan-500/20 blur-md animate-pulse" />
+                <div className="relative my-3">
+                  <div className="absolute inset-0 rounded-full bg-cyan-500/20 blur-lg animate-pulse" />
                   <PlayerAvatarWithFrame
                     avatar={hostPlayer?.avatar}
                     frame={hostPlayer?.avatarFrame || hostPlayer?.avatar_frame}
                     name={hostPlayer?.name}
                     size="xl"
-                    className="scale-105 drop-shadow-xl relative z-10"
+                    className="scale-110 drop-shadow-2xl relative z-10"
                   />
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 border border-cyan-300 text-[10px] font-black text-white shadow-md z-20 whitespace-nowrap">
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 border border-cyan-300 text-[11px] font-black text-white shadow-lg z-20 whitespace-nowrap">
                     Lv.{hostPlayer?.level || 1}
                   </div>
                 </div>
 
-                <h3 className="text-base sm:text-lg font-black text-white tracking-tight truncate max-w-[200px] mt-2">
+                <h3 className="text-base sm:text-lg font-black text-white tracking-tight truncate max-w-[220px] mt-2">
                   {hostPlayer?.name || 'សុខ វិបុល'}
                 </h3>
-                <p className="text-xs text-slate-300 font-medium flex items-center gap-1 mt-0.5 truncate max-w-[200px]">
+                <p className="text-xs text-slate-300 font-medium flex items-center gap-1.5 mt-1 truncate max-w-[220px]">
                   <Building2 className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
                   <span className="truncate">{hostPlayer?.school || 'វិទ្យាល័យជាតិ'}</span>
                 </p>
 
-                <div className="mt-2.5 flex items-center gap-1.5">
-                  <span className="px-2.5 py-0.5 rounded-lg bg-cyan-500/10 text-cyan-300 border border-cyan-400/20 text-[10px] font-bold font-mono">
+                <div className="mt-3.5 w-full pt-3 border-t border-cyan-500/20 flex items-center justify-between text-xs">
+                  <span className="text-slate-400 font-semibold">សមត្ថភាព (XP):</span>
+                  <span className="font-mono font-black text-cyan-300 text-sm">
                     {(hostPlayer?.xp || 500).toLocaleString()} XP
                   </span>
                 </div>
               </div>
 
-              {/* Center VS & 3-2-1 Countdown HUD */}
+              {/* Center VS & Holographic Digital Countdown Radar */}
               <div className="md:col-span-3 flex flex-col items-center justify-center py-2 relative">
                 
                 {/* 3-2-1 Digital Countdown Sphere */}
-                <div className="relative my-2">
-                  {/* Rotating Neon Glow Ring */}
-                  <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full border-2 border-dashed border-indigo-500/60 animate-spin flex items-center justify-center pointer-events-none" style={{ animationDuration: '8s' }} />
+                <div className="relative my-3">
+                  {/* Rotating Neon Glow Rings */}
+                  <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-2 border-dashed border-indigo-400/50 animate-spin flex items-center justify-center pointer-events-none" style={{ animationDuration: '6s' }} />
+                  <div className="absolute inset-2 rounded-full border border-cyan-400/30 animate-pulse pointer-events-none" />
                   
                   {/* Countdown Center Circle */}
-                  <div className={`absolute inset-1.5 rounded-full flex flex-col items-center justify-center shadow-2xl backdrop-blur-md transition-all duration-300 ${
+                  <div className={`absolute inset-3 rounded-full flex flex-col items-center justify-center shadow-2xl backdrop-blur-md transition-all duration-300 ${
                     countdownNum === 'START!'
-                      ? 'bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 border-2 border-emerald-300 shadow-[0_0_35px_rgba(16,185,129,0.8)] scale-110'
+                      ? 'bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 border-2 border-emerald-300 shadow-[0_0_40px_rgba(16,185,129,0.9)] scale-110'
                       : countdownNum === 1
-                        ? 'bg-gradient-to-br from-pink-600 to-rose-700 border-2 border-pink-300 shadow-[0_0_30px_rgba(244,63,94,0.7)] scale-105'
+                        ? 'bg-gradient-to-br from-pink-600 to-rose-700 border-2 border-pink-300 shadow-[0_0_35px_rgba(244,63,94,0.8)] scale-105'
                         : countdownNum === 2
-                          ? 'bg-gradient-to-br from-cyan-600 to-blue-700 border-2 border-cyan-300 shadow-[0_0_30px_rgba(6,182,212,0.7)] scale-105'
-                          : 'bg-gradient-to-br from-amber-500 to-orange-600 border-2 border-amber-300 shadow-[0_0_30px_rgba(245,158,11,0.7)] scale-105'
+                          ? 'bg-gradient-to-br from-cyan-600 to-blue-700 border-2 border-cyan-300 shadow-[0_0_35px_rgba(6,182,212,0.8)] scale-105'
+                          : 'bg-gradient-to-br from-indigo-600 to-purple-700 border-2 border-indigo-300 shadow-[0_0_35px_rgba(99,102,241,0.8)] scale-105'
                   }`}>
                     {countdownNum === 'START!' ? (
                       <div className="flex flex-col items-center animate-bounce">
-                        <Flame className="w-6 h-6 text-amber-200 fill-amber-200" />
+                        <Swords className="w-6 h-6 text-white mb-1" />
                         <span className="font-black text-sm sm:text-base text-white tracking-wider font-mono">
                           START!
                         </span>
@@ -1541,48 +1680,49 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
                 {/* Subtitle Status */}
                 <div className="mt-2">
-                  <span className="text-[11px] sm:text-xs font-bold tracking-wider text-amber-300 animate-pulse">
-                    {countdownNum === 'START!' ? 'ចាប់ផ្តើមការប្រកួត (Match Start)' : countdownNum === 1 ? 'ត្រៀមប្រកួត (Get Ready)' : countdownNum === 2 ? 'ផ្ចង់អារម្មណ៍ (Focus)' : 'ត្រៀមខ្លួន (Ready)'}
+                  <span className="text-xs sm:text-sm font-black tracking-wider text-indigo-300">
+                    {countdownNum === 'START!' ? 'ការប្រកួតចាប់ផ្តើម!' : countdownNum === 1 ? 'ត្រៀមប្រកួត (Get Ready)' : countdownNum === 2 ? 'ផ្ចង់អារម្មណ៍ (Focus)' : 'ត្រៀមខ្លួន (Ready)'}
                   </span>
                 </div>
               </div>
 
-              {/* Challenger Hero Card (Right) */}
-              <div className="md:col-span-4 bg-gradient-to-b from-[#2e1026]/90 to-[#170815]/90 p-5 sm:p-6 rounded-3xl border border-rose-500/40 shadow-2xl shadow-rose-950/40 relative flex flex-col items-center text-center group">
-                <div className="w-full flex items-center justify-between pb-2.5 mb-2 border-b border-rose-500/20">
-                  <span className="text-[11px] font-bold text-rose-300 flex items-center gap-1">
-                    <Swords className="w-3.5 h-3.5 text-rose-400" />
-                    CHALLENGER
+              {/* Challenger Hero Card (Right, Crimson Corner) */}
+              <div className="md:col-span-4 bg-gradient-to-b from-[#341124]/95 to-[#1c0813]/95 p-6 rounded-3xl border-2 border-rose-500/40 shadow-2xl shadow-rose-950/50 relative flex flex-col items-center text-center">
+                <div className="w-full flex items-center justify-between pb-3 mb-3 border-b border-rose-500/20">
+                  <span className="text-xs font-black text-rose-300 flex items-center gap-1.5 uppercase tracking-wider">
+                    <Swords className="w-4 h-4 text-rose-400" />
+                    RED CORNER
                   </span>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-bold border border-emerald-500/40 flex items-center gap-1">
-                    <Check className="w-3 h-3 text-emerald-400" /> READY
+                  <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-black border border-emerald-500/40 flex items-center gap-1">
+                    <Check className="w-3.5 h-3.5 text-emerald-400" /> READY
                   </span>
                 </div>
 
-                <div className="relative my-2">
-                  <div className="absolute inset-0 rounded-full bg-rose-500/20 blur-md animate-pulse" />
+                <div className="relative my-3">
+                  <div className="absolute inset-0 rounded-full bg-rose-500/20 blur-lg animate-pulse" />
                   <PlayerAvatarWithFrame
                     avatar={challengerPlayer?.avatar}
                     frame={challengerPlayer?.avatarFrame || challengerPlayer?.avatar_frame}
                     name={challengerPlayer?.name}
                     size="xl"
-                    className="scale-105 drop-shadow-xl relative z-10"
+                    className="scale-110 drop-shadow-2xl relative z-10"
                   />
-                  <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-rose-600 to-pink-600 border border-rose-300 text-[10px] font-black text-white shadow-md z-20 whitespace-nowrap">
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-gradient-to-r from-rose-600 to-pink-600 border border-rose-300 text-[11px] font-black text-white shadow-lg z-20 whitespace-nowrap">
                     Lv.{challengerPlayer?.level || 1}
                   </div>
                 </div>
 
-                <h3 className="text-base sm:text-lg font-black text-white tracking-tight truncate max-w-[200px] mt-2">
+                <h3 className="text-base sm:text-lg font-black text-white tracking-tight truncate max-w-[220px] mt-2">
                   {challengerPlayer?.name || 'គូប្រជែង'}
                 </h3>
-                <p className="text-xs text-slate-300 font-medium flex items-center gap-1 mt-0.5 truncate max-w-[200px]">
+                <p className="text-xs text-slate-300 font-medium flex items-center gap-1.5 mt-1 truncate max-w-[220px]">
                   <Building2 className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
                   <span className="truncate">{challengerPlayer?.school || 'វិទ្យាល័យ'}</span>
                 </p>
 
-                <div className="mt-2.5 flex items-center gap-1.5">
-                  <span className="px-2.5 py-0.5 rounded-lg bg-rose-500/10 text-rose-300 border border-rose-400/20 text-[10px] font-bold font-mono">
+                <div className="mt-3.5 w-full pt-3 border-t border-rose-500/20 flex items-center justify-between text-xs">
+                  <span className="text-slate-400 font-semibold">សមត្ថភាព (XP):</span>
+                  <span className="font-mono font-black text-rose-300 text-sm">
                     {(challengerPlayer?.xp || 500).toLocaleString()} XP
                   </span>
                 </div>
@@ -1590,9 +1730,9 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
             </div>
 
-            {/* Bottom Tip */}
+            {/* Bottom Target Goal */}
             <p className="text-xs text-slate-400 font-medium">
-              ឆ្លើយឱ្យបានត្រឹមត្រូវ ៦ សំណួរមុនគេដើម្បីទទួលជ័យជម្នះ
+              ឆ្លើយឱ្យបានត្រឹមត្រូវ ៦ សំណួរមុនគេដើម្បីទទួលជ័យជម្នះ (First to 6 Correct Points Wins)
             </p>
           </div>
         )}
