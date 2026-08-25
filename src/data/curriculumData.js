@@ -13,15 +13,15 @@ export const curriculumData = [
     icon: 'Calculator',
     color: '#005baa',
     cardClass: 'subject-card-math',
-    teacher: 'ក្រុមការងារបច្ចេកទេស MoTDAR',
-    teacherRole: 'ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ និងការស្រាវជ្រាវកម្រិតខ្ពស់',
+    teacher: 'សាស្ត្រាចារ្យ គណិតវិទ្យាថ្នាក់ជាតិ',
+    teacherRole: 'នាយកដ្ឋានអភិវឌ្ឍន៍កម្មវិធីសិក្សា MoEYS & MoTDAR',
     progress: 75,
     totalChapters: 6,
     totalLessons: 24,
     quizzesCount: 12,
     bannerImg: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=1200&q=80',
-    descriptionKm: 'កម្មវិធីសិក្សាគណិតវិទ្យាផ្លូវការថ្នាក់ទី១២ ស្របតាមក្របខ័ណ្ឌជាតិ ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ និងការស្រាវជ្រាវកម្រិតខ្ពស់ (MoTDAR) ផ្តោតលើលីមីត ដេរីវេ អាំងតេក្រាល ចំនួនកុំផ្លិច ធរណីមាត្រក្នុងលំហ និងប្រូបាប៊ីលីតេ។',
-    descriptionEn: 'Official MoTDAR Grade 12 Mathematics curriculum covering limits, derivatives, integrals, complex numbers, space geometry vectors, and probability.',
+    descriptionKm: 'កម្មវិធីសិក្សាគណិតវិទ្យាផ្លូវការថ្នាក់ទី១២ ស្របតាមក្របខ័ណ្ឌជាតិ MoEYS & MoTDAR ផ្តោតលើលីមីត ដេរីវេ អាំងតេក្រាល ចំនួនកុំផ្លិច ធរណីមាត្រក្នុងលំហ និងប្រូបាប៊ីលីតេ។',
+    descriptionEn: 'Official Grade 12 Mathematics curriculum covering limits, derivatives, integrals, complex numbers, space geometry vectors, and probability.',
     chapters: [
       {
         id: 'math-ch1',
@@ -33,6 +33,7 @@ export const curriculumData = [
             titleKm: 'មេរៀនទី ១៖ លីមីតនៃអនុគមន៍ត្រង់ចំណុច និងរាងមិនកំណត់ [0/0]',
             titleEn: 'Lesson 1: Limits at a Point & Indeterminate Form [0/0]',
             duration: '26:40',
+            videoUrl: 'https://www.youtube-nocookie.com/embed/n4p_q00a58o',
             videoPoster: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=800&q=80',
             notes: `
 **ខ្លឹមសារសង្ខេបមេរៀនទី ១ (MoTDAR Standard):**
@@ -60,6 +61,33 @@ export const curriculumData = [
               'lim (x → 0) [sin(x) / x] = 1',
               'lim (x → 0) [1 - cos(x)] / x² = 1/2'
             ]
+          },
+          {
+            id: 'm12-l2',
+            titleKm: 'មេរៀនទី ២៖ ដេរីវេ និងការសិក្សាអថេរភាពអនុគមន៍',
+            titleEn: 'Lesson 2: Derivatives & Curve Sketching',
+            duration: '28:15',
+            videoUrl: 'https://www.youtube-nocookie.com/embed/WJ6U9sE_FhI',
+            videoPoster: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&w=800&q=80',
+            notes: 'សិក្សារូបមន្តដេរីវេនៃអនុគមន៍ពហុធា សនិទាន អ៊ិចស្បូណង់ស្យែល និងលោការីតធម្មជាតិ។',
+            keyFormulas: [
+              '(x^n)\' = n*x^(n-1)',
+              '(e^x)\' = e^x, (ln x)\' = 1/x',
+              '(u/v)\' = (u\'v - uv\') / v²'
+            ]
+          },
+          {
+            id: 'm12-l3',
+            titleKm: 'មេរៀនទី ៣៖ ព្រីមីទីវ និងអាំងតេក្រាលដោយផ្នែក',
+            titleEn: 'Lesson 3: Integration by Parts & Applications',
+            duration: '31:20',
+            videoUrl: 'https://www.youtube-nocookie.com/embed/Q0FmF4oUu30',
+            videoPoster: 'https://images.unsplash.com/photo-1635070041078-e363dbe005cb?auto=format&fit=crop&w=800&q=80',
+            notes: 'រូបមន្តអាំងតេក្រាលដោយផ្នែក៖ ∫ u dv = uv - ∫ v du សម្រាប់គណនាផ្ទៃក្រឡា និងមាឌសូលីដ។',
+            keyFormulas: [
+              '∫ u dv = uv - ∫ v du',
+              '∫ (ax + b)^n dx = (ax + b)^(n+1) / [a(n+1)] + C'
+            ]
           }
         ]
       }
@@ -76,7 +104,7 @@ export const curriculumData = [
     icon: 'Atom',
     color: '#0284c7',
     cardClass: 'subject-card-physics',
-    teacher: 'សាស្ត្រាចារ្យ អ៊ុំ សុវណ្ណារិទ្ធ (គ្រូឧទ្ទេសរូបវិទ្យា)',
+    teacher: 'សាស្ត្រាចារ្យ រូបវិទ្យាថ្នាក់ជាតិ',
     teacherRole: 'សមាជិកគណៈកម្មការតាក់តែងវិញ្ញាសារូបវិទ្យាបាក់ឌុប',
     progress: 60,
     totalChapters: 5,
@@ -96,6 +124,7 @@ export const curriculumData = [
             titleKm: 'មេរៀនទី ១៖ សមីការឌីផេរ៉ង់ស្យែលនៃចលនាលំយោល និងប៉ោលបត់បែន',
             titleEn: 'Lesson 1: Differential Equations & Spring Pendulums',
             duration: '29:40',
+            videoUrl: 'https://www.youtube-nocookie.com/embed/jZ_y-88cT8A',
             videoPoster: 'https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?auto=format&fit=crop&w=800&q=80',
             notes: `
 **ច្បាប់ចលនាលំយោល៖**
@@ -109,6 +138,20 @@ export const curriculumData = [
               'x(t) = Xm · cos(ω₀t + φ)',
               'T = 2π √(m / k) (Spring Pendulum)',
               'Em = 1/2 k Xm²'
+            ]
+          },
+          {
+            id: 'p12-l2',
+            titleKm: 'មេរៀនទី ២៖ សៀគ្វីចរន្តឆ្លាស់ RLC និងរេសូណង់អគ្គិសនី',
+            titleEn: 'Lesson 2: RLC Alternating Current Circuits',
+            duration: '27:10',
+            videoUrl: 'https://www.youtube-nocookie.com/embed/yVb8QWpG89w',
+            videoPoster: 'https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?auto=format&fit=crop&w=800&q=80',
+            notes: 'សិក្សាពីអាំងប៉េដង់ Z = √[R² + (ZL - ZC)²] និងអនុភាពអគ្គិសនី P = UI cos(φ)។',
+            keyFormulas: [
+              'ZL = L*ω, ZC = 1/(C*ω)',
+              'Z = √[R² + (ZL - ZC)²]',
+              'cos(φ) = R / Z'
             ]
           }
         ]
@@ -126,7 +169,7 @@ export const curriculumData = [
     icon: 'FlaskConical',
     color: '#059669',
     cardClass: 'subject-card-chemistry',
-    teacher: 'សាស្ត្រាចារ្យ គង់ គីមសាន (គ្រូឧទ្ទេសគីមីវិទ្យា)',
+    teacher: 'សាស្ត្រាចារ្យ គីមីវិទ្យាថ្នាក់ជាតិ',
     teacherRole: 'អ្នកជំនាញកម្មវិធីសិក្សាគីមីវិទ្យាវិទ្យាល័យ',
     progress: 80,
     totalChapters: 4,
@@ -146,6 +189,7 @@ export const curriculumData = [
             titleKm: 'មេរៀនទី ១៖ ល្បឿនមធ្យម និងល្បឿនខណៈនៃប្រតិកម្មគីមី',
             titleEn: 'Lesson 1: Average & Instantaneous Reaction Rates',
             duration: '24:50',
+            videoUrl: 'https://www.youtube-nocookie.com/embed/i_yJ0nK9V0o',
             videoPoster: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80',
             notes: `
 **ស៊ីនេទិចគីមី៖**
@@ -157,6 +201,20 @@ export const curriculumData = [
             keyFormulas: [
               'Vm(formation) = Δ[Product] / Δt',
               'pH = -log[H₃O⁺], [H₃O⁺] = 10^(-pH)'
+            ]
+          },
+          {
+            id: 'c12-l2',
+            titleKm: 'មេរៀនទី ២៖ អាស៊ីត-បាស និងការគណនាតម្លៃ pH',
+            titleEn: 'Lesson 2: Acid-Base & pH Calculations',
+            duration: '26:45',
+            videoUrl: 'https://www.youtube-nocookie.com/embed/kIuK7fE6g4s',
+            videoPoster: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80',
+            notes: 'សិក្សាពីទ្រឹស្តី Bronsted-Lowry ថេរ Ka, Kb, ផលគុណអ៊ីយ៉ុងនៃទឹក Ke, និងសូលុយស្យុងទ្រនាប់។',
+            keyFormulas: [
+              'pH = -log[H3O+]',
+              'pH + pOH = 14',
+              'Ka × Kb = Ke = 10^-14'
             ]
           }
         ]
@@ -174,7 +232,7 @@ export const curriculumData = [
     icon: 'Dna',
     color: '#10b981',
     cardClass: 'subject-card-biology',
-    teacher: 'សាស្ត្រាចារ្យ ចាន់ សារ៉េត (MoTDAR Educator)',
+    teacher: 'សាស្ត្រាចារ្យ ជីវវិទ្យាថ្នាក់ជាតិ',
     teacherRole: 'អ្នករៀបចំលំហាត់ជីវវិទ្យាប្រឡងថ្នាក់ជាតិ',
     progress: 70,
     totalChapters: 4,
@@ -194,6 +252,7 @@ export const curriculumData = [
             titleKm: 'មេរៀនទី ១៖ រចនាសម្ព័ន្ធម៉ូលេគុល ADN និងរូបមន្តគណនាចំនួននុយក្លេអូទីត',
             titleEn: 'Lesson 1: DNA Structure & Nucleotide Calculation Rules',
             duration: '27:30',
+            videoUrl: 'https://www.youtube-nocookie.com/embed/8kK2zwjRV0M',
             videoPoster: 'https://images.unsplash.com/photo-1530026405186-ed1f139313f8?auto=format&fit=crop&w=800&q=80',
             notes: `
 **រូបមន្តគណនា ADN ថ្នាក់ទី១២ MoTDAR៖**
@@ -206,6 +265,19 @@ export const curriculumData = [
               'N = 2A + 2G = 2(A + C)',
               'L = (N / 2) × 3.4 Å',
               'H = 2A + 3G'
+            ]
+          },
+          {
+            id: 'b12-l2',
+            titleKm: 'មេរៀនទី ២៖ តំណពូជម៉ង់ដែល និងការបង្កាត់ពូជ',
+            titleEn: 'Lesson 2: Mendelian Genetics & Crosses',
+            duration: '25:20',
+            videoUrl: 'https://www.youtube-nocookie.com/embed/Mehz7tCxjSE',
+            videoPoster: 'https://images.unsplash.com/photo-1530026405186-ed1f139313f8?auto=format&fit=crop&w=800&q=80',
+            notes: 'ច្បាប់ឯកសណ្ឋានភាព F1, ច្បាប់បំបែកលក្ខណៈ F2 (3:1), និងច្បាប់បន្សំឯករាជ្យនៃគូសេន (9:3:3:1)។',
+            keyFormulas: [
+              'Monohybrid F2: 3:1 (Phenotype), 1:2:1 (Genotype)',
+              'Dihybrid F2: 9:3:3:1'
             ]
           }
         ]
@@ -223,7 +295,7 @@ export const curriculumData = [
     icon: 'Compass',
     color: '#0891b2',
     cardClass: 'subject-card-physics',
-    teacher: 'សាស្ត្រាចារ្យ ស៊ុំ សុជាតិ (អ្នកឯកទេសបរិស្ថាន)',
+    teacher: 'សាស្ត្រាចារ្យ បរិស្ថានវិទ្យាថ្នាក់ជាតិ',
     teacherRole: 'គ្រូឧទ្ទេសភូគព្ភវិទ្យា និងអាកាសធាតុ MoTDAR',
     progress: 65,
     totalChapters: 4,
@@ -243,6 +315,7 @@ export const curriculumData = [
             titleKm: 'មេរៀនទី ១៖ ចលនានៃប្លាកតិចតូនិច និងការកកើតភ្នំភ្លើង',
             titleEn: 'Lesson 1: Plate Movements and Volcanic Formations',
             duration: '25:10',
+            videoUrl: 'https://www.youtube-nocookie.com/embed/d5_3R8q1w1g',
             videoPoster: 'https://images.unsplash.com/photo-1507525428034-b723cf961d3e?auto=format&fit=crop&w=800&q=80',
             notes: 'សិក្សាពីរចនាសម្ព័ន្ធស្រទាប់ផែនដី សម្ពាធ និងចលនានៃប្លាកទ្វីប។',
             keyFormulas: ['E = 10^(11.8 + 1.5M) (Earthquake Energy)']
@@ -282,6 +355,7 @@ export const curriculumData = [
             titleKm: 'មេរៀនទី ១៖ អថេរ លក្ខខណ្ឌ និងរង្វិលជុំក្នុង Python (Variables & Loops)',
             titleEn: 'Lesson 1: Python Variables, Conditionals, and Loops',
             duration: '22:15',
+            videoUrl: 'https://www.youtube-nocookie.com/embed/kqtD5dpn9C8',
             videoPoster: 'https://images.unsplash.com/photo-1526374965328-7f61d4dc18c5?auto=format&fit=crop&w=800&q=80',
             notes: 'រៀនសរសេរកូដ Python សម័យទំនើបសម្រាប់ដោះស្រាយលំហាត់គណិតវិទ្យា។',
             keyFormulas: ['def solve_quadratic(a, b, c): return (-b ± √(b² - 4ac)) / (2a)']
@@ -295,52 +369,7 @@ export const curriculumData = [
   // 📜 ថ្នាក់វិទ្យាសាស្ត្រសង្គម (SOCIAL SCIENCE STREAM)
   // ==========================================
 
-  // 7. Applied Mathematics for Social Science (Grade 12)
-  {
-    id: 'math-social-12',
-    grade: '12',
-    stream: 'social',
-    nameKm: 'គណិតវិទ្យា ថ្នាក់វិទ្យាសាស្ត្រសង្គម (ស្ថិតិ & ប្រូបាប)',
-    nameEn: 'Applied Mathematics Grade 12 (Social Sciences)',
-    icon: 'Calculator',
-    color: '#0284c7',
-    cardClass: 'subject-card-math',
-    teacher: 'សាស្ត្រាចារ្យ គង់ សុជាតិ (MoTDAR Educator)',
-    teacherRole: 'អ្នកជំនាញគណិតវិទ្យាអនុវត្ត និងស្ថិតិវិទ្យា MoTDAR',
-    progress: 80,
-    totalChapters: 4,
-    totalLessons: 16,
-    quizzesCount: 8,
-    bannerImg: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&w=1200&q=80',
-    descriptionKm: 'កម្មវិធីសិក្សាគណិតវិទ្យាផ្លូវការសម្រាប់ថ្នាក់វិទ្យាសាស្ត្រសង្គម ផ្តោតលើប្រូបាប៊ីលីតេ បន្សំ ស្ថិតិវិទ្យា ការវិភាគទិន្នន័យ និងគណិតវិទ្យាហិរញ្ញវត្ថុ។',
-    descriptionEn: 'Grade 12 Applied Mathematics for Social Science covering probability, combinatorics, statistics, regression, and financial calculations.',
-    chapters: [
-      {
-        id: 'math-soc-ch1',
-        titleKm: 'ជំពូកទី ១៖ ប្រូបាប៊ីលីតេ និងបន្សំ (Probability & Combinatorics)',
-        titleEn: 'Chapter 1: Probability and Combinatorics',
-        lessons: [
-          {
-            id: 'ms12-l1',
-            titleKm: 'មេរៀនទី ១៖ បន្សំ ចម្លាស់ និងការគណនាប្រូបាប៊ីលីតេព្រឹត្តិការណ៍',
-            titleEn: 'Lesson 1: Combinations, Permutations & Event Probability',
-            duration: '28:30',
-            videoPoster: 'https://images.unsplash.com/photo-1509228468518-180dd4864904?auto=format&fit=crop&w=800&q=80',
-            notes: `
-**រូបមន្តគ្រឹះគណិតវិទ្យាសង្គមបាក់ឌុប MoTDAR៖**
-១. បន្សំ n ធាតុយកម្តង r ធាតុ៖ C(n, r) = n! / [r! (n - r)!]
-២. ចម្លាស់ n ធាតុយកម្តង r ធាតុ៖ P(n, r) = n! / (n - r)!
-៣. ប្រូបាប៊ីលីតេនៃព្រឹត្តិការណ៍ A៖ P(A) = n(A) / n(S)
-៤. ព្រឹត្តិការណ៍បំពេញ៖ P(A) + P(Ā) = 1  =>  P(A) = 1 - P(Ā)
-            `,
-            keyFormulas: ['P(A) = n(A) / n(S)', 'C(n, r) = n! / [r!(n - r)!]']
-          }
-        ]
-      }
-    ]
-  },
-
-  // 8. Khmer Literature (Grade 12 - MoTDAR)
+  // 7. Khmer Literature (Grade 12 - MoTDAR)
   {
     id: 'khmer-12',
     grade: '12',
@@ -350,14 +379,14 @@ export const curriculumData = [
     icon: 'BookOpen',
     color: '#ca8a04',
     cardClass: 'subject-card-khmer',
-    teacher: 'សាស្ត្រាចារ្យ ម៉ៅ វិបុល (MoTDAR Educator)',
+    teacher: 'សាស្ត្រាចារ្យ អក្សរសាស្ត្រខ្មែរថ្នាក់ជាតិ',
     teacherRole: 'ប្រធានគណៈកម្មការកំណែតែងសេចក្តីបាក់ឌុប',
     progress: 90,
     totalChapters: 4,
     totalLessons: 14,
     quizzesCount: 6,
     bannerImg: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=1200&q=80',
-    descriptionKm: 'បង្រៀនគន្លឹះតែងសេចក្តីបែបពន្យល់ ពិភាក្សា និងប្រៀបធៀបដើម្បីបាននិទ្ទេស A ព្រមទាំងការវិភាគតួអង្គក្នុងរឿងទុំទាវ កុលាបប៉ៃលិន និងភូមិតិរច្ឆាន។',
+    descriptionKm: 'បង្រៀនគន្លឹះតែងសេចក្តីបែបពន្យល់ ពិភាក្សា និងប្រៀបធៀបដើម្បីបាននិទ្ទេស A ព្រមទាំងការវិភាគតួអង្គក្នុងរឿងទុំទាវ កុលាបប៉ៃលិន និងផ្កាស្រពោន។',
     descriptionEn: 'Grade 12 Khmer Literature covering advanced essay writing methods (Explanatory, Discussion, Comparative) and analysis of classic Khmer novels.',
     chapters: [
       {
@@ -370,6 +399,7 @@ export const curriculumData = [
             titleKm: 'មេរៀនទី ១៖ គម្រោងតែងសេចក្តីបែបពន្យល់ និងគន្លឹះយកពិន្ទុពេញ',
             titleEn: 'Lesson 1: Explanatory Essay Outline & Marking Criteria',
             duration: '34:00',
+            videoUrl: 'https://www.youtube-nocookie.com/embed/lA8sJ6U8g9Q',
             videoPoster: 'https://images.unsplash.com/photo-1544716278-ca5e3f4abd8c?auto=format&fit=crop&w=800&q=80',
             notes: `
 **គម្រោងតែងសេចក្តីបែបពន្យល់កម្រិតបាក់ឌុប MoTDAR៖**
@@ -394,7 +424,7 @@ III. បញ្ចប់សេចក្តី (១០%): វាយតម្លៃ
     icon: 'Landmark',
     color: '#dc2626',
     cardClass: 'subject-card-history',
-    teacher: 'សាស្ត្រាចារ្យ ឌៀប សុផល (អ្នកប្រវត្តិសាស្ត្រ)',
+    teacher: 'សាស្ត្រាចារ្យ ប្រវត្តិវិទ្យាថ្នាក់ជាតិ',
     teacherRole: 'ទីប្រឹក្សាស្រាវជ្រាវប្រវត្តិសាស្ត្រជាតិ MoTDAR',
     progress: 85,
     totalChapters: 4,
@@ -411,12 +441,13 @@ III. បញ្ចប់សេចក្តី (១០%): វាយតម្លៃ
         lessons: [
           {
             id: 'h12-l1',
-            titleKm: 'មេរៀនទី ១៖ សន្ធិសញ្ញាសន្តិភាពទីក្រុងប៉ារីស ២៣ តុលា ១៩៩១',
-            titleEn: 'Lesson 1: The Paris Peace Agreements 1991',
+            titleKm: 'មេរៀនទី ១៖ សន្ធិសញ្ញាសន្តិភាពទីក្រុងប៉ារីស ២៣ តុលា ១៩៩១ និងអាស៊ាន',
+            titleEn: 'Lesson 1: The Paris Peace Agreements 1991 & ASEAN',
             duration: '28:15',
+            videoUrl: 'https://www.youtube-nocookie.com/embed/J7aQ3q0v_rU',
             videoPoster: 'https://images.unsplash.com/photo-1461360370896-922624d12aa1?auto=format&fit=crop&w=800&q=80',
-            notes: 'សិក្សាពីកត្តានយោបាយ និងដំណើរការបង្រួបបង្រួមជាតិកម្ពុជា។',
-            keyFormulas: ['កាលបរិច្ឆេទសំខាន់ៗ៖ ៩ វិច្ឆិកា ១៩៥៣ (ឯករាជ្យ), ២៣ តុលា ១៩៩១ (កិច្ចព្រមព្រៀងប៉ារីស)']
+            notes: 'សិក្សាពីកត្តានយោបាយ និងដំណើរការបង្រួបបង្រួមជាតិកម្ពុជា និងសមាជិកភាពអាស៊ាន។',
+            keyFormulas: ['កាលបរិច្ឆេទសំខាន់ៗ៖ ៩ វិច្ឆិកា ១៩៥៣ (ឯករាជ្យ), ២៣ តុលា ១៩៩១ (កិច្ចព្រមព្រៀងប៉ារីស), ៣០ មេសា ១៩៩៩ (អាស៊ាន)']
           }
         ]
       }
@@ -433,7 +464,7 @@ III. បញ្ចប់សេចក្តី (១០%): វាយតម្លៃ
     icon: 'Globe',
     color: '#0284c7',
     cardClass: 'subject-card-physics',
-    teacher: 'សាស្ត្រាចារ្យ អ៊ុំ សាវី (MoTDAR Educator)',
+    teacher: 'សាស្ត្រាចារ្យ ភូមិវិទ្យាថ្នាក់ជាតិ',
     teacherRole: 'អ្នកជំនាញភូមិសាស្ត្រសេដ្ឋកិច្ច និងនគរូបនីយកម្ម',
     progress: 70,
     totalChapters: 4,
@@ -453,6 +484,7 @@ III. បញ្ចប់សេចក្តី (១០%): វាយតម្លៃ
             titleKm: 'មេរៀនទី ១៖ ប្រព័ន្ធទន្លេមេគង្គ និងដីសណ្តទន្លេកម្ពុជា',
             titleEn: 'Lesson 1: The Mekong River System & Cambodian Floodplains',
             duration: '26:30',
+            videoUrl: 'https://www.youtube-nocookie.com/embed/9gCq9Jv-4eY',
             videoPoster: 'https://images.unsplash.com/photo-1524661135-423995f22d0b?auto=format&fit=crop&w=800&q=80',
             notes: 'សិក្សាពីសារៈសំខាន់នៃទន្លេមេគង្គចំពោះវិស័យកសិកម្ម និងជលផលជាតិ។',
             keyFormulas: ['ក្រឡាផ្ទៃកម្ពុជា៖ ១៨១,០៣៥ គីឡូម៉ែត្រការ៉េ']
@@ -472,7 +504,7 @@ III. បញ្ចប់សេចក្តី (១០%): វាយតម្លៃ
     icon: 'Scale',
     color: '#854d0e',
     cardClass: 'subject-card-khmer',
-    teacher: 'សាស្ត្រាចារ្យ ហេង សម្បត្តិ (អ្នកច្បាប់ & សីលធម៌)',
+    teacher: 'សាស្ត្រាចារ្យ សីលធម៌-ពលរដ្ឋថ្នាក់ជាតិ',
     teacherRole: 'អ្នកជំនាញការអប់រំពលរដ្ឋ និងនីតិរដ្ឋ MoTDAR',
     progress: 80,
     totalChapters: 3,
@@ -492,6 +524,7 @@ III. បញ្ចប់សេចក្តី (១០%): វាយតម្លៃ
             titleKm: 'មេរៀនទី ១៖ រចនាសម្ព័ន្ធអំណាចរដ្ឋទាំងបី និងសិទ្ធិជាមូលដ្ឋាន',
             titleEn: 'Lesson 1: The Three State Powers & Fundamental Rights',
             duration: '24:00',
+            videoUrl: 'https://www.youtube-nocookie.com/embed/v9A9g_vK89U',
             videoPoster: 'https://images.unsplash.com/photo-1589829545856-d10d557cf95f?auto=format&fit=crop&w=800&q=80',
             notes: 'អំណាចនីតិបញ្ញត្តិ អំណាចនីតិប្រតិបត្តិ និងអំណាចតុលាការ។',
             keyFormulas: ['អំណាចរដ្ឋទាំង ៣៖ នីតិបញ្ញត្តិ (សភា) + នីតិប្រតិបត្តិ (រាជរដ្ឋាភិបាល) + តុលាការ']
@@ -511,7 +544,7 @@ III. បញ្ចប់សេចក្តី (១០%): វាយតម្លៃ
     icon: 'Languages',
     color: '#db2777',
     cardClass: 'subject-card-english',
-    teacher: 'Mr. David Chea (Senior English Educator)',
+    teacher: 'សាស្ត្រាចារ្យ ភាសាអង់គ្លេសវិទ្យាល័យ',
     teacherRole: 'អ្នកសម្របសម្រួលកម្មវិធីភាសាអង់គ្លេសវិទ្យាល័យ MoTDAR',
     progress: 85,
     totalChapters: 4,
@@ -531,6 +564,7 @@ III. បញ្ចប់សេចក្តី (១០%): វាយតម្លៃ
             titleKm: 'Lesson 1: Advanced Relative Clauses & Academic Vocabulary',
             titleEn: 'Lesson 1: Advanced Relative Clauses & Academic Vocabulary',
             duration: '25:40',
+            videoUrl: 'https://www.youtube-nocookie.com/embed/yW2fF1cW998',
             videoPoster: 'https://images.unsplash.com/photo-1456513080510-7bf3a84b82f8?auto=format&fit=crop&w=800&q=80',
             notes: 'Master defining and non-defining relative clauses for BacII exam.',
             keyFormulas: ['Relative Pronouns: Who (People), Which (Things), Whose (Possession)']

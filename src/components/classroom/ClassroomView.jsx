@@ -6,7 +6,6 @@ import {
   Volume2, 
   Maximize, 
   CheckCircle2, 
-  Download, 
   FileText, 
   MessageSquare, 
   Send, 
@@ -14,7 +13,9 @@ import {
   Sparkles, 
   ArrowLeft,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  Video,
+  Image as ImageIcon
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
@@ -28,7 +29,6 @@ export default function ClassroomView({ subject, onBack, onOpenAITutor }) {
 
   const [activeLesson, setActiveLesson] = useState(defaultLesson || null);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [playbackSpeed, setPlaybackSpeed] = useState('1x');
   const [activeTab, setActiveTab] = useState('notes');
   
   const [comments, setComments] = useState([
@@ -72,6 +72,7 @@ export default function ClassroomView({ subject, onBack, onOpenAITutor }) {
   };
 
   const isCompleted = activeLesson && student?.completedLessons?.includes(activeLesson.id);
+  const videoSrc = activeLesson?.videoUrl || 'https://www.youtube-nocookie.com/embed/n4p_q00a58o';
 
   return (
     <div className="space-y-6 font-kantumruy">
@@ -103,72 +104,96 @@ export default function ClassroomView({ subject, onBack, onOpenAITutor }) {
         {/* Left 2 Cols: Video Player & Notes */}
         <div className="lg:col-span-2 space-y-5">
           
-          {/* Video Player */}
+          {/* REAL VIDEO PLAYER & EMBED */}
           <div className="relative rounded-3xl overflow-hidden bg-slate-950 border border-slate-800 aspect-video shadow-2xl group flex flex-col justify-between">
             
-            <div className="absolute inset-0 z-0">
-              <img 
-                src={activeLesson?.videoPoster || subject.bannerImg} 
-                alt="Lesson Thumbnail" 
-                className="w-full h-full object-cover opacity-80"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-black/60" />
-            </div>
-
-            {/* Top Video Header */}
-            <div className="relative z-10 p-4 sm:p-5 flex items-center justify-between text-white">
-              <div className="flex items-center gap-2">
-                <span className="bg-[#005baa] text-white text-[11px] font-black px-2.5 py-0.5 rounded-lg shadow-sm">
-                  {lang === 'km' ? subject.nameKm : subject.nameEn}
-                </span>
-                <span className="text-xs sm:text-sm text-white truncate max-w-xs font-bold">
-                  {activeLesson ? (lang === 'km' ? activeLesson.titleKm : activeLesson.titleEn) : ''}
-                </span>
+            {isPlaying ? (
+              /* Active Real YouTube Stream */
+              <div className="w-full h-full relative">
+                <iframe
+                  src={`${videoSrc}?autoplay=1&rel=0&modestbranding=1`}
+                  title={activeLesson?.titleKm || 'Lesson Video'}
+                  className="w-full h-full border-0 absolute inset-0"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+                  allowFullScreen
+                />
               </div>
-              <span className="text-xs text-slate-200 font-cinzel font-bold bg-black/40 px-2 py-0.5 rounded-md backdrop-blur-sm">
-                {activeLesson?.duration || '25:00'}
-              </span>
-            </div>
+            ) : (
+              /* Poster / Preview Mode */
+              <>
+                <div className="absolute inset-0 z-0">
+                  <img 
+                    src={activeLesson?.videoPoster || subject.bannerImg} 
+                    alt="Lesson Thumbnail" 
+                    className="w-full h-full object-cover opacity-80 filter brightness-90 group-hover:scale-105 transition-transform duration-700"
+                  />
+                  <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/40 to-black/60" />
+                </div>
 
-            {/* Center Play Button Overlay */}
-            <div className="relative z-10 flex items-center justify-center">
-              <button
-                onClick={() => setIsPlaying(!isPlaying)}
-                className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-[#005baa] to-sky-400 text-white flex items-center justify-center shadow-2xl shadow-blue-500/40 hover:scale-110 active:scale-95 transition-all cursor-pointer border-2 border-white/80"
-              >
-                {isPlaying ? <Pause className="w-7 h-7 sm:w-8 sm:h-8" /> : <Play className="w-7 h-7 sm:w-8 sm:h-8 fill-white ml-1" />}
-              </button>
-            </div>
+                {/* Top Video Header */}
+                <div className="relative z-10 p-4 sm:p-5 flex items-center justify-between text-white">
+                  <div className="flex items-center gap-2">
+                    <span className="bg-[#005baa] text-white text-[11px] font-black px-2.5 py-0.5 rounded-lg shadow-sm">
+                      {lang === 'km' ? subject.nameKm : subject.nameEn}
+                    </span>
+                    <span className="text-xs sm:text-sm text-white truncate max-w-xs font-bold">
+                      {activeLesson ? (lang === 'km' ? activeLesson.titleKm : activeLesson.titleEn) : ''}
+                    </span>
+                  </div>
+                  <span className="text-xs text-slate-200 font-cinzel font-bold bg-black/50 px-2.5 py-0.5 rounded-md backdrop-blur-sm border border-white/10">
+                    {activeLesson?.duration || '25:00'}
+                  </span>
+                </div>
 
-            {/* Bottom Controls Bar */}
-            <div className="relative z-10 p-3 bg-slate-900/80 backdrop-blur-md rounded-2xl border border-white/10 mx-4 mb-4 flex items-center gap-3 shadow-lg">
-              <button onClick={() => setIsPlaying(!isPlaying)} className="text-white hover:text-amber-300 transition-colors cursor-pointer">
-                {isPlaying ? <Pause className="w-4 h-4" /> : <Play className="w-4 h-4 fill-white" />}
-              </button>
-              
-              <div className="flex-1 h-2 bg-white/20 rounded-full overflow-hidden cursor-pointer">
-                <div className="w-2/5 h-full bg-gradient-to-r from-blue-500 to-sky-400 rounded-full" />
-              </div>
+                {/* Center Play Button Overlay */}
+                <div className="relative z-10 flex flex-col items-center justify-center gap-3 my-auto">
+                  <button
+                    onClick={() => setIsPlaying(true)}
+                    className="w-16 h-16 sm:w-20 sm:h-20 rounded-full bg-gradient-to-tr from-[#005baa] to-sky-400 text-white flex items-center justify-center shadow-2xl shadow-blue-500/50 hover:scale-110 active:scale-95 transition-all cursor-pointer border-2 border-white/80 group-hover:ring-8 group-hover:ring-sky-400/30"
+                  >
+                    <Play className="w-7 h-7 sm:w-8 sm:h-8 fill-white ml-1" />
+                  </button>
+                  <span className="text-xs text-white/90 font-bold bg-black/60 px-3.5 py-1 rounded-full backdrop-blur-md border border-white/20">
+                    {lang === 'km' ? '▶ ចុចដើម្បីទស្សនាវីដេអូបង្រៀនផ្លូវការ' : '▶ Click to watch official lecture'}
+                  </span>
+                </div>
 
-              <div className="flex items-center gap-3 text-xs text-slate-300">
-                <span className="font-cinzel text-[11px] text-white">10:45 / 24:30</span>
-                
-                <select 
-                  value={playbackSpeed}
-                  onChange={(e) => setPlaybackSpeed(e.target.value)}
-                  className="bg-white/10 text-white text-[11px] font-bold rounded-lg px-2 py-1 border border-white/20 focus:outline-none cursor-pointer"
-                >
-                  <option value="0.75x" className="bg-slate-900 text-white">0.75x</option>
-                  <option value="1x" className="bg-slate-900 text-white">1.0x</option>
-                  <option value="1.25x" className="bg-slate-900 text-white">1.25x</option>
-                  <option value="1.5x" className="bg-slate-900 text-white">1.5x</option>
-                </select>
-
-                <Maximize className="w-4 h-4 text-slate-300 hover:text-white cursor-pointer" />
-              </div>
-            </div>
+                {/* Bottom Bar Info */}
+                <div className="relative z-10 p-3 bg-slate-900/90 backdrop-blur-md rounded-2xl border border-white/10 mx-4 mb-4 flex items-center justify-between shadow-lg text-xs text-slate-300">
+                  <div className="flex items-center gap-2">
+                    <Video className="w-4 h-4 text-sky-400" />
+                    <span className="font-bold text-white text-xs">
+                      {lang === 'km' ? 'វីដេអូបង្រៀនគុណភាពខ្ពស់ HD របស់ក្រសួង' : 'Official MoEYS HD Video Lesson'}
+                    </span>
+                  </div>
+                  <button
+                    onClick={() => setIsPlaying(true)}
+                    className="px-3 py-1 bg-gradient-to-r from-sky-500 to-[#005baa] text-white text-[11px] font-bold rounded-lg hover:brightness-110 cursor-pointer shadow-xs"
+                  >
+                    {lang === 'km' ? 'ទស្សនាភ្លាមៗ' : 'Play Video'}
+                  </button>
+                </div>
+              </>
+            )}
 
           </div>
+
+          {/* Quick Toggle if Playing */}
+          {isPlaying && (
+            <div className="flex items-center justify-between bg-slate-100 p-2.5 rounded-2xl border border-slate-200 text-xs">
+              <span className="font-bold text-slate-700 flex items-center gap-1.5">
+                <Video className="w-4 h-4 text-[#005baa]" />
+                <span>{lang === 'km' ? 'កំពុងចាក់វីដេអូបង្រៀន' : 'Currently playing lesson video'}</span>
+              </span>
+              <button
+                onClick={() => setIsPlaying(false)}
+                className="px-3 py-1 bg-white hover:bg-slate-200 text-slate-700 rounded-xl font-bold border border-slate-300 cursor-pointer flex items-center gap-1 text-[11px]"
+              >
+                <ImageIcon className="w-3.5 h-3.5" />
+                <span>{lang === 'km' ? 'បិទវីដេអូ' : 'Close Video'}</span>
+              </button>
+            </div>
+          )}
 
           {/* Lesson Header & Mark Completed */}
           <div className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 space-y-4 shadow-sm">
@@ -242,16 +267,6 @@ export default function ClassroomView({ subject, onBack, onOpenAITutor }) {
                         </div>
                       )}
                     </div>
-
-                    <div className="flex justify-end">
-                      <button 
-                        onClick={() => alert(lang === 'km' ? 'ឯកសារសង្ខេបមេរៀនត្រូវបានទាញយកជាទម្រង់ PDF ជោគជ័យ!' : 'Lesson summary PDF downloaded successfully!')}
-                        className="px-4 py-2 rounded-xl bg-slate-100 hover:bg-slate-200 text-[#003366] text-xs font-bold flex items-center gap-1.5 transition-colors cursor-pointer border border-slate-200"
-                      >
-                        <Download className="w-3.5 h-3.5 text-[#005baa]" />
-                        <span>{t('downloadNotes') || (lang === 'km' ? 'ទាញយកឯកសារ PDF' : 'Download PDF')}</span>
-                      </button>
-                    </div>
                   </div>
                 )}
 
@@ -298,55 +313,68 @@ export default function ClassroomView({ subject, onBack, onOpenAITutor }) {
 
         {/* Right 1 Col: Course Playlist */}
         <div className="space-y-4">
-          <div className="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200 space-y-3 shadow-sm">
-            <h3 className="font-black text-sm text-[#003366] flex items-center justify-between">
-              <span>{lang === 'km' ? 'បញ្ជីមេរៀន MoTDAR' : 'Lesson Playlist'}</span>
-              <span className="text-xs text-slate-500 font-bold">
-                {subject.totalLessons} {lang === 'km' ? 'មេរៀន' : 'Lessons'}
+          <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+              <div className="flex items-center gap-2">
+                <BookOpen className="w-4 h-4 text-[#005baa]" />
+                <h3 className="text-sm font-black text-[#003366]">
+                  {lang === 'km' ? 'មាតិកាមេរៀនក្នុងមុខវិជ្ជា' : 'Course Curriculum'}
+                </h3>
+              </div>
+              <span className="text-xs font-bold text-slate-500">
+                {subject.totalLessons || 20} {lang === 'km' ? 'មេរៀន' : 'lessons'}
               </span>
-            </h3>
+            </div>
 
-            <div className="space-y-3 max-h-[600px] overflow-y-auto pr-1 [scrollbar-width:thin] [scrollbar-color:rgba(0,91,170,0.15)_transparent]">
-              {subject.chapters?.map((ch) => (
-                <div key={ch.id} className="border border-slate-200/90 rounded-2xl overflow-hidden bg-white shadow-2xs">
-                  <div className="bg-blue-50/80 p-3 text-xs font-black text-[#003366] border-b border-slate-200">
-                    {lang === 'km' ? ch.titleKm : ch.titleEn}
-                  </div>
-                  
-                  <div className="divide-y divide-slate-100">
-                    {ch.lessons?.map((les) => {
-                      const isLesActive = activeLesson && activeLesson.id === les.id;
-                      const isLesDone = student?.completedLessons?.includes(les.id);
+            <div className="space-y-4 max-h-[600px] overflow-y-auto pr-1">
+              {subject.chapters && subject.chapters.map((chapter) => (
+                <div key={chapter.id} className="space-y-2">
+                  <h4 className="text-xs font-black text-slate-800 px-2 py-1 bg-slate-50 rounded-lg">
+                    {lang === 'km' ? chapter.titleKm : chapter.titleEn}
+                  </h4>
+
+                  <div className="space-y-1.5 pl-1">
+                    {chapter.lessons && chapter.lessons.map((lesson) => {
+                      const isCurrent = activeLesson?.id === lesson.id;
+                      const done = student?.completedLessons?.includes(lesson.id);
 
                       return (
-                        <button
-                          key={les.id}
+                        <div
+                          key={lesson.id}
                           onClick={() => {
-                            setActiveLesson(les);
-                            setIsPlaying(false);
+                            setActiveLesson(lesson);
+                            setIsPlaying(true);
                           }}
-                          className={`w-full text-left p-3 text-xs transition-all flex items-start gap-2.5 cursor-pointer ${
-                            isLesActive
-                              ? 'bg-blue-50/90 text-[#003366] font-extrabold border-l-4 border-[#005baa]'
-                              : 'text-slate-700 hover:bg-slate-50 font-medium'
+                          className={`p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 cursor-pointer ${
+                            isCurrent
+                              ? 'bg-blue-50/80 border-[#005baa] text-[#003366] shadow-xs'
+                              : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700'
                           }`}
                         >
-                          <div className="mt-0.5">
-                            {isLesDone ? (
-                              <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
-                            ) : (
-                              <Play className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-                            )}
-                          </div>
-                          <div className="flex-1 min-w-0">
-                            <p className="line-clamp-2 leading-relaxed">
-                              {lang === 'km' ? les.titleKm : les.titleEn}
-                            </p>
-                            <span className="text-[10px] text-slate-400 font-cinzel font-bold">
-                              {les.duration}
+                          <div className="flex items-center gap-2.5 flex-1 min-w-0">
+                            <div className={`w-6 h-6 rounded-lg flex items-center justify-center flex-shrink-0 ${
+                              done 
+                                ? 'bg-emerald-100 text-emerald-700' 
+                                : isCurrent 
+                                  ? 'bg-[#005baa] text-white' 
+                                  : 'bg-slate-100 text-slate-600'
+                            }`}>
+                              {done ? (
+                                <CheckCircle2 className="w-3.5 h-3.5" />
+                              ) : (
+                                <Play className="w-3 h-3 fill-current ml-0.5" />
+                              )}
+                            </div>
+
+                            <span className="text-xs font-bold truncate">
+                              {lang === 'km' ? lesson.titleKm : lesson.titleEn}
                             </span>
                           </div>
-                        </button>
+
+                          <span className="text-[10px] text-slate-400 font-cinzel font-bold flex-shrink-0">
+                            {lesson.duration || '25:00'}
+                          </span>
+                        </div>
                       );
                     })}
                   </div>
@@ -362,4 +390,3 @@ export default function ClassroomView({ subject, onBack, onOpenAITutor }) {
     </div>
   );
 }
-
