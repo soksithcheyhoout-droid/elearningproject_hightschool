@@ -151,5 +151,11 @@ router.post('/tts', synthesizeSpeech);
 router.post('/ai/chat', handleAIChat);
 router.get('/ai/chat', handleAIChat);
 
+import { getQuestionBankStats, getQuestionsFromPool } from '../controllers/questionBankController.js';
+
+// 13. Master 12,000 National Examination Question Pool (6,000 Science + 6,000 Social)
+router.get('/questions/stats', getQuestionBankStats);
+router.get('/questions/master-pool', getQuestionsFromPool);
+
 export default router;
 

@@ -912,6 +912,34 @@ export const api = {
     if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('data:') || url.startsWith('blob:')) return url;
     if (url.startsWith('/uploads/')) return `${API_BASE.replace('/api', '')}${url}`;
     return url;
+  },
+
+  // 14. Master 12,000 National Examination Question Pool
+  getQuestionBankStats: async () => {
+    try {
+      const res = await fetch(`${API_BASE}/questions/stats`);
+      return await res.json();
+    } catch (err) {
+      console.warn('[API Question Stats Warning]:', err.message);
+      return null;
+    }
+  },
+
+  getQuestionsFromPool: async ({ stream = 'science', subjectKey = '', grade = '12', limit = 20, random = true } = {}) => {
+    try {
+      const params = new URLSearchParams({
+        stream,
+        ...(subjectKey ? { subjectKey } : {}),
+        ...(grade ? { grade } : {}),
+        limit: String(limit),
+        random: String(random)
+      });
+      const res = await fetch(`${API_BASE}/questions/master-pool?${params.toString()}`);
+      return await res.json();
+    } catch (err) {
+      console.warn('[API Question Pool Warning]:', err.message);
+      return null;
+    }
   }
 };
 
