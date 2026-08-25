@@ -41,7 +41,10 @@ import {
   BookOpen,
   GraduationCap,
   Award,
-  Layers
+  Layers,
+  Target,
+  Compass,
+  Rocket
 } from 'lucide-react';
 import { useAuth, computeLevelData } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
@@ -104,7 +107,7 @@ const GRADE_THEMES = {
     nameKm: 'ថ្នាក់ទី ១',
     levelTitle: 'បឋមសិក្សា (Primary Level 1)',
     shortLevel: 'បឋមសិក្សា',
-    tagIcon: '🌱',
+    icon: Sparkles,
     pillActive: 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-lg shadow-emerald-500/40 border-emerald-300 ring-2 ring-emerald-400/50 scale-105',
     pillHover: 'hover:border-emerald-400/60 hover:text-emerald-300 hover:bg-emerald-950/40',
     boxBg: 'bg-gradient-to-br from-[#062018]/95 via-[#061712]/95 to-[#030e0b]/95',
@@ -121,7 +124,7 @@ const GRADE_THEMES = {
     nameKm: 'ថ្នាក់ទី ២',
     levelTitle: 'បឋមសិក្សា (Primary Level 2)',
     shortLevel: 'បឋមសិក្សា',
-    tagIcon: '🌿',
+    icon: Layers,
     pillActive: 'bg-gradient-to-r from-teal-500 to-cyan-500 text-white shadow-lg shadow-teal-500/40 border-teal-300 ring-2 ring-teal-400/50 scale-105',
     pillHover: 'hover:border-teal-400/60 hover:text-teal-300 hover:bg-teal-950/40',
     boxBg: 'bg-gradient-to-br from-[#051f22]/95 via-[#05171a]/95 to-[#030d0f]/95',
@@ -138,7 +141,7 @@ const GRADE_THEMES = {
     nameKm: 'ថ្នាក់ទី ៣',
     levelTitle: 'បឋមសិក្សា (Primary Level 3)',
     shortLevel: 'បឋមសិក្សា',
-    tagIcon: '🌊',
+    icon: Compass,
     pillActive: 'bg-gradient-to-r from-cyan-500 to-sky-500 text-white shadow-lg shadow-cyan-500/40 border-cyan-300 ring-2 ring-cyan-400/50 scale-105',
     pillHover: 'hover:border-cyan-400/60 hover:text-cyan-300 hover:bg-cyan-950/40',
     boxBg: 'bg-gradient-to-br from-[#041e2b]/95 via-[#041620]/95 to-[#020b12]/95',
@@ -155,7 +158,7 @@ const GRADE_THEMES = {
     nameKm: 'ថ្នាក់ទី ៤',
     levelTitle: 'បឋមសិក្សា (Primary Level 4)',
     shortLevel: 'បឋមសិក្សា',
-    tagIcon: '☀️',
+    icon: BookOpen,
     pillActive: 'bg-gradient-to-r from-sky-500 to-blue-600 text-white shadow-lg shadow-sky-500/40 border-sky-300 ring-2 ring-sky-400/50 scale-105',
     pillHover: 'hover:border-sky-400/60 hover:text-sky-300 hover:bg-sky-950/40',
     boxBg: 'bg-gradient-to-br from-[#061d36]/95 via-[#051528]/95 to-[#030c17]/95',
@@ -172,7 +175,7 @@ const GRADE_THEMES = {
     nameKm: 'ថ្នាក់ទី ៥',
     levelTitle: 'បឋមសិក្សា (Primary Level 5)',
     shortLevel: 'បឋមសិក្សា',
-    tagIcon: '📘',
+    icon: Award,
     pillActive: 'bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg shadow-blue-500/40 border-blue-300 ring-2 ring-blue-400/50 scale-105',
     pillHover: 'hover:border-blue-400/60 hover:text-blue-300 hover:bg-blue-950/40',
     boxBg: 'bg-gradient-to-br from-[#091840]/95 via-[#07112d]/95 to-[#040a1c]/95',
@@ -189,7 +192,7 @@ const GRADE_THEMES = {
     nameKm: 'ថ្នាក់ទី ៦',
     levelTitle: 'បឋមសិក្សា (Primary Graduate)',
     shortLevel: 'បញ្ចប់បឋម',
-    tagIcon: '🎓',
+    icon: GraduationCap,
     pillActive: 'bg-gradient-to-r from-indigo-500 to-violet-600 text-white shadow-lg shadow-indigo-500/40 border-indigo-300 ring-2 ring-indigo-400/50 scale-105',
     pillHover: 'hover:border-indigo-400/60 hover:text-indigo-300 hover:bg-indigo-950/40',
     boxBg: 'bg-gradient-to-br from-[#121142]/95 via-[#0d0c30]/95 to-[#07061d]/95',
@@ -206,7 +209,7 @@ const GRADE_THEMES = {
     nameKm: 'ថ្នាក់ទី ៧',
     levelTitle: 'អនុវិទ្យាល័យ (Secondary Level 7)',
     shortLevel: 'អនុវិទ្យាល័យ',
-    tagIcon: '🔮',
+    icon: Zap,
     pillActive: 'bg-gradient-to-r from-violet-500 to-purple-600 text-white shadow-lg shadow-violet-500/40 border-violet-300 ring-2 ring-violet-400/50 scale-105',
     pillHover: 'hover:border-violet-400/60 hover:text-violet-300 hover:bg-violet-950/40',
     boxBg: 'bg-gradient-to-br from-[#1c103f]/95 via-[#140b2e]/95 to-[#0b061c]/95',
@@ -223,7 +226,7 @@ const GRADE_THEMES = {
     nameKm: 'ថ្នាក់ទី ៨',
     levelTitle: 'អនុវិទ្យាល័យ (Secondary Level 8)',
     shortLevel: 'អនុវិទ្យាល័យ',
-    tagIcon: '⚡',
+    icon: Target,
     pillActive: 'bg-gradient-to-r from-fuchsia-500 to-pink-600 text-white shadow-lg shadow-fuchsia-500/40 border-fuchsia-300 ring-2 ring-fuchsia-400/50 scale-105',
     pillHover: 'hover:border-fuchsia-400/60 hover:text-fuchsia-300 hover:bg-fuchsia-950/40',
     boxBg: 'bg-gradient-to-br from-[#280d32]/95 via-[#1c0924]/95 to-[#100515]/95',
@@ -240,7 +243,7 @@ const GRADE_THEMES = {
     nameKm: 'ថ្នាក់ទី ៩',
     levelTitle: 'អនុវិទ្យាល័យ (Diploma / ឌីប្លូម)',
     shortLevel: 'ប្រឡងឌីប្លូម',
-    tagIcon: '🔥',
+    icon: Trophy,
     pillActive: 'bg-gradient-to-r from-rose-500 via-red-500 to-orange-500 text-white shadow-lg shadow-rose-500/40 border-rose-300 ring-2 ring-rose-400/50 scale-105',
     pillHover: 'hover:border-rose-400/60 hover:text-rose-300 hover:bg-rose-950/40',
     boxBg: 'bg-gradient-to-br from-[#300d1a]/95 via-[#220912]/95 to-[#13050a]/95',
@@ -257,7 +260,7 @@ const GRADE_THEMES = {
     nameKm: 'ថ្នាក់ទី ១០',
     levelTitle: 'វិទ្យាល័យ (High School Foundation)',
     shortLevel: 'វិទ្យាល័យ',
-    tagIcon: '🚀',
+    icon: Rocket,
     pillActive: 'bg-gradient-to-r from-amber-500 to-orange-500 text-white shadow-lg shadow-amber-500/40 border-amber-300 ring-2 ring-amber-400/50 scale-105',
     pillHover: 'hover:border-amber-400/60 hover:text-amber-300 hover:bg-amber-950/40',
     boxBg: 'bg-gradient-to-br from-[#2c1908]/95 via-[#1f1105]/95 to-[#120a03]/95',
@@ -274,7 +277,7 @@ const GRADE_THEMES = {
     nameKm: 'ថ្នាក់ទី ១១',
     levelTitle: 'វិទ្យាល័យ (Pre-Baccalaureate)',
     shortLevel: 'ត្រៀមបាក់ឌុប',
-    tagIcon: '💎',
+    icon: Diamond,
     pillActive: 'bg-gradient-to-r from-cyan-500 via-sky-500 to-indigo-600 text-white shadow-lg shadow-cyan-500/45 border-cyan-200 ring-2 ring-cyan-400/60 scale-105',
     pillHover: 'hover:border-cyan-400/60 hover:text-cyan-300 hover:bg-cyan-950/40',
     boxBg: 'bg-gradient-to-br from-[#082238]/95 via-[#061828]/95 to-[#030e17]/95',
@@ -283,7 +286,7 @@ const GRADE_THEMES = {
     accentBg: 'bg-cyan-500/15',
     badgeClass: 'text-cyan-300 bg-cyan-500/20 border-cyan-400/50 shadow-cyan-500/20',
     headerBadge: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40',
-    headerIconBox: 'bg-cyan-500/20 border border-cyan-500/40 text-cyan-400',
+    headerIconBox: 'bg-cyan-500/20 border border-cyan-500/30 text-cyan-400',
     glowBg: 'bg-cyan-500/20'
   },
   '12': {
@@ -291,7 +294,7 @@ const GRADE_THEMES = {
     nameKm: 'ថ្នាក់ទី ១២',
     levelTitle: 'វិទ្យាល័យ (National Bac II / បាក់ឌុប)',
     shortLevel: 'បាក់ឌុបថ្នាក់ជាតិ',
-    tagIcon: '👑',
+    icon: Crown,
     pillActive: 'bg-gradient-to-r from-amber-400 via-rose-500 to-purple-600 text-white shadow-lg shadow-purple-500/50 border-amber-200 ring-2 ring-amber-400/70 scale-105',
     pillHover: 'hover:border-purple-400/60 hover:text-purple-300 hover:bg-purple-950/40',
     boxBg: 'bg-gradient-to-br from-[#240e3f]/95 via-[#18092c]/95 to-[#0e051a]/95',
@@ -424,6 +427,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   const [selectedGrade, setSelectedGrade] = useState(() => String(student?.grade || game?.grade || '12'));
   const [selectedStream, setSelectedStream] = useState(() => (student?.stream || game?.stream || 'science'));
   const currentTheme = GRADE_THEMES[String(selectedGrade)] || GRADE_THEMES['12'];
+  const CurrentGradeIcon = currentTheme.icon || GraduationCap;
 
   // Synchronized Questions Pool (Loaded by Grade and Stream with 24-question deep pool)
   const [questions, setQuestions] = useState(() => getRandomizedGameQuestions(game, 24, student?.grade || '12', student?.stream || 'science'));
@@ -1201,8 +1205,8 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                 <span className={`text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 transition-colors duration-300 ${currentTheme.accentText}`}>
                   1v1 Arena • First to 6 Correct
                 </span>
-                <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold border transition-all duration-300 flex items-center gap-1 shadow-xs ${currentTheme.headerBadge}`}>
-                  <span>{currentTheme.tagIcon}</span>
+                <span className={`text-[10px] px-2.5 py-0.5 rounded-full font-bold border transition-all duration-300 flex items-center gap-1.5 shadow-xs ${currentTheme.headerBadge}`}>
+                  <CurrentGradeIcon className="w-3.5 h-3.5 flex-shrink-0" />
                   <span>ថ្នាក់ទី {selectedGrade} • {selectedGrade >= 11 ? (selectedStream === 'science' ? 'វិទ្យាសាស្ត្រពិត' : 'វិទ្យាសាស្ត្រសង្គម') : currentTheme.shortLevel}</span>
                 </span>
                 {isOvertime && (
@@ -1430,8 +1434,8 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                       <span className="text-xs font-bold text-slate-200">
                         កម្រិតថ្នាក់សិក្សា (Grade Level):
                       </span>
-                      <span className={`text-xs font-black px-2.5 py-0.5 rounded-lg border transition-all duration-300 flex items-center gap-1.5 shadow-sm ${currentTheme.badgeClass}`}>
-                        <span>{currentTheme.tagIcon}</span>
+                      <span className={`text-xs font-black px-2.5 py-1 rounded-xl border transition-all duration-300 flex items-center gap-1.5 shadow-sm ${currentTheme.badgeClass}`}>
+                        <CurrentGradeIcon className="w-3.5 h-3.5 flex-shrink-0" />
                         <span>ថ្នាក់ទី {selectedGrade}</span>
                         <span className="text-[10px] opacity-80 font-normal">({currentTheme.shortLevel})</span>
                       </span>
@@ -1520,7 +1524,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                   ) : (
                     <div className="pt-2.5 border-t border-slate-700/50 flex flex-col sm:flex-row sm:items-center justify-between gap-2 text-xs relative z-10">
                       <div className={`flex items-center gap-2 font-bold ${currentTheme.accentText}`}>
-                        <span className="text-sm">{currentTheme.tagIcon}</span>
+                        <CurrentGradeIcon className="w-4 h-4 flex-shrink-0" />
                         <span>ថ្នាក់មូលដ្ឋានទូទៅ • {currentTheme.levelTitle}</span>
                       </div>
                       <span className="text-[10px] text-slate-300 bg-slate-900/70 px-2.5 py-1 rounded-lg border border-slate-700/60">
@@ -1818,8 +1822,8 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                 </span>
               </div>
               <div className="flex items-center gap-2">
-                <span className={`text-[11px] px-2.5 py-0.5 rounded-lg font-bold border transition-all duration-300 flex items-center gap-1 ${currentTheme.badgeClass}`}>
-                  <span>{currentTheme.tagIcon}</span>
+                <span className={`text-[11px] px-2.5 py-0.5 rounded-lg font-bold border transition-all duration-300 flex items-center gap-1.5 ${currentTheme.badgeClass}`}>
+                  <CurrentGradeIcon className="w-3.5 h-3.5 flex-shrink-0" />
                   <span>{selectedGrade >= 11 ? (selectedStream === 'science' ? 'វិទ្យាសាស្ត្រពិត (Science)' : 'វិទ្យាសាស្ត្រសង្គម (Social)') : `${currentTheme.shortLevel} (General)`}</span>
                 </span>
                 <span className="text-[10px] px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 font-black border border-amber-400/30">
