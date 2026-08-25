@@ -190,7 +190,7 @@ export default function BacIIHubView() {
             </span>
             <span className="bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-xs font-black px-3 py-1 rounded-full inline-flex items-center gap-1 backdrop-blur-md shadow-2xs">
               <Database className="w-3.5 h-3.5" />
-              <span>១២,០០០ វិញ្ញាសាសំណួរជាតិ (12,000 Questions Pool)</span>
+              <span>២០,០០០ វិញ្ញាសាសំណួរជាតិ (20,000 Questions Pool)</span>
             </span>
           </div>
 
@@ -199,8 +199,8 @@ export default function BacIIHubView() {
           </h1>
           <p className="text-xs sm:text-sm text-blue-100/90 leading-relaxed font-medium">
             {lang === 'km' 
-              ? 'បណ្តុំវិញ្ញាសាប្រឡងសញ្ញាបត្រមធ្យមសិក្សាទុតិយភូមិ (បាក់ឌុប) ផ្លូវការ ១២,០០០ សំណួរ និងបណ្ណសារវិញ្ញាសាគ្រប់ឆ្នាំ ២០១៤-២០២៤ ព្រមទាំងគន្លឹះដំណោះស្រាយលម្អិតរបស់គណៈកម្មការកំណែ។' 
-              : 'Official National Baccalaureate Examination Archive with 12,000 authentic questions and Ministry Solutions (2014 - 2024).'}
+              ? 'បណ្តុំវិញ្ញាសាប្រឡងសញ្ញាបត្រមធ្យមសិក្សាទុតិយភូមិ (បាក់ឌុប) ផ្លូវការ ២០,០០០ សំណួរ និងបណ្ណសារវិញ្ញាសាគ្រប់ឆ្នាំ ២០១៤-២០២៤ ព្រមទាំងគន្លឹះដំណោះស្រាយលម្អិតរបស់គណៈកម្មការកំណែ។' 
+              : 'Official National Baccalaureate Examination Archive with 20,000 authentic questions and Ministry Solutions (2014 - 2024).'}
           </p>
         </div>
       </div>

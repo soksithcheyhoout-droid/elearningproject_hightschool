@@ -5,18 +5,47 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-const bankPath = path.join(__dirname, '..', 'data', 'master_question_bank_12000.json');
+const bankPath20k = path.join(__dirname, '..', 'data', 'master_question_bank_20000.json');
+const bankPath12k = path.join(__dirname, '..', 'data', 'master_question_bank_12000.json');
 
 let masterQuestionBank = null;
 
-// Load 12,000 question bank into memory on demand
+// Load 20,000 question bank into memory on demand
 function getMasterBank() {
   if (!masterQuestionBank) {
     try {
-      if (fs.existsSync(bankPath)) {
-        const raw = fs.readFileSync(bankPath, 'utf-8');
-        masterQuestionBank = JSON.parse(raw);
-        console.log(`📚 Master Question Bank loaded into memory: ${masterQuestionBank.totalCount.toLocaleString()} questions (6,000 Science + 6,000 Social)`);
+      let raw = null;
+      if (fs.existsSync(bankPath20k)) {
+        raw = fs.readFileSync(bankPath20k, 'utf-8');
+      } else if (fs.existsSync(bankPath12k)) {
+        raw = fs.readFileSync(bankPath12k, 'utf-8');
+      }
+
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          const science = parsed.filter(q => q.stream === 'science');
+          const social = parsed.filter(q => q.stream === 'social');
+          const bySubject = {};
+          parsed.forEach(q => {
+            bySubject[q.subjectKey || q.subject] = (bySubject[q.subjectKey || q.subject] || 0) + 1;
+          });
+
+          masterQuestionBank = {
+            totalCount: parsed.length,
+            science,
+            social,
+            counts: {
+              science: science.length,
+              social: social.length,
+              bySubject
+            },
+            version: '3.0.0-National-MoEYS-20k'
+          };
+        } else {
+          masterQuestionBank = parsed;
+        }
+        console.log(`📚 Master Question Bank loaded into memory: ${masterQuestionBank.totalCount.toLocaleString()} questions (10,000 Science + 10,000 Social)`);
       }
     } catch (e) {
       console.error('Failed to load master question bank:', e);
@@ -50,8 +79,7 @@ export const getQuestionBankStats = (req, res) => {
     scienceCount: bank.counts.science,
     socialCount: bank.counts.social,
     bySubject: bank.counts.bySubject,
-    version: bank.version,
-    generatedAt: bank.generatedAt
+    version: bank.version
   });
 };
 
@@ -61,7 +89,7 @@ export const getQuestionBankStats = (req, res) => {
  * - stream: 'science' | 'social'
  * - subjectKey: 'math' | 'physics' | 'chemistry' | 'biology' | 'khmer' | 'history' | 'geography' | 'civics'
  * - grade: '10' | '11' | '12'
- * - limit: number (default: 20, max: 100)
+ * - limit: number (default: 20, max: 200)
  * - random: boolean (default: true)
  */
 export const getQuestionsFromPool = (req, res) => {
@@ -78,7 +106,6 @@ export const getQuestionsFromPool = (req, res) => {
   } else if (stream === 'science') {
     pool = bank.science || [];
   } else {
-    // Both
     pool = [...(bank.science || []), ...(bank.social || [])];
   }
 
