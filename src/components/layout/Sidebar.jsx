@@ -158,9 +158,16 @@ export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor }) {
             <img src="/assets/moeys-crest-transparent.png" alt="MoEYS" className="w-4 h-4 object-contain" />
             <span>{lang === 'km' ? 'ជំនួយការសិក្សាជាតិ' : 'National Support'}</span>
           </div>
-          <p className="text-[10px] text-slate-500 font-medium leading-relaxed">
-            {lang === 'km' ? 'ទូរស័ព្ទជំនួយ៖ +855 66 901 800' : 'Hotline: +855 66 901 800'}
-          </p>
+          <div className="text-[10px] text-slate-600 font-semibold space-y-0.5">
+            <p>
+              <a href="tel:0977416126" className="hover:text-[#005baa] font-mono font-bold">
+                {lang === 'km' ? 'ទូរស័ព្ទ / Telegram: 097 741 6126' : 'Hotline: 097 741 6126'}
+              </a>
+            </p>
+            <p className="text-[9.5px] text-slate-500 truncate font-mono">
+              soksithcheyhoout@gmail.com
+            </p>
+          </div>
           <button
             type="button"
             onClick={onOpenAITutor}

@@ -26,7 +26,8 @@ import {
   LogOut,
   ShieldCheck,
   Crown,
-  Heart
+  Heart,
+  Send
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
@@ -318,19 +319,32 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
 
           <div className="flex items-center gap-3 text-[10px] sm:text-[10.5px] text-slate-200 flex-shrink-0">
             <a 
-              href="tel:+85566901800" 
-              className="flex items-center gap-1 hover:text-amber-300 transition-colors"
+              href="tel:0977416126" 
+              className="flex items-center gap-1 hover:text-amber-300 transition-colors font-mono font-bold"
+              title="Call 097 741 6126"
             >
               <Phone className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-300" />
-              <span>+855 66 901 800</span>
+              <span>097 741 6126</span>
             </a>
             <span className="text-white/30 hidden sm:inline">|</span>
             <a 
-              href="mailto:info@motdar.gov.kh" 
-              className="hidden sm:flex items-center gap-1 hover:text-amber-300 transition-colors"
+              href="https://t.me/+855977416126" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden md:flex items-center gap-1 hover:text-cyan-300 transition-colors font-mono font-bold"
+              title="Telegram: 097 741 6126"
+            >
+              <Send className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-cyan-400" />
+              <span>Telegram: 097 741 6126</span>
+            </a>
+            <span className="text-white/30 hidden md:inline">|</span>
+            <a 
+              href="mailto:soksithcheyhoout@gmail.com" 
+              className="hidden sm:flex items-center gap-1 hover:text-amber-300 transition-colors font-mono"
+              title="Email soksithcheyhoout@gmail.com"
             >
               <Mail className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-300" />
-              <span>info@motdar.gov.kh</span>
+              <span>soksithcheyhoout@gmail.com</span>
             </a>
           </div>
         </div>

@@ -911,14 +911,14 @@ export default function LoginView() {
             </div>
 
             <div className="pt-6 border-t border-white/10 flex items-center justify-between text-[11px] text-slate-400">
-              <div className="flex items-center gap-1.5">
+              <a href="tel:0977416126" className="flex items-center gap-1.5 hover:text-white transition-colors font-mono">
                 <Phone className="w-3.5 h-3.5 text-amber-400" />
-                <span>+855 66 901 800</span>
-              </div>
-              <div className="flex items-center gap-1.5">
+                <span>097 741 6126</span>
+              </a>
+              <a href="mailto:soksithcheyhoout@gmail.com" className="flex items-center gap-1.5 hover:text-white transition-colors font-mono">
                 <Mail className="w-3.5 h-3.5 text-cyan-400" />
-                <span>info@moeys.gov.kh</span>
-              </div>
+                <span>soksithcheyhoout@gmail.com</span>
+              </a>
             </div>
 
           </div>

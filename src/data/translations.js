@@ -125,10 +125,11 @@ export const translations = {
     // Footer
     footerAbout: "ប្រព័ន្ធសិក្សាឌីជីថលកម្រិតវិទ្យាល័យ ក្រោមការគ្រប់គ្រងរបស់ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ និងការស្រាវជ្រាវកម្រិតខ្ពស់ នៃព្រះរាជាណាចក្រកម្ពុជា។",
     quickLinks: "តំណភ្ជាប់ផ្លូវការ",
-    contactUs: "ទំនាក់ទំនងក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ",
-    phone: "ទូរស័ព្ទ: (+855) 66 901 800 / 23 888 999",
-    email: "អ៊ីមែល: info@motdar.gov.kh",
-    address: "អាសយដ្ឋាន: មហាវិថីព្រះនរោត្តម រាជធានីភ្នំពេញ ព្រះរាជាណាចក្រកម្ពុជា",
+    contactUs: "ទំនាក់ទំនងបច្ចេកទេស និងជំនួយការសិក្សា",
+    phone: "ទូរស័ព្ទ / Telegram: 097 741 6126",
+    email: "អ៊ីមែល: soksithcheyhoout@gmail.com",
+    address: "រាជធានីភ្នំពេញ ព្រះរាជាណាចក្រកម្ពុជា",
+    supportNotice: "បើមានបញ្ហាបច្ចេកទេស ឬកំហុសឆ្គងក្នុងប្រព័ន្ធ សូមទាក់ទងមកកាន់ Gmail ឬ Telegram តាមរយៈលេខ 0977416126",
     copyright: "រក្សាសិទ្ធិគ្រប់យ៉ាងដោយ ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ និងការស្រាវជ្រាវកម្រិតខ្ពស់ © ២០២៦",
   },
   en: {
@@ -256,10 +257,11 @@ export const translations = {
     // Footer
     footerAbout: "National Secondary Digital Learning Platform operated by the Ministry of Talent Development & Advanced Research of Cambodia.",
     quickLinks: "Official Portals",
-    contactUs: "Contact MoTDAR Administration",
-    phone: "Tel: (+855) 66 901 800 / 23 888 999",
-    email: "Email: info@motdar.gov.kh",
-    address: "Norodom Blvd, Phnom Penh, Kingdom of Cambodia",
+    contactUs: "Technical Support & Inquiries",
+    phone: "Tel / Telegram: 097 741 6126",
+    email: "Email: soksithcheyhoout@gmail.com",
+    address: "Phnom Penh, Kingdom of Cambodia",
+    supportNotice: "For technical issues or bug reports, please contact via Gmail (soksithcheyhoout@gmail.com) or Telegram at 0977416126",
     copyright: "All Rights Reserved. Ministry of Talent Development & Advanced Research © 2026",
   }
 };
