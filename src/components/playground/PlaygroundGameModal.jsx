@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useAuth, computeLevelData } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
-import { getRandomizedGameQuestions } from '../../utils/gamePoolManager';
+import { getRandomizedGameQuestions, fetchLiveExamQuestions } from '../../utils/gamePoolManager';
 import VictoryRewardCelebration from './VictoryRewardCelebration';
 
 export default function PlaygroundGameModal({ game, onClose }) {
@@ -27,7 +27,7 @@ export default function PlaygroundGameModal({ game, onClose }) {
   const levelInfo = computeLevelData(student.xp);
 
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [questions, setQuestions] = useState(() => getRandomizedGameQuestions(game, 6));
+  const [questions, setQuestions] = useState(() => getRandomizedGameQuestions(game, 8));
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswerSubmitted, setIsAnswerSubmitted] = useState(false);
@@ -41,15 +41,29 @@ export default function PlaygroundGameModal({ game, onClose }) {
   const autoNextTimerRef = useRef(null);
   const countdownIntervalRef = useRef(null);
 
-  // Prevent background scroll
+  // Prevent background scroll & fetch from 12,000 question bank
   useEffect(() => {
     document.body.style.overflow = 'hidden';
+    let isSubscribed = true;
+    fetchLiveExamQuestions({
+      stream: game?.stream || 'science',
+      subjectKey: game?.subjectKey || '',
+      grade: student?.grade || game?.grade || '12',
+      limit: 12,
+      random: true
+    }).then((livePool) => {
+      if (isSubscribed && Array.isArray(livePool) && livePool.length > 0) {
+        setQuestions(livePool);
+      }
+    });
+
     return () => {
+      isSubscribed = false;
       document.body.style.overflow = '';
       clearTimeout(autoNextTimerRef.current);
       clearInterval(countdownIntervalRef.current);
     };
-  }, []);
+  }, [game, student]);
 
   // Timer countdown
   useEffect(() => {

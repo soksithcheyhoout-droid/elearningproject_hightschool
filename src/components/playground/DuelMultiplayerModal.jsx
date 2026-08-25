@@ -48,7 +48,7 @@ import {
 } from 'lucide-react';
 import { useAuth, computeLevelData } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
-import { getRandomizedGameQuestions } from '../../utils/gamePoolManager';
+import { getRandomizedGameQuestions, fetchLiveExamQuestions } from '../../utils/gamePoolManager';
 import api from '../../services/api';
 
 // High-end Avatar with Frame Renderer
@@ -469,7 +469,26 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
+
+    // Asynchronously enrich questions from 12,000 question bank
+    let isSubscribed = true;
+    const targetStream = (selectedGrade === '11' || selectedGrade === '12') ? selectedStream : 'general';
+    fetchLiveExamQuestions({
+      stream: targetStream === 'social' ? 'social' : 'science',
+      grade: selectedGrade,
+      limit: 24,
+      random: true
+    }).then((livePool) => {
+      if (isSubscribed && Array.isArray(livePool) && livePool.length > 0) {
+        setQuestions(livePool);
+        if (isHost && roomCode) {
+          api.createArenaRoom(roomCode, game?.id || 'sci-m-01', game?.subject || 'គណិតវិទ្យា', currentStudentPayload, livePool, selectedGrade, targetStream);
+        }
+      }
+    });
+
     return () => {
+      isSubscribed = false;
       document.body.style.overflow = '';
       clearTimeout(autoNextTimerRef.current);
       clearInterval(countdownIntervalRef.current);
@@ -491,23 +510,39 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     isHost: isHost
   };
 
-  // Grade & Stream Handlers for Host
-  const handleSelectGrade = (newGrade) => {
+  // Grade & Stream Handlers for Host (Deeply connected to 12,000 Questions Pool)
+  const handleSelectGrade = async (newGrade) => {
     if (!isHost) return;
     const gStr = String(newGrade);
     setSelectedGrade(gStr);
     const newStream = (gStr === '11' || gStr === '12') ? selectedStream : 'general';
-    const newPool = getRandomizedGameQuestions(game, 24, gStr, newStream);
-    setQuestions(newPool);
-    api.createArenaRoom(roomCode, game?.id || 'sci-m-01', game?.subject || 'គណិតវិទ្យា', currentStudentPayload, newPool, gStr, newStream);
+    const fallbackPool = getRandomizedGameQuestions(game, 24, gStr, newStream);
+    setQuestions(fallbackPool);
+    api.createArenaRoom(roomCode, game?.id || 'sci-m-01', game?.subject || 'គណិតវិទ្យា', currentStudentPayload, fallbackPool, gStr, newStream);
+
+    try {
+      const livePool = await fetchLiveExamQuestions({ stream: newStream === 'social' ? 'social' : 'science', grade: gStr, limit: 24, random: true });
+      if (Array.isArray(livePool) && livePool.length > 0) {
+        setQuestions(livePool);
+        api.createArenaRoom(roomCode, game?.id || 'sci-m-01', game?.subject || 'គណិតវិទ្យា', currentStudentPayload, livePool, gStr, newStream);
+      }
+    } catch (e) { }
   };
 
-  const handleSelectStream = (newStream) => {
+  const handleSelectStream = async (newStream) => {
     if (!isHost) return;
     setSelectedStream(newStream);
-    const newPool = getRandomizedGameQuestions(game, 24, selectedGrade, newStream);
-    setQuestions(newPool);
-    api.createArenaRoom(roomCode, game?.id || 'sci-m-01', game?.subject || 'គណិតវិទ្យា', currentStudentPayload, newPool, selectedGrade, newStream);
+    const fallbackPool = getRandomizedGameQuestions(game, 24, selectedGrade, newStream);
+    setQuestions(fallbackPool);
+    api.createArenaRoom(roomCode, game?.id || 'sci-m-01', game?.subject || 'គណិតវិទ្យា', currentStudentPayload, fallbackPool, selectedGrade, newStream);
+
+    try {
+      const livePool = await fetchLiveExamQuestions({ stream: newStream, grade: selectedGrade, limit: 24, random: true });
+      if (Array.isArray(livePool) && livePool.length > 0) {
+        setQuestions(livePool);
+        api.createArenaRoom(roomCode, game?.id || 'sci-m-01', game?.subject || 'គណិតវិទ្យា', currentStudentPayload, livePool, selectedGrade, newStream);
+      }
+    } catch (e) { }
   };
 
   // Switch to next turn & question

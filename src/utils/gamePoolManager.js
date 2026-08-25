@@ -146,3 +146,34 @@ export function getRandomizedGameQuestions(game, count = 20, grade = '12', strea
   // 6. Shuffle options for each individual question so answer is NEVER at the same static index
   return selectedQuestions.map((q) => shuffleQuestionOptions(q));
 }
+
+/**
+ * Asynchronously fetch fresh authentic questions from the 12,000 Master National Question Bank (6,000 Science + 6,000 Social)
+ * @param {Object} options - { stream, subjectKey, grade, limit, random }
+ */
+export async function fetchLiveExamQuestions({ stream = 'science', subjectKey = '', grade = '12', limit = 24, random = true } = {}) {
+  try {
+    const API_URL = import.meta.env.VITE_API_URL || '/api';
+    const params = new URLSearchParams({
+      stream,
+      ...(subjectKey ? { subjectKey } : {}),
+      ...(grade ? { grade: String(grade) } : {}),
+      limit: String(limit),
+      random: String(random)
+    });
+
+    const res = await fetch(`${API_URL}/questions/master-pool?${params.toString()}`);
+    if (res.ok) {
+      const data = await res.json();
+      if (data && Array.isArray(data.questions) && data.questions.length > 0) {
+        return data.questions.map((q) => shuffleQuestionOptions(q));
+      }
+    }
+  } catch (err) {
+    console.warn('[Live Exam Pool Fetch Warning]:', err.message);
+  }
+
+  // Fallback to local synchronous pool if offline or loading
+  return getRandomizedGameQuestions(null, limit, grade, stream);
+}
+
