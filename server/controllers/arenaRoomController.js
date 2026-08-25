@@ -461,21 +461,38 @@ export const leaveRoom = (req, res) => {
       return res.json({ success: true });
     }
 
-    if (room.host && (room.host.id === studentId || room.host.username === username)) {
+    const isHostLeaving = room.host && (
+      (studentId && String(room.host.id) === String(studentId)) ||
+      (username && room.host.username === username)
+    );
+
+    const isChallengerLeaving = room.challenger && (
+      (studentId && String(room.challenger.id) === String(studentId)) ||
+      (username && room.challenger.username === username)
+    );
+
+    if (isHostLeaving) {
       room.status = 'host_left';
       room.hostLeft = true;
+      room.host = null;
       room.hostRematch = false;
       room.challengerRematch = false;
       setTimeout(() => {
         activeRooms.delete(roomCode);
       }, 5000);
-    } else if (room.challenger && (room.challenger.id === studentId || room.challenger.username === username)) {
+    } else if (isChallengerLeaving || !isHostLeaving) {
       room.challenger = null;
       room.challengerLeft = true;
       room.challengerReady = false;
+      room.challengerScore = 0;
+      room.challengerCorrectCount = 0;
       room.challengerRematch = false;
       room.hostRematch = false;
-      room.status = 'waiting';
+      if (room.status === 'battle' || room.status === 'countdown') {
+        room.status = 'opponent_left';
+      } else {
+        room.status = 'waiting';
+      }
     }
 
     room.lastActive = Date.now();
