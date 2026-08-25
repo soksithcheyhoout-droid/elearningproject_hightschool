@@ -1002,7 +1002,9 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                 )}
               </div>
               <h2 className="text-base sm:text-lg font-black text-white leading-tight truncate mt-0.5">
-                {game?.titleKm || 'សង្វៀនប្រកួតល្បឿនបន្តផ្ទាល់'}
+                {selectedGrade >= 11
+                  ? (selectedStream === 'social' ? 'សង្វៀនប្រឡងវិទ្យាសាស្ត្រសង្គម (Social Science Arena)' : (game?.titleKm || 'សង្វៀនប្រឡងវិទ្យាសាស្ត្រពិត (Science Arena)'))
+                  : `សង្វៀនប្រកួតចំណេះដឹងទូទៅ ថ្នាក់ទី${selectedGrade}`}
               </h2>
             </div>
           </div>
@@ -1881,7 +1883,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             {/* Question Card */}
             <div className="bg-gradient-to-b from-[#0e1730] to-[#080d1e] rounded-3xl p-6 sm:p-8 text-center border border-slate-800 shadow-xl my-auto relative overflow-hidden">
               <span className="text-[10px] font-black text-indigo-400 uppercase tracking-widest block mb-2 font-mono">
-                {game?.category || 'Question'} #{currentQIndex + 1}
+                {`${currentQ?.subject ? currentQ.subject + ' • ' : ''}${currentQ?.category || (selectedStream === 'social' ? 'Social Science' : 'Natural Science')} #${currentQIndex + 1}`}
               </span>
               <h3 className="text-base sm:text-xl md:text-2xl font-black text-white leading-relaxed">
                 {currentQ.q}
