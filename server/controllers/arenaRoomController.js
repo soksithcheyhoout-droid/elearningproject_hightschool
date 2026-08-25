@@ -331,11 +331,13 @@ export const submitTurnAnswer = (req, res) => {
     }
 
     // Check if anyone reached 6 correct answers
-    const hasHostWon = room.hostCorrectCount >= 6;
-    const hasChallengerWon = room.challengerCorrectCount >= 6;
+    const hasHostWon = (room.hostCorrectCount || 0) >= 6;
+    const hasChallengerWon = (room.challengerCorrectCount || 0) >= 6;
+    const now = Date.now();
 
     room.turnStatus = 'turn_ended';
     room.turnResult = {
+      turnId: `turn_${now}_${Math.random().toString(36).substring(2, 7)}`,
       answeredBy: isHost ? 'host' : 'challenger',
       selectedIdx: typeof selectedIdx === 'number' ? selectedIdx : -1,
       isCorrect: !!isCorrect,
@@ -344,10 +346,10 @@ export const submitTurnAnswer = (req, res) => {
       hostCorrectCount: room.hostCorrectCount,
       challengerCorrectCount: room.challengerCorrectCount,
       winnerDeclared: hasHostWon ? 'host' : hasChallengerWon ? 'challenger' : null,
-      timestamp: Date.now()
+      timestamp: now
     };
 
-    room.lastActive = Date.now();
+    room.lastActive = now;
     return res.json({ success: true, room });
   } catch (err) {
     console.error('[Submit Turn Answer Error]:', err);
@@ -355,26 +357,32 @@ export const submitTurnAnswer = (req, res) => {
   }
 };
 
-// Switch turn & advance to next question
+// Switch turn & advance to next question (Idempotent for both Host & Challenger)
 export const nextTurn = (req, res) => {
   try {
     const { roomCode } = req.params;
-    const { extraQuestions } = req.body;
+    const { expectedQIndex, extraQuestions } = req.body;
     const room = activeRooms.get(roomCode);
     if (!room) {
       return res.status(404).json({ error: 'Room not found' });
     }
 
+    // Idempotency: If this request is for an older turn index that already advanced, return immediately
+    if (typeof expectedQIndex === 'number' && room.currentQIndex !== expectedQIndex) {
+      return res.json({ success: true, room, alreadyAdvanced: true });
+    }
+
     // Win condition: Player must reach 6 correct answers
-    const hasHostWon = room.hostCorrectCount >= 6;
-    const hasChallengerWon = room.challengerCorrectCount >= 6;
+    const hasHostWon = (room.hostCorrectCount || 0) >= 6;
+    const hasChallengerWon = (room.challengerCorrectCount || 0) >= 6;
 
     if (hasHostWon || hasChallengerWon) {
-      // Check if both reached 6 (Tie at 6-6)
+      // Check if both reached 6 at the same time (Overtime)
       if (room.hostCorrectCount === 6 && room.challengerCorrectCount === 6) {
         room.isOvertime = true;
       } else {
         room.status = 'results';
+        room.turnStatus = 'turn_ended';
         room.lastActive = Date.now();
         return res.json({ success: true, room });
       }

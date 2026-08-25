@@ -520,12 +520,18 @@ export const api = {
     }
   },
 
-  nextTurn: async (roomCode, extraQuestions = []) => {
+  nextTurn: async (roomCode, expectedQIndex = null, extraQuestions = []) => {
     try {
+      let qIndex = expectedQIndex;
+      let extras = extraQuestions;
+      if (Array.isArray(expectedQIndex)) {
+        extras = expectedQIndex;
+        qIndex = null;
+      }
       const res = await fetch(`${API_BASE}/arena/room/${roomCode}/next-turn`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ extraQuestions })
+        body: JSON.stringify({ expectedQIndex: qIndex, extraQuestions: extras })
       });
       return await res.json();
     } catch (err) {

@@ -26,8 +26,8 @@ export const playSound = {
       const gain = ctx.createGain();
       osc.type = 'sine';
       osc.frequency.setValueAtTime(600, ctx.currentTime);
-      osc.frequency.exponentialRampToValueAtTime(800, ctx.currentTime + 0.05);
-      gain.gain.setValueAtTime(0.15, ctx.currentTime);
+      osc.frequency.exponentialRampToValueAtTime(850, ctx.currentTime + 0.05);
+      gain.gain.setValueAtTime(0.18, ctx.currentTime);
       gain.gain.exponentialRampToValueAtTime(0.01, ctx.currentTime + 0.05);
       osc.connect(gain);
       gain.connect(ctx.destination);
@@ -36,23 +36,134 @@ export const playSound = {
     } catch (e) {}
   },
 
+  // 3-2-1 Countdown Beep with Pitch Escalation (eSports Style)
+  countdownTick: (num = 3) => {
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const freq = num === 1 ? 659.25 : num === 2 ? 554.37 : 440.00; // E5, C#5, A4
+
+      // Primary tone
+      const osc1 = ctx.createOscillator();
+      const gain1 = ctx.createGain();
+      osc1.type = 'triangle';
+      osc1.frequency.setValueAtTime(freq, now);
+      gain1.gain.setValueAtTime(0.25, now);
+      gain1.gain.exponentialRampToValueAtTime(0.001, now + 0.18);
+      osc1.connect(gain1);
+      gain1.connect(ctx.destination);
+      osc1.start(now);
+      osc1.stop(now + 0.18);
+
+      // High harmonic overtone
+      const osc2 = ctx.createOscillator();
+      const gain2 = ctx.createGain();
+      osc2.type = 'sine';
+      osc2.frequency.setValueAtTime(freq * 2, now);
+      gain2.gain.setValueAtTime(0.12, now);
+      gain2.gain.exponentialRampToValueAtTime(0.001, now + 0.12);
+      osc2.connect(gain2);
+      gain2.connect(ctx.destination);
+      osc2.start(now);
+      osc2.stop(now + 0.12);
+    } catch (e) {}
+  },
+
+  // High-Energy Duel / Match Start Sound (Brass + Sub Impact)
+  duelStart: () => {
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+
+      // Sub Bass Impact
+      const subOsc = ctx.createOscillator();
+      const subGain = ctx.createGain();
+      subOsc.type = 'sine';
+      subOsc.frequency.setValueAtTime(140, now);
+      subOsc.frequency.exponentialRampToValueAtTime(35, now + 0.35);
+      subGain.gain.setValueAtTime(0.4, now);
+      subGain.gain.exponentialRampToValueAtTime(0.001, now + 0.35);
+      subOsc.connect(subGain);
+      subGain.connect(ctx.destination);
+      subOsc.start(now);
+      subOsc.stop(now + 0.35);
+
+      // Shimmering Triad Chord (A5, C#6, E6)
+      [880.00, 1108.73, 1318.51, 1760.00].forEach((freq, idx) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(freq, now + idx * 0.02);
+        gain.gain.setValueAtTime(0.18, now + idx * 0.02);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + idx * 0.02 + 0.45);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + idx * 0.02);
+        osc.stop(now + idx * 0.02 + 0.45);
+      });
+    } catch (e) {}
+  },
+
+  // Futuristic Turn Switch / Laser Swoosh
+  turnSwitch: () => {
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'sine';
+      osc.frequency.setValueAtTime(320, now);
+      osc.frequency.exponentialRampToValueAtTime(960, now + 0.12);
+      osc.frequency.exponentialRampToValueAtTime(480, now + 0.22);
+      gain.gain.setValueAtTime(0.2, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.22);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.22);
+    } catch (e) {}
+  },
+
+  // Urgent Clock Tick for last seconds
+  timerWarning: () => {
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const osc = ctx.createOscillator();
+      const gain = ctx.createGain();
+      osc.type = 'square';
+      osc.frequency.setValueAtTime(900, now);
+      gain.gain.setValueAtTime(0.12, now);
+      gain.gain.exponentialRampToValueAtTime(0.001, now + 0.04);
+      osc.connect(gain);
+      gain.connect(ctx.destination);
+      osc.start(now);
+      osc.stop(now + 0.04);
+    } catch (e) {}
+  },
+
   correct: () => {
     try {
       const ctx = getAudioContext();
       if (!ctx) return;
       const now = ctx.currentTime;
-      // High bright chord C5 -> G5
+      // High bright chord C5 -> G5 -> C6
       [523.25, 659.25, 783.99, 1046.50].forEach((freq, i) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'triangle';
         osc.frequency.setValueAtTime(freq, now + i * 0.04);
-        gain.gain.setValueAtTime(0.2, now + i * 0.04);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.04 + 0.25);
+        gain.gain.setValueAtTime(0.25, now + i * 0.04);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.04 + 0.3);
         osc.connect(gain);
         gain.connect(ctx.destination);
         osc.start(now + i * 0.04);
-        osc.stop(now + i * 0.04 + 0.25);
+        osc.stop(now + i * 0.04 + 0.3);
       });
     } catch (e) {}
   },
@@ -102,7 +213,6 @@ export const playSound = {
     } catch (e) {}
   },
 
-
   wrong: () => {
     try {
       const ctx = getAudioContext();
@@ -111,14 +221,14 @@ export const playSound = {
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'sawtooth';
-      osc.frequency.setValueAtTime(200, now);
-      osc.frequency.linearRampToValueAtTime(120, now + 0.2);
-      gain.gain.setValueAtTime(0.2, now);
-      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.2);
+      osc.frequency.setValueAtTime(220, now);
+      osc.frequency.linearRampToValueAtTime(110, now + 0.22);
+      gain.gain.setValueAtTime(0.25, now);
+      gain.gain.exponentialRampToValueAtTime(0.01, now + 0.22);
       osc.connect(gain);
       gain.connect(ctx.destination);
       osc.start(now);
-      osc.stop(now + 0.2);
+      osc.stop(now + 0.22);
     } catch (e) {}
   },
 
@@ -146,7 +256,6 @@ export const playSound = {
       const ctx = getAudioContext();
       if (!ctx) return;
       const now = ctx.currentTime;
-      // Low boom
       const osc = ctx.createOscillator();
       const gain = ctx.createGain();
       osc.type = 'square';
@@ -172,7 +281,7 @@ export const playSound = {
         const gain = ctx.createGain();
         osc.type = 'sine';
         osc.frequency.setValueAtTime(baseFreq + offset, now + idx * 0.05);
-        gain.gain.setValueAtTime(0.2, now + idx * 0.05);
+        gain.gain.setValueAtTime(0.22, now + idx * 0.05);
         gain.gain.exponentialRampToValueAtTime(0.01, now + idx * 0.05 + 0.15);
         osc.connect(gain);
         gain.connect(ctx.destination);
@@ -187,18 +296,39 @@ export const playSound = {
       const ctx = getAudioContext();
       if (!ctx) return;
       const now = ctx.currentTime;
-      const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51];
+      const notes = [523.25, 659.25, 783.99, 1046.50, 1318.51, 1567.98];
       notes.forEach((freq, i) => {
         const osc = ctx.createOscillator();
         const gain = ctx.createGain();
         osc.type = 'triangle';
-        osc.frequency.setValueAtTime(freq, now + i * 0.1);
-        gain.gain.setValueAtTime(0.25, now + i * 0.1);
-        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.1 + 0.4);
+        osc.frequency.setValueAtTime(freq, now + i * 0.09);
+        gain.gain.setValueAtTime(0.28, now + i * 0.09);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.09 + 0.45);
         osc.connect(gain);
         gain.connect(ctx.destination);
-        osc.start(now + i * 0.1);
-        osc.stop(now + i * 0.1 + 0.4);
+        osc.start(now + i * 0.09);
+        osc.stop(now + i * 0.09 + 0.45);
+      });
+    } catch (e) {}
+  },
+
+  defeat: () => {
+    try {
+      const ctx = getAudioContext();
+      if (!ctx) return;
+      const now = ctx.currentTime;
+      const notes = [392.00, 369.99, 329.63, 261.63];
+      notes.forEach((freq, i) => {
+        const osc = ctx.createOscillator();
+        const gain = ctx.createGain();
+        osc.type = 'sine';
+        osc.frequency.setValueAtTime(freq, now + i * 0.14);
+        gain.gain.setValueAtTime(0.2, now + i * 0.14);
+        gain.gain.exponentialRampToValueAtTime(0.001, now + i * 0.14 + 0.4);
+        osc.connect(gain);
+        gain.connect(ctx.destination);
+        osc.start(now + i * 0.14);
+        osc.stop(now + i * 0.14 + 0.4);
       });
     } catch (e) {}
   },
