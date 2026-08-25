@@ -5,10 +5,8 @@ import {
   BookOpen, 
   Calendar, 
   Clock, 
-  CheckCircle2, 
   FileText, 
   Sparkles, 
-  Download, 
   Eye, 
   Play, 
   Award, 
@@ -24,13 +22,11 @@ import {
   ChevronRight,
   LayoutGrid,
   List,
-  Database,
-  Loader2
+  Database
 } from 'lucide-react';
 import { bacIIData } from '../../data/bacIIData';
 import { quizData } from '../../data/quizData';
 import { useLanguage } from '../../context/LanguageContext';
-import { downloadBacIIPdf } from '../../utils/baciiPdfExporter';
 import api from '../../services/api';
 import QuizModal from './QuizModal';
 
@@ -44,8 +40,6 @@ export default function BacIIHubView() {
   const [currentPage, setCurrentPage] = useState(1);
   const [activeSolutionModal, setActiveSolutionModal] = useState(null);
   const [activeQuizModal, setActiveQuizModal] = useState(null);
-  const [downloadToast, setDownloadToast] = useState(null);
-  const [downloadingPaperId, setDownloadingPaperId] = useState(null);
   const [adminExams, setAdminExams] = useState([]);
 
   // Fetch dynamic exams created by Admin
@@ -136,29 +130,6 @@ export default function BacIIHubView() {
 
   const scienceCount = allPapers.filter(p => p.stream === 'science').length;
   const socialCount = allPapers.filter(p => p.stream === 'social').length;
-
-  const handleDownloadPdf = async (paper) => {
-    if (!paper || downloadingPaperId) return;
-    setDownloadingPaperId(paper.id);
-    setDownloadToast(`កំពុងរៀបចំ និងទាញយកវិញ្ញាសា ${paper.year} ${paper.subject} ជាទម្រង់ PDF HD... ⏳`);
-
-    try {
-      const success = await downloadBacIIPdf(paper);
-      if (success) {
-        setDownloadToast(`វិញ្ញាសាបាក់ឌុប ${paper.year} ${paper.subject} (${paper.stream === 'social' ? 'ថ្នាក់វិទ្យាសាស្ត្រសង្គម' : 'ថ្នាក់វិទ្យាសាស្ត្រពិត'}) ត្រូវបានទាញយកជា PDF ជោគជ័យ! ✓`);
-      } else {
-        setDownloadToast(`មានបញ្ហាក្នុងការទាញយក PDF សូមសាកល្បងម្តងទៀត!`);
-      }
-    } catch (e) {
-      console.error(e);
-      setDownloadToast(`មានបញ្ហាក្នុងការទាញយក PDF សូមសាកល្បងម្តងទៀត!`);
-    } finally {
-      setDownloadingPaperId(null);
-      setTimeout(() => {
-        setDownloadToast(null);
-      }, 4000);
-    }
-  };
 
   return (
     <div className="space-y-8 font-kantumruy">
@@ -414,80 +385,59 @@ export default function BacIIHubView() {
         {/* Papers Grid */}
         {viewMode === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-            {paginatedPapers.map((paper) => {
-              const isDownloading = downloadingPaperId === paper.id;
-              return (
-                <div
-                  key={paper.id}
-                  onClick={() => setActiveSolutionModal(paper)}
-                  className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4 hover:border-[#005baa] hover:shadow-lg transition-all flex flex-col justify-between cursor-pointer group"
-                >
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="badge-moeys-gold text-xs font-cinzel">{paper.year}</span>
-                      <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 ${
-                        paper.stream === 'social' 
-                          ? 'bg-amber-100 text-amber-900 border border-amber-300' 
-                          : 'bg-blue-100 text-blue-900 border border-blue-300'
-                      }`}>
-                        {paper.stream === 'social' ? <Landmark className="w-3 h-3 text-amber-600" /> : <Atom className="w-3 h-3 text-[#005baa]" />}
-                        <span>{paper.stream === 'social' ? 'ថ្នាក់វិទ្យាសាស្ត្រសង្គម' : 'ថ្នាក់វិទ្យាសាស្ត្រពិត'}</span>
-                      </span>
-                    </div>
-
-                    <h4 className="text-sm font-black text-[#003366] leading-snug group-hover:text-[#005baa] transition-colors">
-                      {paper.paperTitleKm}
-                    </h4>
-                    <p className="text-xs text-slate-500 font-medium">
-                      {paper.paperTitleEn}
-                    </p>
-
-                    <div className="flex items-center gap-3 text-xs text-slate-500 pt-1">
-                      <span className="flex items-center gap-1">
-                        <Clock className="w-3.5 h-3.5 text-[#005baa]" />
-                        <span>{paper.duration}</span>
-                      </span>
-                      <span>•</span>
-                      <span>{paper.totalPoints} ពិន្ទុពេញ</span>
-                      <span>•</span>
-                      <span>{paper.exercises?.length || 4} លំហាត់/សំណួរ</span>
-                    </div>
+            {paginatedPapers.map((paper) => (
+              <div
+                key={paper.id}
+                onClick={() => setActiveSolutionModal(paper)}
+                className="bg-white rounded-2xl border border-slate-200 p-5 space-y-4 hover:border-[#005baa] hover:shadow-lg transition-all flex flex-col justify-between cursor-pointer group"
+              >
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between">
+                    <span className="badge-moeys-gold text-xs font-cinzel">{paper.year}</span>
+                    <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 ${
+                      paper.stream === 'social' 
+                        ? 'bg-amber-100 text-amber-900 border border-amber-300' 
+                        : 'bg-blue-100 text-blue-900 border border-blue-300'
+                    }`}>
+                      {paper.stream === 'social' ? <Landmark className="w-3 h-3 text-amber-600" /> : <Atom className="w-3 h-3 text-[#005baa]" />}
+                      <span>{paper.stream === 'social' ? 'ថ្នាក់វិទ្យាសាស្ត្រសង្គម' : 'ថ្នាក់វិទ្យាសាស្ត្រពិត'}</span>
+                    </span>
                   </div>
 
-                  <div className="flex items-center gap-2 pt-3 border-t border-slate-100">
-                    <button
-                      type="button"
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setActiveSolutionModal(paper);
-                      }}
-                      className="flex-1 btn-moeys-primary text-xs py-2 flex items-center justify-center gap-1.5 font-bold cursor-pointer"
-                    >
-                      <Eye className="w-3.5 h-3.5" />
-                      <span>{lang === 'km' ? 'មើលដំណោះស្រាយ' : 'View Solutions'}</span>
-                    </button>
+                  <h4 className="text-sm font-black text-[#003366] leading-snug group-hover:text-[#005baa] transition-colors">
+                    {paper.paperTitleKm}
+                  </h4>
+                  <p className="text-xs text-slate-500 font-medium">
+                    {paper.paperTitleEn}
+                  </p>
 
-                    <button
-                      type="button"
-                      disabled={isDownloading}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleDownloadPdf(paper);
-                      }}
-                      className="btn-moeys-secondary text-xs py-2 px-3.5 flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
-                      title="Download Official PDF Exam & Solution"
-                    >
-                      {isDownloading ? (
-                        <Loader2 className="w-3.5 h-3.5 text-[#005baa] animate-spin" />
-                      ) : (
-                        <Download className="w-3.5 h-3.5 text-[#005baa]" />
-                      )}
-                      <span>PDF</span>
-                    </button>
+                  <div className="flex items-center gap-3 text-xs text-slate-500 pt-1">
+                    <span className="flex items-center gap-1">
+                      <Clock className="w-3.5 h-3.5 text-[#005baa]" />
+                      <span>{paper.duration}</span>
+                    </span>
+                    <span>•</span>
+                    <span>{paper.totalPoints} ពិន្ទុពេញ</span>
+                    <span>•</span>
+                    <span>{paper.exercises?.length || 4} លំហាត់/សំណួរ</span>
                   </div>
                 </div>
-              );
-            })}
+
+                <div className="pt-3 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveSolutionModal(paper);
+                    }}
+                    className="w-full btn-moeys-primary text-xs py-2.5 flex items-center justify-center gap-2 font-bold cursor-pointer shadow-xs active:scale-[0.99] transition-all"
+                  >
+                    <Eye className="w-4 h-4" />
+                    <span>{lang === 'km' ? 'មើលកម្រងវិញ្ញាសា & ដំណោះស្រាយ' : 'View Exam & Solutions'}</span>
+                  </button>
+                </div>
+              </div>
+            ))}
           </div>
         ) : (
           /* List Mode */
@@ -505,52 +455,36 @@ export default function BacIIHubView() {
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-slate-100">
-                  {paginatedPapers.map((paper) => {
-                    const isDownloading = downloadingPaperId === paper.id;
-                    return (
-                      <tr
-                        key={paper.id}
-                        onClick={() => setActiveSolutionModal(paper)}
-                        className="hover:bg-blue-50/50 transition-colors cursor-pointer"
-                      >
-                        <td className="py-3 px-4 font-cinzel font-bold">{paper.year}</td>
-                        <td className="py-3 px-4">
-                          <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
-                            paper.stream === 'social' ? 'bg-amber-100 text-amber-900' : 'bg-blue-100 text-blue-900'
-                          }`}>
-                            {paper.stream === 'social' ? 'សង្គម' : 'វិទ្យាសាស្ត្រ'}
-                          </span>
-                        </td>
-                        <td className="py-3 px-4 font-bold text-[#003366]">{paper.paperTitleKm}</td>
-                        <td className="py-3 px-4 text-slate-500">{paper.duration}</td>
-                        <td className="py-3 px-4 text-slate-500">{paper.totalPoints} ពិន្ទុ</td>
-                        <td className="py-3 px-4 text-right">
-                          <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
-                            <button
-                              onClick={() => setActiveSolutionModal(paper)}
-                              className="btn-moeys-primary text-[11px] py-1 px-2.5 cursor-pointer font-bold flex items-center gap-1"
-                            >
-                              <Eye className="w-3 h-3" />
-                              <span>មើល</span>
-                            </button>
-                            <button
-                              disabled={isDownloading}
-                              onClick={() => handleDownloadPdf(paper)}
-                              className="btn-moeys-secondary text-[11px] py-1 px-2.5 cursor-pointer flex items-center gap-1 disabled:opacity-50"
-                              title="Download Official PDF"
-                            >
-                              {isDownloading ? (
-                                <Loader2 className="w-3 h-3 text-[#005baa] animate-spin" />
-                              ) : (
-                                <Download className="w-3 h-3 text-[#005baa]" />
-                              )}
-                              <span>PDF</span>
-                            </button>
-                          </div>
-                        </td>
-                      </tr>
-                    );
-                  })}
+                  {paginatedPapers.map((paper) => (
+                    <tr
+                      key={paper.id}
+                      onClick={() => setActiveSolutionModal(paper)}
+                      className="hover:bg-blue-50/50 transition-colors cursor-pointer"
+                    >
+                      <td className="py-3 px-4 font-cinzel font-bold">{paper.year}</td>
+                      <td className="py-3 px-4">
+                        <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full ${
+                          paper.stream === 'social' ? 'bg-amber-100 text-amber-900' : 'bg-blue-100 text-blue-900'
+                        }`}>
+                          {paper.stream === 'social' ? 'សង្គម' : 'វិទ្យាសាស្ត្រ'}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 font-bold text-[#003366]">{paper.paperTitleKm}</td>
+                      <td className="py-3 px-4 text-slate-500">{paper.duration}</td>
+                      <td className="py-3 px-4 text-slate-500">{paper.totalPoints} ពិន្ទុ</td>
+                      <td className="py-3 px-4 text-right">
+                        <div className="flex items-center justify-end gap-1.5" onClick={(e) => e.stopPropagation()}>
+                          <button
+                            onClick={() => setActiveSolutionModal(paper)}
+                            className="btn-moeys-primary text-[11px] py-1.5 px-3 cursor-pointer font-bold flex items-center gap-1.5"
+                          >
+                            <Eye className="w-3.5 h-3.5" />
+                            <span>មើលវិញ្ញាសា</span>
+                          </button>
+                        </div>
+                      </td>
+                    </tr>
+                  ))}
                 </tbody>
               </table>
             </div>
@@ -604,7 +538,7 @@ export default function BacIIHubView() {
         )}
       </div>
 
-      {/* Official Solution Key Modal (Modal in Screenshot 3) */}
+      {/* Official Solution Key Modal */}
       {activeSolutionModal && createPortal(
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto font-kantumruy animate-fadeIn">
           <div className="moeys-card w-full max-w-3xl bg-white border-slate-300 p-5 sm:p-8 space-y-5 shadow-2xl my-auto max-h-[92vh] flex flex-col">
@@ -652,24 +586,12 @@ export default function BacIIHubView() {
               ))}
             </div>
 
-            <div className="flex items-center justify-between pt-3 border-t border-slate-200 flex-shrink-0">
-              <button
-                disabled={downloadingPaperId === activeSolutionModal.id}
-                onClick={() => handleDownloadPdf(activeSolutionModal)}
-                className="btn-moeys-secondary text-xs py-2 px-4 font-bold flex items-center gap-1.5 cursor-pointer disabled:opacity-50"
-              >
-                {downloadingPaperId === activeSolutionModal.id ? (
-                  <Loader2 className="w-3.5 h-3.5 text-[#005baa] animate-spin" />
-                ) : (
-                  <Download className="w-3.5 h-3.5 text-[#005baa]" />
-                )}
-                <span>ទាញយកជា PDF (Download PDF)</span>
-              </button>
+            <div className="flex items-center justify-end pt-3 border-t border-slate-200 flex-shrink-0">
               <button
                 onClick={() => setActiveSolutionModal(null)}
-                className="btn-moeys-primary text-xs py-2 px-6 font-bold cursor-pointer"
+                className="btn-moeys-primary text-xs py-2.5 px-8 font-bold cursor-pointer"
               >
-                បិទផ្ទាំង (Close)
+                {lang === 'km' ? 'បិទផ្ទាំង (Close)' : 'Close'}
               </button>
             </div>
 
@@ -684,14 +606,6 @@ export default function BacIIHubView() {
           quiz={activeQuizModal}
           onClose={() => setActiveQuizModal(null)}
         />
-      )}
-
-      {/* Download PDF Toast */}
-      {downloadToast && (
-        <div className="fixed bottom-6 right-6 z-[9999] bg-slate-900 text-white px-5 py-3 rounded-2xl shadow-2xl border border-slate-700 flex items-center gap-3 animate-bounce">
-          <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0" />
-          <span className="text-xs font-bold">{downloadToast}</span>
-        </div>
       )}
 
     </div>
