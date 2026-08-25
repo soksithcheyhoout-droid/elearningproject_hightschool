@@ -17,182 +17,366 @@ import {
   Bookmark,
   Sun,
   Moon,
-  Calculator,
-  Atom,
-  FlaskConical,
-  Dna,
-  Landmark,
-  Globe,
-  Scale,
-  Languages,
-  Award,
-  Code,
   GraduationCap,
   Layers,
-  Compass
+  Award
 } from 'lucide-react';
 import { libraryBooks } from '../../data/libraryBooks';
 import { useLanguage } from '../../context/LanguageContext';
 
-// Helper to get vibrant category gradients, icons, stickers, and tags
-function getCategoryDesign(cat = '', title = '') {
+// Helper to determine authentic MoEYS cover styling & vector illustrations
+function getBookCoverDesign(cat = '', title = '') {
   const c = cat.toLowerCase();
   const t = title.toLowerCase();
 
   if (c.includes('math') || t.includes('គណិត')) {
     return {
-      gradient: 'from-[#001f3f] via-[#003876] to-[#005baa]',
-      bgGlow: 'bg-cyan-400/20',
-      icon: Calculator,
-      sticker: '📐',
-      tag: 'គណិតវិទ្យា',
+      theme: 'math',
+      primaryColor: '#003366',
+      bgGradient: 'from-[#002244] via-[#003876] to-[#004b93]',
       accentColor: '#38bdf8',
-      symbol: '∫ f(x)dx • lim • π'
+      titleKm: 'គណិតវិទ្យា',
+      titleEn: 'MATHEMATICS',
+      streamKm: t.includes('សង្គម') ? 'ថ្នាក់វិទ្យាសាស្ត្រសង្គម' : 'ថ្នាក់វិទ្យាសាស្ត្រពិត (កម្រិតខ្ពស់)',
+      badgeText: 'MATHEMATICS',
+      patternType: 'math'
     };
   }
   if (c.includes('physic') || t.includes('រូបវិទ្យា')) {
     return {
-      gradient: 'from-[#082f49] via-[#0284c7] to-[#38bdf8]',
-      bgGlow: 'bg-sky-400/25',
-      icon: Atom,
-      sticker: '⚡',
-      tag: 'រូបវិទ្យា',
+      theme: 'physics',
+      primaryColor: '#0369a1',
+      bgGradient: 'from-[#082f49] via-[#0369a1] to-[#0284c7]',
       accentColor: '#7dd3fc',
-      symbol: 'E = mc² • RLC • ω'
+      titleKm: 'រូបវិទ្យា',
+      titleEn: 'PHYSICS',
+      streamKm: 'ថ្នាក់វិទ្យាសាស្ត្រពិត (ទ្រឹស្តី និងពិសោធន៍)',
+      badgeText: 'PHYSICS',
+      patternType: 'physics'
     };
   }
   if (c.includes('chem') || t.includes('គីមី')) {
     return {
-      gradient: 'from-[#064e3b] via-[#059669] to-[#10b981]',
-      bgGlow: 'bg-emerald-400/25',
-      icon: FlaskConical,
-      sticker: '🧪',
-      tag: 'គីមីវិទ្យា',
+      theme: 'chem',
+      primaryColor: '#047857',
+      bgGradient: 'from-[#022c22] via-[#065f46] to-[#059669]',
       accentColor: '#6ee7b7',
-      symbol: 'pH = -log[H+] • CnH2n'
+      titleKm: 'គីមីវិទ្យា',
+      titleEn: 'CHEMISTRY',
+      streamKm: 'ថ្នាក់វិទ្យាសាស្ត្រពិត (ស៊ីនេទិច និងសរីរាង្គ)',
+      badgeText: 'CHEMISTRY',
+      patternType: 'chem'
     };
   }
   if (c.includes('bio') || t.includes('ជីវវិទ្យា')) {
     return {
-      gradient: 'from-[#14532d] via-[#16a34a] to-[#4ade80]',
-      bgGlow: 'bg-green-400/25',
-      icon: Dna,
-      sticker: '🧬',
-      tag: 'ជីវវិទ្យា',
+      theme: 'bio',
+      primaryColor: '#15803d',
+      bgGradient: 'from-[#052e16] via-[#166534] to-[#15803d]',
       accentColor: '#86efac',
-      symbol: 'ADN • ARNm • 2A+2G'
+      titleKm: 'ជីវវិទ្យា',
+      titleEn: 'BIOLOGY',
+      streamKm: 'ថ្នាក់វិទ្យាសាស្ត្រពិត (ហ្សែន និងម៉ូលេគុល ADN)',
+      badgeText: 'BIOLOGY',
+      patternType: 'bio'
     };
   }
   if (c.includes('khmer') || t.includes('ខ្មែរ') || t.includes('អក្សរ')) {
     return {
-      gradient: 'from-[#78350f] via-[#b45309] to-[#f59e0b]',
-      bgGlow: 'bg-amber-400/25',
-      icon: BookOpen,
-      sticker: '📜',
-      tag: 'អក្សរសាស្ត្រខ្មែរ',
+      theme: 'khmer',
+      primaryColor: '#9a3412',
+      bgGradient: 'from-[#431407] via-[#7c2d12] to-[#9a3412]',
       accentColor: '#fde68a',
-      symbol: 'តែងសេចក្តី • កុលាបប៉ៃលិន'
+      titleKm: 'អក្សរសាស្ត្រខ្មែរ',
+      titleEn: 'KHMER LITERATURE',
+      streamKm: 'អក្សរសិល្ប៍ តែងសេចក្តី & វេយ្យាករណ៍',
+      badgeText: 'KHMER',
+      patternType: 'khmer'
     };
   }
   if (c.includes('hist') || t.includes('ប្រវត្តិ')) {
     return {
-      gradient: 'from-[#7f1d1d] via-[#b91c1c] to-[#ef4444]',
-      bgGlow: 'bg-rose-400/25',
-      icon: Landmark,
-      sticker: '🏛️',
-      tag: 'ប្រវត្តិវិទ្យា',
+      theme: 'hist',
+      primaryColor: '#991b1b',
+      bgGradient: 'from-[#450a0a] via-[#7f1d1d] to-[#991b1b]',
       accentColor: '#fca5a5',
-      symbol: 'អង្គរ • ១៩៥៣ • អាស៊ាន'
+      titleKm: 'ប្រវត្តិវិទ្យា',
+      titleEn: 'HISTORY',
+      streamKm: 'ប្រវត្តិសាស្ត្រកម្ពុជា និងពិភពលោក',
+      badgeText: 'HISTORY',
+      patternType: 'hist'
     };
   }
   if (c.includes('geo') || t.includes('ភូមិ')) {
     return {
-      gradient: 'from-[#083344] via-[#0891b2] to-[#22d3ee]',
-      bgGlow: 'bg-cyan-400/25',
-      icon: Globe,
-      sticker: '🌏',
-      tag: 'ភូមិវិទ្យា',
+      theme: 'geo',
+      primaryColor: '#0e7490',
+      bgGradient: 'from-[#083344] via-[#155e75] to-[#0e7490]',
       accentColor: '#a5f3fc',
-      symbol: 'ទន្លេមេគង្គ • បឹងទន្លេសាប'
+      titleKm: 'ភូមិវិទ្យា',
+      titleEn: 'GEOGRAPHY',
+      streamKm: 'ភូមិសាស្ត្ររូបវន្ត និងសេដ្ឋកិច្ចកម្ពុជា',
+      badgeText: 'GEOGRAPHY',
+      patternType: 'geo'
     };
   }
   if (c.includes('civic') || t.includes('សីលធម៌') || t.includes('ពលរដ្ឋ')) {
     return {
-      gradient: 'from-[#312e81] via-[#4f46e5] to-[#818cf8]',
-      bgGlow: 'bg-indigo-400/25',
-      icon: Scale,
-      sticker: '⚖️',
-      tag: 'សីលធម៌-ពលរដ្ឋ',
+      theme: 'civics',
+      primaryColor: '#4338ca',
+      bgGradient: 'from-[#1e1b4b] via-[#3730a3] to-[#4338ca]',
       accentColor: '#c7d2fe',
-      symbol: 'រដ្ឋធម្មនុញ្ញ • នីតិរដ្ឋ'
+      titleKm: 'សីលធម៌-ពលរដ្ឋ',
+      titleEn: 'MORAL & CIVICS',
+      streamKm: 'រដ្ឋធម្មនុញ្ញ សិទ្ធិមនុស្ស និងនីតិរដ្ឋ',
+      badgeText: 'CIVICS',
+      patternType: 'civics'
     };
   }
   if (c.includes('eng') || t.includes('english') || t.includes('អង់គ្លេស')) {
     return {
-      gradient: 'from-[#831843] via-[#db2777] to-[#f472b6]',
-      bgGlow: 'bg-pink-400/25',
-      icon: Languages,
-      sticker: '🇬🇧',
-      tag: 'ភាសាអង់គ្លេស',
+      theme: 'english',
+      primaryColor: '#be185d',
+      bgGradient: 'from-[#500724] via-[#831843] to-[#9d174d]',
       accentColor: '#fbcfe8',
-      symbol: 'Grammar • Vocabulary'
+      titleKm: 'ភាសាអង់គ្លេស',
+      titleEn: 'ENGLISH FOR CAMBODIA',
+      streamKm: 'Secondary & High School English',
+      badgeText: 'ENGLISH',
+      patternType: 'english'
     };
   }
   if (c.includes('exam') || t.includes('បាក់ឌុប') || t.includes('និទ្ទេស')) {
     return {
-      gradient: 'from-[#451a03] via-[#d97706] to-[#fbbf24]',
-      bgGlow: 'bg-amber-400/30',
-      icon: Award,
-      sticker: '🏆',
-      tag: 'ត្រៀមបាក់ឌុប A',
+      theme: 'exam',
+      primaryColor: '#b45309',
+      bgGradient: 'from-[#451a03] via-[#78350f] to-[#b45309]',
       accentColor: '#fef08a',
-      symbol: 'វិញ្ញាសា & គន្លឹះដោះស្រាយ'
+      titleKm: 'កម្រងវិញ្ញាសាបាក់ឌុប',
+      titleEn: 'BAC II MASTER COMPENDIUM',
+      streamKm: 'គន្លឹះដោះស្រាយយកនិទ្ទេស A',
+      badgeText: 'EXAM PREP',
+      patternType: 'exam'
     };
   }
   if (c.includes('summary') || t.includes('រូបមន្ត')) {
     return {
-      gradient: 'from-[#3b0764] via-[#7e22ce] to-[#c084fc]',
-      bgGlow: 'bg-purple-400/25',
-      icon: FileText,
-      sticker: '📌',
-      tag: 'រូបមន្តសង្ខេប',
+      theme: 'summary',
+      primaryColor: '#6b21a8',
+      bgGradient: 'from-[#3b0764] via-[#581c87] to-[#6b21a8]',
       accentColor: '#e9d5ff',
-      symbol: 'រូបមន្តគន្លឹះត្រូវចាំ'
+      titleKm: 'រូបមន្តសង្ខេបបាក់ឌុប',
+      titleEn: 'FORMULA CHEAT SHEET',
+      streamKm: 'រូបមន្តគន្លឹះត្រូវចាំគ្រប់មុខវិជ្ជា',
+      badgeText: 'FORMULAS',
+      patternType: 'summary'
     };
   }
   if (c.includes('stem') || t.includes('python') || t.includes('កូដ')) {
     return {
-      gradient: 'from-[#1e1b4b] via-[#4338ca] to-[#9333ea]',
-      bgGlow: 'bg-violet-400/25',
-      icon: Code,
-      sticker: '💻',
-      tag: 'STEM & Python',
+      theme: 'stem',
+      primaryColor: '#3730a3',
+      bgGradient: 'from-[#0f172a] via-[#1e1b4b] to-[#312e81]',
       accentColor: '#d8b4fe',
-      symbol: 'def solve(): return AI'
+      titleKm: 'វិទ្យាសាស្ត្រ STEM',
+      titleEn: 'COMPUTER SCIENCE & PYTHON',
+      streamKm: 'កូដកុំព្យូទ័រ & ក្បួនដោះស្រាយបញ្ហា',
+      badgeText: 'STEM',
+      patternType: 'stem'
     };
   }
   if (c.includes('scholarship') || t.includes('អាហារូបករណ៍')) {
     return {
-      gradient: 'from-[#172554] via-[#1d4ed8] to-[#60a5fa]',
-      bgGlow: 'bg-blue-400/25',
-      icon: GraduationCap,
-      sticker: '🎓',
-      tag: 'អាហារូបករណ៍',
+      theme: 'scholarship',
+      primaryColor: '#1e40af',
+      bgGradient: 'from-[#172554] via-[#1e3a8a] to-[#1d4ed8]',
       accentColor: '#bfdbfe',
-      symbol: 'Global Scholarship'
+      titleKm: 'ត្រៀមអាហារូបករណ៍',
+      titleEn: 'SCHOLARSHIP MASTER GUIDE',
+      streamKm: 'អាហារូបករណ៍ជាតិ និងអន្តរជាតិ',
+      badgeText: 'SCHOLARSHIP',
+      patternType: 'scholarship'
     };
   }
 
-  // Default Science
+  // Default fallback
   return {
-    gradient: 'from-[#0f172a] via-[#1e293b] to-[#334155]',
-    bgGlow: 'bg-slate-400/20',
-    icon: BookOpen,
-    sticker: '📖',
-    tag: 'សៀវភៅពុម្ព',
+    theme: 'general',
+    primaryColor: '#334155',
+    bgGradient: 'from-[#0f172a] via-[#1e293b] to-[#334155]',
     accentColor: '#cbd5e1',
-    symbol: 'MoEYS E-Book'
+    titleKm: 'សៀវភៅពុម្ពជាតិ',
+    titleEn: 'NATIONAL TEXTBOOK',
+    streamKm: 'កម្មវិធីសិក្សាគោល MoEYS',
+    badgeText: 'TEXTBOOK',
+    patternType: 'general'
   };
+}
+
+// Vector Illustration Component for Official MoEYS Covers
+function OfficialVectorIllustration({ type, accentColor }) {
+  if (type === 'math') {
+    return (
+      <svg viewBox="0 0 160 100" className="w-full h-full opacity-90 filter drop-shadow">
+        <defs>
+          <linearGradient id="mathGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stopColor="#38bdf8" />
+            <stop offset="100%" stopColor="#818cf8" />
+          </linearGradient>
+        </defs>
+        {/* Grid lines */}
+        <line x1="20" y1="50" x2="140" y2="50" stroke="rgba(255,255,255,0.25)" strokeWidth="1.5" strokeDasharray="3 3" />
+        <line x1="80" y1="10" x2="80" y2="90" stroke="rgba(255,255,255,0.25)" strokeWidth="1.5" strokeDasharray="3 3" />
+        {/* Parabola Curve */}
+        <path d="M 30 80 Q 80 15 130 80" fill="none" stroke="url(#mathGrad)" strokeWidth="3" />
+        {/* Geometric Triangle */}
+        <polygon points="45,75 80,35 115,75" fill="rgba(56,189,248,0.15)" stroke="#38bdf8" strokeWidth="1.5" />
+        {/* Sigma Symbol */}
+        <text x="80" y="58" textAnchor="middle" fill="#ffffff" fontSize="22" fontWeight="bold" fontFamily="serif">∑</text>
+        <text x="32" y="32" fill="#38bdf8" fontSize="11" fontWeight="bold" fontFamily="monospace">f(x)=x²</text>
+        <text x="110" y="32" fill="#e0e7ff" fontSize="11" fontWeight="bold" fontFamily="serif">∫</text>
+      </svg>
+    );
+  }
+
+  if (type === 'physics') {
+    return (
+      <svg viewBox="0 0 160 100" className="w-full h-full opacity-90 filter drop-shadow">
+        {/* Atomic Orbits */}
+        <ellipse cx="80" cy="50" rx="45" ry="16" fill="none" stroke="#7dd3fc" strokeWidth="1.5" transform="rotate(30 80 50)" />
+        <ellipse cx="80" cy="50" rx="45" ry="16" fill="none" stroke="#38bdf8" strokeWidth="1.5" transform="rotate(-30 80 50)" />
+        <ellipse cx="80" cy="50" rx="45" ry="16" fill="none" stroke="#93c5fd" strokeWidth="1.5" />
+        {/* Atomic Nucleus */}
+        <circle cx="80" cy="50" r="7" fill="#fbbf24" stroke="#ffffff" strokeWidth="2" />
+        {/* Electrons */}
+        <circle cx="118" cy="35" r="3" fill="#ffffff" />
+        <circle cx="42" cy="65" r="3" fill="#ffffff" />
+        {/* Formula text */}
+        <text x="80" y="88" textAnchor="middle" fill="#bae6fd" fontSize="10" fontWeight="bold" fontFamily="monospace">E = mc² • RLC</text>
+      </svg>
+    );
+  }
+
+  if (type === 'chem') {
+    return (
+      <svg viewBox="0 0 160 100" className="w-full h-full opacity-90 filter drop-shadow">
+        {/* Benzene Ring 1 */}
+        <polygon points="55,30 70,22 85,30 85,48 70,56 55,48" fill="rgba(16,185,129,0.15)" stroke="#6ee7b7" strokeWidth="2" />
+        <circle cx="70" cy="39" r="8" fill="none" stroke="#6ee7b7" strokeWidth="1.5" strokeDasharray="3 2" />
+        {/* Connected Benzene Ring 2 */}
+        <polygon points="85,48 100,40 115,48 115,66 100,74 85,66" fill="rgba(16,185,129,0.2)" stroke="#34d399" strokeWidth="2" />
+        {/* Erlenmeyer Flask Outline */}
+        <path d="M 35 30 L 45 30 L 45 42 L 25 75 L 55 75 L 35 42 Z" fill="rgba(52,211,153,0.25)" stroke="#ffffff" strokeWidth="1.5" />
+        <text x="80" y="90" textAnchor="middle" fill="#a7f3d0" fontSize="10" fontWeight="bold" fontFamily="monospace">pH = -log[H+]</text>
+      </svg>
+    );
+  }
+
+  if (type === 'bio') {
+    return (
+      <svg viewBox="0 0 160 100" className="w-full h-full opacity-90 filter drop-shadow">
+        {/* DNA Helix Strands */}
+        <path d="M 30 25 Q 55 75 80 25 T 130 25" fill="none" stroke="#86efac" strokeWidth="3" />
+        <path d="M 30 75 Q 55 25 80 75 T 130 75" fill="none" stroke="#4ade80" strokeWidth="3" />
+        {/* Base Pairs (Rungs) */}
+        <line x1="42" y1="42" x2="42" y2="58" stroke="#ffffff" strokeWidth="2" />
+        <line x1="68" y1="45" x2="68" y2="55" stroke="#ffffff" strokeWidth="2" />
+        <line x1="92" y1="45" x2="92" y2="55" stroke="#ffffff" strokeWidth="2" />
+        <line x1="118" y1="42" x2="118" y2="58" stroke="#ffffff" strokeWidth="2" />
+        <text x="80" y="90" textAnchor="middle" fill="#bbf7d0" fontSize="10" fontWeight="bold" fontFamily="sans-serif">ADN • GENETICS</text>
+      </svg>
+    );
+  }
+
+  if (type === 'khmer') {
+    return (
+      <svg viewBox="0 0 160 100" className="w-full h-full opacity-90 filter drop-shadow">
+        {/* Traditional Ornamental Frame */}
+        <rect x="25" y="15" width="110" height="70" rx="8" fill="rgba(251,191,36,0.1)" stroke="#fde68a" strokeWidth="1.5" strokeDasharray="6 3" />
+        {/* Open Book Icon */}
+        <path d="M 80 40 Q 60 30 40 35 L 40 65 Q 60 60 80 70 Q 100 60 120 65 L 120 35 Q 100 30 80 40 Z" fill="rgba(255,255,255,0.2)" stroke="#ffffff" strokeWidth="2" />
+        {/* Lotus Petal Motif */}
+        <path d="M 80 25 Q 75 18 80 12 Q 85 18 80 25 Z" fill="#fde68a" />
+        <text x="80" y="80" textAnchor="middle" fill="#fef08a" fontSize="10" fontWeight="bold" fontFamily="serif">កុលាបប៉ៃលិន • តែងសេចក្តី</text>
+      </svg>
+    );
+  }
+
+  if (type === 'hist') {
+    return (
+      <svg viewBox="0 0 160 100" className="w-full h-full opacity-90 filter drop-shadow">
+        {/* Sun in background */}
+        <circle cx="80" cy="35" r="16" fill="rgba(254,202,202,0.25)" />
+        {/* Angkor Wat 5 Towers Silhouette */}
+        <path d="M 30 75 L 45 75 L 45 55 L 50 48 L 55 55 L 55 75 L 65 75 L 65 42 L 72 32 L 80 20 L 88 32 L 95 42 L 95 75 L 105 75 L 105 55 L 110 48 L 115 55 L 115 75 L 130 75 Z" fill="rgba(255,255,255,0.3)" stroke="#ffffff" strokeWidth="1.5" />
+        <line x1="20" y1="75" x2="140" y2="75" stroke="#fca5a5" strokeWidth="2" />
+        <text x="80" y="89" textAnchor="middle" fill="#fecaca" fontSize="9.5" fontWeight="bold">១៩៥៣ • អាស៊ាន • ប៉ារីស</text>
+      </svg>
+    );
+  }
+
+  if (type === 'geo') {
+    return (
+      <svg viewBox="0 0 160 100" className="w-full h-full opacity-90 filter drop-shadow">
+        {/* Globe Outline */}
+        <circle cx="80" cy="48" r="28" fill="rgba(34,211,238,0.15)" stroke="#a5f3fc" strokeWidth="2" />
+        <ellipse cx="80" cy="48" rx="28" ry="12" fill="none" stroke="#22d3ee" strokeWidth="1" strokeDasharray="3 2" />
+        <ellipse cx="80" cy="48" rx="14" ry="28" fill="none" stroke="#22d3ee" strokeWidth="1" strokeDasharray="3 2" />
+        <line x1="52" y1="48" x2="108" y2="48" stroke="#ffffff" strokeWidth="1.5" />
+        <line x1="80" y1="20" x2="80" y2="76" stroke="#ffffff" strokeWidth="1.5" />
+        <text x="80" y="90" textAnchor="middle" fill="#cffafe" fontSize="9.5" fontWeight="bold">ទន្លេមេគង្គ • បឹងទន្លេសាប</text>
+      </svg>
+    );
+  }
+
+  if (type === 'civics') {
+    return (
+      <svg viewBox="0 0 160 100" className="w-full h-full opacity-90 filter drop-shadow">
+        {/* Pillar & Beam */}
+        <line x1="45" y1="35" x2="115" y2="35" stroke="#ffffff" strokeWidth="2.5" />
+        <line x1="80" y1="30" x2="80" y2="75" stroke="#ffffff" strokeWidth="2.5" />
+        <polygon points="65,75 95,75 80,68" fill="#c7d2fe" />
+        {/* Scale Pans */}
+        <path d="M 45 35 L 35 55 L 55 55 Z" fill="rgba(199,210,254,0.3)" stroke="#c7d2fe" strokeWidth="1.5" />
+        <path d="M 115 35 L 105 55 L 125 55 Z" fill="rgba(199,210,254,0.3)" stroke="#c7d2fe" strokeWidth="1.5" />
+        <text x="80" y="90" textAnchor="middle" fill="#e0e7ff" fontSize="9.5" fontWeight="bold">រដ្ឋធម្មនុញ្ញ • នីតិរដ្ឋ</text>
+      </svg>
+    );
+  }
+
+  if (type === 'english') {
+    return (
+      <svg viewBox="0 0 160 100" className="w-full h-full opacity-90 filter drop-shadow">
+        <rect x="35" y="22" width="90" height="52" rx="8" fill="rgba(244,114,182,0.15)" stroke="#fbcfe8" strokeWidth="2" />
+        <text x="80" y="44" textAnchor="middle" fill="#ffffff" fontSize="13" fontWeight="900" fontFamily="sans-serif" letterSpacing="1">ENGLISH</text>
+        <text x="80" y="60" textAnchor="middle" fill="#fbcfe8" fontSize="10" fontWeight="bold" fontFamily="sans-serif">FOR CAMBODIA</text>
+        <line x1="50" y1="65" x2="110" y2="65" stroke="#ffffff" strokeWidth="1" />
+      </svg>
+    );
+  }
+
+  if (type === 'exam') {
+    return (
+      <svg viewBox="0 0 160 100" className="w-full h-full opacity-90 filter drop-shadow">
+        <circle cx="80" cy="42" r="22" fill="rgba(251,191,36,0.25)" stroke="#fde047" strokeWidth="2.5" />
+        {/* Star */}
+        <polygon points="80,26 84,36 94,36 86,43 89,53 80,47 71,53 74,43 66,36 76,36" fill="#fef08a" />
+        {/* Ribbon tails */}
+        <polygon points="70,60 62,80 72,74 78,80 76,60" fill="#f59e0b" />
+        <polygon points="90,60 84,80 90,74 98,80 92,60" fill="#d97706" />
+        <text x="80" y="94" textAnchor="middle" fill="#fef08a" fontSize="10" fontWeight="bold">និទ្ទេស A • បាក់ឌុប</text>
+      </svg>
+    );
+  }
+
+  // Fallback Book
+  return (
+    <svg viewBox="0 0 160 100" className="w-full h-full opacity-90 filter drop-shadow">
+      <rect x="40" y="20" width="80" height="55" rx="6" fill="rgba(255,255,255,0.15)" stroke="#ffffff" strokeWidth="2" />
+      <line x1="80" y1="20" x2="80" y2="75" stroke="#ffffff" strokeWidth="2" />
+      <text x="80" y="90" textAnchor="middle" fill="#ffffff" fontSize="10" fontWeight="bold">MoEYS TEXTBOOK</text>
+    </svg>
+  );
 }
 
 export default function DigitalLibraryView() {
@@ -412,17 +596,17 @@ export default function DigitalLibraryView() {
           <span className="text-[11px] text-slate-500 font-bold mr-1">{lang === 'km' ? 'ប្រភេទ៖' : 'Category:'}</span>
           {[
             { key: 'all', name: lang === 'km' ? 'ទាំងអស់' : 'All' },
-            { key: 'Math', name: lang === 'km' ? '📐 គណិតវិទ្យា' : 'Math' },
-            { key: 'Physics', name: lang === 'km' ? '⚡ រូបវិទ្យា' : 'Physics' },
-            { key: 'Chemistry', name: lang === 'km' ? '🧪 គីមីវិទ្យា' : 'Chemistry' },
-            { key: 'Biology', name: lang === 'km' ? '🧬 ជីវវិទ្យា' : 'Biology' },
-            { key: 'Khmer', name: lang === 'km' ? '📜 ភាសាខ្មែរ' : 'Khmer' },
-            { key: 'History', name: lang === 'km' ? '🏛️ ប្រវត្តិវិទ្យា' : 'History' },
-            { key: 'Geography', name: lang === 'km' ? '🌏 ភូមិវិទ្យា' : 'Geography' },
-            { key: 'Civics', name: lang === 'km' ? '⚖️ សីលធម៌-ពលរដ្ឋ' : 'Civics' },
-            { key: 'Exam', name: lang === 'km' ? '🏆 ត្រៀមបាក់ឌុប' : 'Exam Series' },
-            { key: 'Summary', name: lang === 'km' ? '📌 រូបមន្តសង្ខេប' : 'Formulas' },
-            { key: 'STEM', name: lang === 'km' ? '💻 STEM & កូដ' : 'STEM' }
+            { key: 'Math', name: lang === 'km' ? 'គណិតវិទ្យា' : 'Math' },
+            { key: 'Physics', name: lang === 'km' ? 'រូបវិទ្យា' : 'Physics' },
+            { key: 'Chemistry', name: lang === 'km' ? 'គីមីវិទ្យា' : 'Chemistry' },
+            { key: 'Biology', name: lang === 'km' ? 'ជីវវិទ្យា' : 'Biology' },
+            { key: 'Khmer', name: lang === 'km' ? 'ភាសាខ្មែរ' : 'Khmer' },
+            { key: 'History', name: lang === 'km' ? 'ប្រវត្តិវិទ្យា' : 'History' },
+            { key: 'Geography', name: lang === 'km' ? 'ភូមិវិទ្យា' : 'Geography' },
+            { key: 'Civics', name: lang === 'km' ? 'សីលធម៌-ពលរដ្ឋ' : 'Civics' },
+            { key: 'Exam', name: lang === 'km' ? 'ត្រៀមបាក់ឌុប' : 'Exam Series' },
+            { key: 'Summary', name: lang === 'km' ? 'រូបមន្តសង្ខេប' : 'Formulas' },
+            { key: 'STEM', name: lang === 'km' ? 'STEM & កូដ' : 'STEM' }
           ].map((cat) => (
             <button
               key={cat.key}
@@ -456,11 +640,10 @@ export default function DigitalLibraryView() {
         </span>
       </div>
 
-      {/* Modern E-Book Cards (Icon & Sticker 3D Layout - NO PHOTO IMAGES) */}
+      {/* AUTHENTIC OFFICIAL CAMBODIAN TEXTBOOK COVERS */}
       <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5 sm:gap-5">
         {filteredBooks.map((book) => {
-          const design = getCategoryDesign(book.category, book.titleKm);
-          const IconComp = design.icon;
+          const design = getBookCoverDesign(book.category, book.titleKm);
 
           return (
             <div 
@@ -469,53 +652,60 @@ export default function DigitalLibraryView() {
                 setActiveReadingBook(book);
                 setCurrentPage(1);
               }}
-              className="group flex flex-col justify-between overflow-hidden shadow-xs border border-slate-200 hover:border-[#005baa] hover:shadow-2xl rounded-2xl sm:rounded-3xl bg-white transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
+              className="group flex flex-col justify-between overflow-hidden shadow-sm border border-slate-200 hover:border-[#005baa] hover:shadow-2xl rounded-2xl sm:rounded-3xl bg-white transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
             >
-              {/* STYLISH E-BOOK COVER WITH 3D ICONS & STICKERS */}
-              <div className={`relative aspect-[3/4] overflow-hidden bg-gradient-to-br ${design.gradient} p-3.5 sm:p-4 flex flex-col justify-between text-white select-none`}>
+              {/* REALISTIC MINISTRY E-BOOK COVER */}
+              <div className={`relative aspect-[3/4.2] overflow-hidden bg-gradient-to-b ${design.bgGradient} p-3 sm:p-3.5 flex flex-col justify-between text-white select-none border-l-4 border-l-black/30 shadow-inner`}>
                 
-                {/* Decorative background glow & blur */}
-                <div className={`absolute top-0 right-0 w-32 h-32 ${design.bgGlow} rounded-full blur-2xl pointer-events-none`} />
-                <div className="absolute inset-0 bg-radial from-transparent to-black/30 pointer-events-none" />
+                {/* Book Spine Highlight Overlay */}
+                <div className="absolute left-0 top-0 bottom-0 w-3 bg-gradient-to-r from-white/20 via-white/5 to-transparent pointer-events-none" />
+                <div className="absolute right-0 top-0 bottom-0 w-2 bg-gradient-to-l from-black/30 to-transparent pointer-events-none" />
 
-                {/* Top Badge & Grade */}
-                <div className="relative z-10 flex items-center justify-between gap-1">
-                  <span className="bg-black/40 backdrop-blur-md text-amber-300 border border-white/20 text-[8.5px] sm:text-[9.5px] px-2 py-0.5 rounded-lg font-black shadow-2xs">
-                    {lang === 'km' ? `ថ្នាក់ទី ${book.grade}` : `Grade ${book.grade}`}
-                  </span>
-                  
-                  <span className="text-[10px] bg-white/20 backdrop-blur-md px-1.5 py-0.5 rounded-md text-white font-bold flex items-center gap-0.5">
-                    <Star className="w-2.5 h-2.5 fill-amber-300 text-amber-300" />
-                    <span className="font-cinzel text-[9.5px]">{book.rating}</span>
-                  </span>
+                {/* Top Ministry Header */}
+                <div className="relative z-10 text-center space-y-0.5 border-b border-white/20 pb-1.5">
+                  <p className="text-[7.5px] sm:text-[8.5px] text-amber-200 font-bold tracking-wider leading-none">
+                    ព្រះរាជាណាចក្រកម្ពុជា • ជាតិ សាសនា ព្រះមហាក្សត្រ
+                  </p>
+                  <p className="text-[8px] sm:text-[9px] text-white/95 font-bold uppercase tracking-tight leading-tight">
+                    ក្រសួងអប់រំ យុវជន និងកីឡា
+                  </p>
                 </div>
 
-                {/* Center 3D Sticker & Icon */}
-                <div className="relative z-10 flex flex-col items-center justify-center text-center gap-1.5 my-auto">
+                {/* Center Title & Vector Diagram */}
+                <div className="relative z-10 flex flex-col items-center justify-center text-center my-auto space-y-1.5">
                   
-                  {/* Floating 3D Sticker */}
-                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/15 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
-                    <span className="text-2xl sm:text-3xl filter drop-shadow">{design.sticker}</span>
+                  {/* Official Grade Seal */}
+                  <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-full bg-gradient-to-tr from-amber-400 to-yellow-300 text-slate-950 font-black text-[10px] sm:text-xs flex items-center justify-center shadow-lg border-2 border-white ring-2 ring-amber-400/40">
+                    <span className="leading-none text-center">
+                      ថ្នាក់ទី<br /><b className="text-xs sm:text-sm">{book.grade}</b>
+                    </span>
                   </div>
 
-                  {/* Subject Tag */}
-                  <span 
-                    className="text-[10.5px] sm:text-[11.5px] font-black px-2.5 py-0.5 rounded-full backdrop-blur-md border border-white/30 tracking-tight shadow-sm font-kantumruy"
-                    style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', color: design.accentColor }}
-                  >
-                    {design.tag}
-                  </span>
+                  {/* Main Subject Title */}
+                  <div className="space-y-0.5 px-1">
+                    <h2 className="text-sm sm:text-base font-black text-white leading-tight font-kantumruy filter drop-shadow">
+                      {design.titleKm}
+                    </h2>
+                    <p className="text-[7.5px] sm:text-[8.5px] text-white/80 font-bold tracking-wider uppercase font-mono">
+                      {design.titleEn}
+                    </p>
+                  </div>
 
-                  {/* Micro formula / symbol sticker */}
-                  <span className="text-[8.5px] sm:text-[9.5px] text-white/75 font-mono truncate max-w-[130px]">
-                    {design.symbol}
+                  {/* Vector Subject Illustration */}
+                  <div className="w-full h-14 sm:h-16 px-2 flex items-center justify-center">
+                    <OfficialVectorIllustration type={design.patternType} accentColor={design.accentColor} />
+                  </div>
+
+                  {/* Stream / Focus pill */}
+                  <span className="text-[7.5px] sm:text-[8.5px] font-bold text-white bg-black/40 px-2 py-0.5 rounded-full border border-white/20 max-w-[140px] truncate">
+                    {design.streamKm}
                   </span>
                 </div>
 
-                {/* Bottom Spine Bar */}
-                <div className="relative z-10 pt-2 border-t border-white/20 flex items-center justify-between text-[9px] sm:text-[10px] text-white/90 font-medium">
-                  <span className="truncate max-w-[90px] font-bold">MoEYS E-Book</span>
-                  <span className="font-cinzel font-bold">{book.pages} {lang === 'km' ? 'ទំព័រ' : 'p.'}</span>
+                {/* Bottom Ministry Publishing Mark */}
+                <div className="relative z-10 pt-1.5 border-t border-white/20 flex items-center justify-between text-[7.5px] sm:text-[8.5px] text-white/90 font-medium">
+                  <span className="truncate max-w-[85px] font-bold">គ្រឹះស្ថានបោះពុម្ព</span>
+                  <span className="font-cinzel font-bold text-amber-200">ឆ្នាំ ២០២៤</span>
                 </div>
 
               </div>
@@ -523,7 +713,10 @@ export default function DigitalLibraryView() {
               {/* Card Meta & Read Button */}
               <div className="p-3 space-y-2 flex-1 flex flex-col justify-between bg-white">
                 <div className="space-y-0.5">
-                  <p className="text-[9px] sm:text-[9.5px] text-[#005baa] font-bold truncate">{book.author}</p>
+                  <div className="flex items-center justify-between text-[9px] text-slate-500 font-bold">
+                    <span className="text-[#005baa] truncate max-w-[100px]">{book.author}</span>
+                    <span className="font-cinzel">{book.pages} ទំព័រ</span>
+                  </div>
                   <h3 className="font-black text-xs text-[#003366] line-clamp-2 leading-tight group-hover:text-[#005baa] transition-colors">
                     {lang === 'km' ? book.titleKm : book.titleEn}
                   </h3>
