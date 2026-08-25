@@ -17,13 +17,183 @@ import {
   Bookmark,
   Sun,
   Moon,
-  BookMarked,
-  List,
+  Calculator,
+  Atom,
+  FlaskConical,
+  Dna,
+  Landmark,
+  Globe,
+  Scale,
+  Languages,
+  Award,
+  Code,
+  GraduationCap,
   Layers,
-  GraduationCap
+  Compass
 } from 'lucide-react';
 import { libraryBooks } from '../../data/libraryBooks';
 import { useLanguage } from '../../context/LanguageContext';
+
+// Helper to get vibrant category gradients, icons, stickers, and tags
+function getCategoryDesign(cat = '', title = '') {
+  const c = cat.toLowerCase();
+  const t = title.toLowerCase();
+
+  if (c.includes('math') || t.includes('គណិត')) {
+    return {
+      gradient: 'from-[#001f3f] via-[#003876] to-[#005baa]',
+      bgGlow: 'bg-cyan-400/20',
+      icon: Calculator,
+      sticker: '📐',
+      tag: 'គណិតវិទ្យា',
+      accentColor: '#38bdf8',
+      symbol: '∫ f(x)dx • lim • π'
+    };
+  }
+  if (c.includes('physic') || t.includes('រូបវិទ្យា')) {
+    return {
+      gradient: 'from-[#082f49] via-[#0284c7] to-[#38bdf8]',
+      bgGlow: 'bg-sky-400/25',
+      icon: Atom,
+      sticker: '⚡',
+      tag: 'រូបវិទ្យា',
+      accentColor: '#7dd3fc',
+      symbol: 'E = mc² • RLC • ω'
+    };
+  }
+  if (c.includes('chem') || t.includes('គីមី')) {
+    return {
+      gradient: 'from-[#064e3b] via-[#059669] to-[#10b981]',
+      bgGlow: 'bg-emerald-400/25',
+      icon: FlaskConical,
+      sticker: '🧪',
+      tag: 'គីមីវិទ្យា',
+      accentColor: '#6ee7b7',
+      symbol: 'pH = -log[H+] • CnH2n'
+    };
+  }
+  if (c.includes('bio') || t.includes('ជីវវិទ្យា')) {
+    return {
+      gradient: 'from-[#14532d] via-[#16a34a] to-[#4ade80]',
+      bgGlow: 'bg-green-400/25',
+      icon: Dna,
+      sticker: '🧬',
+      tag: 'ជីវវិទ្យា',
+      accentColor: '#86efac',
+      symbol: 'ADN • ARNm • 2A+2G'
+    };
+  }
+  if (c.includes('khmer') || t.includes('ខ្មែរ') || t.includes('អក្សរ')) {
+    return {
+      gradient: 'from-[#78350f] via-[#b45309] to-[#f59e0b]',
+      bgGlow: 'bg-amber-400/25',
+      icon: BookOpen,
+      sticker: '📜',
+      tag: 'អក្សរសាស្ត្រខ្មែរ',
+      accentColor: '#fde68a',
+      symbol: 'តែងសេចក្តី • កុលាបប៉ៃលិន'
+    };
+  }
+  if (c.includes('hist') || t.includes('ប្រវត្តិ')) {
+    return {
+      gradient: 'from-[#7f1d1d] via-[#b91c1c] to-[#ef4444]',
+      bgGlow: 'bg-rose-400/25',
+      icon: Landmark,
+      sticker: '🏛️',
+      tag: 'ប្រវត្តិវិទ្យា',
+      accentColor: '#fca5a5',
+      symbol: 'អង្គរ • ១៩៥៣ • អាស៊ាន'
+    };
+  }
+  if (c.includes('geo') || t.includes('ភូមិ')) {
+    return {
+      gradient: 'from-[#083344] via-[#0891b2] to-[#22d3ee]',
+      bgGlow: 'bg-cyan-400/25',
+      icon: Globe,
+      sticker: '🌏',
+      tag: 'ភូមិវិទ្យា',
+      accentColor: '#a5f3fc',
+      symbol: 'ទន្លេមេគង្គ • បឹងទន្លេសាប'
+    };
+  }
+  if (c.includes('civic') || t.includes('សីលធម៌') || t.includes('ពលរដ្ឋ')) {
+    return {
+      gradient: 'from-[#312e81] via-[#4f46e5] to-[#818cf8]',
+      bgGlow: 'bg-indigo-400/25',
+      icon: Scale,
+      sticker: '⚖️',
+      tag: 'សីលធម៌-ពលរដ្ឋ',
+      accentColor: '#c7d2fe',
+      symbol: 'រដ្ឋធម្មនុញ្ញ • នីតិរដ្ឋ'
+    };
+  }
+  if (c.includes('eng') || t.includes('english') || t.includes('អង់គ្លេស')) {
+    return {
+      gradient: 'from-[#831843] via-[#db2777] to-[#f472b6]',
+      bgGlow: 'bg-pink-400/25',
+      icon: Languages,
+      sticker: '🇬🇧',
+      tag: 'ភាសាអង់គ្លេស',
+      accentColor: '#fbcfe8',
+      symbol: 'Grammar • Vocabulary'
+    };
+  }
+  if (c.includes('exam') || t.includes('បាក់ឌុប') || t.includes('និទ្ទេស')) {
+    return {
+      gradient: 'from-[#451a03] via-[#d97706] to-[#fbbf24]',
+      bgGlow: 'bg-amber-400/30',
+      icon: Award,
+      sticker: '🏆',
+      tag: 'ត្រៀមបាក់ឌុប A',
+      accentColor: '#fef08a',
+      symbol: 'វិញ្ញាសា & គន្លឹះដោះស្រាយ'
+    };
+  }
+  if (c.includes('summary') || t.includes('រូបមន្ត')) {
+    return {
+      gradient: 'from-[#3b0764] via-[#7e22ce] to-[#c084fc]',
+      bgGlow: 'bg-purple-400/25',
+      icon: FileText,
+      sticker: '📌',
+      tag: 'រូបមន្តសង្ខេប',
+      accentColor: '#e9d5ff',
+      symbol: 'រូបមន្តគន្លឹះត្រូវចាំ'
+    };
+  }
+  if (c.includes('stem') || t.includes('python') || t.includes('កូដ')) {
+    return {
+      gradient: 'from-[#1e1b4b] via-[#4338ca] to-[#9333ea]',
+      bgGlow: 'bg-violet-400/25',
+      icon: Code,
+      sticker: '💻',
+      tag: 'STEM & Python',
+      accentColor: '#d8b4fe',
+      symbol: 'def solve(): return AI'
+    };
+  }
+  if (c.includes('scholarship') || t.includes('អាហារូបករណ៍')) {
+    return {
+      gradient: 'from-[#172554] via-[#1d4ed8] to-[#60a5fa]',
+      bgGlow: 'bg-blue-400/25',
+      icon: GraduationCap,
+      sticker: '🎓',
+      tag: 'អាហារូបករណ៍',
+      accentColor: '#bfdbfe',
+      symbol: 'Global Scholarship'
+    };
+  }
+
+  // Default Science
+  return {
+    gradient: 'from-[#0f172a] via-[#1e293b] to-[#334155]',
+    bgGlow: 'bg-slate-400/20',
+    icon: BookOpen,
+    sticker: '📖',
+    tag: 'សៀវភៅពុម្ព',
+    accentColor: '#cbd5e1',
+    symbol: 'MoEYS E-Book'
+  };
+}
 
 export default function DigitalLibraryView() {
   const { t, lang } = useLanguage();
@@ -34,7 +204,6 @@ export default function DigitalLibraryView() {
   const [currentPage, setCurrentPage] = useState(1);
   const [fontSize, setFontSize] = useState(15);
   const [readingTheme, setReadingTheme] = useState('sepia'); // 'sepia' | 'light' | 'dark'
-  const [showToc, setShowToc] = useState(false);
 
   // Prevent background scrolling when reader modal is open
   useEffect(() => {
@@ -243,17 +412,17 @@ export default function DigitalLibraryView() {
           <span className="text-[11px] text-slate-500 font-bold mr-1">{lang === 'km' ? 'ប្រភេទ៖' : 'Category:'}</span>
           {[
             { key: 'all', name: lang === 'km' ? 'ទាំងអស់' : 'All' },
-            { key: 'Math', name: lang === 'km' ? 'គណិតវិទ្យា' : 'Math' },
-            { key: 'Physics', name: lang === 'km' ? 'រូបវិទ្យា' : 'Physics' },
-            { key: 'Chemistry', name: lang === 'km' ? 'គីមីវិទ្យា' : 'Chemistry' },
-            { key: 'Biology', name: lang === 'km' ? 'ជីវវិទ្យា' : 'Biology' },
-            { key: 'Khmer', name: lang === 'km' ? 'ភាសាខ្មែរ' : 'Khmer' },
-            { key: 'History', name: lang === 'km' ? 'ប្រវត្តិវិទ្យា' : 'History' },
-            { key: 'Geography', name: lang === 'km' ? 'ភូមិវិទ្យា' : 'Geography' },
-            { key: 'Civics', name: lang === 'km' ? 'សីលធម៌-ពលរដ្ឋ' : 'Civics' },
-            { key: 'Exam', name: lang === 'km' ? 'ត្រៀមបាក់ឌុប' : 'Exam Series' },
-            { key: 'Summary', name: lang === 'km' ? 'រូបមន្តសង្ខេប' : 'Formulas' },
-            { key: 'STEM', name: lang === 'km' ? 'STEM & កូដ' : 'STEM' }
+            { key: 'Math', name: lang === 'km' ? '📐 គណិតវិទ្យា' : 'Math' },
+            { key: 'Physics', name: lang === 'km' ? '⚡ រូបវិទ្យា' : 'Physics' },
+            { key: 'Chemistry', name: lang === 'km' ? '🧪 គីមីវិទ្យា' : 'Chemistry' },
+            { key: 'Biology', name: lang === 'km' ? '🧬 ជីវវិទ្យា' : 'Biology' },
+            { key: 'Khmer', name: lang === 'km' ? '📜 ភាសាខ្មែរ' : 'Khmer' },
+            { key: 'History', name: lang === 'km' ? '🏛️ ប្រវត្តិវិទ្យា' : 'History' },
+            { key: 'Geography', name: lang === 'km' ? '🌏 ភូមិវិទ្យា' : 'Geography' },
+            { key: 'Civics', name: lang === 'km' ? '⚖️ សីលធម៌-ពលរដ្ឋ' : 'Civics' },
+            { key: 'Exam', name: lang === 'km' ? '🏆 ត្រៀមបាក់ឌុប' : 'Exam Series' },
+            { key: 'Summary', name: lang === 'km' ? '📌 រូបមន្តសង្ខេប' : 'Formulas' },
+            { key: 'STEM', name: lang === 'km' ? '💻 STEM & កូដ' : 'STEM' }
           ].map((cat) => (
             <button
               key={cat.key}
@@ -287,68 +456,98 @@ export default function DigitalLibraryView() {
         </span>
       </div>
 
-      {/* Books Grid */}
-      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3 sm:gap-5">
-        {filteredBooks.map((book) => (
-          <div 
-            key={book.id} 
-            onClick={() => {
-              setActiveReadingBook(book);
-              setCurrentPage(1);
-            }}
-            className="group flex flex-col justify-between overflow-hidden shadow-xs border border-slate-200 hover:border-[#005baa] hover:shadow-xl rounded-2xl sm:rounded-3xl bg-white transition-all duration-300 cursor-pointer"
-          >
-            <div className="relative aspect-[3/4] overflow-hidden bg-slate-100">
-              <img 
-                src={book.coverUrl} 
-                alt={book.titleKm} 
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-              
-              <div className="absolute top-2.5 left-2.5">
-                <span className="badge-moeys-gold text-[8.5px] sm:text-[9.5px] px-2 py-0.5 rounded-lg font-black shadow-2xs">
-                  {lang === 'km' ? `ថ្នាក់ទី${book.grade}` : `Grade ${book.grade}`}
-                </span>
+      {/* Modern E-Book Cards (Icon & Sticker 3D Layout - NO PHOTO IMAGES) */}
+      <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-3.5 sm:gap-5">
+        {filteredBooks.map((book) => {
+          const design = getCategoryDesign(book.category, book.titleKm);
+          const IconComp = design.icon;
+
+          return (
+            <div 
+              key={book.id} 
+              onClick={() => {
+                setActiveReadingBook(book);
+                setCurrentPage(1);
+              }}
+              className="group flex flex-col justify-between overflow-hidden shadow-xs border border-slate-200 hover:border-[#005baa] hover:shadow-2xl rounded-2xl sm:rounded-3xl bg-white transition-all duration-300 cursor-pointer transform hover:-translate-y-1"
+            >
+              {/* STYLISH E-BOOK COVER WITH 3D ICONS & STICKERS */}
+              <div className={`relative aspect-[3/4] overflow-hidden bg-gradient-to-br ${design.gradient} p-3.5 sm:p-4 flex flex-col justify-between text-white select-none`}>
+                
+                {/* Decorative background glow & blur */}
+                <div className={`absolute top-0 right-0 w-32 h-32 ${design.bgGlow} rounded-full blur-2xl pointer-events-none`} />
+                <div className="absolute inset-0 bg-radial from-transparent to-black/30 pointer-events-none" />
+
+                {/* Top Badge & Grade */}
+                <div className="relative z-10 flex items-center justify-between gap-1">
+                  <span className="bg-black/40 backdrop-blur-md text-amber-300 border border-white/20 text-[8.5px] sm:text-[9.5px] px-2 py-0.5 rounded-lg font-black shadow-2xs">
+                    {lang === 'km' ? `ថ្នាក់ទី ${book.grade}` : `Grade ${book.grade}`}
+                  </span>
+                  
+                  <span className="text-[10px] bg-white/20 backdrop-blur-md px-1.5 py-0.5 rounded-md text-white font-bold flex items-center gap-0.5">
+                    <Star className="w-2.5 h-2.5 fill-amber-300 text-amber-300" />
+                    <span className="font-cinzel text-[9.5px]">{book.rating}</span>
+                  </span>
+                </div>
+
+                {/* Center 3D Sticker & Icon */}
+                <div className="relative z-10 flex flex-col items-center justify-center text-center gap-1.5 my-auto">
+                  
+                  {/* Floating 3D Sticker */}
+                  <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-white/15 backdrop-blur-md border border-white/30 flex items-center justify-center shadow-lg group-hover:scale-110 group-hover:rotate-3 transition-transform duration-500">
+                    <span className="text-2xl sm:text-3xl filter drop-shadow">{design.sticker}</span>
+                  </div>
+
+                  {/* Subject Tag */}
+                  <span 
+                    className="text-[10.5px] sm:text-[11.5px] font-black px-2.5 py-0.5 rounded-full backdrop-blur-md border border-white/30 tracking-tight shadow-sm font-kantumruy"
+                    style={{ backgroundColor: 'rgba(255, 255, 255, 0.2)', color: design.accentColor }}
+                  >
+                    {design.tag}
+                  </span>
+
+                  {/* Micro formula / symbol sticker */}
+                  <span className="text-[8.5px] sm:text-[9.5px] text-white/75 font-mono truncate max-w-[130px]">
+                    {design.symbol}
+                  </span>
+                </div>
+
+                {/* Bottom Spine Bar */}
+                <div className="relative z-10 pt-2 border-t border-white/20 flex items-center justify-between text-[9px] sm:text-[10px] text-white/90 font-medium">
+                  <span className="truncate max-w-[90px] font-bold">MoEYS E-Book</span>
+                  <span className="font-cinzel font-bold">{book.pages} {lang === 'km' ? 'ទំព័រ' : 'p.'}</span>
+                </div>
+
               </div>
 
-              <div className="absolute bottom-2 left-2 right-2 flex items-center justify-between text-[10px] text-white">
-                <span className="flex items-center gap-0.5 font-bold">
-                  <Star className="w-3 h-3 fill-amber-400 text-amber-400" />
-                  <span className="font-cinzel">{book.rating}</span>
-                </span>
-                <span className="text-[9px] sm:text-[10px] font-cinzel text-slate-200 font-bold">
-                  {book.pages} {lang === 'km' ? 'ទំព័រ' : 'pages'}
-                </span>
+              {/* Card Meta & Read Button */}
+              <div className="p-3 space-y-2 flex-1 flex flex-col justify-between bg-white">
+                <div className="space-y-0.5">
+                  <p className="text-[9px] sm:text-[9.5px] text-[#005baa] font-bold truncate">{book.author}</p>
+                  <h3 className="font-black text-xs text-[#003366] line-clamp-2 leading-tight group-hover:text-[#005baa] transition-colors">
+                    {lang === 'km' ? book.titleKm : book.titleEn}
+                  </h3>
+                </div>
+
+                <div className="pt-2 border-t border-slate-100">
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setActiveReadingBook(book);
+                      setCurrentPage(1);
+                    }}
+                    className="w-full btn-moeys-primary py-1.5 text-[11px] font-bold rounded-xl cursor-pointer flex items-center justify-center gap-1.5 shadow-xs active:scale-95 transition-all"
+                  >
+                    <Eye className="w-3.5 h-3.5" />
+                    <span>{lang === 'km' ? 'អានសៀវភៅ' : 'Read Book'}</span>
+                  </button>
+                </div>
               </div>
+
             </div>
-
-            <div className="p-3 space-y-2 flex-1 flex flex-col justify-between">
-              <div className="space-y-0.5">
-                <p className="text-[9px] sm:text-[10px] text-[#005baa] font-bold truncate">{book.author}</p>
-                <h3 className="font-black text-xs text-[#003366] line-clamp-2 leading-tight group-hover:text-[#005baa] transition-colors">
-                  {lang === 'km' ? book.titleKm : book.titleEn}
-                </h3>
-              </div>
-
-              <div className="pt-2 border-t border-slate-100">
-                <button
-                  type="button"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setActiveReadingBook(book);
-                    setCurrentPage(1);
-                  }}
-                  className="w-full btn-moeys-primary py-1.5 text-[11px] font-bold rounded-xl cursor-pointer flex items-center justify-center gap-1 shadow-xs active:scale-95 transition-all"
-                >
-                  <Eye className="w-3.5 h-3.5" />
-                  <span>{lang === 'km' ? 'អានសៀវភៅ' : 'Read Book'}</span>
-                </button>
-              </div>
-            </div>
-
-          </div>
-        ))}
+          );
+        })}
       </div>
 
       {/* INTERACTIVE MULTI-PAGE E-BOOK READER MODAL */}
