@@ -32,7 +32,10 @@ import {
   RefreshCw,
   Flame,
   CheckCircle,
-  Copy
+  Copy,
+  XCircle,
+  RotateCcw,
+  Sparkle
 } from 'lucide-react';
 import { bacIIData } from '../../data/bacIIData';
 import { quizData } from '../../data/quizData';
@@ -164,12 +167,14 @@ export default function BacIIHubView() {
   const [downloadToast, setDownloadToast] = useState(null);
   const [adminExams, setAdminExams] = useState([]);
 
-  // Master 12,000 Questions Live Explorer States
+  // Master 12,000 Questions Interactive 1-Question-at-a-time Viewer States
   const [activeTabSection, setActiveTabSection] = useState('bank12000'); // 'bank12000' | 'archive'
   const [bankSubject, setBankSubject] = useState('all');
   const [bankQuestions, setBankQuestions] = useState([]);
+  const [currentQIndex, setCurrentQIndex] = useState(0);
+  const [userAnswers, setUserAnswers] = useState({});
+  const [showSolution, setShowSolution] = useState(false);
   const [isLoadingBank, setIsLoadingBank] = useState(false);
-  const [expandedSolutions, setExpandedSolutions] = useState({});
   const [copiedId, setCopiedId] = useState(null);
 
   // Fetch dynamic exams created by Admin
@@ -187,29 +192,36 @@ export default function BacIIHubView() {
     return () => clearInterval(interval);
   }, []);
 
-  // Fetch Live 12,000 Question Samples on subject / stream change
-  useEffect(() => {
-    let isSubscribed = true;
+  // Fetch 20 live questions from 12,000 Question Pool
+  const loadBankQuestions = async (subKey = bankSubject, streamVal = selectedStream) => {
     setIsLoadingBank(true);
+    setCurrentQIndex(0);
+    setUserAnswers({});
+    setShowSolution(false);
 
-    const streamParam = selectedStream === 'all' ? '' : selectedStream;
-    const subjectParam = bankSubject === 'all' ? '' : bankSubject;
+    try {
+      const streamParam = streamVal === 'all' ? '' : streamVal;
+      const subjectParam = subKey === 'all' ? '' : subKey;
 
-    fetchLiveExamQuestions({
-      stream: streamParam || (selectedStream === 'social' ? 'social' : 'science'),
-      subjectKey: subjectParam,
-      limit: 12,
-      random: true
-    }).then((qs) => {
-      if (isSubscribed) {
-        setBankQuestions(Array.isArray(qs) ? qs : []);
-        setIsLoadingBank(false);
+      const qs = await fetchLiveExamQuestions({
+        stream: streamParam || (streamVal === 'social' ? 'social' : 'science'),
+        subjectKey: subjectParam,
+        limit: 20,
+        random: true
+      });
+
+      if (Array.isArray(qs) && qs.length > 0) {
+        setBankQuestions(qs);
       }
-    }).catch(() => {
-      if (isSubscribed) setIsLoadingBank(false);
-    });
+    } catch (e) {
+      console.error(e);
+    } finally {
+      setIsLoadingBank(false);
+    }
+  };
 
-    return () => { isSubscribed = false; };
+  useEffect(() => {
+    loadBankQuestions(bankSubject, selectedStream);
   }, [bankSubject, selectedStream]);
 
   const allPapers = [...adminExams, ...bacIIData];
@@ -290,10 +302,6 @@ export default function BacIIHubView() {
     }
   };
 
-  const toggleSolution = (qId) => {
-    setExpandedSolutions(prev => ({ ...prev, [qId]: !prev[qId] }));
-  };
-
   const handleCopyQuestion = (text, id) => {
     navigator.clipboard.writeText(text);
     setCopiedId(id);
@@ -304,6 +312,9 @@ export default function BacIIHubView() {
     if (selectedStream === 'all') return true;
     return c.stream === selectedStream;
   });
+
+  const currentQuestion = bankQuestions[currentQIndex] || bankQuestions[0] || null;
+  const selectedOptionIdx = userAnswers[currentQIndex];
 
   return (
     <div className="space-y-8 font-kantumruy">
@@ -443,7 +454,7 @@ export default function BacIIHubView() {
 
       </div>
 
-      {/* SECTION 1: MASTER 12,000 QUESTIONS HUB & SIMULATOR */}
+      {/* SECTION 1: MASTER 12,000 QUESTIONS HUB & SINGLE QUESTION INTERACTIVE EXPLORER */}
       {activeTabSection === 'bank12000' && (
         <div className="space-y-6 animate-fadeIn">
           
@@ -462,10 +473,15 @@ export default function BacIIHubView() {
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5 sm:gap-4">
               {filteredSubjectCards.map((card) => {
                 const IconComponent = card.icon;
+                const isCurrent = bankSubject === card.key;
                 return (
                   <div
                     key={card.key}
-                    className={`p-4 sm:p-5 rounded-2xl border ${card.border} ${card.bg} relative overflow-hidden flex flex-col justify-between gap-3 shadow-xs hover:shadow-lg transition-all group`}
+                    className={`p-4 sm:p-5 rounded-2xl border transition-all flex flex-col justify-between gap-3 shadow-xs hover:shadow-lg ${
+                      isCurrent 
+                        ? 'bg-gradient-to-b from-blue-50/90 to-white border-[#005baa] ring-2 ring-[#005baa]/30 shadow-md scale-[1.01]' 
+                        : `${card.border} ${card.bg}`
+                    }`}
                   >
                     <div className="space-y-2">
                       <div className="flex items-center justify-between">
@@ -506,8 +522,8 @@ export default function BacIIHubView() {
                         type="button"
                         onClick={() => setBankSubject(card.key)}
                         className={`p-1.5 rounded-xl border text-[11px] font-bold transition-all cursor-pointer ${
-                          bankSubject === card.key
-                            ? 'bg-white text-[#005baa] border-[#005baa] shadow-xs'
+                          isCurrent
+                            ? 'bg-[#005baa] text-white border-[#005baa] shadow-xs'
                             : 'bg-white/80 hover:bg-white text-slate-600 border-slate-200'
                         }`}
                         title="View questions"
@@ -521,157 +537,285 @@ export default function BacIIHubView() {
             </div>
           </div>
 
-          {/* Live Question Bank Interactive Explorer */}
-          <div className="bg-white rounded-3xl border border-slate-200 p-4 sm:p-6 shadow-sm space-y-4">
-            <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
-              <div className="flex items-center gap-2">
-                <div className="w-8 h-8 rounded-xl bg-blue-50 text-[#005baa] flex items-center justify-center font-bold">
-                  <BookOpen className="w-4 h-4" />
+          {/* 🌟 1-QUESTION-AT-A-TIME INTERACTIVE VIEWER & SLEEK NUMBER NAVIGATOR */}
+          <div className="bg-white rounded-3xl border border-slate-200 p-4 sm:p-7 shadow-sm space-y-6">
+            
+            {/* Top Control Bar with Subject Filter & Refresh */}
+            <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 border-b border-slate-100 pb-4">
+              <div className="flex items-center gap-2.5">
+                <div className="w-9 h-9 rounded-2xl bg-amber-500/10 text-amber-600 flex items-center justify-center font-black">
+                  <Database className="w-5 h-5 text-amber-600" />
                 </div>
                 <div>
-                  <h3 className="text-xs sm:text-sm font-black text-[#003366]">
-                    {lang === 'km' ? 'កម្រងសំណួរជាក់ស្តែង & គន្លឹះដំណោះស្រាយលម្អិត' : 'Live Question Bank & Detailed Solution Keys'}
+                  <h3 className="text-sm sm:text-base font-black text-[#003366] flex items-center gap-1.5">
+                    <span>{lang === 'km' ? 'កម្រងសំណួរជាតិជាក់ស្តែង (១ សំណួរម្តង)' : 'National Question Bank (1 Question at a time)'}</span>
+                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-100 text-emerald-800 font-bold border border-emerald-300">
+                      12,000 POOL
+                    </span>
                   </h3>
-                  <p className="text-[10.5px] text-slate-500">
-                    {lang === 'km' ? 'សំណួរប្រឡងបាក់ឌុបជាតិពិតៗ ជាមួយនឹងរូបមន្ត និងការពន្យល់មួយជំហានម្តងៗ' : 'Authentic National BacII questions with step-by-step solutions'}
+                  <p className="text-[11px] text-slate-500">
+                    {lang === 'km' ? 'ជ្រើសរើសលេខរៀងសំណួរដើម្បីអនុវត្ត និងពិនិត្យមើលដំណោះស្រាយលម្អិត' : 'Select question number to practice and inspect solution key'}
                   </p>
                 </div>
               </div>
 
-              {/* Subject Filter Pills */}
-              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 text-xs font-bold scrollbar-none">
-                <button
-                  type="button"
-                  onClick={() => setBankSubject('all')}
-                  className={`px-3 py-1 rounded-xl transition-all cursor-pointer flex-shrink-0 ${
-                    bankSubject === 'all'
-                      ? 'bg-[#005baa] text-white shadow-xs font-black'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
-                  }`}
-                >
-                  {lang === 'km' ? 'ទាំងអស់' : 'All'}
-                </button>
-                {MASTER_SUBJECT_CARDS.map((sub) => (
+              {/* Subject Select & Refresh Action */}
+              <div className="flex items-center gap-2 flex-wrap">
+                <div className="flex items-center gap-1 overflow-x-auto pb-1 max-w-full scrollbar-none">
                   <button
-                    key={sub.key}
                     type="button"
-                    onClick={() => setBankSubject(sub.key)}
-                    className={`px-2.5 py-1 rounded-xl transition-all cursor-pointer flex-shrink-0 text-[11px] ${
-                      bankSubject === sub.key
-                        ? 'bg-[#005baa] text-white shadow-xs font-black'
+                    onClick={() => setBankSubject('all')}
+                    className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex-shrink-0 ${
+                      bankSubject === 'all'
+                        ? 'bg-[#003366] text-white shadow-xs font-black'
                         : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
                     }`}
                   >
-                    {sub.nameKm}
+                    {lang === 'km' ? 'គ្រប់មុខវិជ្ជា' : 'All'}
                   </button>
-                ))}
+                  {MASTER_SUBJECT_CARDS.map((sub) => (
+                    <button
+                      key={sub.key}
+                      type="button"
+                      onClick={() => setBankSubject(sub.key)}
+                      className={`px-2.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex-shrink-0 ${
+                        bankSubject === sub.key
+                          ? 'bg-[#005baa] text-white shadow-xs font-black'
+                          : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                      }`}
+                    >
+                      {sub.nameKm}
+                    </button>
+                  ))}
+                </div>
+
+                <button
+                  type="button"
+                  onClick={() => loadBankQuestions(bankSubject, selectedStream)}
+                  disabled={isLoadingBank}
+                  className="px-3 py-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-bold transition-all flex items-center gap-1 cursor-pointer flex-shrink-0"
+                  title="Load 20 new randomized questions"
+                >
+                  <RefreshCw className={`w-3.5 h-3.5 ${isLoadingBank ? 'animate-spin text-[#005baa]' : ''}`} />
+                  <span className="hidden sm:inline">{lang === 'km' ? 'សំណួរថ្មីៗ' : 'New Set'}</span>
+                </button>
               </div>
             </div>
 
-            {/* Questions List */}
-            {isLoadingBank ? (
-              <div className="py-12 flex flex-col items-center justify-center gap-3 text-slate-400">
-                <RefreshCw className="w-6 h-6 animate-spin text-[#005baa]" />
-                <span className="text-xs font-bold">{lang === 'km' ? 'កំពុងទាញយកសំណួរពីធនាគារ ១២,០០០ សំណួរ...' : 'Loading questions from 12,000 pool...'}</span>
+            {/* 🔢 HORIZONTAL NUMBERED PILL NAVIGATION BAR (Exact requested UI [1] [2] ... [20]) */}
+            <div className="space-y-2">
+              <div className="flex items-center justify-between text-xs font-bold text-slate-500 px-1">
+                <span>{lang === 'km' ? 'ជ្រើសរើសសំណួរ (Select Question):' : 'Select Question:'}</span>
+                <span className="text-[#005baa]">
+                  សំណួរទី {currentQIndex + 1} នៃ {bankQuestions.length || 20}
+                </span>
               </div>
-            ) : (
-              <div className="space-y-3">
-                {bankQuestions.map((q, idx) => {
-                  const isExpanded = !!expandedSolutions[q.id || idx];
+
+              <div className="bg-slate-50 p-2 sm:p-3 rounded-2xl border border-slate-200/90 overflow-x-auto flex items-center gap-1.5 sm:gap-2 scrollbar-none justify-start sm:justify-center shadow-inner">
+                {bankQuestions.map((_, i) => {
+                  const isActive = currentQIndex === i;
+                  const isAnswered = userAnswers[i] !== undefined;
                   return (
-                    <div
-                      key={q.id || idx}
-                      className="p-4 sm:p-5 rounded-2xl bg-slate-50/70 hover:bg-slate-50 border border-slate-200 space-y-3 transition-all"
+                    <button
+                      key={i}
+                      type="button"
+                      onClick={() => {
+                        setCurrentQIndex(i);
+                        setShowSolution(false);
+                      }}
+                      className={`min-w-[34px] sm:min-w-[42px] h-9 sm:h-11 px-2.5 rounded-xl sm:rounded-2xl font-black text-xs sm:text-sm transition-all duration-200 cursor-pointer flex items-center justify-center relative select-none ${
+                        isActive
+                          ? 'bg-[#f59e0b] text-white shadow-md shadow-amber-500/30 scale-105 ring-2 ring-amber-400 font-extrabold'
+                          : isAnswered
+                          ? 'bg-blue-50 text-[#005baa] border border-blue-200 hover:bg-blue-100'
+                          : 'bg-white text-slate-700 hover:bg-slate-200/80 border border-slate-200/80 shadow-2xs'
+                      }`}
                     >
-                      <div className="flex items-center justify-between gap-2 flex-wrap">
-                        <div className="flex items-center gap-1.5 flex-wrap">
-                          <span className="text-[9.5px] font-black px-2 py-0.5 rounded-md bg-[#005baa] text-white">
-                            #{idx + 1}
-                          </span>
-                          <span className={`text-[9.5px] font-bold px-2 py-0.5 rounded-md ${
-                            q.stream === 'social' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-blue-100 text-blue-900 border border-blue-300'
-                          }`}>
-                            {q.stream === 'social' ? 'វិទ្យាសាស្ត្រសង្គម' : 'វិទ្យាសាស្ត្រពិត'}
-                          </span>
-                          <span className="text-[9.5px] font-bold px-2 py-0.5 rounded-md bg-slate-200 text-slate-700">
-                            {q.subject}
-                          </span>
-                          {q.chapter && (
-                            <span className="text-[9.5px] text-slate-500 hidden sm:inline">
-                              • {q.chapter}
-                            </span>
-                          )}
-                        </div>
-
-                        <button
-                          type="button"
-                          onClick={() => handleCopyQuestion(q.q, q.id || idx)}
-                          className="text-[10px] text-slate-400 hover:text-slate-700 flex items-center gap-1 cursor-pointer"
-                          title="Copy question text"
-                        >
-                          {copiedId === (q.id || idx) ? <Check className="w-3 h-3 text-emerald-500" /> : <Copy className="w-3 h-3" />}
-                          <span>{copiedId === (q.id || idx) ? 'បានចម្លង' : 'ចម្លង'}</span>
-                        </button>
-                      </div>
-
-                      <h4 className="text-xs sm:text-sm font-bold text-slate-900 leading-relaxed">
-                        {q.q}
-                      </h4>
-
-                      {/* 4 Choices */}
-                      {Array.isArray(q.options) && (
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 pt-1">
-                          {q.options.map((opt, optIdx) => (
-                            <div
-                              key={optIdx}
-                              className={`p-2.5 rounded-xl border text-xs flex items-center gap-2 transition-all ${
-                                isExpanded && optIdx === q.answer
-                                  ? 'bg-emerald-50 border-emerald-400 text-emerald-950 font-bold shadow-2xs'
-                                  : 'bg-white border-slate-200 text-slate-700'
-                              }`}
-                            >
-                              <span className={`w-5 h-5 rounded-full text-[10px] font-black flex items-center justify-center flex-shrink-0 ${
-                                isExpanded && optIdx === q.answer
-                                  ? 'bg-emerald-600 text-white'
-                                  : 'bg-slate-100 text-slate-600'
-                              }`}>
-                                {['ក', 'ខ', 'គ', 'ឃ'][optIdx] || optIdx + 1}
-                              </span>
-                              <span className="leading-snug">{opt}</span>
-                            </div>
-                          ))}
-                        </div>
+                      <span>{i + 1}</span>
+                      {isAnswered && !isActive && (
+                        <span className="absolute -top-1 -right-1 w-2.5 h-2.5 rounded-full bg-emerald-500 ring-2 ring-white" />
                       )}
-
-                      {/* Solution Key Accordion */}
-                      <div className="pt-2">
-                        <button
-                          type="button"
-                          onClick={() => toggleSolution(q.id || idx)}
-                          className="text-xs font-bold text-[#005baa] hover:text-[#003d7a] flex items-center gap-1.5 cursor-pointer"
-                        >
-                          <HelpCircle className="w-3.5 h-3.5 text-amber-500" />
-                          <span>{isExpanded ? 'លាក់ដំណោះស្រាយ (Hide Solution)' : 'បង្ហាញដំណោះស្រាយផ្លូវការ & គន្លឹះគណនា (Show Official Solution)'}</span>
-                          {isExpanded ? <ChevronUp className="w-3.5 h-3.5" /> : <ChevronDown className="w-3.5 h-3.5" />}
-                        </button>
-
-                        {isExpanded && (
-                          <div className="mt-2.5 p-3 sm:p-4 rounded-xl bg-blue-50/80 border border-blue-200 text-xs text-slate-800 space-y-1.5 animate-fadeIn">
-                            <div className="font-bold text-[#003366] flex items-center gap-1.5">
-                              <CheckCircle className="w-3.5 h-3.5 text-emerald-600" />
-                              <span>ចម្លើយត្រឹមត្រូវ៖ ជម្រើស {['ក', 'ខ', 'គ', 'ឃ'][q.answer] || q.answer + 1}</span>
-                            </div>
-                            <p className="leading-relaxed text-slate-700 whitespace-pre-line">
-                              {q.explanation || 'សូមផ្ទៀងផ្ទាត់ជាមួយទ្រឹស្តី និងរូបមន្តមេរៀនស្នូល។'}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </div>
+                    </button>
                   );
                 })}
               </div>
-            )}
+            </div>
+
+            {/* 🎯 SINGLE QUESTION INTERACTIVE CARD */}
+            {isLoadingBank ? (
+              <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">
+                <RefreshCw className="w-8 h-8 animate-spin text-[#005baa]" />
+                <span className="text-xs sm:text-sm font-bold">
+                  {lang === 'km' ? 'កំពុងទាញយកសំណួរពីធនាគារ ១២,០០០ សំណួរ...' : 'Loading authentic question...'}
+                </span>
+              </div>
+            ) : currentQuestion ? (
+              <div className="p-5 sm:p-8 rounded-3xl bg-gradient-to-b from-slate-50/90 via-white to-slate-50/60 border-2 border-slate-200/90 shadow-sm space-y-6 animate-fadeIn">
+                
+                {/* Question Header Meta */}
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-200/80 pb-4">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span className="text-xs font-black px-3 py-1 rounded-xl bg-[#005baa] text-white shadow-2xs">
+                      សំណួរទី {currentQIndex + 1}
+                    </span>
+                    <span className={`text-xs font-bold px-2.5 py-1 rounded-xl border ${
+                      currentQuestion.stream === 'social'
+                        ? 'bg-amber-100 text-amber-900 border-amber-300'
+                        : 'bg-blue-100 text-blue-900 border-blue-300'
+                    }`}>
+                      {currentQuestion.stream === 'social' ? 'ថ្នាក់វិទ្យាសាស្ត្រសង្គម' : 'ថ្នាក់វិទ្យាសាស្ត្រពិត'}
+                    </span>
+                    <span className="text-xs font-bold px-2.5 py-1 rounded-xl bg-slate-200/80 text-slate-700">
+                      {currentQuestion.subject}
+                    </span>
+                    {currentQuestion.chapter && (
+                      <span className="text-xs text-slate-500 font-medium hidden sm:inline">
+                        • {currentQuestion.chapter}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2 self-end sm:self-auto">
+                    <button
+                      type="button"
+                      onClick={() => handleCopyQuestion(currentQuestion.q, currentQuestion.id || currentQIndex)}
+                      className="text-xs text-slate-500 hover:text-slate-800 bg-white border border-slate-200 px-3 py-1 rounded-xl flex items-center gap-1 shadow-2xs cursor-pointer transition-all hover:bg-slate-50"
+                      title="Copy question text"
+                    >
+                      {copiedId === (currentQuestion.id || currentQIndex) ? <Check className="w-3.5 h-3.5 text-emerald-500" /> : <Copy className="w-3.5 h-3.5" />}
+                      <span>{copiedId === (currentQuestion.id || currentQIndex) ? 'បានចម្លង' : 'ចម្លងសំណួរ'}</span>
+                    </button>
+                  </div>
+                </div>
+
+                {/* Main Question Text */}
+                <div className="space-y-2">
+                  <h3 className="text-base sm:text-lg md:text-xl font-bold text-slate-900 leading-relaxed">
+                    {currentQuestion.q}
+                  </h3>
+                </div>
+
+                {/* 4 Interactive Option Choices (ក, ខ, គ, ឃ) */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2">
+                  {Array.isArray(currentQuestion.options) && currentQuestion.options.map((opt, optIdx) => {
+                    const isSelected = selectedOptionIdx === optIdx;
+                    const isCorrect = optIdx === currentQuestion.answer;
+                    
+                    let cardStyle = 'bg-white hover:bg-slate-50/80 border-slate-200/90 text-slate-800 shadow-2xs';
+                    let badgeStyle = 'bg-slate-100 text-slate-700 border-slate-200';
+
+                    if (showSolution) {
+                      if (isCorrect) {
+                        cardStyle = 'bg-emerald-50/90 border-emerald-400 text-emerald-950 font-bold ring-2 ring-emerald-400/40 shadow-sm';
+                        badgeStyle = 'bg-emerald-600 text-white border-emerald-600';
+                      } else if (isSelected) {
+                        cardStyle = 'bg-rose-50/90 border-rose-400 text-rose-950 ring-2 ring-rose-400/30';
+                        badgeStyle = 'bg-rose-600 text-white border-rose-600';
+                      }
+                    } else if (isSelected) {
+                      cardStyle = 'bg-gradient-to-r from-blue-50 to-indigo-50/60 border-[#005baa] text-[#003366] font-bold ring-2 ring-[#005baa]/30 shadow-xs';
+                      badgeStyle = 'bg-[#005baa] text-white border-[#005baa]';
+                    }
+
+                    return (
+                      <button
+                        key={optIdx}
+                        type="button"
+                        onClick={() => {
+                          setUserAnswers(prev => ({ ...prev, [currentQIndex]: optIdx }));
+                        }}
+                        className={`p-4 rounded-2xl border text-left text-xs sm:text-sm flex items-center justify-between gap-3 transition-all cursor-pointer active:scale-[0.99] ${cardStyle}`}
+                      >
+                        <div className="flex items-center gap-3">
+                          <span className={`w-7 h-7 rounded-xl text-xs font-black flex items-center justify-center flex-shrink-0 border ${badgeStyle}`}>
+                            {['ក', 'ខ', 'គ', 'ឃ'][optIdx] || optIdx + 1}
+                          </span>
+                          <span className="leading-snug">{opt}</span>
+                        </div>
+
+                        {showSolution && isCorrect && (
+                          <CheckCircle2 className="w-5 h-5 text-emerald-600 flex-shrink-0" />
+                        )}
+                        {showSolution && isSelected && !isCorrect && (
+                          <XCircle className="w-5 h-5 text-rose-500 flex-shrink-0" />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                {/* Solution Accordion & Detailed Step-by-Step Key */}
+                <div className="pt-3 border-t border-slate-200/80 space-y-3">
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2">
+                    <button
+                      type="button"
+                      onClick={() => setShowSolution(!showSolution)}
+                      className="px-4 py-2 rounded-xl bg-blue-50/80 hover:bg-blue-100 text-[#005baa] border border-blue-200 text-xs font-bold flex items-center gap-2 cursor-pointer transition-all self-start"
+                    >
+                      <HelpCircle className="w-4 h-4 text-amber-500" />
+                      <span>{showSolution ? 'លាក់ដំណោះស្រាយ (Hide Solution)' : 'បង្ហាញដំណោះស្រាយផ្លូវការ & គន្លឹះគណនា (Show Solution Key)'}</span>
+                      {showSolution ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+                    </button>
+
+                    {selectedOptionIdx !== undefined && (
+                      <span className="text-xs font-bold text-slate-500">
+                        {selectedOptionIdx === currentQuestion.answer
+                          ? <span className="text-emerald-600 font-black flex items-center gap-1">✓ អ្នកបានឆ្លើយត្រូវ!</span>
+                          : <span className="text-amber-600 font-black">ចម្លើយរបស់អ្នក៖ ជម្រើស {['ក', 'ខ', 'គ', 'ឃ'][selectedOptionIdx]}</span>
+                        }
+                      </span>
+                    )}
+                  </div>
+
+                  {showSolution && (
+                    <div className="p-4 sm:p-5 rounded-2xl bg-[#f0f9ff] border-2 border-[#bae6fd] text-xs sm:text-sm text-slate-800 space-y-2 animate-fadeIn shadow-2xs">
+                      <div className="font-black text-[#003366] flex items-center gap-2">
+                        <CheckCircle className="w-4 h-4 text-emerald-600" />
+                        <span>ចម្លើយផ្លូវការត្រឹមត្រូវ៖ ជម្រើស {['ក', 'ខ', 'គ', 'ឃ'][currentQuestion.answer] || currentQuestion.answer + 1}</span>
+                      </div>
+                      <p className="leading-relaxed text-slate-700 whitespace-pre-line font-mono text-xs sm:text-[13px] bg-white p-3.5 rounded-xl border border-sky-200 shadow-2xs">
+                        {currentQuestion.explanation || 'សូមផ្ទៀងផ្ទាត់ជាមួយទ្រឹស្តី និងរូបមន្តមេរៀនស្នូល។'}
+                      </p>
+                    </div>
+                  )}
+                </div>
+
+                {/* Bottom Navigation Step Controls (Previous / Next Question) */}
+                <div className="flex items-center justify-between pt-4 border-t border-slate-200/80 gap-3">
+                  <button
+                    type="button"
+                    disabled={currentQIndex === 0}
+                    onClick={() => {
+                      setCurrentQIndex(prev => Math.max(prev - 1, 0));
+                      setShowSolution(false);
+                    }}
+                    className="px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-2xl border border-slate-300 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs sm:text-sm disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 cursor-pointer shadow-2xs transition-all active:scale-95"
+                  >
+                    <ChevronLeft className="w-4 h-4" />
+                    <span>{lang === 'km' ? 'សំណួរមុន' : 'Previous'}</span>
+                  </button>
+
+                  <span className="text-xs sm:text-sm font-black text-slate-600 hidden sm:inline">
+                    {currentQIndex + 1} / {bankQuestions.length}
+                  </span>
+
+                  <button
+                    type="button"
+                    disabled={currentQIndex >= bankQuestions.length - 1}
+                    onClick={() => {
+                      setCurrentQIndex(prev => Math.min(prev + 1, bankQuestions.length - 1));
+                      setShowSolution(false);
+                    }}
+                    className="px-4 sm:px-6 py-2.5 rounded-xl sm:rounded-2xl bg-[#005baa] hover:bg-[#003d7a] text-white font-bold text-xs sm:text-sm disabled:opacity-40 disabled:cursor-not-allowed flex items-center gap-1.5 cursor-pointer shadow-xs transition-all active:scale-95"
+                  >
+                    <span>{lang === 'km' ? 'សំណួរបន្ទាប់' : 'Next Question'}</span>
+                    <ChevronRight className="w-4 h-4" />
+                  </button>
+                </div>
+
+              </div>
+            ) : null}
+
           </div>
 
         </div>
