@@ -1,6 +1,248 @@
 export const curriculumData = [
   // ==========================================
-  // 🔬 ថ្នាក់វិទ្យាសាស្ត្រ (SCIENCE STREAM)
+  // 🎒 កម្រិតបឋមសិក្សា (PRIMARY SCHOOL: GRADES 1–6)
+  // ==========================================
+  {
+    id: 'primary-math',
+    grade: '1-6',
+    gradesList: ['1', '2', '3', '4', '5', '6'],
+    stream: 'science',
+    nameKm: 'គណិតវិទ្យា បឋមសិក្សា (ថ្នាក់ទី ១ ដល់ ទី ៦)',
+    nameEn: 'Primary Mathematics (Grades 1–6 Foundation)',
+    icon: 'Calculator',
+    color: '#0284c7',
+    cardClass: 'subject-card-math',
+    teacher: 'នាយកដ្ឋានអភិវឌ្ឍន៍កម្មវិធីសិក្សាបឋមសិក្សា MoEYS',
+    teacherRole: 'គ្រូបង្រៀនគំរូបឋមសិក្សាជាតិ MoTDAR',
+    progress: 90,
+    totalChapters: 6,
+    totalLessons: 24,
+    quizzesCount: 12,
+    bannerImg: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=1200&q=80',
+    descriptionKm: 'កម្មវិធីសិក្សាគណិតវិទ្យាមូលដ្ឋានគ្រឹះកម្រិតបឋមសិក្សា ថ្នាក់ទី ១-៦ បង្រៀនលេខនព្វន្ត បូក ដក គុណ ចែក ប្រភាគ ទសភាគ ផ្ទៃក្រឡា និងបរិមាត្រ។',
+    descriptionEn: 'Official Primary Mathematics curriculum for Grades 1-6 covering arithmetic, multiplication, division, fractions, geometry shapes, and area measurement.',
+    chapters: [
+      {
+        id: 'pmath-ch1',
+        titleKm: 'ជំពូកទី ១៖ លេខនព្វន្ត និងប្រមាណវិធីបឋម (ថ្នាក់ទី ១-៣)',
+        titleEn: 'Chapter 1: Arithmetic & Basic Operations (Grades 1-3)',
+        lessons: [
+          {
+            id: 'pm-l1',
+            titleKm: 'មេរៀនទី ១៖ ចំនួនពី ១ ដល់ ១០០ និងប្រមាណវិធីបូក-ដក',
+            titleEn: 'Lesson 1: Numbers 1-100 and Addition/Subtraction',
+            duration: '18:30',
+            videoUrl: 'https://www.youtube-nocookie.com/embed/n4p_q00a58o',
+            videoPoster: 'https://images.unsplash.com/photo-1509062522246-3755977927d7?auto=format&fit=crop&w=800&q=80',
+            notes: 'រៀនស្គាល់តម្លៃលេខខ្ទង់រាយ ខ្ទង់ដប់ និងការគណនាបូកដកត្រឹមត្រូវ។',
+            keyFormulas: ['តួបូក + តួបូក = ផលបូក', 'តួដក - តួដក = ផលដក']
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'primary-khmer',
+    grade: '1-6',
+    gradesList: ['1', '2', '3', '4', '5', '6'],
+    stream: 'social',
+    nameKm: 'ភាសាខ្មែរ បឋមសិក្សា (ថ្នាក់ទី ១ ដល់ ទី ៦)',
+    nameEn: 'Primary Khmer Language (Reading, Writing & Spelling)',
+    icon: 'BookOpen',
+    color: '#d97706',
+    cardClass: 'subject-card-khmer',
+    teacher: 'សាស្ត្រាចារ្យ ភាសាខ្មែរបឋមសិក្សាជាតិ',
+    teacherRole: 'អ្នកជំនាញការអក្សរសាស្ត្រ និងអំណានកុមារ MoTDAR',
+    progress: 95,
+    totalChapters: 6,
+    totalLessons: 24,
+    quizzesCount: 12,
+    bannerImg: 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=1200&q=80',
+    descriptionKm: 'កម្មវិធីអំណាន និងសរសេរភាសាខ្មែរផ្លូវការ ថ្នាក់ទី ១-៦ រៀនព្យញ្ជនៈ ស្រៈ ព្យាង្គតម្រួត ការប្រកប និងអក្ខរាវិរុទ្ធខ្មែរត្រឹមត្រូវ។',
+    descriptionEn: 'Official Primary Khmer Language curriculum for Grades 1-6 covering vowels, consonants, compound words, and reading comprehension.',
+    chapters: [
+      {
+        id: 'pkhm-ch1',
+        titleKm: 'ជំពូកទី ១៖ ព្យញ្ជនៈ ស្រៈ និងការប្រកបព្យាង្គ',
+        titleEn: 'Chapter 1: Khmer Alphabet, Vowels and Syllables',
+        lessons: [
+          {
+            id: 'pkh-l1',
+            titleKm: 'មេរៀនទី ១៖ ព្យញ្ជនៈខ្មែរទាំង ៣៣ តួ និងស្រៈនិស្ស័យ',
+            titleEn: 'Lesson 1: 33 Khmer Consonants and Dependent Vowels',
+            duration: '20:00',
+            videoUrl: 'https://www.youtube-nocookie.com/embed/jZ_y8z89kX8',
+            videoPoster: 'https://images.unsplash.com/photo-1457369804613-52c61a468e7d?auto=format&fit=crop&w=800&q=80',
+            notes: 'រៀនអាន និងសរសេរព្យញ្ជនៈពួក អ (ក ខ គ...) និងពួក អ៊ (គ ឃ ង...) ឱ្យបានស្ទាត់ជំនាញ។',
+            keyFormulas: ['ព្យញ្ជនៈ ៣៣ តួ + ស្រៈនិស្ស័យ ២៣ តួ + ស្រៈពេញតួ ១៥ តួ']
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'primary-science-social',
+    grade: '1-6',
+    gradesList: ['1', '2', '3', '4', '5', '6'],
+    stream: 'science',
+    nameKm: 'វិទ្យាសាស្ត្រ និងសង្គមសិក្សា បឋមសិក្សា (ថ្នាក់ទី ១-៦)',
+    nameEn: 'Primary Science & Social Studies (Grades 1–6)',
+    icon: 'Globe',
+    color: '#059669',
+    cardClass: 'subject-card-biology',
+    teacher: 'នាយកដ្ឋានស្រាវជ្រាវគរុកោសល្យ MoEYS',
+    teacherRole: 'អ្នកសម្របសម្រួលវិទ្យាសាស្ត្រកុមារ MoTDAR',
+    progress: 88,
+    totalChapters: 6,
+    totalLessons: 20,
+    quizzesCount: 10,
+    bannerImg: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=1200&q=80',
+    descriptionKm: 'សិក្សាពីរុក្ខជាតិ សត្វ ខ្លួនប្រាណមនុស្ស បរិស្ថាន ធម្មជាតិ ភូមិសាស្ត្រខេត្តក្រុង និងប្រវត្តិសាស្ត្រកម្ពុជាបឋម។',
+    descriptionEn: 'Integrated Primary Science & Social Studies for Grades 1-6 covering plants, animals, human health, Cambodian geography, and history.',
+    chapters: [
+      {
+        id: 'psci-ch1',
+        titleKm: 'ជំពូកទី ១៖ ភាវរស់ បរិស្ថាន និងសុខភាពកុមារ',
+        titleEn: 'Chapter 1: Living Organisms & Child Health',
+        lessons: [
+          {
+            id: 'psc-l1',
+            titleKm: 'មេរៀនទី ១៖ ផ្នែកសំខាន់ៗនៃរុក្ខជាតិ និងការថែទាំសុខភាព',
+            titleEn: 'Lesson 1: Plant Structure & Personal Hygiene',
+            duration: '19:15',
+            videoUrl: 'https://www.youtube-nocookie.com/embed/n4p_q00a58o',
+            videoPoster: 'https://images.unsplash.com/photo-1532094349884-543bc11b234d?auto=format&fit=crop&w=800&q=80',
+            notes: 'យល់ដឹងពីមុខងារឬស ដើម ស្លឹក ផ្កា ផ្លែ និងអនាម័យ ៣ ប្រការ (ហូបស្អាត ផឹកស្អាត រស់នៅស្អាត)។',
+            keyFormulas: ['អនាម័យ ៣ ប្រការ៖ ហូបស្អាត + ផឹកស្អាត + រស់នៅស្អាត']
+          }
+        ]
+      }
+    ]
+  },
+
+  // ==========================================
+  // 🏛️ កម្រិតអនុវិទ្យាល័យ (JUNIOR HIGH: GRADES 7–9 / ឌីប្លូម DIPLOMA)
+  // ==========================================
+  {
+    id: 'junior-math-7-9',
+    grade: '7-9',
+    gradesList: ['7', '8', '9'],
+    stream: 'science',
+    nameKm: 'គណិតវិទ្យា អនុវិទ្យាល័យ (ថ្នាក់ទី ៧ ដល់ ទី ៩ - ឌីប្លូម)',
+    nameEn: 'Junior High Mathematics (Grades 7–9 / Diploma Exam)',
+    icon: 'Calculator',
+    color: '#005baa',
+    cardClass: 'subject-card-math',
+    teacher: 'សាស្ត្រាចារ្យ គណិតវិទ្យាអនុវិទ្យាល័យជាតិ',
+    teacherRole: 'គណៈកម្មការរៀបចំការប្រឡងសញ្ញាបត្រឌីប្លូម MoEYS & MoTDAR',
+    progress: 85,
+    totalChapters: 6,
+    totalLessons: 24,
+    quizzesCount: 12,
+    bannerImg: 'https://images.unsplash.com/photo-1596495578065-6e0763fa1178?auto=format&fit=crop&w=1200&q=80',
+    descriptionKm: 'ត្រៀមប្រឡងឌីប្លូមថ្នាក់ជាតិ ផ្តោតលើសមីការលីនេអ៊ែរ សមីការដឺក្រេទី២ ទ្រឹស្តីបទពីតាក័រ និងត្រីកោណមាត្រ។',
+    descriptionEn: 'Official Grade 7-9 Mathematics curriculum covering linear equations, polynomials, Pythagorean theorem, and basic trigonometry.',
+    chapters: [
+      {
+        id: 'jmath-ch1',
+        titleKm: 'ជំពូកទី ១៖ ពិជគណិត និងសមីការដឺក្រេទី ១ និង ២',
+        titleEn: 'Chapter 1: Algebra, Linear & Quadratic Equations',
+        lessons: [
+          {
+            id: 'jm-l1',
+            titleKm: 'មេរៀនទី ១៖ ការដោះស្រាយសមីការដឺក្រេទី ២ តាមឌីសគ្រីមីណង់ Δ (Delta)',
+            titleEn: 'Lesson 1: Solving Quadratic Equations using Discriminant Δ',
+            duration: '25:00',
+            videoUrl: 'https://www.youtube-nocookie.com/embed/n4p_q00a58o',
+            videoPoster: 'https://images.unsplash.com/photo-1596495578065-6e0763fa1178?auto=format&fit=crop&w=800&q=80',
+            notes: 'សមីការ ax² + bx + c = 0 មានឌីសគ្រីមីណង់ Δ = b² - 4ac។ បើ Δ > 0 មានឫសពីរផ្សេងគ្នា x = (-b ± √Δ) / 2a។',
+            keyFormulas: ['Δ = b² - 4ac', 'x = (-b ± √Δ) / (2a)']
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'junior-science-7-9',
+    grade: '7-9',
+    gradesList: ['7', '8', '9'],
+    stream: 'science',
+    nameKm: 'រូបវិទ្យា & គីមីវិទ្យា អនុវិទ្យាល័យ (ថ្នាក់ទី ៧-៩)',
+    nameEn: 'Junior High Physics & Chemistry (Grades 7–9)',
+    icon: 'Atom',
+    color: '#7c3aed',
+    cardClass: 'subject-card-physics',
+    teacher: 'សាស្ត្រាចារ្យ រូបវិទ្យា-គីមីវិទ្យាអនុវិទ្យាល័យ',
+    teacherRole: 'អ្នកជំនាញការពិសោធន៍វិទ្យាសាស្ត្រ MoTDAR',
+    progress: 82,
+    totalChapters: 6,
+    totalLessons: 20,
+    quizzesCount: 10,
+    bannerImg: 'https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?auto=format&fit=crop&w=1200&q=80',
+    descriptionKm: 'សិក្សាពីច្បាប់កម្លាំង ច្បាប់អូម សៀគ្វីអគ្គិសនី អាតូម ធាតុគីមី និងប្រតិកម្មអាស៊ីត-បាស។',
+    descriptionEn: 'Grades 7-9 Physics & Chemistry covering Newton laws, Ohm law, electrical circuits, atoms, and chemical reactions.',
+    chapters: [
+      {
+        id: 'jsci-ch1',
+        titleKm: 'ជំពូកទី ១៖ កម្លាំង ចលនា និងច្បាប់អូមអគ្គិសនី',
+        titleEn: 'Chapter 1: Force, Motion & Ohm Law',
+        lessons: [
+          {
+            id: 'jsc-l1',
+            titleKm: 'មេរៀនទី ១៖ ច្បាប់អូម I = U / R និងសៀគ្វីតជាស៊េរី/ខ្នែង',
+            titleEn: 'Lesson 1: Ohm Law and Series/Parallel Circuits',
+            duration: '22:45',
+            videoUrl: 'https://www.youtube-nocookie.com/embed/n4p_q00a58o',
+            videoPoster: 'https://images.unsplash.com/photo-1636466497217-26a8cbeaf0aa?auto=format&fit=crop&w=800&q=80',
+            notes: 'អាំងតង់ស៊ីតេចរន្ត I សមាមាត្រនឹងតង់ស្យុង U និងច្រាសនឹងរេស៊ីស្តង់ R។',
+            keyFormulas: ['I = U / R (A = V / Ω)', 'P = U × I (W)']
+          }
+        ]
+      }
+    ]
+  },
+  {
+    id: 'junior-social-7-9',
+    grade: '7-9',
+    gradesList: ['7', '8', '9'],
+    stream: 'social',
+    nameKm: 'ប្រវត្តិវិទ្យា & ភូមិវិទ្យា អនុវិទ្យាល័យ (ថ្នាក់ទី ៧-៩)',
+    nameEn: 'Junior High History & Geography (Grades 7–9)',
+    icon: 'Landmark',
+    color: '#b45309',
+    cardClass: 'subject-card-history',
+    teacher: 'សាស្ត្រាចារ្យ ប្រវត្តិសាស្ត្រ និងភូមិវិទ្យាជាតិ',
+    teacherRole: 'អ្នកស្រាវជ្រាវប្រវត្តិសាស្ត្រអាស៊ីអាគ្នេយ៍ MoTDAR',
+    progress: 86,
+    totalChapters: 6,
+    totalLessons: 22,
+    quizzesCount: 10,
+    bannerImg: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=1200&q=80',
+    descriptionKm: 'សិក្សាពីប្រវត្តិសាស្ត្រសម័យហ្វូណន ចេនឡា សម័យអង្គរដ៏រុងរឿង ទន្លេមេគង្គ និងអាកាសធាតុត្រូពិចកម្ពុជា។',
+    descriptionEn: 'Grades 7-9 History & Geography covering Funan, Chenla, Angkorian Empire, Mekong River basin, and climate zones.',
+    chapters: [
+      {
+        id: 'jsoc-ch1',
+        titleKm: 'ជំពូកទី ១៖ ប្រវត្តិសាស្ត្រសម័យបុរាណ និងសម័យអង្គរ (ស.វ.ទី ១-១៤)',
+        titleEn: 'Chapter 1: Ancient & Angkorian Era History',
+        lessons: [
+          {
+            id: 'jso-l1',
+            titleKm: 'មេរៀនទី ១៖ ការកកើតអាណាចក្រភ្នំ និងការស្ថាបនាសម័យអង្គរឆ្នាំ ៨០២',
+            titleEn: 'Lesson 1: Funan Kingdom and Founding of Angkor in 802 AD',
+            duration: '24:10',
+            videoUrl: 'https://www.youtube-nocookie.com/embed/jZ_y8z89kX8',
+            videoPoster: 'https://images.unsplash.com/photo-1544620347-c4fd4a3d5957?auto=format&fit=crop&w=800&q=80',
+            notes: 'ស្វែងយល់ពីប្រវត្តិព្រះបាទជ័យវរ្ម័នទី២ ប្រកាសឯករាជ្យលើភ្នំគូលែនឆ្នាំ ៨០២។',
+            keyFormulas: ['ឆ្នាំ ៨០២៖ ព្រះបាទជ័យវរ្ម័នទី ២ ស្ថាបនាសម័យអង្គរលើភ្នំគូលែន']
+          }
+        ]
+      }
+    ]
+  },
+
+  // ==========================================
+  // 🔬 ថ្នាក់វិទ្យាសាស្ត្រពិត វិទ្យាល័យ (HIGH SCHOOL SCIENCE STREAM: GRADES 10–12 / BAC II)
   // ==========================================
   
   // 1. Mathematics (Grade 12 - Advanced Math MoTDAR)

@@ -124,30 +124,34 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
   // =========================================================================
   let pool = [];
   const targetGrade = String(game?.grade || grade || '12');
+  const targetGradeNum = parseInt(targetGrade, 10) || 12;
   const targetStream = game?.stream || stream || 'science';
-  const isHighSchoolTrack = targetGrade === '11' || targetGrade === '12';
 
-  // 1. Harvest from arenaMasterQuestionBank with STRICT stream filtering
+  // Helper to determine educational tier
+  const isPrimary = targetGradeNum >= 1 && targetGradeNum <= 6;
+  const isJuniorHigh = targetGradeNum >= 7 && targetGradeNum <= 9;
+  const isHighSchool = targetGradeNum >= 10 && targetGradeNum <= 12;
+
+  // 1. Harvest from arenaMasterQuestionBank with Grade & Stream affinity
   if (Array.isArray(arenaMasterQuestionBank)) {
     arenaMasterQuestionBank.forEach((item) => {
       if (!item || !item.q) return;
 
-      if (isHighSchoolTrack) {
-        if (targetStream === 'social') {
-          if (item.stream === 'social' || SOCIAL_SUBJECTS.has(item.subject) || SOCIAL_SUBJECTS.has(item.subjectKey)) {
-            pool.push(item);
-          }
-        } else if (targetStream === 'science') {
-          if (item.stream === 'science' || SCIENCE_SUBJECTS.has(item.subject) || SCIENCE_SUBJECTS.has(item.subjectKey)) {
-            pool.push(item);
-          }
-        } else {
-          pool.push(item);
-        }
-      } else {
-        const itemGradeNum = parseInt(item.grade, 10);
-        const targetGradeNum = parseInt(targetGrade, 10);
-        if (item.grade === targetGrade || (!isNaN(itemGradeNum) && !isNaN(targetGradeNum) && itemGradeNum <= 10)) {
+      const itemGradeNum = parseInt(item.grade, 10);
+      const isExactGrade = String(item.grade) === targetGrade;
+      const isSameTier = 
+        (isPrimary && itemGradeNum >= 1 && itemGradeNum <= 6) ||
+        (isJuniorHigh && itemGradeNum >= 7 && itemGradeNum <= 9) ||
+        (isHighSchool && itemGradeNum >= 10 && itemGradeNum <= 12);
+
+      const matchesStream = targetStream === 'social'
+        ? (item.stream === 'social' || SOCIAL_SUBJECTS.has(item.subject) || SOCIAL_SUBJECTS.has(item.subjectKey))
+        : (item.stream === 'science' || SCIENCE_SUBJECTS.has(item.subject) || SCIENCE_SUBJECTS.has(item.subjectKey));
+
+      if (matchesStream) {
+        if (isExactGrade) {
+          pool.unshift(item); // Exact grade gets top priority
+        } else if (isSameTier) {
           pool.push(item);
         }
       }
@@ -159,17 +163,11 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
     playgroundGamesData.forEach((g) => {
       if (!g || !Array.isArray(g.questions)) return;
 
-      if (isHighSchoolTrack) {
-        if (targetStream === 'social') {
-          if (g.stream === 'social' || SOCIAL_SUBJECTS.has(g.subjectKey) || SOCIAL_SUBJECTS.has(g.subject)) {
-            pool.push(...g.questions);
-          }
-        } else if (targetStream === 'science') {
-          if (g.stream === 'science' || SCIENCE_SUBJECTS.has(g.subjectKey) || SCIENCE_SUBJECTS.has(g.subject)) {
-            pool.push(...g.questions);
-          }
-        }
-      } else {
+      const matchesStream = targetStream === 'social'
+        ? (g.stream === 'social' || SOCIAL_SUBJECTS.has(g.subjectKey) || SOCIAL_SUBJECTS.has(g.subject))
+        : (g.stream === 'science' || SCIENCE_SUBJECTS.has(g.subjectKey) || SCIENCE_SUBJECTS.has(g.subject));
+
+      if (matchesStream) {
         pool.push(...g.questions);
       }
     });

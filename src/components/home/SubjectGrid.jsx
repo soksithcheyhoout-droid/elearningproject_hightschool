@@ -52,7 +52,24 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
 
   const filteredSubjects = useMemo(() => {
     return curriculumData.filter((item) => {
-      const matchesGrade = filterGrade === 'all' || item.grade === filterGrade;
+      let matchesGrade = true;
+      if (filterGrade === 'all') {
+        matchesGrade = true;
+      } else if (filterGrade === 'primary' || filterGrade === '1-6') {
+        matchesGrade = item.grade === '1-6' || (item.gradesList && item.gradesList.some(g => parseInt(g, 10) <= 6)) || (parseInt(item.grade, 10) <= 6);
+      } else if (filterGrade === 'junior' || filterGrade === '7-9') {
+        matchesGrade = item.grade === '7-9' || (item.gradesList && item.gradesList.some(g => parseInt(g, 10) >= 7 && parseInt(g, 10) <= 9)) || (parseInt(item.grade, 10) >= 7 && parseInt(item.grade, 10) <= 9);
+      } else if (filterGrade === 'high' || filterGrade === '10-12') {
+        matchesGrade = parseInt(item.grade, 10) >= 10 || item.grade === '10' || item.grade === '11' || item.grade === '12';
+      } else {
+        // Specific grade e.g. '1', '7', '12'
+        const gNum = parseInt(filterGrade, 10);
+        matchesGrade = item.grade === filterGrade || 
+          (item.gradesList && item.gradesList.includes(filterGrade)) ||
+          (gNum <= 6 && item.grade === '1-6') ||
+          (gNum >= 7 && gNum <= 9 && item.grade === '7-9');
+      }
+
       const matchesStream = filterStream === 'all' || item.stream === filterStream;
       const matchesSearch = searchQuery.trim() === '' || 
         item.nameKm.toLowerCase().includes(searchQuery.toLowerCase()) ||
@@ -105,7 +122,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
                 
                 <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-white/15 backdrop-blur-md text-blue-100 text-[10px] sm:text-xs font-bold border border-white/20 flex items-center gap-1">
                   <GraduationCap className="w-3 h-3 text-amber-300" />
-                  <span>{lang === 'km' ? 'ថ្នាក់ទី ១០-១២' : 'Grades 10–12'}</span>
+                  <span>{lang === 'km' ? 'ថ្នាក់ទី ១ ដល់ ទី ១២' : 'Grades 1 to 12'}</span>
                 </span>
 
                 <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] sm:text-xs font-bold flex items-center gap-1">
@@ -117,12 +134,12 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
               {/* Title & Subtitle */}
               <div className="space-y-1 sm:space-y-2">
                 <h1 className="text-xl sm:text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight">
-                  {lang === 'km' ? 'មុខវិជ្ជាចំណេះទូទៅកម្រិតវិទ្យាល័យ' : 'High School National Curriculum'}
+                  {lang === 'km' ? 'កម្មវិធីសិក្សាចំណេះទូទៅ ថ្នាក់ទី ១-១២' : 'Cambodian National Curriculum (Grades 1–12)'}
                 </h1>
                 <p className="text-xs sm:text-sm text-blue-100/90 leading-relaxed font-medium line-clamp-2 sm:line-clamp-none max-w-xl">
                   {lang === 'km' 
-                    ? 'ជ្រើសរើសមុខវិជ្ជាដើម្បីចូលរៀនមេរៀនវីដេអូបង្រៀនគុណភាពខ្ពស់ កំណត់ចំណាំសង្ខេប សៀវភៅពុម្ព និងលំហាត់ត្រៀមប្រឡងបាក់ឌុប។' 
-                    : 'Access full video courses, chapter notes, digital textbooks, and BacII mock quizzes tailored for Cambodia.'}
+                    ? 'ជ្រើសរើសកម្រិតថ្នាក់ពីថ្នាក់ទី ១ ដល់ ទី ១២ ដើម្បីចូលរៀនមេរៀនវីដេអូបង្រៀនគុណភាពខ្ពស់ កំណត់ចំណាំសង្ខេប សៀវភៅពុម្ព និងកម្រងសំណួរត្រៀមប្រឡងជាតិ។' 
+                    : 'Access full video courses, chapter notes, digital textbooks, and mock quizzes tailored for Grades 1 through 12.'}
                 </p>
               </div>
 
@@ -158,22 +175,18 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
                     className="w-full h-full object-contain filter brightness-125 drop-shadow"
                   />
                 </div>
-                <div>
-                  <h4 className="text-xs sm:text-sm font-black text-amber-300 leading-snug">
-                    {lang === 'km' ? 'ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ' : 'Ministry of Talent Dev'}
+                <div className="min-w-0">
+                  <h4 className="text-xs sm:text-sm font-black text-amber-300 font-cinzel tracking-wider uppercase">
+                    ក្រសួងអប់រំ យុវជន និងកីឡា
                   </h4>
-                  <p className="text-[9.5px] sm:text-[10px] text-blue-200 font-medium">
-                    {lang === 'km' ? 'និងការស្រាវជ្រាវកម្រិតខ្ពស់ (MoTDAR)' : '& Advanced Research (MoTDAR)'}
+                  <p className="text-[10px] sm:text-xs text-blue-200 font-medium">
+                    MoEYS National E-Learning Platform
                   </p>
-                  <span className="inline-flex items-center gap-1 mt-0.5 text-[8.5px] sm:text-[9px] bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 px-2 py-0.5 rounded-full font-bold">
-                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-                    <span>{lang === 'km' ? 'ទទួលស្គាល់ជាផ្លូវការ' : 'Officially Accredited'}</span>
-                  </span>
                 </div>
               </div>
 
               {/* Stats Highlights */}
-              <div className="grid grid-cols-2 gap-1.5 sm:gap-2 pt-2 border-t border-white/10 text-center font-cinzel">
+              <div className="grid grid-cols-2 gap-2 text-center">
                 <div className="bg-white/5 rounded-xl p-1.5 sm:p-2 border border-white/10">
                   <span className="text-[8.5px] sm:text-[9px] text-slate-300 block font-kantumruy font-bold">{lang === 'km' ? 'វិទ្យាសាស្ត្រពិត' : 'Science'}</span>
                   <span className="text-xs sm:text-sm font-black text-sky-400">{totalScienceCount} Subjects</span>
@@ -190,61 +203,140 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
         </div>
       )}
 
-      {/* 🧭 UNIFIED FILTER BAR (Stream Switcher & Subject Counters) */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4 bg-white p-3 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm">
+      {/* 🧭 UNIFIED FILTER BAR (Stream Switcher + Grade 1-12 Selector Ribbon) */}
+      <div className="bg-white p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm space-y-3.5">
         
-        {/* Left Subtitle Information */}
-        <div className="min-w-0">
-          <div className="flex items-center gap-1.5 sm:gap-2 mb-1 flex-wrap">
-            <span className="bg-[#002b5b] text-amber-300 text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-2xs font-mono">
-              MoTDAR STANDARDS
-            </span>
-            <span className="text-[10.5px] sm:text-xs text-slate-500 font-bold">
-              • {filteredSubjects.length} {lang === 'km' ? 'មុខវិជ្ជាសរុប' : 'Subjects Available'} ({lang === 'km' ? 'វិទ្យាសាស្ត្រ' : 'Science'}: {scienceSubjects.length}, {lang === 'km' ? 'សង្គម' : 'Social'}: {socialSubjects.length})
-            </span>
+        {/* Top Row: Stream Switcher & Status */}
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+          <div className="min-w-0">
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-1 flex-wrap">
+              <span className="bg-[#002b5b] text-amber-300 text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-2xs font-mono">
+                MoTDAR STANDARDS
+              </span>
+              <span className="text-[10.5px] sm:text-xs text-slate-500 font-bold">
+                • {filteredSubjects.length} {lang === 'km' ? 'មុខវិជ្ជាសរុប' : 'Subjects Available'} ({lang === 'km' ? 'វិទ្យាសាស្ត្រ' : 'Science'}: {scienceSubjects.length}, {lang === 'km' ? 'សង្គម' : 'Social'}: {socialSubjects.length})
+              </span>
+            </div>
+            <h2 className="text-sm sm:text-lg font-black text-[#002b5b] tracking-tight">
+              {lang === 'km' ? 'តារាងមុខវិជ្ជា និងមេរៀនតាមកម្រិតថ្នាក់' : 'Select Grade & Stream'}
+            </h2>
           </div>
-          <h2 className="text-sm sm:text-lg font-black text-[#002b5b] tracking-tight">
-            {lang === 'km' ? 'តារាងមុខវិជ្ជា និងមេរៀនតាមជំនាញ' : 'Select Stream & Begin Learning'}
-          </h2>
+
+          {/* Right Stream Filter Pills */}
+          <div className="grid grid-cols-3 sm:flex items-center gap-1 sm:gap-2 font-kantumruy text-xs w-full sm:w-auto">
+            <button
+              onClick={() => setFilterStream('all')}
+              className={`py-2 px-1.5 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl transition-all font-black flex items-center justify-center gap-1 text-[11px] sm:text-xs cursor-pointer active:scale-95 ${
+                filterStream === 'all'
+                  ? 'bg-gradient-to-r from-[#005baa] to-[#003875] text-white shadow-md'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
+              }`}
+            >
+              <Layers className="w-3.5 h-3.5 flex-shrink-0" />
+              <span className="truncate">{lang === 'km' ? 'ទាំងអស់' : 'All'} ({curriculumData.length})</span>
+            </button>
+            
+            <button
+              onClick={() => setFilterStream('science')}
+              className={`py-2 px-1.5 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl transition-all font-black flex items-center justify-center gap-1 text-[11px] sm:text-xs cursor-pointer active:scale-95 ${
+                filterStream === 'science'
+                  ? 'bg-gradient-to-r from-[#005baa] to-[#003875] text-white shadow-md'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
+              }`}
+            >
+              <Atom className="w-3.5 h-3.5 text-sky-500 flex-shrink-0" />
+              <span className="truncate">{lang === 'km' ? 'វិទ្យាសាស្ត្រ' : 'Science'} ({totalScienceCount})</span>
+            </button>
+            
+            <button
+              onClick={() => setFilterStream('social')}
+              className={`py-2 px-1.5 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl transition-all font-black flex items-center justify-center gap-1 text-[11px] sm:text-xs cursor-pointer active:scale-95 ${
+                filterStream === 'social'
+                  ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md'
+                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
+              }`}
+            >
+              <BookOpen className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
+              <span className="truncate">{lang === 'km' ? 'សង្គម' : 'Social'} ({totalSocialCount})</span>
+            </button>
+          </div>
         </div>
 
-        {/* Right Stream Filter Pills (Responsive Grid on Mobile so zero clipping) */}
-        <div className="grid grid-cols-3 sm:flex items-center gap-1 sm:gap-2 font-kantumruy text-xs w-full sm:w-auto">
-          <button
-            onClick={() => setFilterStream('all')}
-            className={`py-2 px-1.5 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl transition-all font-black flex items-center justify-center gap-1 text-[11px] sm:text-xs cursor-pointer active:scale-95 ${
-              filterStream === 'all'
-                ? 'bg-gradient-to-r from-[#005baa] to-[#003875] text-white shadow-md'
-                : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
-            }`}
-          >
-            <Layers className="w-3.5 h-3.5 flex-shrink-0" />
-            <span className="truncate">{lang === 'km' ? 'ទាំងអស់' : 'All'} ({curriculumData.length})</span>
-          </button>
-          
-          <button
-            onClick={() => setFilterStream('science')}
-            className={`py-2 px-1.5 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl transition-all font-black flex items-center justify-center gap-1 text-[11px] sm:text-xs cursor-pointer active:scale-95 ${
-              filterStream === 'science'
-                ? 'bg-gradient-to-r from-[#005baa] to-[#003875] text-white shadow-md'
-                : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
-            }`}
-          >
-            <Atom className="w-3.5 h-3.5 text-sky-500 flex-shrink-0" />
-            <span className="truncate">{lang === 'km' ? 'វិទ្យាសាស្ត្រ' : 'Science'} ({totalScienceCount})</span>
-          </button>
-          
-          <button
-            onClick={() => setFilterStream('social')}
-            className={`py-2 px-1.5 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl transition-all font-black flex items-center justify-center gap-1 text-[11px] sm:text-xs cursor-pointer active:scale-95 ${
-              filterStream === 'social'
-                ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md'
-                : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
-            }`}
-          >
-            <BookOpen className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
-            <span className="truncate">{lang === 'km' ? 'សង្គម' : 'Social'} ({totalSocialCount})</span>
-          </button>
+        {/* Bottom Row: Comprehensive Grade 1-12 Selector Ribbon */}
+        <div className="pt-2.5 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
+          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none text-xs">
+            <span className="text-[11px] font-bold text-slate-500 whitespace-nowrap mr-1 hidden lg:inline">
+              កម្រិតថ្នាក់ (Grade):
+            </span>
+
+            {/* Level Tier Group Pills */}
+            <button
+              type="button"
+              onClick={() => setFilterGrade('all')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                filterGrade === 'all'
+                  ? 'bg-indigo-600 text-white shadow-xs'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              ទាំងអស់ (Grades 1–12)
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setFilterGrade('primary')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                filterGrade === 'primary' || filterGrade === '1-6'
+                  ? 'bg-sky-600 text-white shadow-xs'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              🎒 បឋម (ទី១-៦)
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setFilterGrade('junior')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                filterGrade === 'junior' || filterGrade === '7-9'
+                  ? 'bg-violet-600 text-white shadow-xs'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              🏛️ អនុវិទ្យាល័យ (ទី៧-៩)
+            </button>
+
+            <button
+              type="button"
+              onClick={() => setFilterGrade('high')}
+              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+                filterGrade === 'high' || filterGrade === '10-12'
+                  ? 'bg-amber-600 text-white shadow-xs'
+                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+              }`}
+            >
+              🎓 វិទ្យាល័យ (ទី១០-១២)
+            </button>
+          </div>
+
+          {/* Individual Grade Pills 1 to 12 */}
+          <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+            {['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'].map((g) => (
+              <button
+                key={g}
+                type="button"
+                onClick={() => setFilterGrade(g)}
+                className={`w-7 h-7 rounded-lg text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center flex-shrink-0 ${
+                  filterGrade === g
+                    ? 'bg-indigo-600 text-white shadow-xs scale-105 ring-2 ring-indigo-400/40'
+                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                }`}
+                title={`ថ្នាក់ទី ${g}`}
+              >
+                {g}
+              </button>
+            ))}
+          </div>
         </div>
 
       </div>

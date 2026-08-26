@@ -5,10 +5,29 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-console.log('🚀 Starting Generation of Master 60,000 National Examination Questions (30,000 Science + 30,000 Social)...');
+console.log('🚀 Generating 60,000 MoEYS National Curriculum Questions Across All Grades 1 to 12 (30,000 Science + 30,000 Social)...');
 
 const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
 const randInt = (min, max) => Math.floor(Math.random() * (max - min + 1)) + min;
+
+// Grade allocator helper: systematically cycles and covers Grade 1 through 12
+function getGradeForIndex(index, total) {
+  // Distribute across:
+  // Grades 1-6 (Primary): 25% of pool
+  // Grades 7-9 (Junior High): 30% of pool
+  // Grades 10-12 (High School / Bac II): 45% of pool
+  const pct = (index / total);
+  if (pct < 0.25) {
+    const pGrades = ['1', '2', '3', '4', '5', '6'];
+    return pGrades[index % pGrades.length];
+  } else if (pct < 0.55) {
+    const jGrades = ['7', '8', '9'];
+    return jGrades[index % jGrades.length];
+  } else {
+    const hGrades = ['10', '11', '12'];
+    return hGrades[index % hGrades.length];
+  }
+}
 
 // =========================================================================
 // 🔬 SECTION 1: NATURAL SCIENCE (30,000 QUESTIONS - 7,500 per subject)
@@ -17,196 +36,160 @@ function generateScienceQuestions() {
   const scienceQuestions = [];
   let idCounter = 1;
 
-  // 1.1 MATHEMATICS (7,500 questions)
-  console.log('  -> Generating 7,500 Mathematics questions...');
+  // -----------------------------------------------------------------------
+  // 1.1 MATHEMATICS (7,500 questions: Grades 1-12)
+  // -----------------------------------------------------------------------
+  console.log('  -> Generating 7,500 Mathematics questions across Grades 1-12...');
   for (let i = 0; i < 7500; i++) {
-    const qType = i % 20;
-    let q, options, answer, explanation, chapter, grade;
-    grade = pick(['10', '11', '12']);
+    const grade = getGradeForIndex(i, 7500);
+    const gradeNum = parseInt(grade, 10);
+    let q, options, answer = 0, explanation, chapter;
 
-    if (qType === 0) {
-      const a = randInt(1, 15);
-      const a2 = a * a;
-      q = `គណនាដែនកំណត់លីមីត៖ lim (x → ${a}) (x² - ${a2}) / (x - ${a}) = ?`;
-      const ansVal = 2 * a;
-      options = [`${ansVal}`, `${a}`, `${a2}`, `${ansVal + 2}`];
-      answer = 0;
-      explanation = `(x² - ${a2})/(x - ${a}) = (x - ${a})(x + ${a})/(x - ${a}) = x + ${a} => ${a} + ${a} = ${ansVal}។`;
-      chapter = 'លីមីត និងភាពជាប់';
-    } else if (qType === 1) {
-      const n = randInt(2, 6);
-      const c = randInt(2, 8);
-      const k = randInt(1, 12);
-      q = `រកដេរីវេ f'(x) នៃអនុគមន៍ f(x) = ${c}x^${n} - ${c * 2}x + ${k}`;
-      const term1 = c * n;
-      const term2 = c * 2;
-      options = [
-        `${term1}x^${n - 1} - ${term2}`,
-        `${term1}x^${n} - ${term2}`,
-        `${c}x^${n - 1} - ${term2}x`,
-        `${term1}x^${n - 1} + ${term2}`
-      ];
-      answer = 0;
-      explanation = `រូបមន្តដេរីវេ (x^n)' = n*x^(n-1) => f'(x) = ${c}*(${n}x^${n - 1}) - ${term2} = ${term1}x^${n - 1} - ${term2}។`;
-      chapter = 'ដេរីវេ និងអនុវត្តន៍';
-    } else if (qType === 2) {
-      const k = randInt(2, 8);
-      const b = randInt(1, 10);
-      q = `គណនាអាំងតេក្រាលមិនកំណត់៖ ∫ (${k}x + ${b}) dx = ?`;
-      options = [
-        `(${k}/2)x² + ${b}x + C`,
-        `${k}x² + ${b}x + C`,
-        `(${k}/2)x² + C`,
-        `${k}x² + ${b} + C`
-      ];
-      answer = 0;
-      explanation = `∫ (${k}x + ${b}) dx = ${k}(x²/2) + ${b}x + C = (${k}/2)x² + ${b}x + C។`;
-      chapter = 'ព្រីមីទីវ និងអាំងតេក្រាល';
-    } else if (qType === 3) {
-      const re = randInt(1, 8);
-      const im = randInt(1, 8);
-      const modSq = re * re + im * im;
-      q = `រកម៉ូឌុល |z| នៃចំនួនកុំផ្លិច z = ${re} + ${im}i`;
-      options = [`√${modSq}`, `${re + im}`, `√${re * im}`, `${modSq}`];
-      answer = 0;
-      explanation = `|z| = √(a² + b²) = √(${re}² + ${im}²) = √${modSq}។`;
-      chapter = 'ចំនួនកុំផ្លិច';
-    } else if (qType === 4) {
-      const n = randInt(5, 12);
-      const totalComb = (n * (n - 1)) / 2;
-      q = `គណនាចំនួនបន្សំ C(${n}, 2) = ?`;
-      options = [`${totalComb}`, `${n * (n - 1)}`, `${totalComb * 2}`, `${n * 2}`];
-      answer = 0;
-      explanation = `C(n, k) = n! / (k!(n-k)!) => C(${n}, 2) = (${n} × ${n - 1}) / 2 = ${totalComb}។`;
-      chapter = 'កុំប៊ីណាតូ និងប្រូបាប';
-    } else if (qType === 5) {
-      const a = randInt(2, 6);
-      q = `ដោះស្រាយសមីការឌីផេរ៉ង់ស្យែលលីនេអ៊ែរលំដាប់ទី១ y' - ${a}y = 0`;
-      options = [`y = C*e^(${a}x)`, `y = C*e^(-${a}x)`, `y = ${a}x + C`, `y = e^(${a}x) + C`];
-      answer = 0;
-      explanation = `សមីការ y' - ay = 0 មានចម្លើយទូទៅ y = C*e^(ax) ដែល a = ${a} => y = C*e^(${a}x)។`;
-      chapter = 'សមីការឌីផេរ៉ង់ស្យែល';
-    } else if (qType === 6) {
-      const r = randInt(2, 5);
-      const u1 = randInt(1, 4);
-      const u4 = u1 * Math.pow(r, 3);
-      q = `ស្វ៊ីតធរណីមាត្រមួយមានតួទី១ u1 = ${u1} និងរ៉ាស្យុង q = ${r}។ រកតួទី ៤ (u4)`;
-      options = [`${u4}`, `${u1 * Math.pow(r, 4)}`, `${u4 + r}`, `${u1 + 3 * r}`];
-      answer = 0;
-      explanation = `រូបមន្ត un = u1 * q^(n-1) => u4 = ${u1} * ${r}^3 = ${u1} * ${r * r * r} = ${u4}។`;
-      chapter = 'ស្វ៊ីតចំនួនពិត';
-    } else if (qType === 7) {
-      const u1 = randInt(1, 5);
-      const d = randInt(2, 6);
-      const n = randInt(4, 8);
-      const un = u1 + (n - 1) * d;
-      q = `ស្វ៊ីតនព្វន្តមាន u1 = ${u1} និងផលសងរួម d = ${d}។ គណនាតួទី ${n} (u${n})`;
-      options = [`${un}`, `${un + d}`, `${un - d}`, `${u1 * n}`];
-      answer = 0;
-      explanation = `រូបមន្ត un = u1 + (n-1)d => u${n} = ${u1} + (${n}-1)×${d} = ${u1} + ${(n - 1) * d} = ${un}។`;
-      chapter = 'ស្វ៊ីតនព្វន្ត';
-    } else if (qType === 8) {
-      const x1 = randInt(1, 5);
-      const y1 = randInt(1, 5);
-      const z1 = randInt(1, 5);
-      q = `គណនាប្រវែងវ៉ិចទ័រ v = (${x1}, ${y1}, ${z1})`;
-      const lenSq = x1 * x1 + y1 * y1 + z1 * z1;
-      options = [`√${lenSq}`, `${x1 + y1 + z1}`, `${lenSq}`, `√${x1 * y1 * z1}`];
-      answer = 0;
-      explanation = `|v| = √(x² + y² + z²) = √(${x1}² + ${y1}² + ${z1}²) = √${lenSq}។`;
-      chapter = 'វ៉ិចទ័រក្នុងលំហ';
-    } else if (qType === 9) {
-      const h = randInt(1, 7);
-      const k = randInt(1, 7);
-      const r = randInt(2, 9);
-      q = `សមីការរង្វង់ដែលមានផ្ចិត I(${h}, ${k}) និងកាំ R = ${r} គឺ៖`;
-      options = [
-        `(x - ${h})² + (y - ${k})² = ${r * r}`,
-        `(x + ${h})² + (y + ${k})² = ${r * r}`,
-        `(x - ${h})² + (y - ${k})² = ${r}`,
-        `x² + y² = ${r * r}`
-      ];
-      answer = 0;
-      explanation = `សមីការស្តង់ដារង្វង់៖ (x - h)² + (y - k)² = R² => (x - ${h})² + (y - ${k})² = ${r * r}។`;
-      chapter = 'កោនិច និងរង្វង់';
-    } else if (qType === 10) {
-      const a = randInt(2, 6);
-      q = `គណនាដែនកំណត់ lim (x → 0) [ sin(${a}x) / x ] = ?`;
-      options = [`${a}`, `1`, `0`, `+∞`];
-      answer = 0;
-      explanation = `រូបមន្តគ្រឹះ lim (u → 0) [ sin(u)/u ] = 1 => lim (x → 0) [ ${a}*sin(${a}x)/(${a}x) ] = ${a}*1 = ${a}។`;
-      chapter = 'លីមីតត្រីកោណមាត្រ';
-    } else if (qType === 11) {
-      const a = randInt(2, 5);
-      const exp = randInt(2, 4);
-      const ans = Math.pow(a, exp);
-      q = `គណនាតម្លៃនៃកន្សោមលោការីត៖ log_${a}(${ans}) = ?`;
-      options = [`${exp}`, `${ans}`, `${a}`, `${exp + 1}`];
-      answer = 0;
-      explanation = `log_a(a^n) = n => log_${a}(${a}^${exp}) = ${exp}។`;
-      chapter = 'អនុគមន៍លោការីត';
-    } else if (qType === 12) {
-      const a = randInt(2, 5);
-      q = `ដេរីវេនៃអនុគមន៍ f(x) = e^(${a}x) គឺ៖`;
-      options = [`${a}e^(${a}x)`, `e^(${a}x)`, `${a}xe^(${a}x)`, `e^(${a}x)/${a}`];
-      answer = 0;
-      explanation = `រូបមន្ត (e^u)' = u'*e^u => (e^${a}x)' = ${a}e^(${a}x)។`;
-      chapter = 'អនុគមន៍អិចស្បូណង់ស្យែល';
-    } else if (qType === 13) {
-      const n = randInt(3, 6);
-      let fact = 1;
-      for (let f = 1; f <= n; f++) fact *= f;
-      q = `គណនាតម្លៃនៃ ${n}! (ហ្វាក់តូរីយែល) = ?`;
-      options = [`${fact}`, `${fact * (n + 1)}`, `${fact / 2}`, `${n * 2}`];
-      answer = 0;
-      explanation = `${n}! = 1 × 2 × ... × ${n} = ${fact}។`;
-      chapter = 'កុំប៊ីណាតូ';
-    } else if (qType === 14) {
-      const a = randInt(2, 5);
-      const b = randInt(1, 4);
-      q = `ក្រាបនៃអនុគមន៍ f(x) = (${a}x + 1) / (x - ${b}) មានអាស៊ីមតូតឈរត្រង់៖`;
-      options = [`x = ${b}`, `x = -${b}`, `y = ${a}`, `x = 0`];
-      answer = 0;
-      explanation = `អាស៊ីមតូតឈរកើតមាននៅពេលភាគបែងស្មើសូន្យ x - ${b} = 0 => x = ${b}។`;
-      chapter = 'អាស៊ីមតូតនៃក្រាប';
-    } else if (qType === 15) {
-      const a = randInt(2, 5);
-      const b = randInt(1, 4);
-      q = `ក្រាបនៃអនុគមន៍ f(x) = (${a}x + 1) / (x - ${b}) មានអាស៊ីមតូតដេកត្រង់៖`;
-      options = [`y = ${a}`, `x = ${b}`, `y = 0`, `y = 1`];
-      answer = 0;
-      explanation = `អាស៊ីមតូតដេក៖ lim (x → ±∞) (${a}x + 1)/(x - ${b}) = ${a} => y = ${a}។`;
-      chapter = 'អាស៊ីមតូតនៃក្រាប';
-    } else if (qType === 16) {
-      const p = randInt(1, 4);
-      q = `ប៉ារ៉ាបូលដែលមានសមីការ y² = ${4 * p}x មានកូអរដោនេកំណុំ F គឺ៖`;
-      options = [`F(${p}, 0)`, `F(0, ${p})`, `F(-${p}, 0)`, `F(${2 * p}, 0)`];
-      answer = 0;
-      explanation = `សមីការ y² = 4px មានកំណុំ F(p, 0) ដែល 4p = ${4 * p} => p = ${p} => F(${p}, 0)។`;
-      chapter = 'កោនិច - ប៉ារ៉ាបូល';
-    } else if (qType === 17) {
-      const a = randInt(2, 4);
-      const sq = a * a;
-      q = `គណនាអាំងតេក្រាលកំណត់៖ ∫[0 ទៅ ${a}] 2x dx = ?`;
-      options = [`${sq}`, `${2 * sq}`, `${a}`, `${sq / 2}`];
-      answer = 0;
-      explanation = `∫ 2x dx = [x²] ពី 0 ទៅ ${a} = ${a}² - 0 = ${sq}។`;
-      chapter = 'អាំងតេក្រាលកំណត់';
-    } else if (qType === 18) {
-      const k = randInt(1, 5);
-      q = `កុំផ្លិចឆ្លាស់នៃ z = ${k} - ${k + 2}i គឺ៖`;
-      options = [`${k} + ${k + 2}i`, `-${k} - ${k + 2}i`, `-${k} + ${k + 2}i`, `${k + 2} - ${k}i`];
-      answer = 0;
-      explanation = `បើ z = a - bi នោះកុំផ្លិចឆ្លាស់ z̄ = a + bi => ${k} + ${k + 2}i។`;
-      chapter = 'ចំនួនកុំផ្លិច';
+    if (gradeNum <= 3) {
+      // Primary Grade 1 - 3
+      chapter = 'គណិតវិទ្យាបឋម (លេខនព្វន្ត និងប្រមាណវិធី)';
+      const subType = i % 5;
+      if (subType === 0) {
+        const a = randInt(1, 20 * gradeNum);
+        const b = randInt(1, 15 * gradeNum);
+        q = `តើផលបូក ${a} + ${b} ស្មើនឹងប៉ុន្មាន? (ថ្នាក់ទី ${grade})`;
+        const sum = a + b;
+        options = [`${sum}`, `${sum + randInt(1, 3)}`, `${Math.max(1, sum - randInt(1, 3))}`, `${sum + 10}`];
+        explanation = `ផលបូក ${a} + ${b} = ${sum}។`;
+      } else if (subType === 1) {
+        const a = randInt(10, 30 * gradeNum);
+        const b = randInt(1, a - 1);
+        q = `តើផលដក ${a} - ${b} ស្មើនឹងប៉ុន្មាន? (ថ្នាក់ទី ${grade})`;
+        const diff = a - b;
+        options = [`${diff}`, `${diff + randInt(1, 3)}`, `${diff + 5}`, `${Math.max(0, diff - 2)}`];
+        explanation = `ផលដក ${a} - ${b} = ${diff}។`;
+      } else if (subType === 2) {
+        const a = randInt(2, 9);
+        const b = randInt(2, 9);
+        q = `តើផលគុណ ${a} × ${b} ស្មើនឹងប៉ុន្មាន? (ថ្នាក់ទី ${grade})`;
+        const prod = a * b;
+        options = [`${prod}`, `${prod + a}`, `${prod - a}`, `${prod + randInt(2, 5)}`];
+        explanation = `តាមមេគុណ ${a} × ${b} = ${prod}។`;
+      } else if (subType === 3) {
+        const sides = pick([3, 4, 5, 6]);
+        const names = { 3: 'ត្រីកោណ', 4: 'ចតុកោណ', 5: 'បញ្ចកោណ', 6: 'ឆកោណ' };
+        q = `តើរូបធរណីមាត្រដែលមានជ្រុងចំនួន ${sides} ហៅថាអ្វី? (ថ្នាក់ទី ${grade})`;
+        options = [`${names[sides]}`, `${names[sides === 3 ? 4 : 3]}`, 'រង្វង់', 'ពហុកោណមិនកំណត់'];
+        explanation = `រូបដែលមានជ្រុង ${sides} ហៅថា ${names[sides]}។`;
+      } else {
+        const h = randInt(1, 12);
+        q = `បើទ្រនិចខ្លីចង្អុលលេខ ${h} និងទ្រនិចវែងចង្អុលលេខ ១២ តើម៉ោងប៉ុន្មាន? (ថ្នាក់ទី ${grade})`;
+        options = [`ម៉ោង ${h} គត់`, `ម៉ោង ${h} និង ៣០ នាទី`, `ម៉ោង ${h + 1} គត់`, `ម៉ោង ១២ គត់`];
+        explanation = `ទ្រនិចវែងនៅលេខ ១២ បង្ហាញពីម៉ោងគត់ ដូច្នេះគឺម៉ោង ${h} គត់។`;
+      }
+    } else if (gradeNum <= 6) {
+      // Primary Grade 4 - 6
+      chapter = 'គណិតវិទ្យាបឋមជាន់ខ្ពស់ (ប្រភាគ ទសភាគ និងផ្ទៃក្រឡា)';
+      const subType = i % 5;
+      if (subType === 0) {
+        const l = randInt(4, 25);
+        const w = randInt(2, l - 1);
+        q = `ចតុកោណកែងមួយមានបណ្តោយ ${l}m និងទទឹង ${w}m។ តើផ្ទៃក្រឡាស្មើប៉ុន្មាន? (ថ្នាក់ទី ${grade})`;
+        const area = l * w;
+        options = [`${area} m²`, `${2 * (l + w)} m²`, `${area + l} m²`, `${area - w} m²`];
+        explanation = `ផ្ទៃក្រឡាចតុកោណកែង S = បណ្តោយ × ទទឹង = ${l} × ${w} = ${area} m²។`;
+      } else if (subType === 1) {
+        const pct = pick([10, 20, 25, 50, 75]);
+        const total = randInt(2, 20) * 100;
+        const ansVal = (total * pct) / 100;
+        q = `តើ ${pct}% នៃចំនួន ${total} ស្មើនឹងប៉ុន្មាន? (ថ្នាក់ទី ${grade})`;
+        options = [`${ansVal}`, `${ansVal + 10}`, `${ansVal * 2}`, `${ansVal / 2}`];
+        explanation = `${pct}% នៃ ${total} = (${pct} × ${total}) / 100 = ${ansVal}។`;
+      } else if (subType === 2) {
+        const d = randInt(50, 300);
+        const t = pick([2, 3, 4, 5]);
+        const v = d / t;
+        q = `ឡានមួយធ្វើដំណើរបានចម្ងាយ ${d} km ក្នុងរយៈពេល ${t} ម៉ោង។ តើល្បឿនមធ្យមស្មើប៉ុន្មាន? (ថ្នាក់ទី ${grade})`;
+        options = [`${v} km/h`, `${v + 15} km/h`, `${v - 10} km/h`, `${d * t} km/h`];
+        explanation = `ល្បឿន V = ចម្ងាយ (d) / រយៈពេល (t) = ${d} / ${t} = ${v} km/h។`;
+      } else if (subType === 3) {
+        const a = randInt(1, 5);
+        const b = randInt(2, 6);
+        q = `គណនាប្រភាគ៖ ${a}/${b} + ${a + 1}/${b} = ? (ថ្នាក់ទី ${grade})`;
+        options = [`${2 * a + 1}/${b}`, `${2 * a + 1}/${2 * b}`, `${a}/${b}`, `${2 * a}/${b}`];
+        explanation = `បូកភាគយក និងរក្សាភាគបែងដដែល៖ (${a} + ${a + 1}) / ${b} = ${2 * a + 1}/${b}។`;
+      } else {
+        const l = randInt(5, 30);
+        const w = randInt(3, l - 1);
+        const p = 2 * (l + w);
+        q = `ចតុកោណកែងមួយមានបណ្តោយ ${l}cm និងទទឹង ${w}cm។ តើបរិមាត្រស្មើប៉ុន្មាន? (ថ្នាក់ទី ${grade})`;
+        options = [`${p} cm`, `${l * w} cm`, `${p + 4} cm`, `${p - 4} cm`];
+        explanation = `បរិមាត្រ P = 2 × (បណ្តោយ + ទទឹង) = 2 × (${l} + ${w}) = ${p} cm។`;
+      }
+    } else if (gradeNum <= 9) {
+      // Junior High Grade 7 - 9 (ឌីប្លូម)
+      chapter = 'ពិជគណិត និងធរណីមាត្រអនុវិទ្យាល័យ (ឌីប្លូម)';
+      const subType = i % 5;
+      if (subType === 0) {
+        const a = randInt(2, 8);
+        const b = randInt(1, 20);
+        const x = randInt(1, 10);
+        const c = a * x + b;
+        q = `ដោះស្រាយសមីការលីនេអ៊ែរ៖ ${a}x + ${b} = ${c} (ថ្នាក់ទី ${grade})`;
+        options = [`x = ${x}`, `x = ${x + 1}`, `x = ${Math.max(1, x - 1)}`, `x = ${x + 2}`];
+        explanation = `${a}x = ${c} - ${b} = ${a * x} => x = ${a * x}/${a} = ${x}។`;
+      } else if (subType === 1) {
+        const pyth = pick([[3, 4, 5], [6, 8, 10], [5, 12, 13], [9, 12, 15]]);
+        q = `ត្រីកោណកែងមួយមានជ្រុងជាប់មុំកែង ${pyth[0]}cm និង ${pyth[1]}cm។ តាមទ្រឹស្តីបទពីតាក័រ តើអ៊ីប៉ូតេនុសស្មើប៉ុន្មាន? (ថ្នាក់ទី ${grade})`;
+        options = [`${pyth[2]} cm`, `${pyth[2] + 2} cm`, `${pyth[0] + pyth[1]} cm`, `${pyth[2] - 1} cm`];
+        explanation = `អ៊ីប៉ូតេនុស c² = a² + b² = ${pyth[0]}² + ${pyth[1]}² = ${pyth[2] * pyth[2]} => c = ${pyth[2]} cm។`;
+      } else if (subType === 2) {
+        const a = randInt(2, 7);
+        q = `ពន្លាតកន្សោមស្វ័យគុណ (x + ${a})² = ? (ថ្នាក់ទី ${grade})`;
+        options = [`x² + ${2 * a}x + ${a * a}`, `x² + ${a * a}`, `x² + ${a}x + ${a * a}`, `x² + ${2 * a}x + ${2 * a}`];
+        explanation = `តាមរូបមន្ត (a + b)² = a² + 2ab + b² => (x + ${a})² = x² + 2(${a})x + ${a}² = x² + ${2 * a}x + ${a * a}។`;
+      } else if (subType === 3) {
+        const r = randInt(1, 10);
+        q = `ដោះស្រាយសមីការដឺក្រេទី ២៖ x² - ${r * r} = 0 (ថ្នាក់ទី ${grade})`;
+        options = [`x = ±${r}`, `x = ${r}`, `x = -${r}`, `x = ${r * r}`];
+        explanation = `x² = ${r * r} => x = ±√(${r * r}) = ±${r}។`;
+      } else {
+        const angle = pick([30, 45, 60]);
+        const sinVals = { 30: '1/2', 45: '√2/2', 60: '√3/2' };
+        q = `តើតម្លៃ sin(${angle}°) ស្មើនឹងប៉ុន្មាន? (ថ្នាក់ទី ${grade})`;
+        options = [`${sinVals[angle]}`, `${angle === 30 ? '√3/2' : '1/2'}`, '1', '0'];
+        explanation = `តាមតារាងត្រីកោណមាត្រគ្រឹះ sin(${angle}°) = ${sinVals[angle]}។`;
+      }
     } else {
-      const n = randInt(2, 4);
-      q = `តម្លៃនៃ cos(π/${n === 2 ? 2 : (n === 3 ? 3 : 4)}) ស្មើនឹង៖`;
-      const valStr = n === 2 ? '0' : (n === 3 ? '1/2' : '√2/2');
-      options = [valStr, '1', '√3/2', '-1'];
-      answer = 0;
-      explanation = `តាមតារាងតម្លៃត្រីកោណមាត្រពិសេស cos(π/${n === 2 ? 2 : (n === 3 ? 3 : 4)}) = ${valStr}។`;
-      chapter = 'ត្រីកោណមាត្រ';
+      // High School Grade 10 - 12 (បាក់ឌុប Bac II)
+      chapter = 'គណិតវិទ្យាវិទ្យាល័យកម្រិតខ្ពស់ (Bac II)';
+      const subType = i % 5;
+      if (subType === 0) {
+        const a = randInt(1, 12);
+        const a2 = a * a;
+        q = `គណនាលីមីត៖ lim (x → ${a}) (x² - ${a2}) / (x - ${a}) = ? (ថ្នាក់ទី ${grade})`;
+        const ansVal = 2 * a;
+        options = [`${ansVal}`, `${a}`, `${a2}`, `${ansVal + 2}`];
+        explanation = `(x² - ${a2})/(x - ${a}) = x + ${a} => lim = ${a} + ${a} = ${ansVal}។`;
+      } else if (subType === 1) {
+        const c = randInt(2, 8);
+        const n = randInt(2, 5);
+        q = `រកដេរីវេ f'(x) នៃ f(x) = ${c}x^${n} - ${c * 2}x (ថ្នាក់ទី ${grade})`;
+        options = [`${c * n}x^${n - 1} - ${c * 2}`, `${c * n}x^${n} - ${c * 2}`, `${c}x^${n - 1} - ${c * 2}`, `${c * n}x^${n - 1} + ${c * 2}`];
+        explanation = `f'(x) = ${c} × (${n}x^${n - 1}) - ${c * 2} = ${c * n}x^${n - 1} - ${c * 2}។`;
+      } else if (subType === 2) {
+        const k = randInt(2, 8);
+        q = `គណនាអាំងតេក្រាល ∫ ${k}x dx = ? (ថ្នាក់ទី ${grade})`;
+        options = [`(${k}/2)x² + C`, `${k}x² + C`, `${k} + C`, `(${k}/3)x³ + C`];
+        explanation = `∫ ${k}x dx = ${k} × (x²/2) + C = (${k}/2)x² + C។`;
+      } else if (subType === 3) {
+        const a = randInt(1, 6);
+        const b = randInt(1, 6);
+        q = `រកម៉ូឌុលនៃចំនួនកុំផ្លិច z = ${a} + ${b}i (ថ្នាក់ទី ${grade})`;
+        const modSq = a * a + b * b;
+        options = [`√${modSq}`, `${modSq}`, `${a + b}`, `√${a + b}`];
+        explanation = `ម៉ូឌុល |z| = √(a² + b²) = √(${a}² + ${b}²) = √${modSq}។`;
+      } else {
+        const n = randInt(4, 10);
+        q = `តើចំនួនបន្សំ C(${n}, 1) ស្មើនឹងប៉ុន្មាន? (ថ្នាក់ទី ${grade})`;
+        options = [`${n}`, '1', `${n * (n - 1)}`, '0'];
+        explanation = `តាមរូបមន្តបន្សំ C(n, 1) = n! / (1!(n - 1)!) = n = ${n}។`;
+      }
     }
 
     scienceQuestions.push({
@@ -223,133 +206,91 @@ function generateScienceQuestions() {
     });
   }
 
-  // 1.2 PHYSICS (7,500 questions)
-  console.log('  -> Generating 7,500 Physics questions...');
+  // -----------------------------------------------------------------------
+  // 1.2 PHYSICS & SCIENCE (7,500 questions: Grades 1-12)
+  // -----------------------------------------------------------------------
+  console.log('  -> Generating 7,500 Physics & Science questions across Grades 1-12...');
   for (let i = 0; i < 7500; i++) {
-    const qType = i % 15;
-    let q, options, answer, explanation, chapter, grade;
-    grade = pick(['10', '11', '12']);
+    const grade = getGradeForIndex(i, 7500);
+    const gradeNum = parseInt(grade, 10);
+    let q, options, answer = 0, explanation, chapter;
 
-    if (qType === 0) {
-      const m = randInt(1, 8);
-      const k = randInt(50, 200);
-      q = `ប៉ោលរលកស្ព្រីងមួយមានម៉ាស m = ${m} kg និងថេររឹង k = ${k} N/m។ រកប្រេកង់មុំ ω (rad/s)`;
-      options = [`√(${k}/${m}) rad/s`, `√(${m}/${k}) rad/s`, `${k * m} rad/s`, `2π√(${k}/${m})`];
-      answer = 0;
-      explanation = `រូបមន្តប្រេកង់មុំប៉ោលស្ព្រីង ω = √(k/m) = √(${k}/${m}) rad/s។`;
-      chapter = 'លំយោលមេកានិច និងប៉ោល';
-    } else if (qType === 1) {
-      const f = randInt(100, 800);
-      const v = 340;
-      const lambda = (v / f).toFixed(2);
-      q = `រលកសំឡេងមួយមានប្រេកង់ f = ${f} Hz ធ្វើដំណើរក្នុងខ្យល់ដោយល្បឿន v = 340 m/s។ រកប្រវែងរលក λ`;
-      options = [`${lambda} m`, `${(f / v).toFixed(2)} m`, `${f * v} m`, `${(v * 2 / f).toFixed(2)} m`];
-      answer = 0;
-      explanation = `រូបមន្តប្រវែងរលក λ = v / f = 340 / ${f} ≈ ${lambda} m។`;
-      chapter = 'រលកសំឡេង និង Doppler';
-    } else if (qType === 2) {
-      const L = randInt(1, 5);
-      const omega = 100;
-      const ZL = L * omega;
-      q = `បូប៊ីនសុទ្ធមួយមានអាំងឌុចតង់ L = ${L} H ភ្ជាប់នឹងចរន្តឆ្លាស់ប្រេកង់មុំ ω = 100 rad/s។ រកសាំងឌុចតង់ ZL`;
-      options = [`${ZL} Ω`, `${(L / omega).toFixed(2)} Ω`, `${ZL * 2} Ω`, `${(omega / L).toFixed(2)} Ω`];
-      answer = 0;
-      explanation = `សាំងឌុចតង់ ZL = L * ω = ${L} × 100 = ${ZL} Ω។`;
-      chapter = 'សៀគ្វីចរន្តឆ្លាស់ RLC';
-    } else if (qType === 3) {
-      const m = randInt(1, 9);
-      q = `យោងតាមទ្រឹស្តីរ៉ឺឡាទីវីតេអែងស្តែង ថាមពលអសកម្មនៃម៉ាស m = ${m} kg គឺ៖`;
-      options = [`E = ${m} × c² (J)`, `E = ${m} × c (J)`, `E = (1/2)${m} × c² (J)`, `E = ${m} / c² (J)`];
-      answer = 0;
-      explanation = `រូបមន្តសមមូលម៉ាស-ថាមពលអែងស្តែង៖ E = m*c² => E = ${m} × c²។`;
-      chapter = 'ទាក់ទងភាព និងនុយក្លេអ៊ែរ';
-    } else if (qType === 4) {
-      const T12 = randInt(5, 30);
-      const nHalf = randInt(2, 4);
-      const t = T12 * nHalf;
-      const initM = 100;
-      const remM = initM / Math.pow(2, nHalf);
-      q = `ធាតុវិទ្យុសកម្មមួយមានពាក់កណ្តាលជីវិត T = ${T12} ថ្ងៃ។ បើដំបូងមាន 100g ក្រោយរយៈពេល ${t} ថ្ងៃ នៅសល់ម៉ាសប៉ុន្មាន?`;
-      options = [`${remM} g`, `${remM * 2} g`, `${initM / nHalf} g`, `${remM / 2} g`];
-      answer = 0;
-      explanation = `ចំនួនពាក់កណ្តាលជីវិត n = t / T = ${t} / ${T12} = ${nHalf}។ ម៉ាសនៅសល់ m = m0 / 2^n = 100 / 2^${nHalf} = ${remM} g។`;
-      chapter = 'វិទ្យុសកម្ម និងបំបែកនុយក្លេអ៊ែរ';
-    } else if (qType === 5) {
-      q = `ថាមពលនៃហ្វូតុងពន្លឺដែលមានប្រេកង់ f ត្រូវបានកំណត់ដោយរូបមន្តណា? (h ជាថេរផ្លង់)`;
-      options = [`E = h × f`, `E = h / f`, `E = f / h`, `E = h × f²`];
-      answer = 0;
-      explanation = `យោងទ្រឹស្តីកង់ទិចរបស់ Planck & Einstein: ថាមពលហ្វូតុង E = h*f (ឬ E = hc/λ)។`;
-      chapter = 'ពន្លឺ និងទ្រឹស្តីកង់ទិច';
-    } else if (qType === 6) {
-      const u = randInt(110, 240);
-      const r = randInt(10, 50);
-      const i = (u / r).toFixed(2);
-      q = `តង់ស្យុងប្រសិទ្ធ U = ${u}V ឆ្លងកាត់រេស៊ីស្តង់ R = ${r}Ω។ រកអាំងតង់ស៊ីតេចរន្តប្រសិទ្ធ I`;
-      options = [`${i} A`, `${(r / u).toFixed(2)} A`, `${(u * r)} A`, `${(u / (r * 2)).toFixed(2)} A`];
-      answer = 0;
-      explanation = `តាមច្បាប់អូមសម្រាប់ចរន្តអគ្គិសនី I = U / R = ${u} / ${r} ≈ ${i} A។`;
-      chapter = 'ចរន្តអគ្គិសនី និងច្បាប់អូម';
-    } else if (qType === 7) {
-      q = `លក្ខខណ្ឌដែលធ្វើឱ្យកើតមានបាតុភូត «រេសូណង់អគ្គិសនី» ក្នុងសៀគ្វី RLC តជាស៊េរី គឺ៖`;
-      options = [`ZL = ZC (L*ω = 1/(C*ω))`, `ZL > ZC`, `ZL < ZC`, `R = 0`];
-      answer = 0;
-      explanation = `រេសូណង់អគ្គិសនីកើតឡើងនៅពេល ZL = ZC => អាំងប៉េដង់សរុប Z = R មានតម្លៃអប្បបរមា និងចរន្ត I មានតម្លៃអតិបរមា។`;
-      chapter = 'រេសូណង់អគ្គិសនី RLC';
-    } else if (qType === 8) {
-      const m = randInt(1, 10);
-      const v = randInt(2, 10);
-      const ek = 0.5 * m * v * v;
-      q = `វត្ថុមួយមានម៉ាស m = ${m} kg ផ្លាស់ទីដោយល្បឿន v = ${v} m/s។ រកថាមពលស៊ីនេទិច Ek`;
-      options = [`${ek} J`, `${ek * 2} J`, `${m * v} J`, `${ek / 2} J`];
-      answer = 0;
-      explanation = `ថាមពលស៊ីនេទិច Ek = (1/2)mv² = 0.5 × ${m} × ${v}² = ${ek} J។`;
-      chapter = 'ថាមពលមេកានិច';
-    } else if (qType === 9) {
-      const m = randInt(2, 8);
-      const g = 10;
-      const h = randInt(2, 10);
-      const ep = m * g * h;
-      q = `វត្ថុមួយមានម៉ាស m = ${m} kg ស្ថិតនៅកម្ពស់ h = ${h} m ធៀបនឹងដី (g = 10 m/s²)។ រកថាមពលប៉ូតង់ស្យែល Ep`;
-      options = [`${ep} J`, `${ep / 2} J`, `${m * h} J`, `${ep * 2} J`];
-      answer = 0;
-      explanation = `ថាមពលប៉ូតង់ស្យែលទំនាញដី Ep = mgh = ${m} × 10 × ${h} = ${ep} J។`;
-      chapter = 'ថាមពលមេកានិច';
-    } else if (qType === 10) {
-      const l = randInt(1, 4);
-      q = `ប៉ោលទោលមួយមានប្រវែងខ្សែ l = ${l} m នៅកន្លែងដែលមាន g = π² ≈ 10 m/s²។ រកខួប T នៃលំយោល`;
-      const tVal = 2 * Math.sqrt(l);
-      options = [`${tVal} s`, `${tVal * 2} s`, `${l} s`, `${tVal / 2} s`];
-      answer = 0;
-      explanation = `ខួបប៉ោលទោល T = 2π√(l/g) = 2π√(l/π²) = 2√l = 2√${l} = ${tVal} s។`;
-      chapter = 'ប៉ោលទោល';
-    } else if (qType === 11) {
-      q = `កម្លាំងអន្តរកម្មរវាងបន្ទុកអគ្គិសនីពីរ q1 និង q2 ចម្ងាយ r កំណត់ដោយច្បាប់ណា?`;
-      options = [`ច្បាប់គូឡុំ (Coulomb's Law: F = k|q1q2|/r²)`, `ច្បាប់ញូតុនទី២`, `ច្បាប់អូម`, `ច្បាប់ហ្វារ៉ាដេយ`];
-      answer = 0;
-      explanation = `ច្បាប់គូឡុំ F = k*|q1*q2|/r² កំណត់កម្លាំងអគ្គិសនីស្ទាទិចរវាងបន្ទុកពីរ។`;
-      chapter = 'ដែនអគ្គិសនីស្ទាទិច';
-    } else if (qType === 12) {
-      q = `ច្បាប់អាំងឌុចស្យុងអេឡិចត្រូម៉ាញ៉េទិច (Faraday's Law) ចែងថា កម្លាំងអគ្គិសនីចលករអាំងឌ្វី e កំណត់ដោយ៖`;
-      options = [`e = -dΦ/dt (បំរែបំរួលហ្វ្លុចម៉ាញ៉េទិចធៀបនឹងពេល)`, `e = Φ * t`, `e = B * I * L`, `e = R * I`];
-      answer = 0;
-      explanation = `ច្បាប់ហ្វារ៉ាដេយ e = -dΦ/dt បង្ហាញថាកម្លាំងអគ្គិសនីចលករអាំងឌ្វីសមាមាត្រនឹងល្បឿនបំរែបំរួលហ្វ្លុចម៉ាញ៉េទិច។`;
-      chapter = 'អាំងឌុចស្យុងអេឡិចត្រូម៉ាញ៉េទិច';
-    } else if (qType === 13) {
-      q = `បាតុភូតចំណាំងផ្លាតពេញលេញ (Total Internal Reflection) អាចកើតមាននៅពេល៖`;
-      options = [`ពន្លឺធ្វើដំណើរពីមជ្ឈដ្ឋានថ្លាមានសន្ទស្សន៍ចំណាំងធំទៅតូច និងមុំធ្លាក់ធំជាងមុំកំណត់`, `ពន្លឺធ្វើដំណើរពីសន្ទស្សន៍តូចទៅធំ`, `មុំធ្លាក់ស្មើសូន្យ`, `ក្នុងលំហសូន្យ`];
-      answer = 0;
-      explanation = `ចំណាំងផ្លាតពេញលេញកើតមាននៅពេល n1 > n2 និងមុំធ្លាក់ i > i_lim (sin i_lim = n2/n1)។`;
-      chapter = 'អុបទិចធរណីមាត្រ';
+    if (gradeNum <= 6) {
+      chapter = 'វិទ្យាសាស្ត្របឋម (កម្លាំង ថាមពល និងពន្លឺ)';
+      const subType = i % 4;
+      if (subType === 0) {
+        q = `តើព្រះអាទិត្យផ្តល់ថាមពលអ្វីខ្លះដល់ផែនដី? (ថ្នាក់ទី ${grade})`;
+        options = ['ថាមពលពន្លឺ និងថាមពលកម្ដៅ', 'ថាមពលសំឡេងតែមួយមុខ', 'ថាមពលអគ្គិសនីសុទ្ធ', 'ថាមពលគីមី'];
+        explanation = 'ព្រះអាទិត្យជាប្រភពចម្បងនៃពន្លឺ និងកម្តៅសម្រាប់ជីវិតលើផែនដី។';
+      } else if (subType === 1) {
+        q = `តើទឹកកកប្រែទៅជារាវកាលណាត្រូវកម្តៅ ហៅថាបាតុភូតអ្វី? (ថ្នាក់ទី ${grade})`;
+        options = ['ការរលាយ (Melting)', 'ការកក (Freezing)', 'ការរំហួត (Evaporation)', 'ការកកកំណក'];
+        explanation = 'ការប្តូរភាពរូបពីអង្គធាតុរឹងទៅរាវហៅថា ការរលាយ។';
+      } else if (subType === 2) {
+        q = `តើវត្ថុណាខ្លះដែលមេដែកអាចឆក់ទាញបាន? (ថ្នាក់ទី ${grade})`;
+        options = ['ដែក និងដែកថែប', 'ឈើ និងក្រដាស', 'កៅស៊ូ និងជ័រ', 'កញ្ចក់'];
+        explanation = 'មេដែកមានកម្លាំងដែនម៉ាញ៉េទិចឆក់តែសារធាតុដែក និងនីកែលប៉ុណ្ណោះ។';
+      } else {
+        q = `តើខ្យល់មានទម្ងន់ និងមាឌដែរឬទេ? (ថ្នាក់ទី ${grade})`;
+        options = ['មានទម្ងន់ និងមានមាឌ (យកទំហំទីកន្លែង)', 'គ្មានទម្ងន់ទាល់តែសោះ', 'មានតែទម្ងន់តែគ្មានមាឌ', 'គ្មានទាំងពីរ'];
+        explanation = 'ខ្យល់ជាឧស្ម័នដែលមានទម្ងន់ និងកាន់កាប់មាឌក្នុងលំហ។';
+      }
+    } else if (gradeNum <= 9) {
+      chapter = 'រូបវិទ្យាអនុវិទ្យាល័យ (ចលនា កម្លាំង និងអគ្គិសនី)';
+      const subType = i % 4;
+      if (subType === 0) {
+        const m = randInt(2, 20);
+        const a = randInt(2, 10);
+        const f = m * a;
+        q = `វត្ថុមួយមានម៉ាស ${m}kg មានសំទុះ ${a}m/s²។ តាមច្បាប់ទី២ញូតុន តើកម្លាំង F ស្មើប៉ុន្មាន? (ថ្នាក់ទី ${grade})`;
+        options = [`${f} N`, `${f + 10} N`, `${m + a} N`, `${f / 2} N`];
+        explanation = `រូបមន្ត F = m × a = ${m} × ${a} = ${f} N (ញូតុន)។`;
+      } else if (subType === 1) {
+        const u = randInt(10, 220);
+        const r = pick([2, 4, 5, 10]);
+        const iVal = u / r;
+        q = `ចរន្តអគ្គិសនីមានតង់ស្យុង ${u}V ឆ្លងកាត់រេស៊ីស្តង់ ${r}Ω។ តាមច្បាប់អូម តើអាំងតង់ស៊ីតេ I ស្មើប៉ុន្មាន? (ថ្នាក់ទី ${grade})`;
+        options = [`${iVal} A`, `${u * r} A`, `${iVal + 2} A`, `${u + r} A`];
+        explanation = `តាមច្បាប់អូម I = U / R = ${u} / ${r} = ${iVal} A (អំពែ)។`;
+      } else if (subType === 2) {
+        q = `តើល្បឿននៃពន្លឺក្នុងសុញ្ញាកាសមានតម្លៃប្រហាក់ប្រហែលប៉ុន្មាន? (ថ្នាក់ទី ${grade})`;
+        options = ['3 × 10⁸ m/s (300,000 km/s)', '340 m/s', '1,500 m/s', '3 × 10⁵ m/s'];
+        explanation = 'ល្បឿនពន្លឺក្នុងសុញ្ញាកាស c ≈ 300,000 km/s ឬ 3 × 10⁸ m/s។';
+      } else {
+        const f = randInt(10, 100);
+        const d = randInt(2, 10);
+        const w = f * d;
+        q = `កម្លាំង ${f}N រុញវត្ថុឱ្យរំកិលបានចម្ងាយ ${d}m តាមទិសដៅកម្លាំង។ តើកម្មន្ត W ស្មើប៉ុន្មាន? (ថ្នាក់ទី ${grade})`;
+        options = [`${w} J`, `${f + d} J`, `${w * 2} J`, `${f / d} J`];
+        explanation = `កម្មន្ត W = F × d = ${f} × ${d} = ${w} J (ស៊ូល)។`;
+      }
     } else {
-      q = `យោងទ្រឹស្តីកម្តៅ គោលការណ៍ទី១ នៃទែម៉ូឌីណាមិច (First Law of Thermodynamics) គឺ៖`;
-      options = [`ΔU = Q + W (ថាមពលក្នុងប្រែប្រួលស្មើកម្តៅបូកការងារ)`, `ΔU = Q - W²`, `Q = 0`, `W = F × d`];
-      answer = 0;
-      explanation = `គោលការណ៍ទី១ ទែម៉ូឌីណាមិច៖ បំរែបំរួលថាមពលក្នុង ΔU = Q + W (ច្បាប់រក្សាថាមពល)។`;
-      chapter = 'ទែម៉ូឌីណាមិច';
+      chapter = 'រូបវិទ្យាវិទ្យាល័យកម្រិតខ្ពស់ (មេកានិច និងអគ្គិសនី Bac II)';
+      const subType = i % 4;
+      if (subType === 0) {
+        q = `ក្នុងសៀគ្វី RLC ចរន្តឆ្លាស់ បាតុភូតរ៉េសូណង់កើតឡើងកាលណា៖ (ថ្នាក់ទី ${grade})`;
+        options = ['ZL = ZC (Lω = 1/Cω)', 'ZL > ZC', 'R = 0', 'ZL = R'];
+        explanation = 'រ៉េសូណង់អគ្គិសនីកើតឡើងនៅពេល ZL = ZC ដែលនាំឱ្យអាំងប៉េដង់ Z ថយចុះដល់កម្រិតអប្បបរមា Z = R។';
+      } else if (subType === 1) {
+        const m = randInt(1, 10);
+        const v = randInt(2, 8);
+        const ek = 0.5 * m * v * v;
+        q = `គណនាថាមពលស៊ីនេទិចនៃអង្គធាតុម៉ាស ${m}kg កំពុងផ្លាស់ទីក្នុងល្បឿន ${v}m/s (ថ្នាក់ទី ${grade})`;
+        options = [`${ek} J`, `${m * v} J`, `${ek * 2} J`, `${m * v * v} J`];
+        explanation = `Ek = (1/2)mv² = 0.5 × ${m} × (${v}²) = ${ek} J។`;
+      } else if (subType === 2) {
+        q = `តើរូបមន្តសមីការដឺប្រយ (de Broglie wavelength) នៃភាគល្អិតត្រូវនឹងរូបមន្តណា? (ថ្នាក់ទី ${grade})`;
+        options = ['λ = h / p = h / (mv)', 'λ = h × c', 'λ = p / h', 'λ = mc²'];
+        explanation = 'ប្រវែងរលកដឺប្រយ λ = h/p = h/(mv) ដែល h ជាថេរផ្លង់ និង p ជាបរិមាណចលនា។';
+      } else {
+        q = `ច្បាប់អាំងឌុចស្យុងអេឡិចត្រូម៉ាញ៉េទិចហ្វារ៉ាដេយ កម្លាំងអគ្គិសនីចលករ e កំណត់ដោយ៖ (ថ្នាក់ទី ${grade})`;
+        options = ['e = - dΦ/dt', 'e = Φ × t', 'e = B × I × L', 'e = R × I²'];
+        explanation = 'កម្លាំងអគ្គិសនីចលករអាំងឌ្វី e = - dΦ/dt គឺសមាមាត្រនឹងអត្រាបម្រែបម្រួលភ្លុចម៉ាញ៉េទិច។';
+      }
     }
 
     scienceQuestions.push({
-      id: `sci-phys-${idCounter++}`,
+      id: `sci-phy-${idCounter++}`,
       stream: 'science',
       subject: 'រូបវិទ្យា',
       subjectKey: 'physics',
@@ -362,112 +303,71 @@ function generateScienceQuestions() {
     });
   }
 
-  // 1.3 CHEMISTRY (7,500 questions)
-  console.log('  -> Generating 7,500 Chemistry questions...');
+  // -----------------------------------------------------------------------
+  // 1.3 CHEMISTRY (7,500 questions: Grades 1-12)
+  // -----------------------------------------------------------------------
+  console.log('  -> Generating 7,500 Chemistry questions across Grades 1-12...');
   for (let i = 0; i < 7500; i++) {
-    const qType = i % 15;
-    let q, options, answer, explanation, chapter, grade;
-    grade = pick(['10', '11', '12']);
+    const grade = getGradeForIndex(i, 7500);
+    const gradeNum = parseInt(grade, 10);
+    let q, options, answer = 0, explanation, chapter;
 
-    if (qType === 0) {
-      const c = randInt(1, 9);
-      const exp = randInt(2, 6);
-      q = `គណនាតម្លៃ pH នៃសូលុយស្យុងអាស៊ីតខ្លាំងដែលមាន [H3O+] = ${c} × 10^-${exp} M`;
-      const phVal = (exp - Math.log10(c)).toFixed(2);
-      options = [`${phVal}`, `${exp}`, `${(exp + Math.log10(c)).toFixed(2)}`, `${14 - exp}`];
-      answer = 0;
-      explanation = `pH = -log[H3O+] = -log(${c} × 10^-${exp}) = ${exp} - log(${c}) ≈ ${phVal}។`;
-      chapter = 'អាស៊ីត-បាស និង pH';
-    } else if (qType === 1) {
-      const nC = randInt(2, 6);
-      const nH = 2 * nC + 2;
-      q = `អាល់កាន (Alkane) ដែលមានអាតូមកាបូន C = ${nC} មានរូបមន្តម៉ូលេគុលណា?`;
-      options = [`C${nC}H${nH}`, `C${nC}H${2 * nC}`, `C${nC}H${2 * nC - 2}`, `C${nC}H${nH + 2}`];
-      answer = 0;
-      explanation = `រូបមន្តទូទៅនៃអាល់កានគឺ CnH2n+2។ សម្រាប់ n = ${nC} => C${nC}H${2 * nC + 2} = C${nC}H${nH}។`;
-      chapter = 'អ៊ីដ្រូកាបួ និងអាល់កាន';
-    } else if (qType === 2) {
-      q = `ប្រតិកម្មរវាងអាស៊ីតកាបុកស៊ីលិច (R-COOH) និងអាល់កុល (R'-OH) បង្កើតបានជាអ្វី?`;
-      options = [`អេស្ទែ + ទឹក (Ester + H2O)`, `អាល់ដេអ៊ីត + ទឹក`, `អាស៊ីតខ្លាំង + អំបិល`, `អេទែ + អ៊ីដ្រូសែន`];
-      answer = 0;
-      explanation = `R-COOH + R'-OH ⇌ R-COO-R' + H2O គឺជាប្រតិកម្មអេស្ទែភវកម្ម (Esterification) បង្កើតបានអេស្ទែ និងទឹក។`;
-      chapter = 'អេស្ទែ និងលីពីត';
-    } else if (qType === 3) {
-      const m = randInt(1, 5) * 40;
-      const moles = m / 40;
-      q = `គណនាចំនួនម៉ូលនៃ NaOH ម៉ាស m = ${m} g (ដឹងថា M(Na)=23, M(O)=16, M(H)=1)`;
-      options = [`${moles} mol`, `${moles * 2} mol`, `${(moles / 2).toFixed(1)} mol`, `${moles + 1} mol`];
-      answer = 0;
-      explanation = `ម៉ាសម៉ូល NaOH = 23 + 16 + 1 = 40 g/mol => n = m / M = ${m} / 40 = ${moles} mol។`;
-      chapter = 'កំហាប់ និងបរិមាណសារធាតុ';
-    } else if (qType === 4) {
-      q = `យោងតាមគោលការណ៍ Le Chatelier នៅពេលបង្កើនសីតុណ្ហភាព ប្រព័ន្ធលំនឹងនឹងរំកិលទៅទិសដៅណា?`;
-      options = [`ទិសដៅប្រតិកម្មស្រូបកម្តៅ (Endothermic)`, `ទិសដៅប្រតិកម្មបញ្ចេញកម្តៅ (Exothermic)`, `មិនប្រែប្រួល`, `ទិសដៅបង្កើតកករ`];
-      answer = 0;
-      explanation = `នៅពេលបង្កើនសីតុណ្ហភាព ប្រព័ន្ធនឹងរំកិលទៅទិសដៅដែលស្រូបកម្តៅ (Endothermic direction) ដើម្បីបន្ថយការកើនឡើងនៃកម្តៅ។`;
-      chapter = 'លំនឹងគីមី និង Le Chatelier';
-    } else if (qType === 5) {
-      q = `កាតាលីករ (Catalyst) មាននាទីយ៉ាងដូចម្តេចក្នុងប្រតិកម្មគីមី?`;
-      options = [`បង្កើនល្បឿនប្រតិកម្មដោយបន្ថយថាមពលសកម្មកម្ម`, `បង្កើនទិន្នផលអតិបរមា`, `ផ្លាស់ប្តូរលំនឹងគីមី`, `ក្លាយជាផលិតផលសម្រេច`];
-      answer = 0;
-      explanation = `កាតាលីករបង្កើនល្បឿនប្រតិកម្មដោយបន្ថយថាមពលសកម្មកម្ម (Activation Energy) ដោយមិនបាត់បង់រូបធាតុខ្លួនឯងឡើយ។`;
-      chapter = 'ស៊ីនេទិចគីមី និងកាតាលីករ';
-    } else if (qType === 6) {
-      q = `ក្នុងកោសិកាអេឡិចត្រូគីមី (Galvanic/Voltaic cell) អេឡិចត្រូដ «អាណូត» (Anode) រងប្រតិកម្មអ្វី?`;
-      options = [`ប្រតិកម្មអុកស៊ីតកម្ម (បាត់បង់អេឡិចត្រុង)`, `ប្រតិកម្មរេដុកម្ម (ទទួលអេឡិចត្រុង)`, `ប្រតិកម្មបន្សាប`, `ប្រតិកម្មកករ`];
-      answer = 0;
-      explanation = `អាណូត (Anode) ជានិច្ចជាកាលរងប្រតិកម្មអុកស៊ីតកម្ម (បាត់បង់ e⁻) រីឯកាតូត (Cathode) រងប្រតិកម្មរេដុកម្ម (ទទួល e⁻)។`;
-      chapter = 'អេឡិចត្រូគីមី និងពិលវ៉ុលតា';
-    } else if (qType === 7) {
-      q = `សារធាតុណាខ្លះជាសមាសភាគបង្កើតបានជា «សូលុយស្យុងទ្រនាប់» (Buffer Solution)?`;
-      options = [`អាស៊ីតខ្សោយ + បាសឆ្លាស់របស់វា`, `អាស៊ីតខ្លាំង + បាសខ្លាំង`, `អំបិលអព្យាក្រឹត + ទឹក`, `អាស៊ីតខ្លាំង + កករ`];
-      answer = 0;
-      explanation = `សូលុយស្យុងទ្រនាប់ផ្សំឡើងពី អាស៊ីតខ្សោយ និងបាសឆ្លាស់របស់វា (ឬបាសខ្សោយ និងអាស៊ីតឆ្លាស់របស់វា) ដែលអាចរក្សាតម្លៃ pH មិនឱ្យប្រែប្រួលខ្លាំង។`;
-      chapter = 'សូលុយស្យុងទ្រនាប់ (Buffer)';
-    } else if (qType === 8) {
-      const nC = randInt(2, 5);
-      q = `អាល់កែន (Alkene) ដែលមាន C = ${nC} មានរូបមន្តម៉ូលេគុលទូទៅណា?`;
-      options = [`C${nC}H${2 * nC}`, `C${nC}H${2 * nC + 2}`, `C${nC}H${2 * nC - 2}`, `C${nC}H${nC}`];
-      answer = 0;
-      explanation = `រូបមន្តទូទៅនៃអាល់កែនគឺ CnH2n ដែលមានសម្ព័ន្ធពីរ C=C មួយ។ សម្រាប់ n = ${nC} => C${nC}H${2 * nC}។`;
-      chapter = 'អ៊ីដ្រូកាបួមិនឆ្អែត - អាល់កែន';
-    } else if (qType === 9) {
-      const nC = randInt(2, 5);
-      q = `អាល់គីន (Alkyne) ដែលមាន C = ${nC} មានរូបមន្តម៉ូលេគុលទូទៅណា?`;
-      options = [`C${nC}H${2 * nC - 2}`, `C${nC}H${2 * nC}`, `C${nC}H${2 * nC + 2}`, `C${nC}H${nC}`];
-      answer = 0;
-      explanation = `រូបមន្តទូទៅនៃអាល់គីនគឺ CnH2n-2 ដែលមានសម្ព័ន្ធបី C≡C មួយ។ សម្រាប់ n = ${nC} => C${nC}H${2 * nC - 2}។`;
-      chapter = 'អ៊ីដ្រូកាបួមិនឆ្អែត - អាល់គីន';
-    } else if (qType === 10) {
-      q = `បង្គុំនាទីនៃ «អាល់កុល» (Alcohol) គឺបង្គុំណា?`;
-      options = [`-OH (អ៊ីដ្រុកស៊ីល)`, `-COOH (កាបុកស៊ីល)`, `-CHO (អាល់ដេអ៊ីត)`, `-COO- (អេស្ទែ)`];
-      answer = 0;
-      explanation = `អាល់កុលមានបង្គុំនាទីអ៊ីដ្រុកស៊ីល (-OH) ភ្ជាប់នឹងកាបូនឆ្អែត R-OH។`;
-      chapter = 'អាល់កុល និងអេទែ';
-    } else if (qType === 11) {
-      q = `បង្គុំនាទីនៃ «អាស៊ីតកាបុកស៊ីលិច» (Carboxylic Acid) គឺ៖`;
-      options = [`-COOH (កាបុកស៊ីល)`, `-OH`, `-NH2 (អាមីន)`, `-CO- (កេតូន)`];
-      answer = 0;
-      explanation = `អាស៊ីតកាបុកស៊ីលិចមានរូបមន្តទូទៅ R-COOH ដែលផ្សំឡើងពីបង្គុំកាបូនីល >C=O និងអ៊ីដ្រុកស៊ីល -OH។`;
-      chapter = 'អាស៊ីតកាបុកស៊ីលិច';
-    } else if (qType === 12) {
-      q = `ក្នុងប្រតិកម្មរេដុកម្ម ភ្នាក់ងាររេដុករ (Reducing Agent) គឺជាសារធាតុដែល៖`;
-      options = [`បាត់បង់អេឡិចត្រុង (រងអុកស៊ីតកម្ម)`, `ទទួលអេឡិចត្រុង (រងរេដុកម្ម)`, `មិនប្តូរចំនួនអុកស៊ីតកម្ម`, `ស្រូបយកប្រូតុង`];
-      answer = 0;
-      explanation = `ភ្នាក់ងាររេដុករ គឺជាសារធាតុដែលបោះបង់អេឡិចត្រុង (ចំនួនអុកស៊ីតកម្មកើនឡើង)។`;
-      chapter = 'ប្រតិកម្មអុកស៊ីដូរេដុកម្ម';
-    } else if (qType === 13) {
-      q = `សារធាតុសាប៊ូ (Soap) គឺជាអំបិលសូដ្យូម ឬប៉ូតាស្យូមនៃ៖`;
-      options = [`អាស៊ីតខ្លាញ់ខ្សែវែង (Fatty Acids)`, `អាស៊ីតអាមីណេ`, `គ្លុយកូស`, `អាស៊ីតអសរីរាង្គ`];
-      answer = 0;
-      explanation = `សាប៊ូបានមកពីប្រតិកម្មសាប៊ូភវកម្ម (Saponification) រវាងទ្រីគ្លីសេរីដ និងបាសខ្លាំង (NaOH/KOH) បង្កើតបានអំបិលអាស៊ីតខ្លាញ់ និងគ្លីសេរ៉ុល។`;
-      chapter = 'លីពីត និងសាប៊ូ';
+    if (gradeNum <= 6) {
+      chapter = 'វិទ្យាសាស្ត្របឋម (រូបធាតុ និងការប្រែប្រួល)';
+      const subType = i % 3;
+      if (subType === 0) {
+        q = `តើទឹកមានរូបមន្តគីមីយ៉ាងដូចម្តេច? (ថ្នាក់ទី ${grade})`;
+        options = ['H₂O (អ៊ីដ្រូសែន ២ និង អុកស៊ីសែន ១)', 'CO₂', 'O₂', 'NaCl'];
+        explanation = 'ម៉ូលេគុលទឹកផ្សំឡើងពីអាតូមអ៊ីដ្រូសែន ២ និងអុកស៊ីសែន ១ (H₂O)។';
+      } else if (subType === 1) {
+        q = `តើឧស្ម័នណាដែលមនុស្ស និងសត្វដកដង្ហើមចូលដើម្បីរស់? (ថ្នាក់ទី ${grade})`;
+        options = ['ឧស្ម័នអុកស៊ីសែន (O₂)', 'ឧស្ម័នកាបូនិច (CO₂)', 'ឧស្ម័នអាសូត (N₂)', 'ឧស្ម័នមេតាន'];
+        explanation = 'សារពាង្គកាយដកដង្ហើមយកអុកស៊ីសែនសម្រាប់ដុតរំលាយអាហារបង្កើតថាមពល។';
+      } else {
+        q = `តើអំបិលសម្លដែលយើងហូបប្រចាំថ្ងៃមានឈ្មោះគីមីអ្វី? (ថ្នាក់ទី ${grade})`;
+        options = ['សូដ្យូមក្លរួ (NaCl)', 'កាល់ស្យូមកាបូណាត', 'អាស៊ីតស៊ុលផួរិច', 'ស្ករគ្លុយកូស'];
+        explanation = 'អំបិលសម្លគឺ Sodium Chloride (NaCl)។';
+      }
+    } else if (gradeNum <= 9) {
+      chapter = 'គីមីវិទ្យាអនុវិទ្យាល័យ (អាតូម ធាតុ និងប្រតិកម្មគីមី)';
+      const subType = i % 4;
+      if (subType === 0) {
+        q = `តើសូលុយស្យុងដែលមានកម្រិត pH < 7 ជាសូលុយស្យុងអ្វី? (ថ្នាក់ទី ${grade})`;
+        options = ['សូលុយស្យុងអាស៊ីត', 'សូលុយស្យុងបាស', 'សូលុយស្យុងណឺត', 'សូលុយស្យុងអំបិលសុទ្ធ'];
+        explanation = 'pH < 7 ជាអាស៊ីត, pH = 7 ជាណឺត, និង pH > 7 ជាបាស។';
+      } else if (subType === 1) {
+        q = `តើអាតូមមួយផ្សំឡើងពីភាគល្អិតណាខ្លះ? (ថ្នាក់ទី ${grade})`;
+        options = ['ប្រូតុង ណឺត្រុង (ក្នុងស្នូល) និងអេឡិចត្រុង (ជុំវិញស្នូល)', 'ប្រូតុង និងអ៊ីយ៉ុង', 'ម៉ូលេគុលសុទ្ធ', 'អេឡិចត្រុងតែមួយមុខ'];
+        explanation = 'អាតូមមានស្នូល (ប្រូតុង + ណឺត្រុង) និងពពកអេឡិចត្រុងវិលជុំវិញស្នូល។';
+      } else if (subType === 2) {
+        q = `តើម៉ាសម៉ូលនៃឧស្ម័នកាបូនិច CO₂ ស្មើនឹងប៉ុន្មាន? (C=12, O=16) (ថ្នាក់ទី ${grade})`;
+        options = ['44 g/mol', '28 g/mol', '32 g/mol', '16 g/mol'];
+        explanation = 'M(CO₂) = 12 + (16 × 2) = 12 + 32 = 44 g/mol។';
+      } else {
+        q = `តើលោហៈណាដែលស្រាលជាងគេ និងសកម្មគីមីខ្លាំងក្នុងក្រុម I-A? (ថ្នាក់ទី ${grade})`;
+        options = ['លីចូម (Li)', 'ដែក (Fe)', 'មាស (Au)', 'ទង់ដែង (Cu)'];
+        explanation = 'លីចូមជាលោហៈអាល់កាឡាំងស្រាលបំផុតក្នុងតារាងខួប។';
+      }
     } else {
-      q = `អាស៊ីតអាមីណេ (Amino Acid) មានបង្គុំនាទីសំខាន់ពីរណាខ្លះ?`;
-      options = [`បង្គុំអាមីន (-NH2) និងបង្គុំកាបុកស៊ីល (-COOH)`, `-OH និង -CHO`, `-COO- និង -CH3`, `-SO3H និង -OH`];
-      answer = 0;
-      explanation = `អាស៊ីតអាមីណេជាសមាសធាតុសរីរាង្គទ្វេនាទី ដែលមានទាំងបង្គុំបាស (-NH2) និងបង្គុំអាស៊ីត (-COOH)។`;
-      chapter = 'អាស៊ីតអាមីណេ និងប្រូតេអ៊ីន';
+      chapter = 'គីមីវិទ្យាវិទ្យាល័យកម្រិតខ្ពស់ (សរីរាង្គ អេសស្ទែ និង pH Bac II)';
+      const subType = i % 4;
+      if (subType === 0) {
+        q = `ប្រតិកម្មរវាងអាស៊ីតកាបុកស៊ីលិច និងអាល់កុល បង្កើតបានជាអ្វី? (ថ្នាក់ទី ${grade})`;
+        options = ['អេសស្ទែ និងទឹក (Esterification)', 'អាល់កាន និងទឹក', 'អាល់ដេអ៊ីត', 'អេទែ'];
+        explanation = 'R-COOH + R\'-OH ⇌ R-COO-R\' + H₂O (ប្រតិកម្មអេសស្ទែកម្ម)។';
+      } else if (subType === 1) {
+        q = `តើកំហាប់អ៊ីយ៉ុង [H₃O⁺] នៃសូលុយស្យុងមាន pH = 3 ស្មើនឹងប៉ុន្មាន? (ថ្នាក់ទី ${grade})`;
+        options = ['10⁻³ M', '10⁻¹¹ M', '3 M', '10³ M'];
+        explanation = '[H₃O⁺] = 10^(-pH) = 10^(-3) M (mol/L)។';
+      } else if (subType === 2) {
+        q = `តើអាល់កុលកម្រិត ១ កាលណាត្រូវអុកស៊ីតកម្មដោយកាតាលីករ CuO ផ្តល់ផលជាអ្វី? (ថ្នាក់ទី ${grade})`;
+        options = ['អាល់ដេអ៊ីត (Aldehyde)', 'សេតូន (Ketone)', 'អេសស្ទែ', 'អាល់កាន'];
+        explanation = 'R-CH₂OH + [O] → R-CHO (អាល់ដេអ៊ីត) + H₂O។';
+      } else {
+        q = `តើចំនួនអុកស៊ីតកម្មនៃម៉ង់កាណែស (Mn) ក្នុងសមាសធាតុ KMnO₄ ស្មើប៉ុន្មាន? (ថ្នាក់ទី ${grade})`;
+        options = ['+7', '+4', '+2', '+6'];
+        explanation = '(+1) + x + 4(-2) = 0 => x - 7 = 0 => x = +7។';
+      }
     }
 
     scienceQuestions.push({
@@ -484,106 +384,67 @@ function generateScienceQuestions() {
     });
   }
 
-  // 1.4 BIOLOGY (7,500 questions)
-  console.log('  -> Generating 7,500 Biology questions...');
+  // -----------------------------------------------------------------------
+  // 1.4 BIOLOGY (7,500 questions: Grades 1-12)
+  // -----------------------------------------------------------------------
+  console.log('  -> Generating 7,500 Biology questions across Grades 1-12...');
   for (let i = 0; i < 7500; i++) {
-    const qType = i % 15;
-    let q, options, answer, explanation, chapter, grade;
-    grade = pick(['10', '11', '12']);
+    const grade = getGradeForIndex(i, 7500);
+    const gradeNum = parseInt(grade, 10);
+    let q, options, answer = 0, explanation, chapter;
 
-    if (qType === 0) {
-      const aCount = randInt(200, 800);
-      const gCount = randInt(300, 900);
-      const totalN = (aCount + gCount) * 2;
-      q = `ម៉ូលេគុល ADN មួយមាន A = ${aCount} និង G = ${gCount}។ រកចំនួននុយក្លេអូទីតសរុប N`;
-      options = [`${totalN}`, `${totalN / 2}`, `${aCount + gCount}`, `${totalN + 100}`];
-      answer = 0;
-      explanation = `យោងច្បាប់ Chargaff: A = T = ${aCount} និង G = C = ${gCount} => N = 2A + 2G = 2(${aCount}) + 2(${gCount}) = ${totalN} នុយក្លេអូទីត។`;
-      chapter = 'ម៉ូលេគុល ADN និងហ្សែន';
-    } else if (qType === 1) {
-      q = `កូដុងផ្តើម (Start Codon) លើម៉ូលេគុល ARNm សម្រាប់ដំណើរការបកប្រែក្រម គឺ៖`;
-      options = [`5'-AUG-3' (កំណត់អាស៊ីតអាមីណេ Met)`, `5'-UAA-3'`, `5'-UAG-3'`, `5'-UGA-3'`];
-      answer = 0;
-      explanation = `AUG គឺជាកូដុងផ្តើមតែមួយគត់ដែលចាប់ផ្តើមការសំយោគប្រូតេអ៊ីន និងកំណត់អាស៊ីតអាមីណេ មេធ្យូនីន (Methionine)។`;
-      chapter = 'ការសំយោគប្រូតេអ៊ីន និង ARNm';
-    } else if (qType === 2) {
-      q = `តំណាក់កាលណាខ្លះនៃវដ្តកោសិកាដែលក្រូម៉ូសូមតម្រៀបគ្នានៅប្លង់អេក្វាទ័រនៃកោសិកា?`;
-      options = [`មេតាផាស (Metaphase)`, `ប្រូផាស (Prophase)`, `អាណាផាស (Anaphase)`, `តេឡូផាស (Telophase)`];
-      answer = 0;
-      explanation = `នៅក្នុងវគ្គមេតាផាស (Metaphase) ក្រូម៉ូសូមកន្ត្រាក់ខ្លីបំផុត និងតម្រៀបជួរគ្នានៅលើប្លង់អេក្វាទ័រកោសិកា។`;
-      chapter = 'ការបែងចែកកោសិកា មីតូស និងមេយ៉ូស';
-    } else if (qType === 3) {
-      q = `យោងច្បាប់ទី១ របស់លោកម៉ង់ដែល (ច្បាប់ឯកសណ្ឋានភាព F1)៖ នៅពេលបង្កាត់ពូជសុទ្ធពីរផ្ទុយគ្នា កូន F1 មានលក្ខណៈយ៉ាងដូចម្តេច?`;
-      options = [`កូន F1 ទាំង ១០០% មានរូបរាងដូចគ្នាទាំងអស់ (ឯកសណ្ឋាន)`, `កូន F1 បែកខ្ញែក ៣ : ១`, `កូន F1 មានរូបរាងដូចតែឪពុក`, `កូន F1 មិនអាចបន្តពូជបាន`];
-      answer = 0;
-      explanation = `ច្បាប់ទី១ ម៉ង់ដែល៖ កូនកាត់ជំនាន់ទី១ (F1) កើតចេញពីមេបាពូជសុទ្ធខុសគ្នាដោយលក្ខណៈផ្ទុយគ្នា តែងតែមានសណ្ឋានដូចគ្នា ១០០% តាមលក្ខណៈលេច។`;
-      chapter = 'ច្បាប់តំណពូជម៉ង់ដែល';
-    } else if (qType === 4) {
-      q = `អង្គបដិប្រាណ (Antibodies) ត្រូវបានផលិតឡើងដោយកោសិកាឈាមសប្រភេទណា?`;
-      options = [`ប្លាស្ម៉ូស៊ីត (ដែលបំប្លែងមកពីប្លោកឡាំផូស៊ីត B)`, `ឡាំផូស៊ីត T ពិឃាដ`, `គោលិកាឈាមក្រហម`, `ប្លាកែតឈាម`];
-      answer = 0;
-      explanation = `ឡាំផូស៊ីត B នៅពេលភ្ញោចដោយអង់ទីហ្សែន នឹងបំប្លែងខ្លួនជាប្លាស្ម៉ូស៊ីត (Plasmocytes) ដើម្បីផលិតអង្គបដិប្រាណរាប់ពាន់ក្នុងមួយវិនាទី។`;
-      chapter = 'ប្រព័ន្ធភាពស៊ាំ និងការពាររាងកាយ';
-    } else if (qType === 5) {
-      q = `អ័រម៉ូន «អាំងស៊ុយលីន» (Insulin) ផលិតចេញពីកោសិកាណា និងមាននាទីអ្វី?`;
-      options = [`កោសិកាបេតា (β) នៃកោះឡង់ហ្គេរ៉ង់ក្នុងលំពែង ដើម្បីបញ្ចុះជាតិស្ករ`, `កោសិកាអាល់ហ្វា (α) ដើម្បីបង្កើនជាតិស្ករ`, `ក្រពេញទីរ៉ូអ៊ីត ដើម្បីបង្កើនកម្តៅ`, `ក្រពេញមួកតម្រងនោម`];
-      answer = 0;
-      explanation = `អាំងស៊ុយលីនបញ្ចេញដោយកោសិកា β ក្នុងលំពែង ជួយជំរុញកោសិកាស្រូបគ្លុយកូស និងស្តុកជាគ្លីកូសែនក្នុងថ្លើម ដើម្បីបញ្ចុះជាតិស្ករក្នុងឈាម។`;
-      chapter = 'ប្រព័ន្ធអង់ដូគ្រីន និងអ័រម៉ូន';
-    } else if (qType === 6) {
-      q = `ណឺរ៉ូន (Neuron) បញ្ជូនសញ្ញាប្រសាទតាមទិសដៅណាត្រឹមត្រូវ?`;
-      options = [`ដង់ឌ្រីត → តួកោសិកា → អាក់សូន → ចុងអាក់សូន (ស៊ីណាប់)`, `អាក់សូន → តួកោសិកា → ដង់ឌ្រីត`, `ស៊ីណាប់ → តួកោសិកា → ដង់ឌ្រីត`, `តួកោសិកា → ដង់ឌ្រីត → អាក់សូន`];
-      answer = 0;
-      explanation = `ព័ត៌មានប្រសាទត្រូវបានទទួលតាមដង់ឌ្រីត (Dendrites) បញ្ជូនកាត់តួកោសិកា (Soma) រួចបាញ់ចេញតាមអាក់សូន (Axon) ទៅកាន់ស៊ីណាប់។`;
-      chapter = 'ប្រព័ន្ធប្រសាទ និងណឺរ៉ូន';
-    } else if (qType === 7) {
-      q = `បាតុភូត «បំលាស់ប្តូរកំណាត់ក្រូម៉ូសូម» (Crossing-Over) កើតឡើងក្នុងវគ្គណា?`;
-      options = [`ប្រូផាស I នៃមេយ៉ូស (Prophase I)`, `មេតាផាស II`, `ប្រូផាសនៃមីតូស`, `តេឡូផាស I`];
-      answer = 0;
-      explanation = `Crossing-over កើតឡើងក្នុងវគ្គប្រូផាស I (Prophase I) នៃមេយ៉ូស ដែលក្រូម៉ាទីតមិនមែនជាបងប្អូនផ្លាស់ប្តូរកំណាត់ ADN គ្នា បង្កើតបំរែបំរួលសេន។`;
-      chapter = 'មេយ៉ូស និងបំរែបំរួលសេន';
-    } else if (qType === 8) {
-      q = `ដំណើរការរស្មីសំយោគ (Photosynthesis) របស់រុក្ខជាតិបៃតង កើតឡើងនៅឯណា?`;
-      options = [`ក្លរ៉ូប្លាស (Chloroplast)`, `មីតូកុងឌ្រី`, `រីបូសូម`, `កូរផ្សំ Golgi`];
-      answer = 0;
-      explanation = `រស្មីសំយោគកើតឡើងក្នុងក្លរ៉ូប្លាស ដែលផ្ទុកសារធាតុពណ៌បៃតងក្លរ៉ូភីលស្រូបថាមពលពន្លឺព្រះអាទិត្យ។`;
-      chapter = 'រស្មីសំយោគ និងការដកដង្ហើមកោសិកា';
-    } else if (qType === 9) {
-      q = `ម៉ូលេគុលផ្ទុកថាមពលគីមីជាសកលក្នុងកោសិកាមានឈ្មោះថា៖`;
-      options = [`ATP (Adenosine Triphosphate)`, `ADN`, `ARN`, `គ្លុយកូស`];
-      answer = 0;
-      explanation = `ATP គឺជារូបិយប័ណ្ណថាមពលចម្បងរបស់កោសិកាសម្រាប់ទ្រទ្រង់រាល់សកម្មភាពជីវិត។`;
-      chapter = 'ថាមពលជីវិត និង ATP';
-    } else if (qType === 10) {
-      q = `អ័រម៉ូន «គ្លុយកាកុង» (Glucagon) មានមុខងារយ៉ាងដូចម្តេចក្នុងរាងកាយ?`;
-      options = [`បង្កើនកំហាប់ជាតិស្ករក្នុងឈាមដោយបំប្លែងគ្លីកូសែនទៅជាគ្លុយកូស`, `បញ្ចុះជាតិស្ករក្នុងឈាម`, `បង្កើនសម្ពាធឈាម`, `ជំរុញការលូតលាស់ឆ្អឹង`];
-      answer = 0;
-      explanation = `គ្លុយកាកុងបញ្ចេញដោយកោសិកា α ក្នុងលំពែង ជំរុញការបំបែកគ្លីកូសែនក្នុងថ្លើមឱ្យទៅជាគ្លុយកូសដើម្បីបង្កើនជាតិស្ករក្នុងឈាម។`;
-      chapter = 'ប្រព័ន្ធអង់ដូគ្រីន';
-    } else if (qType === 11) {
-      q = `មនុស្សមានក្រូម៉ូសូមធម្មតាចំនួនប៉ុន្មានគូ និងប៉ុន្មានដើម?`;
-      options = [`២៣ គូ (ស្មើនឹង ៤៦ ដើម)`, `២២ គូ (៤៤ ដើម)`, `២៤ គូ (៤៨ ដើម)`, `៤៦ គូ`];
-      answer = 0;
-      explanation = `កោសិការាងកាយមនុស្សមានក្រូម៉ូសូម ២n = ៤៦ ដើម (២៣ គូ៖ ២២ គូអូតូសូម និង ១ គូក្រូម៉ូសូមភេទ XX ឬ XY)។`;
-      chapter = 'ពន្ធុវិទ្យាមនុស្ស';
-    } else if (qType === 12) {
-      q = `កូដុងបញ្ចប់ (Stop Codons) លើ ARNm រួមមាន៖`;
-      options = [`UAA, UAG, UGA`, `AUG, UAA, UAG`, `AAA, UUU, GGG`, `CCC, GGG, UAA`];
-      answer = 0;
-      explanation = `កូដុងបញ្ចប់មាន ៣ គឺ UAA, UAG, UGA ដែលបញ្ឈប់ដំណើរការសំយោគប្រូតេអ៊ីន។`;
-      chapter = 'ក្រមពន្ធុ និងការបកប្រែក្រម';
-    } else if (qType === 13) {
-      q = `អង់ស៊ីមដែលដើរតួនាទីកាត់ម៉ូលេគុល ADN ត្រង់ទីតាំងជាក់លាក់ក្នុងបច្ចេកវិទ្យាជីវៈ គឺ៖`;
-      options = [`អង់ស៊ីមកាត់កំណត់ (Restriction Enzymes / Endonucleases)`, `អង់ស៊ីមលីហ្កាស (Ligase)`, `ADN ប៉ូលីមេរ៉ាស`, `អាមីឡាស`];
-      answer = 0;
-      explanation = `Restriction Enzymes (កន្ត្រៃម៉ូលេគុល) ទទួលស្គាល់ និងកាត់ ADN ត្រង់លំដាប់នុយក្លេអូទីតជាក់លាក់។`;
-      chapter = 'វិស្វកម្មសេនេទិច';
+    if (gradeNum <= 6) {
+      chapter = 'វិទ្យាសាស្ត្រជីវិតបឋម (រុក្ខជាតិ សត្វ និងសុខភាព)';
+      const subType = i % 3;
+      if (subType === 0) {
+        q = `តើរុក្ខជាតិបៃតងផលិតអាហារដោយខ្លួនឯងតាមរយៈដំណើរការអ្វី? (ថ្នាក់ទី ${grade})`;
+        options = ['រស្មីសំយោគ (Photosynthesis)', 'ការដកដង្ហើម', 'ការស្រូបទឹក', 'ការលូតលាស់'];
+        explanation = 'រស្មីសំយោគប្រើពន្លឺព្រះអាទិត្យ ទឹក និង CO₂ ដើម្បីបង្កើតជាតិស្ករគ្លុយកូស និង O₂។';
+      } else if (subType === 1) {
+        q = `តើសរីរាង្គណាដែលបូមឈាមទៅចិញ្ចឹមរាងកាយមនុស្សទាំងមូល? (ថ្នាក់ទី ${grade})`;
+        options = ['បេះដូង (Heart)', 'សួត', 'ក្រពះ', 'ថ្លើម'];
+        explanation = 'បេះដូងដើរតួជាម៉ាស៊ីនបូមឈាមច្របាច់ឈាមទៅគ្រប់កោសិកាទូទាំងរាងកាយ។';
+      } else {
+        q = `តើសត្វណាខ្លះជាសត្វកងឈាមត្រជាក់? (ថ្នាក់ទី ${grade})`;
+        options = ['ត្រី កង្កែប និងពស់ (ល្មូន)', 'ឆ្កែ និងឆ្មា', 'បក្សីព្រាប', 'មនុស្ស'];
+        explanation = 'សត្វល្មូន និងត្រីមានសីតុណ្ហភាពខ្លួនប្រែប្រួលតាមបរិស្ថាន (ឈាមត្រជាក់)។';
+      }
+    } else if (gradeNum <= 9) {
+      chapter = 'ជីវវិទ្យាអនុវិទ្យាល័យ (កោសិកា សរីរាង្គ និងប្រព័ន្ធប្រសាទ)';
+      const subType = i % 3;
+      if (subType === 0) {
+        q = `តើសរីរាង្គកោសិកាណាដែលដើរតួជា "រោងចក្រថាមពល" ផលិត ATP? (ថ្នាក់ទី ${grade})`;
+        options = ['មីតូកុងឌ្រី (Mitochondria)', 'រីបូសូម', 'ក្លរ៉ូប្លាស', 'ណ្វៃយ៉ូ'];
+        explanation = 'មីតូកុងឌ្រីជាទីកន្លែងនៃការដកដង្ហើមកោសិកា និងផលិតថាមពល ATP។';
+      } else if (subType === 1) {
+        q = `តើកោសិកាប្រសាទមានឈ្មោះបច្ចេកទេសថាដូចម្តេច? (ថ្នាក់ទី ${grade})`;
+        options = ['ណឺរ៉ូន (Neuron)', 'ណេហ្វ្រូន', 'អេរីត្រូស៊ីត', 'ឡេកូស៊ីត'];
+        explanation = 'ណឺរ៉ូនជាឯកតារចនាសម្ព័ន្ធ និងមុខងារជាមូលដ្ឋាននៃប្រព័ន្ធប្រសាទ។';
+      } else {
+        q = `តើក្រពេញណាជាមេបញ្ជាការបញ្ចេញអ័រម៉ូនគ្រប់គ្រងក្រពេញដទៃទៀត? (ថ្នាក់ទី ${grade})`;
+        options = ['ក្រពេញអ៊ីប៉ូភីស (Pituitary Gland)', 'ក្រពេញទីរ៉ូអ៊ីត', 'លំពែង', 'ក្រពេញលើតម្រងនោម'];
+        explanation = 'អ៊ីប៉ូភីសជាក្រពេញមេបញ្ជាការដែលបញ្ចេញអ័រម៉ូនរំញោចក្រពេញផ្សេងៗ។';
+      }
     } else {
-      q = `ប្រព័ន្ធអេកូឡូស៊ីមួយមានសមាសភាគសំខាន់ពីរ គឺ៖`;
-      options = [`សមាសភាគមានជីវិត (Biocenose) និងសមាសភាគគ្មានជីវិត (Biotope)`, `រុក្ខជាតិ និងសត្វ`, `ដី និងទឹក`, `អាកាសធាតុ និងមនុស្ស`];
-      answer = 0;
-      explanation = `ប្រព័ន្ធអេកូឡូស៊ី = ជីវចម្រុះ (ជីវៈ) + មជ្ឈដ្ឋានរូបវន្ត (អជីវៈ) ដូចជាដី ទឹក ខ្យល់ ពន្លឺ។`;
-      chapter = 'អេកូឡូស៊ី និងបរិស្ថាន';
+      chapter = 'ជីវវិទ្យាវិទ្យាល័យកម្រិតខ្ពស់ (ពន្ធុវិទ្យា DNA និងអេកូឡូស៊ី Bac II)';
+      const subType = i % 4;
+      if (subType === 0) {
+        q = `តាមគោលការណ៍បំពេញបាសនៃម៉ូលេគុល DNA៖ អាដេនីន (A) ភ្ជាប់ជាមួយ... (ថ្នាក់ទី ${grade})`;
+        options = ['ទីមីន (T) ដោយសម្ព័ន្ធអ៊ីដ្រូសែន ២', 'ហ្គានីន (G)', 'ស៊ីតូស៊ីន (C)', 'អ៊ុយរ៉ាស៊ីល (U)'];
+        explanation = 'ក្នុង DNA: A ភ្ជាប់ T ដោយសម្ព័ន្ធអ៊ីដ្រូសែន ២ ហើយ G ភ្ជាប់ C ដោយសម្ព័ន្ធ ៣។';
+      } else if (subType === 1) {
+        q = `តើម៉ូលេគុល ARN នាំសារ (mRNA) គ្មានបាសអាសូតមួយណា? (ថ្នាក់ទី ${grade})`;
+        options = ['ទីមីន (T) - ជំនួសដោយ អ៊ុយរ៉ាស៊ីល (U)', 'អាដេនីន (A)', 'ហ្គានីន (G)', 'ស៊ីតូស៊ីន (C)'];
+        explanation = 'ក្នុង ARN គ្មានបាស T ទេ គឺត្រូវជំនួសដោយបាស U (អ៊ុយរ៉ាស៊ីល)។';
+      } else if (subType === 2) {
+        q = `តើកូដុងចាប់ផ្តើមនៃការសំយោគប្រូតេអ៊ីនគឺកូដុងណា? (ថ្នាក់ទី ${grade})`;
+        options = ['AUG (កូដសម្រាប់ មេチញ៉ូនីន)', 'UAA', 'UAG', 'UGA'];
+        explanation = 'AUG ជា Start Codon ដែលកំណត់អាស៊ីតអាមីណេ មេធ្យូនីន (Methionine)។';
+      } else {
+        q = `តើការបែងចែកកោសិកាបន្តពូជ (មេយ៉ូស) បង្កើតបានកោសិកាកូនប៉ុន្មាន? (ថ្នាក់ទី ${grade})`;
+        options = ['៤ កោសិកា ដែលមានក្រូម៉ូសូម n (Haploid)', '២ កោសិកា 2n', '២ កោសិកា n', '៨ កោសិកា'];
+        explanation = 'មេយ៉ូសចែកកោសិកា ២ លើកជាប់គ្នា បង្កើតបាន ៤ កោសិកាកូនដែលមានចំនួនក្រូម៉ូសូមពាក់កណ្តាល (n)។';
+      }
     }
 
     scienceQuestions.push({
@@ -610,115 +471,81 @@ function generateSocialQuestions() {
   const socialQuestions = [];
   let idCounter = 1;
 
-  // 2.1 KHMER LITERATURE (7,500 questions)
-  console.log('  -> Generating 7,500 Khmer Literature questions...');
+  // -----------------------------------------------------------------------
+  // 2.1 KHMER LITERATURE & LANGUAGE (7,500 questions: Grades 1-12)
+  // -----------------------------------------------------------------------
+  console.log('  -> Generating 7,500 Khmer Literature & Language questions across Grades 1-12...');
   for (let i = 0; i < 7500; i++) {
-    const qType = i % 16;
-    let q, options, answer, explanation, chapter, grade;
-    grade = pick(['10', '11', '12']);
+    const grade = getGradeForIndex(i, 7500);
+    const gradeNum = parseInt(grade, 10);
+    let q, options, answer = 0, explanation, chapter;
 
-    if (qType === 0) {
-      q = `ប្រលោមលោក «កុលាបប៉ៃលិន» ជានិពន្ធកម្មរបស់កវី ឬអ្នកនិពន្ធខ្មែររូបណា និងតាក់តែងក្នុងឆ្នាំណា?`;
-      options = [`លោក ញ៉ុក ថែម (ឆ្នាំ ១៩៣៦ / ១៩៤៣)`, `លោក នូ ហាច (ឆ្នាំ ១៩៤៧)`, `លោក រីម គីន (ឆ្នាំ ១៩៣៨)`, `លោក ហង្ស ធុនហាក់`];
-      answer = 0;
-      explanation = `«កុលាបប៉ៃលិន» និពន្ធដោយលោក ញ៉ុក ថែម ក្នុងឆ្នាំ ១៩៣៦ និងបោះពុម្ពផ្សាយជាផ្លូវការនៅឆ្នាំ ១៩៤៣។`;
-      chapter = 'អក្សរសិល្ប៍ទំនើប - កុលាបប៉ៃលិន';
-    } else if (qType === 1) {
-      q = `នៅក្នុងរឿង «ផ្កាស្រពោន» តួអង្គនាងវិធាវី ត្រូវទទួលមរណភាពដោយសារមូលហេតុចម្បងអ្វី?`;
-      options = [`ការបង្ខំចិត្តរៀបការជាមួយណៃស៊ត និងការព្រាត់ប្រាសស្នេហាស្មោះជាមួយប៊ុនធឿន`, `ជំងឺគ្រុនចាញ់នៅប៉ៃលិន`, `គ្រោះថ្នាក់ទូកលិច`, `ការធ្វើអត្តឃាត`];
-      answer = 0;
-      explanation = `វិធាវីស្លាប់ដោយសារវិបត្តិផ្លូវចិត្តធ្ងន់ធ្ងរ (ជំងឺរបេង/ខូចចិត្ត) ពីការគាបសង្កត់ទំនៀមទម្លាប់ «នំមិនធំជាងនាឡិ» របស់យាយនួន។`;
-      chapter = 'អក្សរសិល្ប៍ទំនើប - ផ្កាស្រពោន';
-    } else if (qType === 2) {
-      q = `ប្រលោមលោកបែបមនោសញ្ចេតនា និងទស្សនវិជ្ជាព្រះពុទ្ធសាសនា «សូផាត» និពន្ធដោយអ្នកណា?`;
-      options = [`លោក រីម គីន (ឆ្នាំ ១៩៣៨)`, `លោក ញ៉ុក ថែម`, `លោក នូ ហាច`, `លោក ឌឹក គាម`];
-      answer = 0;
-      explanation = `«សូផាត» ជារបត់ប្រលោមលោកទំនើបដំបូងបង្អស់នៅកម្ពុជា និពន្ធដោយលោក រីម គីន នៅឆ្នាំ ១៩៣៨។`;
-      chapter = 'អក្សរសិល្ប៍ទំនើប - សូផាត';
-    } else if (qType === 3) {
-      q = `រឿង «ទុំទាវ» ជាស្នាដៃរឿងប្រឌិត ឬជារឿងពិតប្រវត្តិសាស្ត្រ និងតាក់តែងដោយកវីណា?`;
-      options = [`ជារឿងរ៉ាវទំនាស់សង្គមសម័យលង្វែក តាក់តែងជាបទកាព្យដោយ ភិក្ខុសោម (១៩១៥)`, `និពន្ធដោយ សន្ធរម៉ុក`, `និពន្ធដោយ ឧកញ៉ាសុត្តន្តប្រីជាឥន្ទ`, `ជារឿងទេវកថាបុរាណ`];
-      answer = 0;
-      explanation = `រឿងទុំទាវចារឡើងវិញជាកំណាព្យដោយភិក្ខុសោមនៅឆ្នាំ ១៩១៥ ឆ្លុះបញ្ចាំងពីសោកនាដកម្មស្នេហាក្នុងសង្គមសក្តិភូមិខ្មែរ។`;
-      chapter = 'អក្សរសិល្ប៍បុរាណ - ទុំទាវ';
-    } else if (qType === 4) {
-      q = `កំណាព្យបទ «ពាក្យ ៧» (កាកគតិ/ព្រហ្មគីតិ/ពាក្យ៧) ក្នុងមួយវគ្គមានប៉ុន្មានឃ្លា និងមួយឃ្លាមានប៉ុន្មានព្យាង្គ?`;
-      options = [`មាន ៤ ឃ្លា និងក្នុងមួយឃ្លាមាន ៧ ព្យាង្គ (សរុប ២៨ ព្យាង្គ)`, `មាន ៧ ឃ្លា មួយឃ្លា ៤ ព្យាង្គ`, `មាន ៣ ឃ្លា មួយឃ្លា ៧ ព្យាង្គ`, `មាន ៤ ឃ្លា មួយឃ្លា ៨ ព្យាង្គ`];
-      answer = 0;
-      explanation = `បទពាក្យ ៧ ក្នុងមួយវគ្គមាន ៤ ឃ្លា ស្មើនឹង ២៨ ព្យាង្គ ហើយព្យាង្គទី៧ នៃឃ្លាទី១ ជួននឹងព្យាង្គទី៧ នៃឃ្លាទី២។`;
-      chapter = 'កាព្យសាស្ត្រខ្មែរ និងច្បាប់ជួន';
-    } else if (qType === 5) {
-      q = `ក្នុងកម្រងតែងសេចក្តី រចនាសម្ព័ន្ធនៃ «គម្រោងតែង» ត្រូវបែងចែកជា ៣ ផ្នែកធំៗ គឺ៖`;
-      options = [`សេចក្តីផ្តើម, តួសេចក្តី, និងសេចក្តីបញ្ចប់`, `ចំណងជើង, តួអង្គ, និងសីលធម៌`, `ប្រធាន, ឧទាហរណ៍, និងគតិបណ្ឌិត`, `ពន្យល់ពាក្យ, បកស្រាយ, និងសង្ខេប`];
-      answer = 0;
-      explanation = `តែងសេចក្តីតែងតែរួមមាន៖ ១. សេចក្តីផ្តើម (លំនាំ, ចំណូល, ចំណោទ), ២. តួសេចក្តី (ពន្យល់, បកស្រាយ, ឧទាហរណ៍), ៣. សេចក្តីបញ្ចប់ (វាយតម្លៃ, មតិផ្ទាល់)។`;
-      chapter = 'វិធីសាស្ត្រតែងសេចក្តី';
-    } else if (qType === 6) {
-      q = `ពាក្យថា «សាមគ្គីភាព» មានន័យដូចម្តេចក្នុងវចនានុក្រមសម្តេចព្រះសង្ឃរាជ ជួន ណាត?`;
-      options = [`ការរួបរួមចិត្តគំនិត កម្លាំងកាយ និងសកម្មភាពដើម្បីផលប្រយោជន៍រួម`, `ការប្រកួតប្រជែងដណ្តើមអំណាច`, `ការរស់នៅដាច់ដោយឡែកពីគ្នា`, `ការបែងចែកវណ្ណៈក្នុងសង្គម`];
-      answer = 0;
-      explanation = `សាមគ្គីភាព គឺជាការព្រមព្រៀង រួបរួមសាមគ្គីគ្នាជាធ្លុងមួយ ជួយគ្នាទៅវិញទៅមកដោយសុចរិត។`;
-      chapter = 'វាក្យសព្ទ និងវេយ្យាករណ៍';
-    } else if (qType === 7) {
-      q = `តួអង្គ «ចៅចិត្រ» ក្នុងរឿងកុលាបប៉ៃលិន តំណាងឱ្យវណ្ណៈណា និងគុណធម៌អ្វី?`;
-      options = [`វណ្ណៈពលករកម្មករ និងតំណាងឱ្យភាពស្មោះត្រង់ ឧស្សាហ៍ព្យាយាម និងសេចក្តីថ្លៃថ្នូរ`, `វណ្ណៈអភិជនជិះជាន់`, `វណ្ណៈឈ្មួញកណ្តាលទុច្ចរិត`, `តំណាងឱ្យជនឆ្លៀតឱកាស`];
-      answer = 0;
-      explanation = `ចៅចិត្រជាយុវជនតស៊ូ ស្មោះត្រង់ ចេះដឹងគុណ មិនរាថយចំពោះការងារជីកត្បូងដ៏លំបាកនៅប៉ៃលិន។`;
-      chapter = 'វិភាគតួអង្គអក្សរសិល្ប៍';
-    } else if (qType === 8) {
-      q = `រឿង «រាមកេរ្តិ៍» ខ្មែរ បានទទួលឥទ្ធិពលពីគម្ពីររាមាយណៈនៃប្រទេសណា?`;
-      options = [`ប្រទេសឥណ្ឌា (តាក់តែងដោយឥសីវាល្មីកិ)`, `ប្រទេសចិន`, `ប្រទេសបារាំង`, `ប្រទេសអេហ្ស៊ីប`];
-      answer = 0;
-      explanation = `រាមកេរ្តិ៍ខ្មែរដកស្រង់ចេញពីរឿងរាមាយណៈឥណ្ឌា ប៉ុន្តែបានកែច្នៃស្របតាមវប្បធម៌ ទំនៀមទម្លាប់ និងព្រលឹងខ្មែរ។`;
-      chapter = 'រឿងរាមកេរ្តិ៍បុរាណ';
-    } else if (qType === 9) {
-      q = `តួអង្គ «ធនញ្ជ័យ» ក្នុងរឿងនិទានប្រជាប្រិយខ្មែរ តំណាងឱ្យអ្វី?`;
-      options = [`ប្រាជ្ញាវាងវៃ និងការតស៊ូរបស់វណ្ណៈរាស្ត្រសាមញ្ញទល់នឹងស្តេចក្រាញ់`, `ភាពល្ងង់ខ្លៅ`, `អ្នកចម្បាំងខ្លាំងពូកែ`, `ស្តេចផែនដី`];
-      answer = 0;
-      explanation = `ធនញ្ជ័យជាតំណាងប្រាជ្ញាឈ្លាសវៃរបស់ប្រជាកសិករខ្មែរដែលចេះប្រើបញ្ញាការពារខ្លួន និងបម្រើរាស្ត្រ។`;
-      chapter = 'អក្សរសិល្ប៍ប្រជាប្រិយ - ធនញ្ជ័យ';
-    } else if (qType === 10) {
-      q = `រឿង «ក្អែកមួយជាក្អែកដប់» ផ្តល់តម្លៃអប់រំយ៉ាងដូចម្តេចដល់សង្គម?`;
-      options = [`កុំឆាប់ជឿពាក្យចចាមអារ៉ាម និងពាក្យបំផ្លើសដោយមិនបានពិចារណាឱ្យច្បាស់លាស់`, `បង្រៀនឱ្យស្រឡាញ់សត្វក្អែក`, `បង្រៀនឱ្យចេះលាក់ការណ៍`, `បង្រៀនឱ្យចេះដើរលេង`];
-      answer = 0;
-      explanation = `រឿងនេះទូន្មានមនុស្សកុំឱ្យជឿពាក្យចចាមអារ៉ាមតៗគ្នា ដែលនាំឱ្យកើតការភាន់ច្រឡំធំដុំ។`;
-      chapter = 'អក្សរសិល្ប៍ប្រជាប្រិយ';
-    } else if (qType === 11) {
-      q = `«ច្បាប់ស្រី» និង «ច្បាប់ប្រុស» ត្រូវបានតាក់តែងឡើងក្នុងគោលបំណងចម្បងអ្វី?`;
-      options = [`អប់រំសីលធម៌ សុជីវធម៌ក្នុងការរស់នៅ និងការថែរក្សាសុភមង្គលក្នុងគ្រួសារ`, `ច្បាប់ព្រហ្មទណ្ឌដាក់ទោស`, `ក្បួនយុទ្ធសាស្ត្រសង្គ្រាម`, `របៀបប្រមូលពន្ធដារ`];
-      answer = 0;
-      explanation = `ច្បាប់ស្រី-ប្រុស ជាកម្រងទូន្មានសីលធម៌ សុជីវធម៌ និងការគោរពគ្នាក្នុងគ្រួសារខ្មែរពីបុរាណ។`;
-      chapter = 'ច្បាប់ទូន្មានបុរាណ';
-    } else if (qType === 12) {
-      q = `ប្រលោមលោក «គ្រូបង្រៀនស្រុកស្រែ» និពន្ធដោយអ្នកណា និងឆ្លុះបញ្ចាំងពីអ្វី?`;
-      options = [`លោក ឌឹក គាម និង ឌឿក អំ (ឆ្លុះបញ្ចាំងពីការលះបង់របស់គ្រូនៅជនបទ)`, `លោក នូ ហាច`, `លោក ញ៉ុក ថែម`, `លោក រីម គីន`];
-      answer = 0;
-      explanation = `«គ្រូបង្រៀនស្រុកស្រែ» ឆ្លុះបញ្ចាំងពីការលះបង់ខ្ពស់របស់លោកគ្រូពិទូរក្នុងការអប់រំកុមារជនបទ។`;
-      chapter = 'អក្សរសិល្ប៍ទំនើប - គ្រូបង្រៀនស្រុកស្រែ';
-    } else if (qType === 13) {
-      q = `រឿង «ថៅកែធិត» ឆ្លុះបញ្ចាំងពីបញ្ហាសង្គមអ្វីខ្លះ?`;
-      options = [`ការជិះជាន់កម្លាំងពលកម្ម និងការចងការប្រាក់កេងប្រវ័ញ្ចរបស់ឈ្មួញកណ្តាល`, `ការស្រាវជ្រាវវិទ្យាសាស្ត្រ`, `រឿងព្រេងទេវកថា`, `ការសាងសង់ប្រាសាទ`];
-      answer = 0;
-      explanation = `រឿងថៅកែធិតលាតត្រដាងពីចរិតលោភលន់ និងការកេងប្រវ័ញ្ចលើកសិករក្រីក្រក្នុងសង្គម។`;
-      chapter = 'អក្សរសិល្ប៍ទំនើប - ថៅកែធិត';
-    } else if (qType === 14) {
-      q = `សម្តេចព្រះសង្ឃរាជ ជួន ណាត (ជោតញ្ញាណោ) មានស្នាដៃដ៏ធំធេងអ្វីសម្រាប់ជាតិខ្មែរ?`;
-      options = [`បង្កើតវចនានុក្រមខ្មែរ និងនិពន្ធបទភ្លេងជាតិ «នគររាជ»`, `កសាងប្រាសាទអង្គរវត្ត`, `និពន្ធរឿងទុំទាវ`, `ចារសិលាចារឹក`];
-      answer = 0;
-      explanation = `សម្តេចព្រះសង្ឃរាជ ជួន ណាត ជាបិតាអក្សរសាស្ត្រខ្មែរទំនើប ដែលបានរៀបចំវចនានុក្រមខ្មែរ និងភ្លេងជាតិនគររាជ។`;
-      chapter = 'ប្រវត្តិអក្សរសាស្ត្រជាតិ';
+    if (gradeNum <= 6) {
+      chapter = 'ភាសាខ្មែរបឋមសិក្សា (អក្សរ ស្រៈ ព្យញ្ជនៈ និងអក្ខរាវិរុទ្ធ)';
+      const subType = i % 4;
+      if (subType === 0) {
+        q = `តើព្យញ្ជនៈខ្មែរមានសរុបប៉ុន្មានតួ? (ថ្នាក់ទី ${grade})`;
+        options = ['៣៣ តួ (ក ដល់ អ)', '៣០ តួ', '៣៦ តួ', '២៤ តួ'];
+        explanation = 'ព្យញ្ជនៈខ្មែរមាន ៣៣ តួ ចែកជាពួក អ និងពួក អ៊។';
+      } else if (subType === 1) {
+        q = `តើពាក្យណាដែលសរសេរត្រូវអក្ខរាវិរុទ្ធខ្មែរ? (ថ្នាក់ទី ${grade})`;
+        options = ['សិស្សានុសិស្ស', 'សិស្សសានុសិស្ស', 'សិស្សនុសិស្ស', 'សិត្សានុសិស្ស'];
+        explanation = 'ពាក្យត្រឹមត្រូវតាមវចនានុក្រមសម្តេចព្រះសង្ឃរាជ ជួន ណាត គឺ «សិស្សានុសិស្ស»។';
+      } else if (subType === 2) {
+        q = `តើពាក្យផ្ទុយនៃពាក្យ «ឧស្សាហ៍» គឺពាក្យអ្វី? (ថ្នាក់ទី ${grade})`;
+        options = ['ខ្ជិល', 'ឆ្លាត', 'ស្អាត', 'ពូកែ'];
+        explanation = 'ឧស្សាហ៍ មានន័យថាព្យាយាម ផ្ទុយនឹងពាក្យ ខ្ជិល។';
+      } else {
+        q = `តើពាក្យ «អរគុណ» ប្រើក្នុងកាលៈទេសៈណា? (ថ្នាក់ទី ${grade})`;
+        options = ['នៅពេលមានអ្នកជួយ ឬផ្តល់របស់អ្វីមួយឱ្យយើង', 'នៅពេលយើងធ្វើខុស', 'នៅពេលខឹង', 'នៅពេលឃ្លាន'];
+        explanation = 'អរគុណ ជាពាក្យគួរសមសំដែងការដឹងគុណចំពោះអ្នកដែលបានជួយយើង។';
+      }
+    } else if (gradeNum <= 9) {
+      chapter = 'អក្សរសាស្ត្រខ្មែរអនុវិទ្យាល័យ (រឿងនិទាន កំណាព្យ និងវេយ្យាករណ៍)';
+      const subType = i % 4;
+      if (subType === 0) {
+        q = `តើរឿង «ទុំទាវ» ជាស្នាដៃនិពន្ធរបស់អ្នកណា? (ថ្នាក់ទី ${grade})`;
+        options = ['ភិក្ខុសោម (ព្រះបទុមត្ថេរ)', 'ក្រមង៉ុយ', 'នូ ហាច', 'រីម គីន'];
+        explanation = 'រឿងទុំទាវជាស្នាដៃនិពន្ធរបស់ព្រះភិក្ខុសោម ក្នុងឆ្នាំ ១៩១៥។';
+      } else if (subType === 1) {
+        q = `តែកំណាព្យបទ «កាកគតិ» ក្នុងមួយល្បះមានប៉ុន្មានព្យាង្គ? (ថ្នាក់ទី ${grade})`;
+        options = ['២៨ ព្យាង្គ (៧ ឃ្លា ក្នុងមួយឃ្លា ៤ ព្យាង្គ)', '៣៥ ព្យាង្គ', '២០ ព្យាង្គ', '៤៩ ព្យាង្គ'];
+        explanation = 'បទកាកគតិមាន ៧ ឃ្លា ក្នុងមួយឃ្លា ៤ ព្យាង្គ សរុប ២៨ ព្យាង្គ។';
+      } else if (subType === 2) {
+        q = `តើអ្នកណាជាអ្នកនិពន្ធរឿង «សូផាត» ដែលជាប្រលោមលោកទំនើបដំបូងគេបង្អស់? (ថ្នាក់ទី ${grade})`;
+        options = ['រីម គីន (Rim Kin)', 'នូ ហាច', 'ឌឹក គាម', 'គង់ ប៊ុនឈឿន'];
+        explanation = 'រឿងសូផាតនិពន្ធដោយលោក រីម គីន ក្នុងឆ្នាំ ១៩៣៨ និងបោះពុម្ពឆ្នាំ ១៩៤២។';
+      } else {
+        q = `តើពាក្យផ្សំជាអ្វីក្នុងវេយ្យាករណ៍ខ្មែរ? (ថ្នាក់ទី ${grade})`;
+        options = ['ពាក្យដែលកើតពីពាក្យឫសពីរឬច្រើនផ្គុំចូលគ្នាបង្កើតបានន័យថ្មី', 'ពាក្យដែលមានតែមួយព្យាង្គ', 'ពាក្យកម្ចីពីបាលី', 'ពាក្យកិរិយាស័ព្ទ'];
+        explanation = 'ពាក្យផ្សំ (Compound words) កើតពីពាក្យទោលពីរឡើងទៅផ្គុំគ្នាដូចជា៖ ផ្ទះបាយ, ទឹកកក។';
+      }
     } else {
-      q = `រឿង «មហាវេស្សន្តរជាតក» ឆ្លុះបញ្ចាំងពីការបំពេញបារមីអ្វីរបស់ព្រះពោធិសត្វ?`;
-      options = [`ទានបារមី (ការលះបង់ទ្រព្យ កូន និងភរិយា)`, `សីលបារមី`, `បញ្ញាបារមី`, `ខន្តីបារមី`];
-      answer = 0;
-      explanation = `ព្រះវេស្សន្តរបំពេញទានបារមីដ៏ខ្ពង់ខ្ពស់បំផុត ដោយបរិច្ចាគរាជសម្បត្តិ ដំរីសិរីមង្គល និងបុត្រភរិយា។`;
-      chapter = 'អក្សរសិល្ប៍ពុទ្ធនិយម - ជាតក';
+      chapter = 'អក្សរសាស្ត្រខ្មែរវិទ្យាល័យកម្រិតខ្ពស់ (តែងសេចក្តី និងអក្សរសិល្ប៍ Bac II)';
+      const subType = i % 4;
+      if (subType === 0) {
+        q = `តើប្រលោមលោក «កុលាបប៉ៃលិន» ឆ្លុះបញ្ចាំងពីតម្លៃអ្វីជាចម្បង? (ថ្នាក់ទី ${grade})`;
+        options = ['តម្លៃនៃភាពស្មោះត្រង់ សេចក្តីព្យាយាម និងសេចក្តីថ្លៃថ្នូររបស់មនុស្ស', 'អំណាចនៃទ្រព្យសម្បត្តិ', 'ជំនឿលើព្រហ្មលិខិត', 'សង្គ្រាមវណ្ណៈ'];
+        explanation = 'ចៅចិត្រជាតំណាងឱ្យយុវជនខ្មែរដែលមានសេចក្តីព្យាយាម ស្មោះត្រង់ និងមិនចុះចាញ់ឧបសគ្គ។';
+      } else if (subType === 1) {
+        q = `តើវិធីតែងសេចក្តីបែបពន្យល់មានរចនាសម្ព័ន្ធប៉ុន្មានផ្នែកធំៗ? (ថ្នាក់ទី ${grade})`;
+        options = ['៣ ផ្នែក (សេចក្តីផ្តើម, តួសេចក្តី, សេចក្តីបញ្ចប់)', '២ ផ្នែក', '៤ ផ្នែក', '៥ ផ្នែក'];
+        explanation = 'តែងសេចក្តីទាំងអស់ត្រូវគោរពតាមគម្រោងតែង ៣ ផ្នែក៖ ផ្តើម, តួ, បញ្ចប់។';
+      } else if (subType === 2) {
+        q = `តើរឿង «ថៅកែចិត្រក» ជាស្នាដៃរបស់អ្នកនិពន្ធរូបណា? (ថ្នាក់ទី ${grade})`;
+        options = ['ពៅ ស៊ីផូ (និង ឌឹក គាម)', 'នូ ហាច', 'ភិក្ខុសោម', 'ក្រមង៉ុយ'];
+        explanation = 'រឿងថៅកែចិត្រកជាស្នាដៃរួមគ្នារបស់លោក ឌឹក គាម និងលោក ពៅ ស៊ីផូ ក្នុងឆ្នាំ ១៩៦៥។';
+      } else {
+        q = `តើចលនាអក្សរសិល្ប៍ខេមរនិយមមានលក្ខណៈពិសេសអ្វី? (ថ្នាក់ទី ${grade})`;
+        options = ['លើកតម្កើងស្មារតីជាតិ វប្បធម៌ និងអត្តសញ្ញាណខ្មែរប្រឆាំងការត្រួតត្រាបរទេស', 'ទទួលយកវប្បធម៌បរទេសទាំងស្រុង', 'សរសេរតែពីទេវកថា', 'គ្មានតម្លៃប្រវត្តិសាស្ត្រ'];
+        explanation = 'ខេមរនិយមផ្តោតលើការស្រឡាញ់ជាតិ មាតុភូមិ និងការថែរក្សាអត្តសញ្ញាណជាតិខ្មែរ។';
+      }
     }
 
     socialQuestions.push({
       id: `soc-khm-${idCounter++}`,
       stream: 'social',
-      subject: 'ភាសាខ្មែរ',
+      subject: 'ភាសាខ្មែរ និងអក្សរសាស្ត្រ',
       subjectKey: 'khmer',
       grade,
       chapter,
@@ -729,103 +556,75 @@ function generateSocialQuestions() {
     });
   }
 
-  // 2.2 HISTORY (7,500 questions)
-  console.log('  -> Generating 7,500 History questions...');
+  // -----------------------------------------------------------------------
+  // 2.2 HISTORY (7,500 questions: Grades 1-12)
+  // -----------------------------------------------------------------------
+  console.log('  -> Generating 7,500 History questions across Grades 1-12...');
   for (let i = 0; i < 7500; i++) {
-    const qType = i % 15;
-    let q, options, answer, explanation, chapter, grade;
-    grade = pick(['10', '11', '12']);
+    const grade = getGradeForIndex(i, 7500);
+    const gradeNum = parseInt(grade, 10);
+    let q, options, answer = 0, explanation, chapter;
 
-    if (qType === 0) {
-      q = `តើសមាគមប្រជាជាតិអាស៊ីអាគ្នេយ៍ (អាស៊ាន/ASEAN) ត្រូវបានបង្កើតឡើងនៅថ្ងៃ ខែ ឆ្នាំណា និងនៅទីណា?`;
-      options = [`ថ្ងៃទី ៨ ខែសីហា ឆ្នាំ១៩៦៧ នៅទីក្រុងបាងកក ប្រទេសថៃ`, `ថ្ងៃទី ៣០ ខែមេសា ឆ្នាំ១៩៩៩ នៅទីក្រុងហាណូយ`, `ថ្ងៃទី ២៣ ខែតុលា ឆ្នាំ១៩៩១ នៅប៉ារីស`, `ថ្ងៃទី ៩ ខែវិច្ឆិកា ឆ្នាំ១៩៥៣ នៅភ្នំពេញ`];
-      answer = 0;
-      explanation = `អាស៊ានបង្កើតឡើងនៅថ្ងៃទី ៨ សីហា ១៩៦៧ តាមសេចក្តីថ្លែងការណ៍បាងកក ដោយប្រទេសស្ថាបនិកទាំង ៥ (ឥណ្ឌូណេស៊ី ម៉ាឡេស៊ី ហ្វីលីពីន សិង្ហបុរី ថៃ)។`;
-      chapter = 'អាស៊ាន និងសមាហរណកម្មតំបន់';
-    } else if (qType === 1) {
-      q = `ព្រះរាជាណាចក្រកម្ពុជា បានចូលជាសមាជិកពេញសិទ្ធិនៃអាស៊ាននៅថ្ងៃ ខែ ឆ្នាំណា?`;
-      options = [`ថ្ងៃទី ៣០ ខែមេសា ឆ្នាំ១៩៩៩ (ជាសមាជិកទី ១០)`, `ថ្ងៃទី ៨ ខែសីហា ឆ្នាំ១៩៦៧`, `ថ្ងៃទី ២៤ ខែកញ្ញា ឆ្នាំ១៩៩៣`, `ថ្ងៃទី ២៩ ខែធ្នូ ឆ្នាំ១៩៩៨`];
-      answer = 0;
-      explanation = `កម្ពុជាចូលជាសមាជិកពេញសិទ្ធិទី ១០ នៃអាស៊ាននៅថ្ងៃទី ៣០ មេសា ១៩៩៩ នៅទីក្រុងហាណូយ ប្រទេសវៀតណាម។`;
-      chapter = 'កម្ពុជានិងអាស៊ាន';
-    } else if (qType === 2) {
-      q = `កិច្ចព្រមព្រៀងសន្តិភាពទីក្រុងប៉ារីសស្តីពីកម្ពុជា ត្រូវបានចុះហត្ថលេខានៅថ្ងៃ ខែ ឆ្នាំណា?`;
-      options = [`ថ្ងៃទី ២៣ ខែតុលា ឆ្នាំ១៩៩១`, `ថ្ងៃទី ៧ ខែមករា ឆ្នាំ១៩៧៩`, `ថ្ងៃទី ១៧ ខែមេសា ឆ្នាំ១៩៧៥`, `ថ្ងៃទី ២៤ ខែកញ្ញា ឆ្នាំ១៩៩៣`];
-      answer = 0;
-      explanation = `កិច្ចព្រមព្រៀងប៉ារីស ២៣ តុលា ១៩៩១ ចុះហត្ថលេខាដោយភាគីកម្ពុជាទាំង ៤ និងប្រទេសហត្ថលេខីអន្តរជាតិ ១៨ ប្រទេស បញ្ចប់សង្គ្រាមស៊ីវិល។`;
-      chapter = 'កិច្ចព្រមព្រៀងសន្តិភាពប៉ារីស ១៩៩១';
-    } else if (qType === 3) {
-      q = `នយោបាយ «ឈ្នះ-ឈ្នះ» ត្រូវបានអនុវត្តដោយជោគជ័យពេញលេញនៅថ្ងៃណា ដែលនាំមកនូវសន្តិភាពទូទាំងប្រទេស?`;
-      options = [`ថ្ងៃទី ២៩ ខែធ្នូ ឆ្នាំ១៩៩៨`, `ថ្ងៃទី ២៣ ខែតុលា ឆ្នាំ១៩៩១`, `ថ្ងៃទី ៩ ខែវិច្ឆិកា ឆ្នាំ១៩៥៣`, `ថ្ងៃទី ១៨ ខែមីនា ឆ្នាំ១៩៧០`];
-      answer = 0;
-      explanation = `ថ្ងៃទី ២៩ ធ្នូ ១៩៩៨ អង្គការចាត់តាំងខ្មែរក្រហមត្រូវបានរំលាយទាំងស្រុងក្រោមនយោបាយឈ្នះ-ឈ្នះ នាំមកនូវសន្តិភាព និងការបង្រួបបង្រួមជាតិពេញលេញ។`;
-      chapter = 'នយោបាយឈ្នះ-ឈ្នះ និងសន្តិភាព';
-    } else if (qType === 4) {
-      q = `ព្រះករុណាព្រះបាទសម្តេចព្រះ នរោត្តម សីហនុ បានដឹកនាំព្រះរាជបូជនីយកិច្ចទាមទារឯករាជ្យពីអាណានិគមបារាំងបានសម្រេចនៅថ្ងៃណា?`;
-      options = [`ថ្ងៃទី ៩ ខែវិច្ឆិកា ឆ្នាំ១៩៥៣`, `ថ្ងៃទី ៨ ខែសីហា ឆ្នាំ១៩៦៧`, `ថ្ងៃទី ១៧ ខែមេសា ឆ្នាំ១៩៧៥`, `ថ្ងៃទី ២៤ ខែមេសា ឆ្នាំ១៩៥៥`];
-      answer = 0;
-      explanation = `កម្ពុជាទទួលបានឯករាជ្យពេញលេញពីបារាំងនៅថ្ងៃទី ៩ វិច្ឆិកា ១៩៥៣ ក្រោមការដឹកនាំរបស់ព្រះបាទនរោត្តម សីហនុ ព្រះបរមរតនកោដ្ឋ។`;
-      chapter = 'ព្រះរាជបូជនីយកិច្ចឯករាជ្យជាតិ ១៩៥៣';
-    } else if (qType === 5) {
-      q = `ប្រាសាទអង្គរវត្ត ត្រូវបានកសាងឡើងក្នុងរជ្ជកាលព្រះមហាក្សត្រអង្គណា និងក្នុងសតវត្សរ៍ទីប៉ុន្មាន?`;
-      options = [`ព្រះបាទសូរ្យវរ្ម័នទី២ (សតវត្សរ៍ទី ១២ - ឧទ្ទិសថ្វាយព្រះវិស្ណុ)`, `ព្រះបាទជ័យវរ្ម័នទី៧ (សតវត្សរ៍ទី ១២-១៣)`, `ព្រះបាទជ័យវរ្ម័នទី២ (សតវត្សរ៍ទី ៩)`, `ព្រះបាទឥសានវរ្ម័នទី១`];
-      answer = 0;
-      explanation = `ប្រាសាទអង្គរវត្តកសាងឡើងនៅដើមសតវត្សរ៍ទី១២ ដោយព្រះបាទសូរ្យវរ្ម័នទី២ (១១១៣-១១៥០) ឧទ្ទិសដល់ព្រហ្មញ្ញសាសនា (ព្រះវិស្ណុ)។`;
-      chapter = 'សម័យអង្គរដ៏រុងរឿង';
-    } else if (qType === 6) {
-      q = `សង្គ្រាមត្រជាក់ (Cold War ១៩៤៧-១៩៩១) កើតឡើងរវាងប្លុកមហាអំណាចណាខ្លះ?`;
-      options = [`ប្លុកសេរី (ដឹកនាំដោយសហរដ្ឋអាមេរិក) និងប្លុកកុម្មុយនីស្ត (ដឹកនាំដោយសហភាពសូវៀត)`, `ប្លុកអឺរ៉ុប និងប្លុកអាស៊ី`, `បារាំង និងអង់គ្លេស`, `ចិន និងជប៉ុន`];
-      answer = 0;
-      explanation = `សង្គ្រាមត្រជាក់ជាការប្រកួតប្រជែងមនោគមវិជ្ជា នយោបាយ និងយោធារវាងបស្ចិមប្រទេស (USA) និងបូព៌ាប្រទេស (USSR)។`;
-      chapter = 'ពិភពលោកក្នុងសង្គ្រាមត្រជាក់';
-    } else if (qType === 7) {
-      q = `របបកម្ពុជាប្រជាធិបតេយ្យ (ខ្មែរក្រហម) បានកាន់កាប់អំណាចនៅកម្ពុជាក្នុងចន្លោះឆ្នាំណា?`;
-      options = [`ពីថ្ងៃទី ១៧ ខែមេសា ឆ្នាំ១៩៧៥ ដល់ថ្ងៃទី ៦ ខែមករា ឆ្នាំ១៩៧៩`, `ពីឆ្នាំ ១៩៧០ ដល់ ១៩៧៥`, `ពីឆ្នាំ ១៩៧៩ ដល់ ១៩៩៣`, `ពីឆ្នាំ ១៩៥៣ ដល់ ១៩៧០`];
-      answer = 0;
-      explanation = `របបខ្មែរក្រហមដឹកនាំដោយ ប៉ុល ពត បានគ្រប់គ្រងប្រទេសពី ១៧ មេសា ១៩៧៥ ដល់ ៦ មករា ១៩៧៩ ដោយបង្កការកាប់សម្លាប់ប្រជាជនជាង ២ លាននាក់។`;
-      chapter = 'របបប្រល័យពូជសាសន៍ ១៩៧៥-១៩៧៩';
-    } else if (qType === 8) {
-      q = `ព្រះបាទជ័យវរ្ម័នទី៧ បានរំដោះប្រទេសកម្ពុជាពីការឈ្លានពានរបស់កងទ័ពចាមនៅឆ្នាំណា?`;
-      options = [`ឆ្នាំ ១១៨១ នៃគ្រិស្តសករាជ`, `ឆ្នាំ ១១១៣`, `ឆ្នាំ ៨០២`, `ឆ្នាំ ១៩៥៣`];
-      answer = 0;
-      explanation = `ព្រះបាទជ័យវរ្ម័នទី៧ បានកម្ចាត់កងទ័ពចាមឈ្លានពាន និងឡើងគ្រងរាជ្យនៅឆ្នាំ ១១៨១ រួចកសាងប្រាសាទបាយ័ន និងមន្ទីរពេទ្យ ១០២ កន្លែង។`;
-      chapter = 'រជ្ជកាលព្រះបាទជ័យវរ្ម័នទី៧';
-    } else if (qType === 9) {
-      q = `សម័យចេនឡា (Chenla Era) ត្រូវបានបែងចែកជាពីរសំខាន់គឺ៖`;
-      options = [`ចេនឡាដីគោក និងចេនឡាទឹកលិច`, `ចេនឡាខាងកើត និងចេនឡាខាងលិច`, `ចេនឡាភ្នំ និងចេនឡាកោះ`, `ចេនឡាខាងជើង និងចេនឡាខាងត្បូង`];
-      answer = 0;
-      explanation = `នៅដើមសតវត្សរ៍ទី ៨ ចេនឡាបានបែកបាក់ជាពីរ គឺចេនឡាដីគោក (ភាគខាងជើង) និងចេនឡាទឹកលិច (ភាគខាងត្បូង)។`;
-      chapter = 'សម័យបុរេអង្គរ - ចេនឡា';
-    } else if (qType === 10) {
-      q = `រដ្ឋហ្វូណន (នគរភ្នំ) មានកំពង់ផែពាណិជ្ជកម្មអន្តរជាតិដ៏ល្បីល្បាញឈ្មោះអ្វី?`;
-      options = [`កំពង់ផែអូរកែវ (Oc Eo)`, `កំពង់ផែក្រុងព្រះសីហនុ`, `កំពង់ផែរាម`, `កំពង់ផែកំពត`];
-      answer = 0;
-      explanation = `កំពង់ផែអូរកែវ ជាមជ្ឈមណ្ឌលពាណិជ្ជកម្មដែនសមុទ្រដ៏រុងរឿងតភ្ជាប់រវាងចក្រភពរ៉ូម ឥណ្ឌា និងចិន។`;
-      chapter = 'សម័យហ្វូណន (នគរភ្នំ)';
-    } else if (qType === 11) {
-      q = `សង្គ្រាមលោកលើកទី១ (WWI) បានផ្ទុះឡើង និងបញ្ចប់នៅក្នុងចន្លោះឆ្នាំណា?`;
-      options = [`ឆ្នាំ ១៩១៤ ដល់ ១៩១៨`, `ឆ្នាំ ១៩៣៩ ដល់ ១៩៤៥`, `ឆ្នាំ ១៩៥០ ដល់ ១៩៥៣`, `ឆ្នាំ ១៩៤៧ ដល់ ១៩៩១`];
-      answer = 0;
-      explanation = `សង្គ្រាមលោកលើកទី១ ចាប់ផ្តើមនៅខែកក្កដា ១៩១៤ និងបញ្ចប់នៅថ្ងៃទី ១១ ខែវិច្ឆិកា ឆ្នាំ១៩១៨។`;
-      chapter = 'ប្រវត្តិសាស្ត្រពិភពលោក - សង្គ្រាមលោក';
-    } else if (qType === 12) {
-      q = `សង្គ្រាមលោកលើកទី២ (WWII) បានផ្ទុះឡើង និងបញ្ចប់នៅក្នុងចន្លោះឆ្នាំណា?`;
-      options = [`ឆ្នាំ ១៩៣៩ ដល់ ១៩៤៥`, `ឆ្នាំ ១៩១៤ ដល់ ១៩១៨`, `ឆ្នាំ ១៩៧៥ ដល់ ១៩៧៩`, `ឆ្នាំ ១៩៩១ ដល់ ២០០០`];
-      answer = 0;
-      explanation = `សង្គ្រាមលោកលើកទី២ ចាប់ផ្តើមនៅថ្ងៃទី ១ កញ្ញា ១៩៣៩ និងបញ្ចប់នៅថ្ងៃទី ២ កញ្ញា ១៩៤៥។`;
-      chapter = 'ប្រវត្តិសាស្ត្រពិភពលោក - សង្គ្រាមលោក';
-    } else if (qType === 13) {
-      q = `រដ្ឋប្រហារទម្លាក់សម្តេចព្រះ នរោត្តម សីហនុ ដោយលោកសេនាប្រមុខ លន់ នល់ កើតឡើងនៅថ្ងៃណា?`;
-      options = [`ថ្ងៃទី ១៨ ខែមីនា ឆ្នាំ១៩៧០`, `ថ្ងៃទី ១៧ ខែមេសា ឆ្នាំ១៩៧៥`, `ថ្ងៃទី ៩ ខែវិច្ឆិកា ឆ្នាំ១៩៥៣`, `ថ្ងៃទី ២៣ ខែតុលា ឆ្នាំ១៩៩១`];
-      answer = 0;
-      explanation = `ថ្ងៃទី ១៨ មីនា ១៩៧០ លន់ នល់ និងសិរីមតៈ បានធ្វើរដ្ឋប្រហារទម្លាក់សម្តេចសីហនុ បង្កើតរបបសាធារណរដ្ឋខ្មែរ។`;
-      chapter = 'របបសាធារណរដ្ឋខ្មែរ ១៩៧០-១៩៧៥';
+    if (gradeNum <= 6) {
+      chapter = 'ប្រវត្តិវិទ្យាបឋម (ប្រាសាទបុរាណ និងវីរបុរសជាតិ)';
+      const subType = i % 4;
+      if (subType === 0) {
+        q = `តើប្រាសាទអង្គរវត្តស្ថិតនៅក្នុងខេត្តណា? (ថ្នាក់ទី ${grade})`;
+        options = ['ខេត្តសៀមរាប', 'ខេត្តបាត់ដំបង', 'ខេត្តកំពង់ធំ', 'រាជធានីភ្នំពេញ'];
+        explanation = 'ប្រាសាទអង្គរវត្តជាសម្បត្តិបេតិកភណ្ឌពិភពលោកស្ថិតក្នុងខេត្តសៀមរាប។';
+      } else if (subType === 1) {
+        q = `តើទិវាបុណ្យឯករាជ្យជាតិកម្ពុជាប្រារព្ធនៅថ្ងៃណាជារៀងរាល់ឆ្នាំ? (ថ្នាក់ទី ${grade})`;
+        options = ['ថ្ងៃទី ៩ ខែវិច្ឆិកា ឆ្នាំ ១៩៥៣', 'ថ្ងៃទី ៧ ខែមករា', 'ថ្ងៃទី ២៤ ខែកញ្ញា', 'ថ្ងៃទី ១ ខែមករា'];
+        explanation = 'កម្ពុជាទទួលបានឯករាជ្យពេញលេញពីបារាំងនៅថ្ងៃទី ៩ វិច្ឆិកា ១៩៥៣ ក្រោមព្រះរាជបូជនីយកិច្ចនៃព្រះបាទនរោត្តម សីហនុ។';
+      } else if (subType === 2) {
+        q = `តើទង់ជាតិកម្ពុជាមានរូបប្រាសាទអ្វីនៅកណ្តាល? (ថ្នាក់ទី ${grade})`;
+        options = ['ប្រាសាទអង្គរវត្ត (កំពូល ៣)', 'ប្រាសាទបាយ័ន', 'ប្រាសាទព្រះវិហារ', 'ប្រាសាទបន្ទាយស្រី'];
+        explanation = 'ទង់ជាតិកម្ពុជាមានពណ៌ខៀវ ក្រហម ខៀវ និងមានរូបប្រាសាទអង្គរវត្តកំពូល៣ ពណ៌សនៅចំកណ្តាល។';
+      } else {
+        q = `តើព្រះមហាក្សត្រដែលកសាងប្រាសាទបាយ័នមានព្រះនាមអ្វី? (ថ្នាក់ទី ${grade})`;
+        options = ['ព្រះបាទជ័យវរ្ម័នទី ៧', 'ព្រះបាទសូរ្យវរ្ម័នទី ២', 'ព្រះបាទជ័យវរ្ម័នទី ២', 'ព្រះបាទនរោត្តម'];
+        explanation = 'ព្រះបាទជ័យវរ្ម័នទី៧ បានកសាងប្រាសាទបាយ័ន និងទីក្រុងអង្គរធំនៅចុងសតវត្សរ៍ទី១២។';
+      }
+    } else if (gradeNum <= 9) {
+      chapter = 'ប្រវត្តិវិទ្យាអនុវិទ្យាល័យ (សម័យហ្វូណន ចេនឡា និងអង្គរ)';
+      const subType = i % 4;
+      if (subType === 0) {
+        q = `តើរដ្ឋដំបូងបង្អស់ក្នុងប្រវត្តិសាស្ត្រខ្មែរឈ្មោះអ្វី? (ថ្នាក់ទី ${grade})`;
+        options = ['អាណាចក្រភ្នំ (ហ្វូណន / Funan)', 'ចេនឡា', 'អង្គរ', 'ចម្ប៉ា'];
+        explanation = 'អាណាចក្រភ្នំ (សតវត្សរ៍ទី ១ ដល់ ទី ៦) ជារដ្ឋដំបូងបង្អស់ដែលបានកត់ត្រាក្នុងប្រវត្តិសាស្ត្រ។';
+      } else if (subType === 1) {
+        q = `តើព្រះមហាក្សត្រអង្គណាដែលបានបង្រួបបង្រួមជាតិ និងស្ថាបនាសម័យអង្គរនៅឆ្នាំ ៨០២ លើភ្នំគូលែន? (ថ្នាក់ទី ${grade})`;
+        options = ['ព្រះបាទជ័យវរ្ម័នទី ២', 'ព្រះបាទសូរ្យវរ្ម័នទី ២', 'ព្រះបាទឥសានវរ្ម័ន', 'ព្រះបាទភវវរ្ម័ន'];
+        explanation = 'ព្រះបាទជ័យវរ្ម័នទី២ បានប្រកាសឯករាជ្យពីជ្វានៅលើភ្នំមហេន្ទ្របព៌ត (ភ្នំគូលែន) ក្នុងឆ្នាំ ៨០២។';
+      } else if (subType === 2) {
+        q = `តើព្រះមហាក្សត្រអង្គណាដែលបានកសាងប្រាសាទអង្គរវត្ត? (ថ្នាក់ទី ${grade})`;
+        options = ['ព្រះបាទសូរ្យវរ្ម័នទី ២ (Suryavarman II)', 'ព្រះបាទជ័យវរ្ម័នទី ៧', 'ព្រះបាទយសោវរ្ម័នទី ១', 'ព្រះបាទឥន្ទ្រវរ្ម័នទី ១'];
+        explanation = 'ព្រះបាទសូរ្យវរ្ម័នទី២ បានកសាងប្រាសាទអង្គរវត្តនៅដើមសតវត្សរ៍ទី១២ ដើម្បីឧទ្ទិសថ្វាយព្រះវិស្ណុ។';
+      } else {
+        q = `តើអ្នកការទូតចិនរូបណាដែលបានមកទស្សនាកម្ពុជាសម័យអង្គរ និងសរសេរកំណត់ហេតុដ៏ល្បីល្បាញ? (ថ្នាក់ទី ${grade})`;
+        options = ['ជីវ តាក្វាន់ (Zhou Daguan)', 'កាង ថៃ', 'ឈូ ហ្វានជី', 'ហ្វាសៀន'];
+        explanation = 'ជីវ តាក្វាន់ បានមកដល់អង្គរក្នុងឆ្នាំ ១២៩៦ និងសរសេរសៀវភៅ «ប្រពៃណីនៃអ្នកស្រុកចេនឡា»។';
+      }
     } else {
-      q = `ការបោះឆ្នោតជាតិលើកដំបូងដែលរៀបចំដោយ UNTAC នៅកម្ពុជា ធ្វើឡើងនៅឆ្នាំណា?`;
-      options = [`ខែឧសភា ឆ្នាំ១៩៩៣`, `ឆ្នាំ១៩៩១`, `ឆ្នាំ១៩៩៨`, `ឆ្នាំ១៩៧៩`];
-      answer = 0;
-      explanation = `ការបោះឆ្នោតសកលរៀបចំដោយអាជ្ញាធរអន្តរកាល UNTAC ធ្វើឡើងនៅខែឧសភា ១៩៩៣ បង្កើតរដ្ឋធម្មនុញ្ញ និងរាជរដ្ឋាភិបាលទី១។`;
-      chapter = 'កម្ពុជាសម័យទំនើប និង UNTAC';
+      chapter = 'ប្រវត្តិវិទ្យាវិទ្យាល័យកម្រិតខ្ពស់ (សម័យទំនើប និងពិភពលោក Bac II)';
+      const subType = i % 4;
+      if (subType === 0) {
+        q = `តើកម្ពុជាបានធ្លាក់ក្រោមអាណាព្យាបាលបារាំងនៅឆ្នាំណា? (ថ្នាក់ទី ${grade})`;
+        options = ['១១ សីហា ឆ្នាំ ១៨៦៣ (រជ្ជកាលព្រះបាទនរោត្តម)', 'ឆ្នាំ ១៩៥៣', 'ឆ្នាំ ១៩៧០', 'ឆ្នាំ ១៨៨៤'];
+        explanation = 'សន្ធិសញ្ញាអាណាព្យាបាលបារាំងត្រូវបានចុះហត្ថលេខានៅថ្ងៃទី ១១ សីហា ១៨៦៣ ដោយព្រះបាទនរោត្តម។';
+      } else if (subType === 1) {
+        q = `តើកិច្ចព្រមព្រៀងសន្តិភាពទីក្រុងប៉ារីសស្តីពីកម្ពុជាត្រូវបានចុះហត្ថលេខានៅថ្ងៃណា? (ថ្នាក់ទី ${grade})`;
+        options = ['ថ្ងៃទី ២៣ ខែតុលា ឆ្នាំ ១៩៩១', 'ថ្ងៃទី ៧ ខែមករា ឆ្នាំ ១៩៧៩', 'ថ្ងៃទី ៩ ខែវិច្ឆិកា ឆ្នាំ ១៩៥៣', 'ថ្ងៃទី ២៤ ខែកញ្ញា ឆ្នាំ ១៩៩៣'];
+        explanation = 'កិច្ចព្រមព្រៀងសន្តិភាពទីក្រុងប៉ារីស ២៣ តុលា ១៩៩១ បានបញ្ចប់សង្គ្រាមស៊ីវិល និងបើកផ្លូវដល់ការបោះឆ្នោតជាតិឆ្នាំ ១៩៩៣។';
+      } else if (subType === 2) {
+        q = `តើសង្គ្រាមលោកលើកទី ២ បានបញ្ចប់ជាផ្លូវការនៅឆ្នាំណា? (ថ្នាក់ទី ${grade})`;
+        options = ['ឆ្នាំ ១៩៤៥ (បន្ទាប់ពីជប៉ុនចុះចាញ់)', 'ឆ្នាំ ១៩៣៩', 'ឆ្នាំ ១៩១៨', 'ឆ្នាំ ១៩៥០'];
+        explanation = 'សង្គ្រាមលោកលើកទី២ បានបញ្ចប់នៅឆ្នាំ ១៩៤៥ បន្ទាប់ពីការទម្លាក់គ្រាប់បែកបរមាណូនៅហ៊ីរ៉ូស៊ីម៉ា និងណាហ្គាសាគី។';
+      } else {
+        q = `តើអង្គការសហប្រជាជាតិ (UN) ត្រូវបានបង្កើតឡើងនៅឆ្នាំណា? (ថ្នាក់ទី ${grade})`;
+        options = ['ថ្ងៃទី ២៤ ខែតុលា ឆ្នាំ ១៩៤៥', 'ឆ្នាំ ១៩១៩', 'ឆ្នាំ ១៩៩១', 'ឆ្នាំ ១៩៥៥'];
+        explanation = 'UN ត្រូវបានបង្កើតឡើងនៅថ្ងៃទី ២៤ តុលា ១៩៤៥ ដើម្បីរក្សាសន្តិភាព និងសន្តិសុខអន្តរជាតិ។';
+      }
     }
 
     socialQuestions.push({
@@ -842,103 +641,75 @@ function generateSocialQuestions() {
     });
   }
 
-  // 2.3 GEOGRAPHY (7,500 questions)
-  console.log('  -> Generating 7,500 Geography questions...');
+  // -----------------------------------------------------------------------
+  // 2.3 GEOGRAPHY (7,500 questions: Grades 1-12)
+  // -----------------------------------------------------------------------
+  console.log('  -> Generating 7,500 Geography questions across Grades 1-12...');
   for (let i = 0; i < 7500; i++) {
-    const qType = i % 15;
-    let q, options, answer, explanation, chapter, grade;
-    grade = pick(['10', '11', '12']);
+    const grade = getGradeForIndex(i, 7500);
+    const gradeNum = parseInt(grade, 10);
+    let q, options, answer = 0, explanation, chapter;
 
-    if (qType === 0) {
-      q = `ប្រទេសកម្ពុជាមានផ្ទៃដីសរុបប៉ុន្មានគីឡូម៉ែត្រការ៉េ និងមានព្រំប្រទល់ជាប់ប្រទេសណាខ្លះ?`;
-      options = [`១៨១,០៣៥ គ.ម² (ជាប់ប្រទេសថៃ ឡាវ វៀតណាម និងឈូងសមុទ្រថៃ)`, `១៥០,០០០ គ.ម²`, `២០០,០០០ គ.ម²`, `១២០,៥០០ គ.ម²`];
-      answer = 0;
-      explanation = `កម្ពុជាមានផ្ទៃដី ១៨១,០៣៥ គីឡូម៉ែត្រការ៉េ ស្ថិតនៅចំកណ្តាលតំបន់អាស៊ីអាគ្នេយ៍ដីគោក។`;
-      chapter = 'ទីតាំងភូមិសាស្ត្រកម្ពុជា';
-    } else if (qType === 1) {
-      q = `បាតុភូតទឹកទន្លេសាបហូរច្រាលបញ្ច្រាសទិសចូលបឹងទន្លេសាប កើតឡើងនៅរដូវណា?`;
-      options = [`រដូវវស្សា (ចន្លោះខែ ឧសភា ដល់ តុលា)`, `រដូវប្រាំង (ចន្លោះខែ វិច្ឆិកា ដល់ មេសា)`, `រដូវរំហើយ`, `ខែមករា និងកុម្ភៈ`];
-      answer = 0;
-      explanation = `នៅរដូវវស្សា ទឹកទន្លេមេគង្គឡើងខ្ពស់ហូរច្រាលបញ្ច្រាសចូលបឹងទន្លេសាប ធ្វើឱ្យផ្ទៃបឹងរីកធំដល់ ១៦,០០០ គ.ម²។`;
-      chapter = 'ជលសាស្ត្រ និងបឹងទន្លេសាប';
-    } else if (qType === 2) {
-      q = `ខ្យល់មូសុងនិរតី (Southwest Monsoon) បក់ចូលកម្ពុជានៅរដូវណា និងនាំមកនូវលក្ខណៈអាកាសធាតុបែបណា?`;
-      options = [`បក់ពីខែ ឧសភា ដល់ តុលា នាំមកនូវសំណើមខ្ពស់ និងភ្លៀងធ្លាក់ជាង ៧៥-៨០%`, `បក់ពីខែ វិច្ឆិកា ដល់ មេសា នាំភាពត្រជាក់ និងរាំងស្ងួត`, `នាំមកនូវខ្យល់ស្ងួតគ្មានភ្លៀង`, `បក់តែនៅតំបន់មាត់សមុទ្រ`];
-      answer = 0;
-      explanation = `មូសុងនិរតីបក់ពីមហាសមុទ្រឥណ្ឌា នាំខ្យល់សើម និងភ្លៀងធ្លាក់ជោកជាំសម្រាប់កសិកម្មរដូវវស្សា។`;
-      chapter = 'អាកាសធាតុ និងខ្យល់មូសុង';
-    } else if (qType === 3) {
-      q = `តំបន់ដីក្រហមបាសាល់នៅកម្ពុជា ប្រមូលផ្តុំនៅបណ្តាខេត្តណាខ្លះ និងស័ក្តិសមបំផុតសម្រាប់ដំណាំអ្វី?`;
-      options = [`កំពង់ចាម ត្បូងឃ្មុំ រតនគិរី មណ្ឌលគិរី (ស័ក្តិសមសម្រាប់ កៅស៊ូ ស្វាយចន្ទី កាហ្វេ ម្រេច)`, `តាកែវ និងព្រៃវែង (ដំណាំស្រូវ)`, `សៀមរាប និងបាត់ដំបង`, `កោះកុង និងកំពត`];
-      answer = 0;
-      explanation = `ដីក្រហមបាសាល់ជាដីភ្នំភ្លើងបុរាណមានជីជាតិខ្ពស់បំផុត សម្រាប់ដំណាំកសិ-ឧស្សាហកម្មកៅស៊ូ ស្វាយចន្ទី និងកាហ្វេ។`;
-      chapter = 'ប្រភេទដី និងកសិកម្ម';
-    } else if (qType === 4) {
-      q = `កំពង់ផែស្វយ័តអន្តរជាតិទឹកជ្រៅតែមួយគត់របស់ប្រទេសកម្ពុជា ស្ថិតនៅខេត្ត/ក្រុងណា?`;
-      options = [`ក្រុងព្រះសីហនុ (ខេត្តព្រះសីហនុ)`, `ខេត្តកំពត`, `ខេត្តកោះកុង`, `ខេត្តកែប`];
-      answer = 0;
-      explanation = `កំពង់ផែស្វយ័តក្រុងព្រះសីហនុ (PAS) ជាច្រករបៀងពាណិជ្ជកម្មសមុទ្រអន្តរជាតិដ៏សំខាន់បំផុតរបស់កម្ពុជា។`;
-      chapter = 'គមនាគមន៍ និងកំពង់ផែសមុទ្រ';
-    } else if (qType === 5) {
-      q = `ជួរភ្នំក្រវាញ និងជួរភ្នំដងរែក មានទីតាំងភូមិសាស្ត្រស្ថិតនៅផ្នែកណាខ្លះនៃប្រទេសកម្ពុជា?`;
-      options = [`ជួរភ្នំក្រវាញនៅទិសនិរតី និងជួរភ្នំដងរែកនៅទិសឧត្តរ (ព្រំប្រទល់ថៃ)`, `ជួរភ្នំក្រវាញនៅទិសកើត ភ្នំដងរែកនៅទិសលិច`, `ជួរភ្នំទាំងពីរនៅទិសត្បូង`, `នៅកណ្តាលវាលរាបកម្ពុជា`];
-      answer = 0;
-      explanation = `ជួរភ្នំក្រវាញស្ថិតនៅភាគនិរតី (ខេត្តកោះកុង ពោធិ៍សាត់ កំពង់ស្ពឺ) រីឯជួរភ្នំដងរែកខណ្ឌព្រំប្រទល់កម្ពុជា-ថៃនៅភាគខាងជើង។`;
-      chapter = 'សណ្ឋានដី និងប្រព័ន្ធភ្នំ';
-    } else if (qType === 6) {
-      q = `ទន្លេមេគង្គមានប្រភពដើមចេញមកពីតំបន់ខ្ពង់រាបណា និងហូរកាត់ប្រទេសប៉ុន្មាន?`;
-      options = [`ខ្ពង់រាបទីបេ (ប្រទេសចិន) និងហូរកាត់ ៦ ប្រទេស (ចិន មីយ៉ាន់ម៉ា ឡាវ ថៃ កម្ពុជា វៀតណាម)`, `ភ្នំហិមាល័យ ហូរកាត់ ៤ ប្រទេស`, `ខ្ពង់រាបយូណាន ហូរកាត់ ៣ ប្រទេស`, `សមុទ្រចិនខាងត្បូង`];
-      answer = 0;
-      explanation = `ទន្លេមេគង្គមានប្រវែង ៤,៨៨០ គ.ម ហូរចេញពីខ្ពង់រាបទីបេកាត់ប្រទេស ៦ មុនហូរចាក់ចូលសមុទ្រចិនខាងត្បូង។`;
-      chapter = 'ប្រព័ន្ធទន្លេមេគង្គ';
-    } else if (qType === 7) {
-      q = `«ភាគលាភប្រជាសាស្ត្រ» (Demographic Dividend) របស់កម្ពុជា មានន័យដូចម្តេច?`;
-      options = [`ចំនួនប្រជាជនវ័យធ្វើការ (អាយុ ១៥-៦៤ ឆ្នាំ) មានសមាមាត្រច្រើនជាងកុមារ និងមនុស្សចាស់`, `ចំនួនមនុស្សចាស់កើនឡើងខ្ពស់`, `អត្រាមរណភាពទារកកើនឡើង`, `ការធ្វើចំណាកស្រុកទៅក្រៅប្រទេស`];
-      answer = 0;
-      explanation = `ភាគលាភប្រជាសាស្ត្រផ្តល់កម្លាំងពលកម្មសកម្មដ៏សម្បូរបែប ក្នុងការជំរុញកំណើនសេដ្ឋកិច្ចជាតិឱ្យរីកចម្រើនយ៉ាងឆាប់រហ័ស។`;
-      chapter = 'ប្រជាសាស្ត្រ និងធនធានមនុស្ស';
-    } else if (qType === 8) {
-      q = `កំពូលភ្នំដែលខ្ពស់ជាងគេបំផុតនៅប្រទេសកម្ពុជា មានឈ្មោះអ្វី និងកម្ពស់ប៉ុន្មានម៉ែត្រ?`;
-      options = [`ភ្នំឱរ៉ាល់ (កម្ពស់ ១,៨១៣ ម៉ែត្រ)`, `ភ្នំបូកគោ (១,០៧៥ ម៉ែត្រ)`, `ភ្នំដងរែក (៧៥០ ម៉ែត្រ)`, `ភ្នំគូលែន (៤៩២ ម៉ែត្រ)`];
-      answer = 0;
-      explanation = `ភ្នំឱរ៉ាល់ស្ថិតក្នុងជួរភ្នំក្រវាញ (ខេត្តកំពង់ស្ពឺ) មានកម្ពស់ ១,៨១៣ ម៉ែត្រ ជាចំណុចខ្ពស់បំផុតនៅកម្ពុជា។`;
-      chapter = 'សណ្ឋានដីកម្ពុជា';
-    } else if (qType === 9) {
-      q = `ខេត្តណាខ្លះជាជង្រុកស្រូវដ៏ធំបំផុតរបស់ប្រទេសកម្ពុជា (តំបន់វាលរាបបឹងទន្លេសាប)?`;
-      options = [`បាត់ដំបង បន្ទាយមានជ័យ ព្រៃវែង និងតាកែវ`, `រតនគិរី និងមណ្ឌលគិរី`, `កោះកុង និងព្រះសីហនុ`, `ស្ទឹងត្រែង និងក្រចេះ`];
-      answer = 0;
-      explanation = `ខេត្តបាត់ដំបង បន្ទាយមានជ័យ ព្រៃវែង និងតាកែវ មានដីល្បាប់មានជីជាតិខ្ពស់សមស្របបំផុតសម្រាប់ផលិតកម្មស្រូវ។`;
-      chapter = 'កសិកម្ម និងដំណាំស្រូវ';
-    } else if (qType === 10) {
-      q = `ទន្លេបួនមុខនៅរាជធានីភ្នំពេញ (ចតុមុខ) កើតចេញពីការប្រសព្វគ្នានៃទន្លេណាខ្លះ?`;
-      options = [`ទន្លេមេគង្គលើ, ទន្លេមេគង្គក្រោម, ទន្លេសាប, និងទន្លេបាសាក់`, `ទន្លេសេកុង, សេសាន, ស្រែពក, និងមេគង្គ`, `ទន្លេស្ទឹងសែន, ស្ទឹងជីក្រែង, ស្ទឹងសង្កែ`, `ទន្លេមេគង្គ និងស្ទឹងព្រែកត្នោត`];
-      answer = 0;
-      explanation = `ទន្លេចតុមុខ គឺជាប្រសព្វទន្លេ ៤ មុខ៖ មេគង្គលើ មេគង្គក្រោម ទន្លេសាប និងទន្លេបាសាក់។`;
-      chapter = 'ជលសាស្ត្រកម្ពុជា';
-    } else if (qType === 11) {
-      q = `បណ្តាប្រទេសសមាជិកអាស៊ានទាំង ១០ រួមមាន៖`;
-      options = [`កម្ពុជា, ថៃ, ឡាវ, វៀតណាម, មីយ៉ាន់ម៉ា, ម៉ាឡេស៊ី, សិង្ហបុរី, ឥណ្ឌូណេស៊ី, ហ្វីលីពីន, ប្រ៊ុយណេ`, `ចិន, ជប៉ុន, កូរ៉េ`, `ឥណ្ឌា, ប៉ាគីស្ថាន`, `អូស្ត្រាលី, នូវែលសេឡង់`];
-      answer = 0;
-      explanation = `អាស៊ានមាន ១០ ប្រទេសសមាជិកផ្លូវការក្នុងតំបន់អាស៊ីអាគ្នេយ៍ (និងទីម័រខាងកើតជាបេក្ខភាព)។`;
-      chapter = 'ភូមិសាស្ត្រអាស៊ាន';
-    } else if (qType === 12) {
-      q = `បាតុភូត «អេលនីញ៉ូ» (El Niño) បណ្តាលឱ្យអាកាសធាតុនៅកម្ពុជាប្រែប្រួលយ៉ាងដូចម្តេច?`;
-      options = [`កម្តៅកើនឡើងខ្លាំង និងរាំងស្ងួតអូសបន្លាយ ភ្លៀងធ្លាក់តិចជាងមធ្យមភាគ`, `ទឹកជំនន់ជន់លិចធ្ងន់ធ្ងរ`, `ធ្លាក់ព្រិលត្រជាក់ខ្លាំង`, `មានព្យុះសង្ឃរាជាប្រចាំ`];
-      answer = 0;
-      explanation = `El Niño បង្កឱ្យសីតុណ្ហភាពទឹកសមុទ្រប៉ាស៊ីហ្វិកឡើងកម្តៅ បណ្តាលឱ្យអាស៊ីអាគ្នេយ៍រងភាពរាំងស្ងួតខ្លាំង។`;
-      chapter = 'បំរែបំរួលអាកាសធាតុ';
-    } else if (qType === 13) {
-      q = `តំបន់អេកូទេសចរណ៍ «កោះកុងក្រៅ» និង «ព្រៃកោងកាងពាមក្រសោប» ស្ថិតនៅខេត្តណា?`;
-      options = [`ខេត្តកោះកុង`, `ខេត្តព្រះសីហនុ`, `ខេត្តកំពត`, `ខេត្តកែប`];
-      answer = 0;
-      explanation = `ព្រៃកោងកាងពាមក្រសោបនៅខេត្តកោះកុង ជាតំបន់អភិរក្សព្រៃលិចទឹកប្រៃធំបំផុតមួយនៅអាស៊ីអាគ្នេយ៍។`;
-      chapter = 'ធនធានធម្មជាតិ និងទេសចរណ៍';
+    if (gradeNum <= 6) {
+      chapter = 'ភូមិវិទ្យាបឋម (ផែនទី ខេត្តក្រុង និងធម្មជាតិកម្ពុជា)';
+      const subType = i % 4;
+      if (subType === 0) {
+        q = `តើប្រទេសកម្ពុជាមានរាជធានី និងខេត្តសរុបប៉ុន្មាន? (ថ្នាក់ទី ${grade})`;
+        options = ['២៥ រាជធានី-ខេត្ត (១ រាជធានី និង ២៤ ខេត្ត)', '២៤ ខេត្ត', '២៣ ខេត្ត', '២៦ ខេត្ត'];
+        explanation = 'កម្ពុជាមានរាជធានីភ្នំពេញ និងខេត្តចំនួន ២៤ សរុប ២៥ រាជធានី-ខេត្ត។';
+      } else if (subType === 1) {
+        q = `តើបឹងទឹកសាបដែលធំជាងគេបង្អស់នៅកម្ពុជា និងអាស៊ីអាគ្នេយ៍ឈ្មោះអ្វី? (ថ្នាក់ទី ${grade})`;
+        options = ['បឹងទន្លេសាប', 'បឹងយក្សឡោម', 'បឹងកណ្តាល', 'បឹងទន្លេបាទី'];
+        explanation = 'បឹងទន្លេសាបជាបឹងទឹកសាបធម្មជាតិធំជាងគេនៅអាស៊ីអាគ្នេយ៍ សម្បូរត្រី និងជីវចម្រុះ។';
+      } else if (subType === 2) {
+        q = `តើភ្នំដែលខ្ពស់ជាងគេបង្អស់នៅប្រទេសកម្ពុជាឈ្មោះអ្វី? (ថ្នាក់ទី ${grade})`;
+        options = ['ភ្នំឱរ៉ាល់ (កម្ពស់ ១៨១៣ ម៉ែត្រ)', 'ភ្នំបូកគោ', 'ភ្នំគូលែន', 'ភ្នំដងរែក'];
+        explanation = 'ភ្នំឱរ៉ាល់ ស្ថិតក្នុងជួរភ្នំក្រវាញ ខេត្តកំពង់ស្ពឺ មានកម្ពស់ ១៨១៣ ម៉ែត្រ។';
+      } else {
+        q = `តើប្រទេសកម្ពុជាមានព្រំប្រទល់ជាប់ប្រទេសណាខ្លះ? (ថ្នាក់ទី ${grade})`;
+        options = ['ថៃ ឡាវ និងវៀតណាម', 'ថៃ និងភូមា', 'ចិន និងវៀតណាម', 'ម៉ាឡេស៊ី និងសិង្ហបុរី'];
+        explanation = 'កម្ពុជាមានព្រំប្រទល់ជាប់ ថៃ (ខាងលិច/ពាយព្យ), ឡាវ (ខាងជើង), និង វៀតណាម (ខាងកើត/អាគ្នេយ៍)។';
+      }
+    } else if (gradeNum <= 9) {
+      chapter = 'ភូមិវិទ្យាអនុវិទ្យាល័យ (អាកាសធាតុ ទន្លេមេគង្គ និងធនធានធម្មជាតិ)';
+      const subType = i % 4;
+      if (subType === 0) {
+        q = `តើទន្លេមេគង្គមានប្រភពហូរមកពីតំបន់ណា? (ថ្នាក់ទី ${grade})`;
+        options = ['ខ្ពង់រាបទីបេ (ប្រទេសចិន)', 'ប្រទេសឥណ្ឌា', 'ប្រទេសភូមា', 'ភ្នំហិម៉ាឡៃ'];
+        explanation = 'ទន្លេមេគង្គមានប្រភពពីខ្ពង់រាបទីបេ ប្រទេសចិន ហូរកាត់ ៦ ប្រទេសមុនចាក់ចូលសមុទ្រចិនខាងត្បូង។';
+      } else if (subType === 1) {
+        q = `តើប្រទេសកម្ពុជាស្ថិតក្នុងតំបន់អាកាសធាតុប្រភេទណា? (ថ្នាក់ទី ${grade})`;
+        options = ['ត្រូពិចខ្យល់មូសុង (មានរដូវវស្សា និងរដូវប្រាំង)', 'អាកាសធាតុមេឌីទែរ៉ាណេ', 'អាកាសធាតុត្រជាក់', 'អាកាសធាតុវាលខ្សាច់'];
+        explanation = 'កម្ពុជាស្ថិតក្នុងតំបន់ត្រូពិចខ្យល់មូសុង ក្តៅហើយសើម មានរដូវវស្សា (ឧសភា-តុលា) និងរដូវប្រាំង (វិច្ឆិកា-មេសា)។';
+      } else if (subType === 2) {
+        q = `តើឈូងសមុទ្រដែលនៅជាប់នឹងឆ្នេរសមុទ្រកម្ពុជាឈ្មោះអ្វី? (ថ្នាក់ទី ${grade})`;
+        options = ['ឈូងសមុទ្រថៃ (Gulf of Thailand)', 'សមុទ្រអានដាម៉ាន', 'ឈូងសមុទ្របេងហ្គាល់', 'សមុទ្រក្រហម'];
+        explanation = 'ឆ្នេរសមុទ្រកម្ពុជាមានប្រវែង ៤៤០ គ.ម ស្ថិតនៅជាប់នឹងឈូងសមុទ្រថៃ។';
+      } else {
+        q = `តើដីក្រហមបាសាល់ដែលសម្បូរជីវជាតិសម្រាប់ដំណាំកៅស៊ូ និងកាហ្វេ សម្បូរនៅតំបន់ណា? (ថ្នាក់ទី ${grade})`;
+        options = ['តំបន់ខ្ពង់រាបភាគឦសាន (កំពង់ចាម ត្បូងឃ្មុំ រតនគិរី មណ្ឌលគិរី)', 'តំបន់វាលរាបកណ្តាល', 'តំបន់មាត់សមុទ្រ', 'តំបន់បឹងទន្លេសាប'];
+        explanation = 'ដីក្រហមកើតពីកម្អែភ្នំភ្លើងបាសាល់ សម្បូរនៅខេត្តត្បូងឃ្មុំ កំពង់ចាម និងភូមិភាគឦសាន។';
+      }
     } else {
-      q = `តំបន់ត្រីកោណអភិវឌ្ឍន៍ CLV-DTA គ្របដណ្តប់លើព្រំប្រទល់ប្រទេសណាខ្លះ?`;
-      options = [`កម្ពុជា (Cambodia), ឡាវ (Laos), និងវៀតណាម (Vietnam)`, `ចិន, ឡាវ, វៀតណាម`, `ថៃ, ឡាវ, កម្ពុជា`, `កម្ពុជា, ថៃ, មីយ៉ាន់ម៉ា`];
-      answer = 0;
-      explanation = `CLV-DTA ជាតំបន់កិច្ចសហប្រតិបត្តិការអភិវឌ្ឍន៍សេដ្ឋកិច្ចព្រំដែនត្រីភាគីរវាងកម្ពុជា ឡាវ និងវៀតណាម។`;
-      chapter = 'កិច្ចសហប្រតិបត្តិការតំបន់';
+      chapter = 'ភូមិវិទ្យាវិទ្យាល័យកម្រិតខ្ពស់ (ប្រជាសាស្ត្រ សេដ្ឋកិច្ចពិភពលោក និងបរិស្ថាន Bac II)';
+      const subType = i % 4;
+      if (subType === 0) {
+        q = `តើកត្តាចម្បងដែលបង្កឱ្យមានបម្រែបម្រួលអាកាសធាតុសកល (Global Warming) គឺអ្វី? (ថ្នាក់ទី ${grade})`;
+        options = ['ការបំភាយឧស្ម័នផ្ទះកញ្ចក់ (CO₂, CH₄) ពីឧស្សាហកម្ម និងការកាប់បំផ្លាញព្រៃឈើ', 'ការប្រែប្រួលគន្លងព្រះចន្ទ', 'ការផ្ទុះរស្មីព្រះអាទិត្យ', 'ការរញ្ជួយដី'];
+        explanation = 'ឧស្ម័នផ្ទះកញ្ចក់ជាពិសេស CO₂ និងមេតាន បានស្រូបកម្តៅទុកក្នុងបរិយាកាសផែនដី។';
+      } else if (subType === 1) {
+        q = `តើសមាគមប្រជាជាតិអាស៊ីអាគ្នេយ៍ (អាស៊ាន/ASEAN) បច្ចុប្បន្នមានសមាជិកប៉ុន្មានប្រទេស? (ថ្នាក់ទី ${grade})`;
+        options = ['១០ ប្រទេស (និង ទីម័រខាងកើត ជាសមាជិកសង្កេតការណ៍)', '៨ ប្រទេស', '១២ ប្រទេស', '១៥ ប្រទេស'];
+        explanation = 'អាស៊ានមានសមាជិកពេញសិទ្ធិ ១០ ប្រទេស ដែលកម្ពុជាបានចូលជាសមាជិកទី ១០ នៅថ្ងៃទី ៣០ មេសា ១៩៩៩។';
+      } else if (subType === 2) {
+        q = `តើច្រកសមុទ្រណាដែលជាផ្លូវដឹកជញ្ជូនប្រេងកាត និងទំនិញអន្តរជាតិមមាញឹកបំផុតនៅអាស៊ី? (ថ្នាក់ទី ${grade})`;
+        options = ['ច្រកសមុទ្រម៉ាឡាកា (Strait of Malacca)', 'ច្រកសមុទ្រស៊ុយអេ', 'ច្រកសមុទ្រហរមូស', 'ច្រកសមុទ្របេរីង'];
+        explanation = 'ច្រកសមុទ្រម៉ាឡាកាស្ថិតនៅចន្លោះម៉ាឡេស៊ី និងឥណ្ឌូណេស៊ី ជាសរសៃឈាមពាណិជ្ជកម្មពិភពលោក។';
+      } else {
+        q = `តើវិស័យសសរស្តម្ភទាំង ៤ នៃកំណើនសេដ្ឋកិច្ចកម្ពុជារួមមានអ្វីខ្លះ? (ថ្នាក់ទី ${grade})`;
+        options = ['កាត់ដេរ កសិកម្ម ទេសចរណ៍ និងសំណង់/អចលនទ្រព្យ', 'ឧស្សាហកម្មធុនធ្ងន់ និងអវកាស', 'រុករករ៉ែមាស និងប្រេងកាត', 'នេសាទសមុទ្រសុទ្ធ'];
+        explanation = 'សេដ្ឋកិច្ចកម្ពុជាពឹងផ្អែកជាចម្បងលើវិស័យកាត់ដេរសម្លៀកបំពាក់ កសិកម្ម ទេសចរណ៍ និងសំណង់។';
+      }
     }
 
     socialQuestions.push({
@@ -955,103 +726,75 @@ function generateSocialQuestions() {
     });
   }
 
-  // 2.4 CIVICS & ECONOMICS (7,500 questions)
-  console.log('  -> Generating 7,500 Civics & Economics questions...');
+  // -----------------------------------------------------------------------
+  // 2.4 CIVICS & ECONOMICS (7,500 questions: Grades 1-12)
+  // -----------------------------------------------------------------------
+  console.log('  -> Generating 7,500 Civics & Economics questions across Grades 1-12...');
   for (let i = 0; i < 7500; i++) {
-    const qType = i % 15;
-    let q, options, answer, explanation, chapter, grade;
-    grade = pick(['10', '11', '12']);
+    const grade = getGradeForIndex(i, 7500);
+    const gradeNum = parseInt(grade, 10);
+    let q, options, answer = 0, explanation, chapter;
 
-    if (qType === 0) {
-      q = `យោងតាមរដ្ឋធម្មនុញ្ញឆ្នាំ១៩៩៣ របបនយោបាយដឹកនាំនៃព្រះរាជាណាចក្រកម្ពុជា គឺជារបបអ្វី?`;
-      options = [`របបរាជានិយមអាស្រ័យរដ្ឋធម្មនុញ្ញ និងលទ្ធិប្រជាធិបតេយ្យសេរីពហុបក្ស`, `របបសាធារណរដ្ឋប្រធានាធិបតី`, `របបឯកបក្ស`, `របបសក្តិភូមិផ្តាច់ការ`];
-      answer = 0;
-      explanation = `មាត្រា១ នៃរដ្ឋធម្មនុញ្ញ៖ ប្រទេសកម្ពុជាជារាជាណាចក្រ ដែលព្រះមហាក្សត្រទ្រង់គ្រងរាជសម្បត្តិ ប៉ុន្តែទ្រង់មិនកាន់អំណាចឡើយ។`;
-      chapter = 'រដ្ឋធម្មនុញ្ញ និងស្ថាប័នរដ្ឋ';
-    } else if (qType === 1) {
-      q = `អំណាចកំពូលទាំង ៣ នៃរដ្ឋដែលត្រូវបានបែងចែកដាច់ពីគ្នា (អំណាចតុល្យភាព) រួមមាន៖`;
-      options = [`អំណាចនីតិបញ្ញត្តិ (សភា), អំណាចនីតិប្រតិបត្តិ (រដ្ឋាភិបាល), និងអំណាចតុលាការ`, `អំណាចយោធា, នគរបាល, និងសេដ្ឋកិច្ច`, `អំណាចស្តេច, នាយករដ្ឋមន្ត្រី, និងអភិបាលខេត្ត`, `អំណាចប្រព័ន្ធផ្សព្វផ្សាយ, ពាណិជ្ជកម្ម, និងសាសនា`];
-      answer = 0;
-      explanation = `គោលការណ៍បែងចែកអំណាចធានាថានីតិបញ្ញត្តិ (តាក់តែងច្បាប់), នីតិប្រតិបត្តិ (អនុវត្តច្បាប់), និងតុលាការ (កាត់សេចក្តី) ឯករាជ្យពីគ្នា។`;
-      chapter = 'អំណាចរដ្ឋ និងនីតិរដ្ឋ';
-    } else if (qType === 2) {
-      q = `សេចក្តីប្រកាសជាសកលស្តីពីសិទ្ធិមនុស្ស (UDHR) ត្រូវបានអនុម័តដោយអង្គការសហប្រជាជាតិនៅថ្ងៃណា?`;
-      options = [`ថ្ងៃទី ១០ ខែធ្នូ ឆ្នាំ១៩៤៨`, `ថ្ងៃទី ២៤ ខែតុលា ឆ្នាំ១៩៤៥`, `ថ្ងៃទី ២៣ ខែតុលា ឆ្នាំ១៩៩១`, `ថ្ងៃទី ៩ ខែវិច្ឆិកា ឆ្នាំ១៩៥៣`];
-      answer = 0;
-      explanation = `UDHR អនុម័តនៅថ្ងៃទី ១០ ធ្នូ ១៩៤៨ ដើម្បីធានាសិទ្ធិសេរីភាពស្មើភាពគ្នារបស់មនុស្សជាតិគ្រប់រូបលើពិភពលោក។`;
-      chapter = 'សិទ្ធិមនុស្ស និងសេរីភាពជាមូលដ្ឋាន';
-    } else if (qType === 3) {
-      q = `ប្រព័ន្ធទូទាត់ឌីជីថល «បាគង» (Bakong) របស់ធនាគារជាតិនៃកម្ពុជា ដំណើរការលើបច្ចេកវិទ្យាទំនើបណា?`;
-      options = [`បច្ចេកវិទ្យា Blockchain (Hyperledger Iroha)`, `បច្ចេកវិទ្យា Bluetooth`, `បច្ចេកវិទ្យាផ្កាយរណបបុរាណ`, `ប្រព័ន្ធកាតម៉ាញ៉េទិច`];
-      answer = 0;
-      explanation = `ប្រព័ន្ធបាគងដំណើរការលើបច្ចេកវិទ្យា Blockchain អនុញ្ញាតឱ្យទូទាត់ប្រាក់រៀល និងដុល្លារឆ្លងធនាគារបានភ្លាមៗ និងមានសុវត្ថិភាពខ្ពស់។`;
-      chapter = 'សេដ្ឋកិច្ចឌីជីថល និងប្រព័ន្ធបាគង';
-    } else if (qType === 4) {
-      q = `តាមទ្រឹស្តីសេដ្ឋកិច្ចទីផ្សារសេរី តើតម្លៃទំនិញត្រូវបានកំណត់ឡើងដោយកត្តាអ្វី?`;
-      options = [`ចំណុចប្រសព្វរវាងកម្លាំងតម្រូវការ (Demand) និងការផ្គត់ផ្គង់ (Supply)`, `រដ្ឋាភិបាលកំណត់ជាដាច់ខាត`, `ការសម្រេចរបស់អ្នកលក់ម្នាក់ឯង`, `ចំនួនអ្នកទិញតែម្យ៉ាង`];
-      answer = 0;
-      explanation = `ក្នុងទីផ្សារសេរី តម្លៃលំនឹងត្រូវបានកំណត់ដោយការប្រទាក់ក្រឡារវាងកម្លាំងទិញ (តម្រូវការ) និងកម្លាំងលក់ (ការផ្គត់ផ្គង់)។`;
-      chapter = 'សេដ្ឋកិច្ចទីផ្សារ និងតម្លៃលំនឹង';
-    } else if (qType === 5) {
-      q = `គោលដៅអភិវឌ្ឍន៍ប្រកបដោយចីរភាពរបស់អង្គការសហប្រជាជាតិ (SDGs 2030) មានចំនួនប៉ុន្មានគោលដៅ?`;
-      options = [`១៧ គោលដៅ (17 Goals)`, `១០ គោលដៅ`, `២០ គោលដៅ`, `១២ គោលដៅ`];
-      answer = 0;
-      explanation = `SDGs 2030 រួមមាន ១៧ គោលដៅធំៗ សំដៅលុបបំបាត់ភាពក្រីក្រ លើកកម្ពស់ការអប់រំ និងការពារភពផែនដី។`;
-      chapter = 'ការអភិវឌ្ឍប្រកបដោយចីរភាព (SDGs)';
-    } else if (qType === 6) {
-      q = `កាតព្វកិច្ចចម្បងរបស់ពលរដ្ឋគ្រប់រូបក្នុងសង្គមប្រជាធិបតេយ្យនីតិរដ្ឋ គឺ៖`;
-      options = [`គោរពច្បាប់រដ្ឋធម្មនុញ្ញ ការបង់ពន្ធជូនរដ្ឋ និងការការពារជាតិមាតុភូមិ`, `ការប្រកបអាជីវកម្មមិនបង់ពន្ធ`, `ការធ្វើបាតុកម្មខុសច្បាប់`, `ការមិនចូលរួមបោះឆ្នោត`];
-      answer = 0;
-      explanation = `ពលរដ្ឋល្អត្រូវគោរពច្បាប់ បង់ពន្ធ និងចូលរួមចំណែកការពារសន្តិភាព និងការអភិវឌ្ឍសង្គមជាតិ។`;
-      chapter = 'កាតព្វកិច្ច និងសីលធម៌ពលរដ្ឋ';
-    } else if (qType === 7) {
-      q = `ពាក្យថា «អតិផរណា» (Inflation) ក្នុងសេដ្ឋកិច្ច សំដៅលើស្ថានភាពអ្វី?`;
-      options = [`ការកើនឡើងជាទូទៅនៃកម្រិតថ្លៃទំនិញ និងសេវាកម្ម ដែលធ្វើឱ្យតម្លៃប្រាក់ធ្លាក់ចុះ`, `ការធ្លាក់ចុះនៃថ្លៃទំនិញ`, `ការកើនឡើងនៃផលិតផលក្នុងស្រុក GDP`, `ការកើនឡើងនៃប្រាក់ចំណូលជាតិ`];
-      answer = 0;
-      explanation = `អតិផរណាគឺជាការកើនឡើងជាបន្តបន្ទាប់នៃថ្លៃទំនិញ ដែលធ្វើឱ្យអំណាចទិញរបស់រូបិយវត្ថុមានការថយចុះ។`;
-      chapter = 'អតិផរណា និងគោលនយោបាយរូបិយវត្ថុ';
-    } else if (qType === 8) {
-      q = `ផលិតផលក្នុងស្រុកសរុប (GDP - Gross Domestic Product) គឺជា៖`;
-      options = [`តម្លៃសរុបនៃទំនិញ និងសេវាកម្មសម្រេចទាំងអស់ដែលផលិតបានក្នុងប្រទេសក្នុងរយៈពេលមួយឆ្នាំ`, `ប្រាក់ចំណូលរបស់រដ្ឋាភិបាល`, `ចំនួនប្រាក់កម្ចីបរទេស`, `ទុនបម្រុងអន្តរជាតិ`];
-      answer = 0;
-      explanation = `GDP វាស់វែងទំហំ និងកំណើនសេដ្ឋកិច្ចជាតិ តាមរយៈការបូកសរុបតម្លៃទំនិញ-សេវាសម្រេចដែលផលិតក្នុងព្រំដែនប្រទេស។`;
-      chapter = 'ម៉ាក្រូសេដ្ឋកិច្ច និង GDP';
-    } else if (qType === 9) {
-      q = `«ពន្ធលើតម្លៃបន្ថែម» (VAT - Value Added Tax) នៅប្រទេសកម្ពុជា មានអត្រាស្តង់ដាប៉ុន្មានភាគរយ?`;
-      options = [`១០ ភាគរយ (10%)`, `៥ ភាគរយ`, `១៥ ភាគរយ`, `២០ ភាគរយ`];
-      answer = 0;
-      explanation = `អត្រាពន្ធ VAT ទូទៅលើទំនិញ និងសេវាប្រើប្រាស់ក្នុងស្រុកគឺ ១០% (និង ០% សម្រាប់ការនាំចេញ)។`;
-      chapter = 'ពន្ធដារ និងថវិការដ្ឋ';
-    } else if (qType === 10) {
-      q = `ធនាគារកណ្តាលនៃប្រទេសកម្ពុជា (ធនាគារជាតិនៃកម្ពុជា - NBC) មានតួនាទីចម្បងអ្វី?`;
-      options = [`បោះផ្សាយរូបិយវត្ថុជាតិ (ប្រាក់រៀល) និងគ្រប់គ្រងគោលនយោបាយរូបិយវត្ថុ រក្សាស្ថិរភាពថ្លៃ`, `ផ្តល់ប្រាក់កម្ចីដល់ប្រជាជនផ្ទាល់`, `កំណត់ថ្លៃទំនិញនៅផ្សារ`, `ប្រមូលពន្ធដារ`];
-      answer = 0;
-      explanation = `ធនាគារជាតិនៃកម្ពុជា ជាអាជ្ញាធររូបិយវត្ថុទទួលបន្ទុករក្សាស្ថិរភាពថ្លៃ អភិវឌ្ឍន៍វិស័យធនាគារ និងលើកកម្ពស់ការប្រើប្រាស់ប្រាក់រៀល។`;
-      chapter = 'ប្រព័ន្ធធនាគារជាតិ';
-    } else if (qType === 11) {
-      q = `អាយុគ្រប់ការស្របច្បាប់សម្រាប់ការបោះឆ្នោតជ្រើសតាំងតំណាងរាស្ត្រនៅកម្ពុជា គឺចាប់ពីអាយុប៉ុន្មាន?`;
-      options = [`ចាប់ពី ១៨ ឆ្នាំឡើងទៅ`, `ចាប់ពី ១៦ ឆ្នាំ`, `ចាប់ពី ២១ ឆ្នាំ`, `ចាប់ពី ២៥ ឆ្នាំ`];
-      answer = 0;
-      explanation = `រដ្ឋធម្មនុញ្ញ និងច្បាប់បោះឆ្នោត៖ ប្រជាពលរដ្ឋខ្មែរទាំងពីរភេទដែលមានអាយុយ៉ាងតិច ១៨ ឆ្នាំឡើងទៅ មានសិទ្ធិបោះឆ្នោត។`;
-      chapter = 'សិទ្ធិបោះឆ្នោត និងប្រជាធិបតេយ្យ';
-    } else if (qType === 12) {
-      q = `យុទ្ធសាស្ត្របញ្ចកោណ ដំណាក់កាលទី១ របស់រាជរដ្ឋាភិបាលកម្ពុជា មានអាទិភាពគន្លឹះ ៥ រួមមាន៖`;
-      options = [`មនុស្ស, ផ្លូវ, ទឹក, ភ្លើង, និងបច្ចេកវិទ្យា`, `មាស, ប្រាក់, ដី, ផ្ទះ, ឡាន`, `កសិកម្ម, ទេសចរណ៍, ឧស្សាហកម្ម, សេវាកម្ម, ដឹកជញ្ជូន`, `សុខាភិបាល, អប់រំ, កីឡា, វប្បធម៌, សាសនា`];
-      answer = 0;
-      explanation = `យុទ្ធសាស្ត្របញ្ចកោណផ្តោតលើអាទិភាព ៥៖ មនុស្ស (ធនធានមនុស្ស), ផ្លូវ (ហេដ្ឋារចនាសម្ព័ន្ធ), ទឹក (ប្រព័ន្ធធារាសាស្ត្រ), ភ្លើង (ថាមពល), និងបច្ចេកវិទ្យា (ឌីជីថល)។`;
-      chapter = 'យុទ្ធសាស្ត្របញ្ចកោណ និងការអភិវឌ្ឍ';
-    } else if (qType === 13) {
-      q = `គោលការណ៍ «នីតិរដ្ឋ» (Rule of Law) មានន័យដូចម្តេច?`;
-      options = [`មនុស្សគ្រប់រូប រួមទាំងថ្នាក់ដឹកនាំ ត្រូវរស់នៅ និងស្ថិតនៅក្រោមច្បាប់ស្មើៗគ្នាដោយគ្មានការលើកលែង`, `អ្នកមានអំណាចនៅពីលើច្បាប់`, `ច្បាប់អនុវត្តតែលើអ្នកក្រ`, `ការប្រើប្រាស់កម្លាំងយោធាគ្រប់គ្រង`];
-      answer = 0;
-      explanation = `នីតិរដ្ឋគឺជាសង្គមដែលច្បាប់ជាកំពូល មនុស្សទាំងអស់មានសមភាពចំពោះមុខច្បាប់ និងទទួលបានការការពារដោយយុត្តិធម៌។`;
-      chapter = 'នីតិរដ្ឋ និងយុត្តិធម៌សង្គម';
+    if (gradeNum <= 6) {
+      chapter = 'សីលធម៌ និងពលរដ្ឋវិជ្ជាបឋម (ការគោរព សីលធម៌ និងគ្រួសារ)';
+      const subType = i % 4;
+      if (subType === 0) {
+        q = `តើកូនល្អត្រូវមានអាកប្បកិរិយាយ៉ាងដូចម្តេចចំពោះឪពុកម្តាយ និងលោកគ្រូអ្នកគ្រូ? (ថ្នាក់ទី ${grade})`;
+        options = ['គោរព ស្តាប់ដំបូន្មាន និងមានសេចក្តីដឹងគុណ', 'មិនស្តាប់បង្គាប់', 'ឈ្លោះប្រកែក', 'គេចវេះពីការរៀនសូត្រ'];
+        explanation = 'សីលធម៌កូនល្អ និងសិស្សល្អគឺត្រូវចេះគោរពដឹងគុណចំពោះអ្នកមានគុណ។';
+      } else if (subType === 1) {
+        q = `តើយើងគួរធ្វើដូចម្តេចនៅពេលឃើញភ្លើងស្តុបពណ៌ក្រហម? (ថ្នាក់ទី ${grade})`;
+        options = ['ឈប់យានយន្តឱ្យស្ងៀមនៅក្រោយគំនូសស', 'បើកទៅមុខលឿនៗ', 'បត់ឆ្វេងភ្លាមៗ', 'ស៊ីផ្លេខ្លាំងៗ'];
+        explanation = 'ភ្លើងក្រហមបញ្ជាក់ពីការឈប់ ដើម្បីសុវត្ថិភាពចរាចរណ៍ទាំងអស់គ្នា។';
+      } else if (subType === 2) {
+        q = `តើយើងត្រូវទុកដាក់សំរាមនៅកន្លែងណាដើម្បីថែរក្សាអនាម័យសាលារៀន? (ថ្នាក់ទី ${grade})`;
+        options = ['បោះចោលក្នុងធុងសំរាមឱ្យបានត្រឹមត្រូវ', 'បោះចោលលើឥដ្ឋ', 'បោះចូលក្នុងប្រឡាយទឹក', 'ទុកក្រោមតុ'];
+        explanation = 'ការចោលសំរាមក្នុងធុងសំរាមជួយឱ្យបរិស្ថានស្អាត និងមានសុខភាពល្អ។';
+      } else {
+        q = `តើសម្បត្តិសាធារណៈជាអ្វី? (ថ្នាក់ទី ${grade})`;
+        options = ['ទ្រព្យសម្បត្តិរួមរបស់សង្គមជាតិដែលមនុស្សគ្រប់រូបត្រូវរួមគ្នាថែរក្សា', 'របស់ផ្ទាល់ខ្លួនរបស់ម្នាក់ៗ', 'របស់ដែលអាចបំផ្លាញបាន', 'របស់សម្រាប់លក់'];
+        explanation = 'សម្បត្តិសាធារណៈដូចជា សាលារៀន សួនច្បារ ផ្លូវថ្នល់ ស្ពាន ជាទ្រព្យសម្បត្តិរួម។';
+      }
+    } else if (gradeNum <= 9) {
+      chapter = 'សីលធម៌-ពលរដ្ឋអនុវិទ្យាល័យ (សិទ្ធិមនុស្ស ច្បាប់ និងសង្គម)';
+      const subType = i % 4;
+      if (subType === 0) {
+        q = `តើសេចក្តីប្រកាសជាសកលស្តីពីសិទ្ធិមនុស្ស (UDHR) ត្រូវបានអនុម័តនៅឆ្នាំណា? (ថ្នាក់ទី ${grade})`;
+        options = ['ថ្ងៃទី ១០ ខែធ្នូ ឆ្នាំ ១៩៤៨', 'ឆ្នាំ ១៩៥៣', 'ឆ្នាំ ១៩៩៣', 'ឆ្នាំ ១៩៧៥'];
+        explanation = 'UDHR ត្រូវបានអនុម័តដោយមហាសន្និបាតអង្គការសហប្រជាជាតិនៅថ្ងៃទី ១០ ធ្នូ ១៩៤៨។';
+      } else if (subType === 1) {
+        q = `តើប្រជាពលរដ្ឋកម្ពុជាមានសិទ្ធិបោះឆ្នោតចាប់ពីអាយុប៉ុន្មានឆ្នាំឡើងទៅ? (ថ្នាក់ទី ${grade})`;
+        options = ['អាយុ ១៨ ឆ្នាំឡើងទៅ', 'អាយុ ១៦ ឆ្នាំ', 'អាយុ ២១ ឆ្នាំ', 'អាយុ ២៥ ឆ្នាំ'];
+        explanation = 'រដ្ឋធម្មនុញ្ញកម្ពុជាចែងថា ប្រជាពលរដ្ឋទាំងពីរភេទមានសិទ្ធិបោះឆ្នោតចាប់ពីអាយុ ១៨ ឆ្នាំឡើងទៅ។';
+      } else if (subType === 2) {
+        q = `តើច្បាប់ស្តីពីចរាចរណ៍ផ្លូវគោកតម្រូវឱ្យអ្នកជិះម៉ូតូទាំងអស់ត្រូវធ្វើអ្វី? (ថ្នាក់ទី ${grade})`;
+        options = ['ពាក់មួកសុវត្ថិភាពឱ្យបានត្រឹមត្រូវទាំងអ្នកបើកបរ និងអ្នករួមដំណើរ', 'បើកបរលើសល្បឿន', 'ជិះលើចិញ្ចើមផ្លូវ', 'មិនបាច់ពាក់មួក'];
+        explanation = 'ការពាក់មួកសុវត្ថិភាពការពារអាយុជីវិត និងកាត់បន្ថយគ្រោះថ្នាក់ក្បាល ៨០%។';
+      } else {
+        q = `តើអំពើពុករលួយផ្តល់ផលប៉ះពាល់អ្វីខ្លះដល់សង្គមជាតិ? (ថ្នាក់ទី ${grade})`;
+        options = ['បំផ្លាញសេដ្ឋកិច្ចជាតិ បង្កអយុត្តិធម៌សង្គម និងបាត់បង់ទំនុកចិត្តពីសាធារណជន', 'ជួយសង្គមរីកចម្រើន', 'បង្កើតការងារថ្មី', 'ជួយដល់ជនក្រីក្រ'];
+        explanation = 'អំពើពុករលួយជាឧបសគ្គរារាំងការអភិវឌ្ឍជាតិ និងបង្កើតវិសមភាពសង្គម។';
+      }
     } else {
-      q = `កិច្ចព្រមព្រៀងពាណិជ្ជកម្មសេរីអាស៊ីប៉ាស៊ីហ្វិក (RCEP) ជាកិច្ចព្រមព្រៀងពាណិជ្ជកម្មសេរីធំបំផុតដែលកម្ពុជាជាសមាជិក រួមមានប្រទេសប៉ុន្មាន?`;
-      options = [`១៥ ប្រទេស (អាស៊ាន ១០ + ចិន ជប៉ុន កូរ៉េខាងត្បូង អូស្ត្រាលី នូវែលសេឡង់)`, `១០ ប្រទេស`, `២០ ប្រទេស`, `១២ ប្រទេស`];
-      answer = 0;
-      explanation = `RCEP គ្របដណ្តប់ប្រជាជនជិត ៣០% នៃពិភពលោក និង ៣០% នៃ GDP សកល ដែលបើកទីផ្សារនាំចេញដ៏ធំសម្រាប់កម្ពុជា។`;
-      chapter = 'សមាហរណកម្មពាណិជ្ជកម្មអន្តរជាតិ (RCEP)';
+      chapter = 'សីលធម៌-ពលរដ្ឋ និងសេដ្ឋកិច្ចវិទ្យាល័យ (រដ្ឋធម្មនុញ្ញ និងម៉ាក្រូសេដ្ឋកិច្ច Bac II)';
+      const subType = i % 4;
+      if (subType === 0) {
+        q = `តើរដ្ឋធម្មនុញ្ញកម្ពុជាឆ្នាំ ១៩៩៣ ចែងថាកម្ពុជាដឹកនាំតាមរបបនយោបាយអ្វី? (ថ្នាក់ទី ${grade})`;
+        options = ['រាជាធិបតេយ្យអាស្រ័យរដ្ឋធម្មនុញ្ញ និងប្រជាធិបតេយ្យសេរីពហុបក្ស', 'សាធារណរដ្ឋប្រធានាធិបតី', 'សង្គមនិយមឯកបក្ស', 'រាជាធិបតេយ្យផ្តាច់ការ'];
+        explanation = 'មាត្រា ១ នៃរដ្ឋធម្មនុញ្ញ៖ ប្រទេសកម្ពុជាជារាជាណាចក្រដែលព្រះមហាក្សត្រទ្រង់គ្រងរាជ្យសម្បត្តិ ប៉ុន្តែទ្រង់មិនកាន់អំណាចឡើយ។';
+      } else if (subType === 1) {
+        q = `តើអំណាចរដ្ឋទាំង ៣ តាមគោលការណ៍បែងចែកអំណាចរួមមានអ្វីខ្លះ? (ថ្នាក់ទី ${grade})`;
+        options = ['អំណាចនីតិបញ្ញត្តិ (រដ្ឋសភា/ព្រឹទ្ធសភា) + នីតិប្រតិបត្តិ (រាជរដ្ឋាភិបាល) + តុលាការ', 'អំណាចយោធា + នគរបាល + រដ្ឋបាល', 'អំណាចក្រសួង + មន្ទីរ + ស្រុក', 'អំណាចស្តេច + នាយករដ្ឋមន្ត្រី + មេទ័ព'];
+        explanation = 'ការបែងចែកអំណាចរដ្ឋទាំងបីដើម្បីធានាការត្រួតពិនិត្យ និងតុល្យភាពអំណាច (Checks and Balances) ក្នុងនីតិរដ្ឋ។';
+      } else if (subType === 2) {
+        q = `តើអតិផរណា (Inflation) ក្នុងសេដ្ឋកិច្ចសំដៅលើអ្វី? (ថ្នាក់ទី ${grade})`;
+        options = ['ការកើនឡើងជាទូទៅ និងជាបន្តបន្ទាប់នៃកម្រិតថ្លៃទំនិញ និងសេវាកម្ម', 'ការធ្លាក់ចុះថ្លៃទំនិញ', 'ការកើនឡើងនៃប្រាក់ចំណូលពិត', 'ការថយចុះនៃចំនួនប្រជាជន'];
+        explanation = 'អតិផរណានាំឱ្យអំណាចទិញនៃរូបិយវត្ថុធ្លាក់ចុះ ដែលតម្រូវឱ្យធនាគារកណ្តាលអនុវត្តគោលនយោបាយរូបិយវត្ថុដើម្បីគ្រប់គ្រង។';
+      } else {
+        q = `តើធនាគារកណ្តាល (ធនាគារជាតិនៃកម្ពុជា - NBC) មានតួនាទីចម្បងអ្វី? (ថ្នាក់ទី ${grade})`;
+        options = ['បោះផ្សាយរូបិយវត្ថុជាតិ (រៀល) និងរក្សាស្ថិរភាពថ្លៃ និងអត្រាប្តូរប្រាក់', 'ផ្តល់កម្ចីទិញផ្ទាល់ដល់ប្រជាពលរដ្ឋទូទៅ', 'ប្រមូលពន្ធគយ', 'សាងសង់ហេដ្ឋារចនាសម្ព័ន្ធ'];
+        explanation = 'NBC ជាធនាគាររបស់រដ្ឋដែលគ្រប់គ្រងគោលនយោបាយរូបិយវត្ថុ និងប្រព័ន្ធធនាគារពាណិជ្ជ។';
+      }
     }
 
     socialQuestions.push({
@@ -1079,7 +822,7 @@ const masterQuestions = [...science, ...social];
 console.log(`\n🎉 Generation Complete!`);
 console.log(`  🔬 Natural Science Pool: ${science.length.toLocaleString()} Questions (7,500 Math + 7,500 Physics + 7,500 Chemistry + 7,500 Biology)`);
 console.log(`  📚 Social Science Pool:  ${social.length.toLocaleString()} Questions (7,500 Khmer + 7,500 History + 7,500 Geography + 7,500 Civics/Econ)`);
-console.log(`  ⭐ Total Master Pool:    ${masterQuestions.length.toLocaleString()} Questions\n`);
+console.log(`  ⭐ Total Master Pool:    ${masterQuestions.length.toLocaleString()} Questions across Grades 1 to 12\n`);
 
 // Save to server database
 const targetDir = path.join(__dirname, 'server', 'data');
