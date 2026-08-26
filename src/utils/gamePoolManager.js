@@ -144,28 +144,34 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
         (isJuniorHigh && itemGradeNum >= 7 && itemGradeNum <= 9) ||
         (isHighSchool && itemGradeNum >= 10 && itemGradeNum <= 12);
 
-      const matchesStream = targetStream === 'social'
-        ? (item.stream === 'social' || SOCIAL_SUBJECTS.has(item.subject) || SOCIAL_SUBJECTS.has(item.subjectKey))
-        : (item.stream === 'science' || SCIENCE_SUBJECTS.has(item.subject) || SCIENCE_SUBJECTS.has(item.subjectKey));
+      const matchesStream = targetStream === 'random'
+        ? true
+        : targetStream === 'social'
+          ? (item.stream === 'social' || SOCIAL_SUBJECTS.has(item.subject) || SOCIAL_SUBJECTS.has(item.subjectKey))
+          : (item.stream === 'science' || SCIENCE_SUBJECTS.has(item.subject) || SCIENCE_SUBJECTS.has(item.subjectKey));
 
       if (matchesStream) {
         if (isExactGrade) {
           pool.unshift(item); // Exact grade gets top priority
         } else if (isSameTier) {
           pool.push(item);
+        } else {
+          pool.push(item);
         }
       }
     });
   }
 
-  // 2. Gather from playgroundGamesData with STRICT stream isolation
+  // 2. Gather from playgroundGamesData with stream matching
   if (Array.isArray(playgroundGamesData)) {
     playgroundGamesData.forEach((g) => {
       if (!g || !Array.isArray(g.questions)) return;
 
-      const matchesStream = targetStream === 'social'
-        ? (g.stream === 'social' || SOCIAL_SUBJECTS.has(g.subjectKey) || SOCIAL_SUBJECTS.has(g.subject))
-        : (g.stream === 'science' || SCIENCE_SUBJECTS.has(g.subjectKey) || SCIENCE_SUBJECTS.has(g.subject));
+      const matchesStream = targetStream === 'random'
+        ? true
+        : targetStream === 'social'
+          ? (g.stream === 'social' || SOCIAL_SUBJECTS.has(g.subjectKey) || SOCIAL_SUBJECTS.has(g.subject))
+          : (g.stream === 'science' || SCIENCE_SUBJECTS.has(g.subjectKey) || SCIENCE_SUBJECTS.has(g.subject));
 
       if (matchesStream) {
         pool.push(...g.questions);

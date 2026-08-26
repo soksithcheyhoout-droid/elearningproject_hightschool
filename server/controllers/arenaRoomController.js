@@ -530,6 +530,12 @@ export const leaveRoom = (req, res) => {
       room.host = null;
       room.hostRematch = false;
       room.challengerRematch = false;
+      // Delete all pending invites for this room immediately
+      for (const [id, inv] of pendingInvites.entries()) {
+        if (inv.roomCode === roomCode) {
+          pendingInvites.delete(id);
+        }
+      }
       setTimeout(() => {
         activeRooms.delete(roomCode);
       }, 5000);

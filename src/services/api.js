@@ -457,20 +457,34 @@ export const api = {
   getArenaRoom: async (roomCode) => {
     try {
       const res = await fetch(`${API_BASE}/arena/room/${roomCode}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data && data.room) return data;
+      const data = await res.json();
+      if (!res.ok || !data || data.canceled || data.error) {
+        try {
+          localStorage.removeItem(`arena_room_${roomCode}`);
+        } catch (e) {}
+        return data || { success: false, canceled: true, error: 'ម្ចាស់បន្ទប់ (Admin) បានបោះបង់ ឬបិទការប្រកួតហើយ!' };
       }
+      return data;
     } catch (err) {}
 
+    return null;
+  },
+
+  leaveArenaRoom: async (roomCode, studentId, username) => {
     try {
-      const saved = localStorage.getItem(`arena_room_${roomCode}`);
-      if (saved) {
-        return { success: true, room: JSON.parse(saved) };
-      }
+      localStorage.removeItem(`arena_room_${roomCode}`);
     } catch (e) {}
 
-    return null;
+    try {
+      const res = await fetch(`${API_BASE}/arena/room/${roomCode}/leave`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ studentId, username })
+      });
+      return await res.json();
+    } catch (err) {
+      return { success: true };
+    }
   },
 
   updateArenaRoom: async (roomCode, updates) => {
