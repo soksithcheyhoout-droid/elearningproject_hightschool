@@ -298,7 +298,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   const CurrentStreamIcon = currentTheme.icon || Atom;
 
   // Synchronized Questions Pool (24-question deep pool)
-  const [questions, setQuestions] = useState(() => getRandomizedGameQuestions(game, 24, '12', student?.stream || 'science'));
+  const [questions, setQuestions] = useState(() => {
+    const initialStream = student?.stream || game?.stream || 'science';
+    return getRandomizedGameQuestions(game?.stream === initialStream ? game : null, 24, '12', initialStream);
+  });
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [myScore, setMyScore] = useState(0);
   const [opponentScore, setOpponentScore] = useState(0);
@@ -321,12 +324,19 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   const hostKickedRef = useRef(false); // Tracks if host just kicked challenger (prevents poller re-firing)
   const lastProcessedTurnRef = useRef(null); // Prevents 700ms poller from restarting the 3-2-1 turn countdown
 
-  const currentQ = (questions && questions[currentQIndex]) || (questions && questions[0]) || {
-    q: 'គណនា lim (x → 2) (x² - 4) / (x - 2) = ?',
-    options: ['0', '2', '4', '8'],
-    answer: 2,
-    explanation: '(x-2)(x+2)/(x-2) = x+2 => 4'
-  };
+  const currentQ = (questions && questions[currentQIndex]) || (questions && questions[0]) || (
+    selectedStream === 'social' ? {
+      q: 'តើប្រាសាទអង្គរវត្តត្រូវបានកសាងឡើងក្នុងរជ្ជកាលព្រះបាទណា?',
+      options: ['ព្រះបាទជ័យវរ្ម័នទី៧', 'ព្រះបាទសូរ្យវរ្ម័នទី២', 'ព្រះបាទយសោវរ្ម័នទី១', 'ព្រះបាទឥសានវរ្ម័ន'],
+      answer: 1,
+      explanation: 'ប្រាសាទអង្គរវត្តត្រូវបានកសាងឡើងក្នុងរជ្ជកាលព្រះបាទសូរ្យវរ្ម័នទី២ ក្នុងសតវត្សរ៍ទី១២។'
+    } : {
+      q: 'គណនា lim (x → 2) (x² - 4) / (x - 2) = ?',
+      options: ['0', '2', '4', '8'],
+      answer: 2,
+      explanation: '(x-2)(x+2)/(x-2) = x+2 => 4'
+    }
+  );
 
   const isMyTurn = (isHost && activeTurn === 'host') || (!isHost && activeTurn === 'challenger');
   const activePlayerName = activeTurn === 'host' ? (hostPlayer?.name || 'ម្ចាស់បន្ទប់') : (challengerPlayer?.name || 'គូប្រជែង');
@@ -751,13 +761,29 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     if (soundEnabled) playSound.click();
     setSelectedStream(newStream);
 
-    const freshQuestions = getRandomizedGameQuestions(game, 24, '12', newStream);
+    const freshQuestions = getRandomizedGameQuestions(game?.stream === newStream ? game : null, 24, '12', newStream);
     setQuestions(freshQuestions);
 
     try {
       await api.updateArenaRoom(roomCode, {
         stream: newStream,
         questions: freshQuestions
+      });
+
+      // Asynchronously enrich with authentic stream-specific questions from 60k bank
+      fetchLiveExamQuestions({
+        stream: newStream === 'social' ? 'social' : newStream === 'random' ? 'all' : 'science',
+        grade: '12',
+        limit: 24,
+        random: true
+      }).then((livePool) => {
+        if (Array.isArray(livePool) && livePool.length > 0) {
+          setQuestions(livePool);
+          api.updateArenaRoom(roomCode, {
+            stream: newStream,
+            questions: livePool
+          });
+        }
       });
     } catch (e) {}
   };

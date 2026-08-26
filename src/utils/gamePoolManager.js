@@ -49,10 +49,13 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
   const SCIENCE_SUBJECTS = new Set(['គណិតវិទ្យា', 'រូបវិទ្យា', 'គីមីវិទ្យា', 'ជីវវិទ្យា', 'math', 'physics', 'chemistry', 'biology']);
   const SOCIAL_SUBJECTS = new Set(['ភាសាខ្មែរ', 'អក្សរសាស្ត្រខ្មែរ', 'ប្រវត្តិវិទ្យា', 'ភូមិវិទ្យា', 'សីលធម៌-ពលរដ្ឋ', 'សេដ្ឋកិច្ច', 'khmer', 'history', 'geography', 'civics', 'morals', 'economics']);
 
+  const requestedStream = stream || game?.stream || 'science';
+  const gameStream = game?.stream || 'science';
+
   // =========================================================================
-  // CASE 1: SPECIFIC TOPIC GAME CLICKED (e.g. Khmer Folk Tales, Calculus, etc.)
+  // CASE 1: SPECIFIC TOPIC GAME CLICKED (Only if requestedStream matches the game's stream)
   // =========================================================================
-  if (game && Array.isArray(game.questions) && game.questions.length > 0) {
+  if (game && Array.isArray(game.questions) && game.questions.length > 0 && requestedStream === gameStream && requestedStream !== 'random') {
     const gameQuestions = game.questions.filter((q) => q && q.q);
 
     // If game has sufficient questions for this session, shuffle and return
@@ -68,7 +71,7 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
 
     const targetSubjectKey = game.subjectKey;
     const targetSubject = game.subject;
-    const targetStream = game.stream || (SOCIAL_SUBJECTS.has(targetSubject) || SOCIAL_SUBJECTS.has(targetSubjectKey) ? 'social' : 'science');
+    const targetStream = requestedStream;
 
     // 1. Gather other games with the EXACT SAME subjectKey from playgroundGamesData
     if (Array.isArray(playgroundGamesData)) {
@@ -103,7 +106,6 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
       arenaMasterQuestionBank.forEach((item) => {
         if (!item || !item.q) return;
         if (item.stream === targetStream && !seenTexts.has(item.q.trim())) {
-          // Double check it's not a mismatched subject
           if (targetStream === 'social' && !SCIENCE_SUBJECTS.has(item.subject)) {
             seenTexts.add(item.q.trim());
             pool.push(item);
@@ -120,19 +122,19 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
   }
 
   // =========================================================================
-  // CASE 2: GENERAL ARENA DUEL / RANDOM SESSION (No specific game selected)
+  // CASE 2: GENERAL ARENA DUEL / RANDOM SESSION / STREAM SWITCH (Science vs Social vs Random)
   // =========================================================================
   let pool = [];
-  const targetGrade = String(game?.grade || grade || '12');
+  const targetGrade = String(grade || game?.grade || '12');
   const targetGradeNum = parseInt(targetGrade, 10) || 12;
-  const targetStream = game?.stream || stream || 'science';
+  const targetStream = requestedStream;
 
   // Helper to determine educational tier
   const isPrimary = targetGradeNum >= 1 && targetGradeNum <= 6;
   const isJuniorHigh = targetGradeNum >= 7 && targetGradeNum <= 9;
   const isHighSchool = targetGradeNum >= 10 && targetGradeNum <= 12;
 
-  // 1. Harvest from arenaMasterQuestionBank with Grade & Stream affinity
+  // 1. Harvest from arenaMasterQuestionBank with STRICT Stream matching
   if (Array.isArray(arenaMasterQuestionBank)) {
     arenaMasterQuestionBank.forEach((item) => {
       if (!item || !item.q) return;
@@ -144,15 +146,18 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
         (isJuniorHigh && itemGradeNum >= 7 && itemGradeNum <= 9) ||
         (isHighSchool && itemGradeNum >= 10 && itemGradeNum <= 12);
 
-      const matchesStream = targetStream === 'random'
-        ? true
-        : targetStream === 'social'
-          ? (item.stream === 'social' || SOCIAL_SUBJECTS.has(item.subject) || SOCIAL_SUBJECTS.has(item.subjectKey))
-          : (item.stream === 'science' || SCIENCE_SUBJECTS.has(item.subject) || SCIENCE_SUBJECTS.has(item.subjectKey));
+      let matchesStream = false;
+      if (targetStream === 'random') {
+        matchesStream = true;
+      } else if (targetStream === 'social') {
+        matchesStream = (item.stream === 'social' || SOCIAL_SUBJECTS.has(item.subject) || SOCIAL_SUBJECTS.has(item.subjectKey)) && !SCIENCE_SUBJECTS.has(item.subject);
+      } else {
+        matchesStream = (item.stream === 'science' || SCIENCE_SUBJECTS.has(item.subject) || SCIENCE_SUBJECTS.has(item.subjectKey)) && !SOCIAL_SUBJECTS.has(item.subject);
+      }
 
       if (matchesStream) {
         if (isExactGrade) {
-          pool.unshift(item); // Exact grade gets top priority
+          pool.unshift(item);
         } else if (isSameTier) {
           pool.push(item);
         } else {
@@ -162,16 +167,19 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
     });
   }
 
-  // 2. Gather from playgroundGamesData with stream matching
+  // 2. Gather from playgroundGamesData with STRICT Stream matching
   if (Array.isArray(playgroundGamesData)) {
     playgroundGamesData.forEach((g) => {
       if (!g || !Array.isArray(g.questions)) return;
 
-      const matchesStream = targetStream === 'random'
-        ? true
-        : targetStream === 'social'
-          ? (g.stream === 'social' || SOCIAL_SUBJECTS.has(g.subjectKey) || SOCIAL_SUBJECTS.has(g.subject))
-          : (g.stream === 'science' || SCIENCE_SUBJECTS.has(g.subjectKey) || SCIENCE_SUBJECTS.has(g.subject));
+      let matchesStream = false;
+      if (targetStream === 'random') {
+        matchesStream = true;
+      } else if (targetStream === 'social') {
+        matchesStream = (g.stream === 'social' || SOCIAL_SUBJECTS.has(g.subjectKey) || SOCIAL_SUBJECTS.has(g.subject)) && !SCIENCE_SUBJECTS.has(g.subject);
+      } else {
+        matchesStream = (g.stream === 'science' || SCIENCE_SUBJECTS.has(g.subjectKey) || SCIENCE_SUBJECTS.has(g.subject)) && !SOCIAL_SUBJECTS.has(g.subject);
+      }
 
       if (matchesStream) {
         pool.push(...g.questions);
@@ -179,11 +187,15 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
     });
   }
 
-  // 3. Deduplicate by question text
+  // 3. Deduplicate by question text and enforce strict stream isolation
   const uniquePool = [];
   const seenTexts = new Set();
   pool.forEach((q) => {
     if (q && q.q && !seenTexts.has(q.q.trim())) {
+      // Hard guard: Never allow Science questions into Social, and vice-versa
+      if (targetStream === 'social' && SCIENCE_SUBJECTS.has(q.subject)) return;
+      if (targetStream === 'science' && SOCIAL_SUBJECTS.has(q.subject)) return;
+
       seenTexts.add(q.q.trim());
       uniquePool.push(q);
     }
