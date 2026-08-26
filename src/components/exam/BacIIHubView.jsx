@@ -541,44 +541,57 @@ export default function BacIIHubView() {
           </div>
         )}
 
-        {/* Pagination Controls */}
+        {/* Pagination Controls - Touch-Swipeable & Fully Responsive */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-between bg-white p-3 sm:p-4 rounded-xl border border-slate-200 shadow-xs text-xs font-bold">
-            <span className="text-slate-500">
+          <div className="flex flex-col sm:flex-row items-center justify-between bg-white p-3 sm:p-4 rounded-2xl border border-slate-200 shadow-xs text-xs font-bold gap-3">
+            <span className="text-slate-500 text-center sm:text-left text-[11px] sm:text-xs">
               ទំព័រទី <b className="text-[#005baa]">{currentPage}</b> នៃ {totalPages} (សរុប {filteredPapers.length} វិញ្ញាសា)
             </span>
 
-            <div className="flex items-center gap-1">
+            <div className="w-full sm:w-auto flex items-center justify-center sm:justify-end gap-1.5 overflow-x-auto max-w-full py-1 px-1 no-scrollbar touch-pan-x [scrollbar-width:none]">
               <button
                 type="button"
                 disabled={currentPage === 1}
-                onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
-                className="p-1.5 sm:px-3 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1"
+                onClick={() => {
+                  setCurrentPage(prev => Math.max(prev - 1, 1));
+                  window.scrollTo({ top: 300, behavior: 'smooth' });
+                }}
+                className="p-1.5 sm:px-3 h-8 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1 flex-shrink-0 transition-colors shadow-2xs"
+                title="Previous Page"
               >
                 <ChevronLeft className="w-3.5 h-3.5" />
                 <span className="hidden sm:inline">មុន</span>
               </button>
 
-              {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
-                <button
-                  key={page}
-                  type="button"
-                  onClick={() => setCurrentPage(page)}
-                  className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg transition-colors cursor-pointer ${
-                    currentPage === page
-                      ? 'bg-[#005baa] text-white shadow-xs font-black'
-                      : 'bg-slate-50 text-slate-700 hover:bg-slate-100 border border-slate-200'
-                  }`}
-                >
-                  {page}
-                </button>
-              ))}
+              <div className="flex items-center gap-1 overflow-x-auto max-w-[240px] sm:max-w-none py-0.5 px-0.5 no-scrollbar touch-pan-x [scrollbar-width:none]">
+                {Array.from({ length: totalPages }, (_, i) => i + 1).map(page => (
+                  <button
+                    key={page}
+                    type="button"
+                    onClick={() => {
+                      setCurrentPage(page);
+                      window.scrollTo({ top: 300, behavior: 'smooth' });
+                    }}
+                    className={`min-w-[32px] h-8 px-2 rounded-xl transition-all cursor-pointer flex-shrink-0 flex items-center justify-center text-xs ${
+                      currentPage === page
+                        ? 'bg-[#005baa] text-white shadow-xs font-black ring-2 ring-[#005baa]/30 scale-105'
+                        : 'bg-slate-50 hover:bg-blue-50 text-slate-700 hover:text-[#005baa] border border-slate-200'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                ))}
+              </div>
 
               <button
                 type="button"
                 disabled={currentPage === totalPages}
-                onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
-                className="p-1.5 sm:px-3 rounded-lg border border-slate-300 bg-white hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1"
+                onClick={() => {
+                  setCurrentPage(prev => Math.min(prev + 1, totalPages));
+                  window.scrollTo({ top: 300, behavior: 'smooth' });
+                }}
+                className="p-1.5 sm:px-3 h-8 rounded-xl border border-slate-300 bg-white hover:bg-slate-50 disabled:opacity-30 disabled:cursor-not-allowed cursor-pointer flex items-center gap-1 flex-shrink-0 transition-colors shadow-2xs"
+                title="Next Page"
               >
                 <span className="hidden sm:inline">បន្ទាប់</span>
                 <ChevronRight className="w-3.5 h-3.5" />

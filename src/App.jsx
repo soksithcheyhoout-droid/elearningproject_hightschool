@@ -312,7 +312,7 @@ function MainApp() {
         />
 
         {/* Dynamic Center Canvas View */}
-        <main className={`flex-1 flex flex-col min-w-0 ${activeTab === 'chat' ? 'h-[calc(100dvh-60px)] sm:h-[calc(100vh-80px)] min-h-0 overflow-hidden p-0' : 'overflow-x-hidden pb-16 md:pb-0'}`}>
+        <main className={`flex-1 flex flex-col min-w-0 ${activeTab === 'chat' ? 'h-[calc(100dvh-64px)] md:h-[calc(100vh-92px)] min-h-0 overflow-hidden p-0' : 'overflow-x-hidden pb-16 md:pb-0'}`}>
           
           {/* HOME TAB */}
           {activeTab === 'home' && (

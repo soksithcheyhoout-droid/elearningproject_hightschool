@@ -1103,7 +1103,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
   });
 
   return (
-    <div className="w-full max-w-[1600px] mx-auto h-full flex-1 flex flex-col bg-white border-0 sm:border border-slate-200 sm:rounded-3xl shadow-sm sm:shadow-lg overflow-hidden font-kantumruy select-none">
+    <div className="w-full max-w-[1600px] mx-auto h-full flex-1 flex flex-col bg-white border-0 md:border border-slate-200 rounded-none md:rounded-3xl shadow-none md:shadow-lg overflow-hidden font-kantumruy select-none">
       
       {/* Header Bar */}
       <div className="bg-white border-b border-slate-200 px-2.5 sm:px-6 py-2 sm:py-3 flex items-center justify-between gap-2 flex-shrink-0 select-none shadow-2xs">
@@ -1898,7 +1898,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
           </div>
 
           {/* Input Bar Form */}
-          <div className="bg-white border-t border-slate-200 p-1.5 sm:p-3 flex-shrink-0 relative z-30 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-xs w-full max-w-full overflow-hidden">
+          <div className="bg-white border-t border-slate-200 p-1.5 sm:p-3 flex-shrink-0 relative z-40 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-xs w-full max-w-full overflow-visible">
             <form onSubmit={handleSendMessage} className="flex items-center gap-1 sm:gap-2 relative w-full max-w-full">
               
               {/* 1. Native Clean Emoji / Reaction Trigger Button */}
@@ -1924,7 +1924,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                 {isEmojiPickerOpen && (
                   <div 
                     onClick={(e) => e.stopPropagation()}
-                    className="absolute bottom-full left-0 mb-2 w-[calc(100vw-20px)] max-w-sm sm:max-w-md bg-white/98 backdrop-blur-2xl rounded-2xl border border-slate-200 shadow-2xl p-2.5 sm:p-3.5 z-50 animate-scale-up select-none ring-1 ring-black/5 font-kantumruy"
+                    className="absolute bottom-full left-0 mb-3 w-[calc(100vw-20px)] max-w-sm sm:max-w-md bg-white/98 backdrop-blur-2xl rounded-2xl border border-slate-200 shadow-2xl p-2.5 sm:p-3.5 z-[100] animate-scale-up select-none ring-1 ring-black/10 font-kantumruy drop-shadow-2xl"
                   >
                     <div className="flex items-center justify-between pb-2 border-b border-slate-100 gap-2">
                       <div className="flex items-center gap-1.5 min-w-0">
@@ -2026,7 +2026,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                 {isGifPickerOpen && (
                   <div 
                     onClick={(e) => e.stopPropagation()}
-                    className="absolute bottom-full left-0 sm:-left-20 mb-2 w-[calc(100vw-32px)] max-w-xs sm:max-w-[460px] bg-white/98 backdrop-blur-2xl rounded-2xl border border-slate-200 shadow-2xl p-3 z-50 animate-scale-up select-none ring-1 ring-black/5 font-kantumruy"
+                    className="absolute bottom-full left-0 sm:-left-20 mb-3 w-[calc(100vw-32px)] max-w-xs sm:max-w-[460px] bg-white/98 backdrop-blur-2xl rounded-2xl border border-slate-200 shadow-2xl p-3 z-[100] animate-scale-up select-none ring-1 ring-black/10 font-kantumruy drop-shadow-2xl"
                   >
                     <div className="flex items-center justify-between pb-2 border-b border-slate-100 gap-2">
                       <div className="flex items-center gap-2">
