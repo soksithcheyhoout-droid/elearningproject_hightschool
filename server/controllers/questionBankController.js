@@ -5,17 +5,20 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+const bankPath60k = path.join(__dirname, '..', 'data', 'master_question_bank_60000.json');
 const bankPath20k = path.join(__dirname, '..', 'data', 'master_question_bank_20000.json');
 const bankPath12k = path.join(__dirname, '..', 'data', 'master_question_bank_12000.json');
 
 let masterQuestionBank = null;
 
-// Load 20,000 question bank into memory on demand
+// Load 60,000 question bank into memory on demand
 function getMasterBank() {
   if (!masterQuestionBank) {
     try {
       let raw = null;
-      if (fs.existsSync(bankPath20k)) {
+      if (fs.existsSync(bankPath60k)) {
+        raw = fs.readFileSync(bankPath60k, 'utf-8');
+      } else if (fs.existsSync(bankPath20k)) {
         raw = fs.readFileSync(bankPath20k, 'utf-8');
       } else if (fs.existsSync(bankPath12k)) {
         raw = fs.readFileSync(bankPath12k, 'utf-8');
@@ -40,12 +43,12 @@ function getMasterBank() {
               social: social.length,
               bySubject
             },
-            version: '3.0.0-National-MoEYS-20k'
+            version: '4.0.0-National-MoEYS-60k'
           };
         } else {
           masterQuestionBank = parsed;
         }
-        console.log(`📚 Master Question Bank loaded into memory: ${masterQuestionBank.totalCount.toLocaleString()} questions (10,000 Science + 10,000 Social)`);
+        console.log(`📚 Master Question Bank loaded into memory: ${masterQuestionBank.totalCount.toLocaleString()} questions (30,000 Science + 30,000 Social)`);
       }
     } catch (e) {
       console.error('Failed to load master question bank:', e);
