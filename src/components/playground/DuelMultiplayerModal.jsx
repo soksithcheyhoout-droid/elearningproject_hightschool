@@ -338,19 +338,18 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
 
-    // Asynchronously enrich questions from 12,000 question bank
+    // Asynchronously enrich questions from question bank
     let isSubscribed = true;
-    const targetStream = (selectedGrade === '11' || selectedGrade === '12') ? selectedStream : 'general';
     fetchLiveExamQuestions({
-      stream: targetStream === 'social' ? 'social' : 'science',
-      grade: selectedGrade,
+      stream: selectedStream === 'social' ? 'social' : selectedStream === 'random' ? 'all' : 'science',
+      grade: '12',
       limit: 24,
       random: true
     }).then((livePool) => {
       if (isSubscribed && Array.isArray(livePool) && livePool.length > 0) {
         setQuestions(livePool);
         if (isHost && roomCode) {
-          api.createArenaRoom(roomCode, game?.id || 'sci-m-01', game?.subject || 'គណិតវិទ្យា', currentStudentPayload, livePool, selectedGrade, targetStream);
+          api.createArenaRoom(roomCode, game?.id || 'sci-m-01', game?.subject || 'គណិតវិទ្យា', currentStudentPayload, livePool, '12', selectedStream);
         }
       }
     });
@@ -378,8 +377,6 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     isHost: isHost
   };
 
-
-
   // Switch to next turn & question
   const handleSwitchToNextTurn = useCallback(async () => {
     clearTimeout(autoNextTimerRef.current);
@@ -400,7 +397,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     // Prepare next question
     let extra = [];
     if (currentQIndex + 1 >= questions.length) {
-      extra = getRandomizedGameQuestions(game, 15, selectedGrade, selectedStream);
+      extra = getRandomizedGameQuestions(game, 15, '12', selectedStream);
       setQuestions((prev) => [...prev, ...extra]);
     }
 
@@ -557,7 +554,6 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
           if (res && res.success && res.room && res.room.status !== 'host_left' && !res.room.hostLeft && res.room.host) {
             if (res.room.host) setHostPlayer(res.room.host);
             if (res.room.challenger) setChallengerPlayer(res.room.challenger);
-            if (res.room.grade) setSelectedGrade(String(res.room.grade));
             if (res.room.stream) setSelectedStream(res.room.stream);
             if (Array.isArray(res.room.questions) && res.room.questions.length > 0) {
               setQuestions(res.room.questions);
@@ -1755,12 +1751,12 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             <div className={`inline-flex items-center gap-2 px-3 sm:px-5 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl border shadow-xl transition-all duration-300 ${currentTheme.boxBg} ${currentTheme.boxBorder}`}>
               <Swords className={`w-3.5 h-3.5 sm:w-4 sm:h-4 animate-pulse ${currentTheme.accentText}`} />
               <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-white">
-                <span className="sm:hidden">1v1 DUEL • ទី{selectedGrade}</span>
-                <span className="hidden sm:inline">1v1 DUEL ARENA • ថ្នាក់ទី {selectedGrade}</span>
+                <span className="sm:hidden">1v1 DUEL • {currentTheme.shortName}</span>
+                <span className="hidden sm:inline">1v1 DUEL ARENA • {currentTheme.nameKm}</span>
               </span>
               <span className={`text-[9px] sm:text-[11px] px-1.5 sm:px-2.5 py-0.5 rounded-lg font-bold border transition-all duration-300 items-center gap-1 hidden sm:flex ${currentTheme.badgeClass}`}>
-                <CurrentGradeIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
-                <span>{selectedGrade >= 11 ? (selectedStream === 'science' ? 'វិទ្យាសាស្ត្រពិត' : 'វិទ្យាសាស្ត្រសង្គម') : `${currentTheme.shortLevel}`}</span>
+                <CurrentStreamIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                <span>{currentTheme.subtitleKm}</span>
               </span>
               <span className="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 font-black border border-amber-400/30">
                 +500 XP
