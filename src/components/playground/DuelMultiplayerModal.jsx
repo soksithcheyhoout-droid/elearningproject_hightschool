@@ -537,19 +537,34 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     fetchStudents();
   }, [showInviteModal]);
 
-  // Real-Time Profile & Frame Sync Listener across tabs & users
+  // Real-Time Profile & Room Sync Listener across tabs & users
   useEffect(() => {
     let bc = null;
+    let roomBc = null;
     if (typeof BroadcastChannel !== 'undefined') {
       bc = new BroadcastChannel('khmer_elearn_profile_sync');
       bc.onmessage = () => {
         fetchStudents();
       };
+
+      roomBc = new BroadcastChannel('khmer_elearn_arena_room_sync');
+      roomBc.onmessage = (event) => {
+        const msg = event?.data;
+        if (msg && msg.roomCode === roomCode && !isHost) {
+          if (msg.type === 'STREAM_CHANGED' && msg.stream) {
+            setSelectedStream(msg.stream);
+            if (Array.isArray(msg.questions) && msg.questions.length > 0) {
+              setQuestions(msg.questions);
+            }
+          }
+        }
+      };
     }
     return () => {
       if (bc) bc.close();
+      if (roomBc) roomBc.close();
     };
-  }, []);
+  }, [roomCode, isHost]);
 
   // Initialize Host Room or Auto-Join Incoming Invite Room in Backend
   useEffect(() => {
@@ -764,6 +779,20 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     const freshQuestions = getRandomizedGameQuestions(game?.stream === newStream ? game : null, 24, '12', newStream);
     setQuestions(freshQuestions);
 
+    // Broadcast immediately across tabs
+    try {
+      if (typeof BroadcastChannel !== 'undefined') {
+        const roomBc = new BroadcastChannel('khmer_elearn_arena_room_sync');
+        roomBc.postMessage({
+          type: 'STREAM_CHANGED',
+          roomCode,
+          stream: newStream,
+          questions: freshQuestions
+        });
+        roomBc.close();
+      }
+    } catch (e) {}
+
     try {
       await api.updateArenaRoom(roomCode, {
         stream: newStream,
@@ -783,6 +812,19 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             stream: newStream,
             questions: livePool
           });
+
+          try {
+            if (typeof BroadcastChannel !== 'undefined') {
+              const roomBc = new BroadcastChannel('khmer_elearn_arena_room_sync');
+              roomBc.postMessage({
+                type: 'STREAM_CHANGED',
+                roomCode,
+                stream: newStream,
+                questions: livePool
+              });
+              roomBc.close();
+            }
+          } catch (e) {}
         }
       });
     } catch (e) {}
@@ -1396,18 +1438,31 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                   {/* Dynamic Ambient Background Glow */}
                   <div className={`absolute -right-16 -bottom-16 w-56 h-56 rounded-full blur-[80px] pointer-events-none opacity-40 transition-colors duration-500 ${currentTheme.glowBg}`} />
 
-                  {/* Top Title */}
-                  <div className="flex items-center justify-between gap-2.5 relative z-10">
-                    <div className="flex items-center gap-2">
+                  {/* Top Title & Host vs Challenger Indicator Note */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 relative z-10">
+                    <div className="flex items-center gap-2 flex-wrap">
                       <CurrentStreamIcon className={`w-4 h-4 transition-colors duration-300 ${currentTheme.accentText}`} />
                       <span className="text-xs font-bold text-slate-200">
-                        ជ្រើសរើសផ្នែកប្រកួត (Stream Mode):
+                        ផ្នែកប្រកួត (Stream Mode):
                       </span>
                       <span className={`text-xs font-black px-2.5 py-1 rounded-xl border transition-all duration-300 flex items-center gap-1.5 shadow-sm ${currentTheme.badgeClass}`}>
                         <CurrentStreamIcon className="w-3.5 h-3.5 flex-shrink-0" />
                         <span>{currentTheme.nameKm}</span>
                       </span>
                     </div>
+
+                    {/* Prominent Badge for Host vs Challenger */}
+                    {!isHost ? (
+                      <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-500/15 border border-amber-400/40 text-amber-300 text-[11px] font-bold shadow-xs">
+                        <Crown className="w-3.5 h-3.5 text-amber-400 fill-amber-400 flex-shrink-0" />
+                        <span>កំណត់ដោយម្ចាស់បន្ទប់ (Admin Only)</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-indigo-500/15 border border-indigo-400/40 text-indigo-300 text-[11px] font-bold shadow-xs">
+                        <Sparkles className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" />
+                        <span>ចុចដើម្បីប្តូរផ្នែកប្រកួត (Admin Control)</span>
+                      </div>
+                    )}
                   </div>
 
                   {/* 3 Stream Selection Cards Grid */}
@@ -1418,11 +1473,12 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                       type="button"
                       disabled={!isHost}
                       onClick={() => handleSelectStream('science')}
-                      className={`p-3 rounded-xl border text-left transition-all duration-200 cursor-pointer flex items-center justify-between gap-2.5 ${
+                      className={`p-3 rounded-xl border text-left transition-all duration-200 flex items-center justify-between gap-2.5 ${
                         selectedStream === 'science'
                           ? STREAM_THEMES.science.cardActive
                           : STREAM_THEMES.science.cardInactive
-                      } ${!isHost ? 'opacity-70 cursor-not-allowed' : ''}`}
+                      } ${!isHost ? 'cursor-default opacity-90' : 'cursor-pointer hover:scale-[1.01]'}`}
+                      title={!isHost ? 'ម្ចាស់បន្ទប់ (Admin) ជាអ្នកកំណត់ផ្នែកប្រកួត' : 'ជ្រើសរើសវិទ្យាសាស្ត្រពិត'}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div className="w-8 h-8 rounded-lg bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 flex items-center justify-center flex-shrink-0 shadow-inner">
@@ -1444,11 +1500,12 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                       type="button"
                       disabled={!isHost}
                       onClick={() => handleSelectStream('social')}
-                      className={`p-3 rounded-xl border text-left transition-all duration-200 cursor-pointer flex items-center justify-between gap-2.5 ${
+                      className={`p-3 rounded-xl border text-left transition-all duration-200 flex items-center justify-between gap-2.5 ${
                         selectedStream === 'social'
                           ? STREAM_THEMES.social.cardActive
                           : STREAM_THEMES.social.cardInactive
-                      } ${!isHost ? 'opacity-70 cursor-not-allowed' : ''}`}
+                      } ${!isHost ? 'cursor-default opacity-90' : 'cursor-pointer hover:scale-[1.01]'}`}
+                      title={!isHost ? 'ម្ចាស់បន្ទប់ (Admin) ជាអ្នកកំណត់ផ្នែកប្រកួត' : 'ជ្រើសរើសវិទ្យាសាស្ត្រសង្គម'}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-400/40 text-amber-300 flex items-center justify-center flex-shrink-0 shadow-inner">
@@ -1470,11 +1527,12 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                       type="button"
                       disabled={!isHost}
                       onClick={() => handleSelectStream('random')}
-                      className={`p-3 rounded-xl border text-left transition-all duration-200 cursor-pointer flex items-center justify-between gap-2.5 ${
+                      className={`p-3 rounded-xl border text-left transition-all duration-200 flex items-center justify-between gap-2.5 ${
                         selectedStream === 'random'
                           ? STREAM_THEMES.random.cardActive
                           : STREAM_THEMES.random.cardInactive
-                      } ${!isHost ? 'opacity-70 cursor-not-allowed' : ''}`}
+                      } ${!isHost ? 'cursor-default opacity-90' : 'cursor-pointer hover:scale-[1.01]'}`}
+                      title={!isHost ? 'ម្ចាស់បន្ទប់ (Admin) ជាអ្នកកំណត់ផ្នែកប្រកួត' : 'ជ្រើសរើសសំណួរចម្រុះ'}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
                         <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 flex items-center justify-center flex-shrink-0 shadow-inner">

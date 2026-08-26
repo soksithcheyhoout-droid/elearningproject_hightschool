@@ -126,12 +126,14 @@ export const getRoom = (req, res) => {
 export const updateRoomStatus = (req, res) => {
   try {
     const { roomCode } = req.params;
-    const { status, currentQIndex, hostScore, challengerScore, challengerReady, activeTurn, questions } = req.body;
+    const { status, currentQIndex, hostScore, challengerScore, challengerReady, activeTurn, questions, stream, grade } = req.body;
     const room = activeRooms.get(roomCode);
     if (!room) {
       return res.status(404).json({ error: 'Room not found' });
     }
 
+    if (stream) room.stream = stream;
+    if (grade) room.grade = grade;
     if (status) room.status = status;
     if (activeTurn) room.activeTurn = activeTurn;
     if (Array.isArray(questions) && questions.length > 0) room.questions = questions;
