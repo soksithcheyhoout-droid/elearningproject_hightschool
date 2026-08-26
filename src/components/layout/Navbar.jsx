@@ -459,13 +459,13 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
           </nav>
 
           {/* Right Utilities: Search, Language Switcher, and USER PROFILE (PF) */}
-          <div className="flex items-center gap-1 sm:gap-2 flex-shrink-0 ml-auto">
+          <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 flex-shrink-0 ml-auto">
             
             {/* 🏛️ OFFICIAL MINISTRY NATIONAL FUND BUTTON */}
             <button
               type="button"
               onClick={onOpenDonation}
-              className="flex items-center gap-1.5 px-2.5 sm:px-3 py-1.5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-[#002d62] via-[#004080] to-[#002d62] hover:from-[#00387a] hover:to-[#004d99] text-white border border-amber-400/60 hover:border-amber-300 shadow-xs hover:shadow-md font-black text-[11px] sm:text-xs transition-all duration-200 cursor-pointer active:scale-95 flex-shrink-0 select-none whitespace-nowrap ring-1 ring-amber-400/20"
+              className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-[#002d62] via-[#004080] to-[#002d62] hover:from-[#00387a] hover:to-[#004d99] text-white border border-amber-400/60 hover:border-amber-300 shadow-xs hover:shadow-md font-black text-[11px] sm:text-xs transition-all duration-200 cursor-pointer active:scale-95 flex-shrink-0 select-none whitespace-nowrap ring-1 ring-amber-400/20"
               title={lang === 'km' ? 'មូលនិធិជាតិ MoTDAR គាំទ្រការអប់រំ និងទេពកោសល្យ' : 'MoTDAR National Education & Talent Fund'}
             >
               <div className="w-4 h-4 rounded-full bg-amber-400/20 border border-amber-400/50 flex items-center justify-center flex-shrink-0 p-0.5 shadow-2xs">
@@ -475,7 +475,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
                   className="w-full h-full object-contain filter drop-shadow-xs" 
                 />
               </div>
-              <span className="font-extrabold text-amber-300 hover:text-amber-200 whitespace-nowrap tracking-tight">
+              <span className="hidden md:inline font-extrabold text-amber-300 hover:text-amber-200 whitespace-nowrap tracking-tight">
                 {lang === 'km' ? 'មូលនិធិជាតិ' : 'Edu Fund'}
               </span>
               <Heart className="w-3 h-3 fill-rose-500 text-rose-500 animate-pulse flex-shrink-0 -ml-0.5" />
@@ -491,7 +491,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
                     setTimeout(() => searchInputRef.current?.focus(), 50);
                   }
                 }}
-                className="p-2 rounded-xl text-[#005baa] hover:text-[#002d62] hover:bg-blue-50/80 transition-colors cursor-pointer flex items-center justify-center flex-shrink-0"
+                className="p-1.5 sm:p-2 rounded-xl text-[#005baa] hover:text-[#002d62] hover:bg-blue-50/80 transition-colors cursor-pointer flex items-center justify-center flex-shrink-0"
                 title="ស្វែងរក / Search (Ctrl+K)"
               >
                 <Search className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
@@ -626,7 +626,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
               <button
                 type="button"
                 onClick={() => setIsAnnouncementOpen(!isAnnouncementOpen)}
-                className="relative p-2 rounded-xl text-[#005baa] hover:text-[#002d62] hover:bg-blue-50/80 transition-colors cursor-pointer flex items-center justify-center flex-shrink-0"
+                className="relative p-1.5 sm:p-2 rounded-xl text-[#005baa] hover:text-[#002d62] hover:bg-blue-50/80 transition-colors cursor-pointer flex items-center justify-center flex-shrink-0"
                 title={lang === 'km' ? 'សេចក្តីជូនដំណឹងផ្លូវការ (Announcements)' : 'Official Ministry Announcements'}
               >
                 <Bell className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
@@ -787,7 +787,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
               <button
                 type="button"
                 onClick={() => setIsLangOpen(!isLangOpen)}
-                className="px-2 sm:px-2.5 py-1.5 rounded-xl border border-[#005baa]/30 hover:border-[#005baa] text-xs font-black text-[#005baa] hover:text-[#002d62] hover:bg-blue-50/80 transition-all flex items-center gap-1 cursor-pointer shadow-2xs whitespace-nowrap flex-shrink-0"
+                className="px-1.5 sm:px-2.5 py-1 sm:py-1.5 rounded-xl border border-[#005baa]/30 hover:border-[#005baa] text-[11px] sm:text-xs font-black text-[#005baa] hover:text-[#002d62] hover:bg-blue-50/80 transition-all flex items-center gap-0.5 sm:gap-1 cursor-pointer shadow-2xs whitespace-nowrap flex-shrink-0"
               >
                 <span>{lang === 'km' ? 'Kh' : 'En'}</span>
                 <ChevronDown className="w-3 h-3 text-[#005baa]/70" />
@@ -820,7 +820,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
             </div>
 
             {/* USER PROFILE SUITE (PF + Streak + XP) - Guaranteed 0% Clipping on all screen sizes */}
-            <div className="flex items-center gap-1.5 sm:gap-2 pl-1.5 sm:pl-2 border-l border-slate-200 flex-shrink-0 mr-1 sm:mr-2">
+            <div className="flex items-center gap-1 sm:gap-2 pl-1 sm:pl-2 border-l border-slate-200 flex-shrink-0 mr-0.5 sm:mr-2">
               
               {/* Streak Badge */}
               <div 
@@ -1025,14 +1025,14 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-                className={`p-2 rounded-xl transition-all cursor-pointer border ${
+                className={`p-1.5 sm:p-2 rounded-xl transition-all cursor-pointer border ${
                   mobileMenuOpen 
                     ? 'bg-[#005baa] text-white border-[#005baa] shadow-xs' 
                     : 'bg-slate-100 hover:bg-slate-200 text-[#003876] border-slate-200'
                 }`}
                 title="Menu"
               >
-                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+                {mobileMenuOpen ? <X className="w-4.5 h-4.5 sm:w-5 sm:h-5" /> : <Menu className="w-4.5 h-4.5 sm:w-5 sm:h-5" />}
               </button>
 
               {/* Backdrop Scrim */}
