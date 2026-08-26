@@ -1853,87 +1853,85 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
         {/* STEP 2: AAA eSPORTS MATCHUP / VERSUS INTRO COUNTDOWN */}
         {/* ========================================================================= */}
         {currentStep === 'countdown' && (
-          <div className="p-4 sm:p-8 md:p-10 flex-1 flex flex-col justify-center items-center text-center space-y-6 sm:space-y-8 animate-fade-in my-auto relative overflow-hidden">
+          <div className="p-3 sm:p-6 md:p-10 flex-1 flex flex-col justify-center items-center text-center space-y-4 sm:space-y-6 animate-fade-in my-auto relative overflow-hidden">
             
             {/* Background Battle Beams */}
             <div className="absolute top-1/2 left-1/4 -translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-cyan-500/10 rounded-full blur-[100px] pointer-events-none" />
             <div className="absolute top-1/2 right-1/4 translate-x-1/2 -translate-y-1/2 w-80 h-80 bg-rose-500/10 rounded-full blur-[100px] pointer-events-none" />
 
             {/* Top Match Title Ribbon */}
-            <div className={`inline-flex flex-col sm:flex-row items-center gap-2 px-5 py-2 rounded-2xl border shadow-xl transition-all duration-300 ${currentTheme.boxBg} ${currentTheme.boxBorder}`}>
-              <div className="flex items-center gap-2">
-                <Swords className={`w-4 h-4 animate-pulse ${currentTheme.accentText}`} />
-                <span className="text-xs font-black uppercase tracking-wider text-white">
-                  1v1 DUEL ARENA • ថ្នាក់ទី {selectedGrade}
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <span className={`text-[11px] px-2.5 py-0.5 rounded-lg font-bold border transition-all duration-300 flex items-center gap-1.5 ${currentTheme.badgeClass}`}>
-                  <CurrentGradeIcon className="w-3.5 h-3.5 flex-shrink-0" />
-                  <span>{selectedGrade >= 11 ? (selectedStream === 'science' ? 'វិទ្យាសាស្ត្រពិត (Science)' : 'វិទ្យាសាស្ត្រសង្គម (Social)') : `${currentTheme.shortLevel} (General)`}</span>
-                </span>
-                <span className="text-[10px] px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 font-black border border-amber-400/30">
-                  +500 XP
-                </span>
-              </div>
+            <div className={`inline-flex items-center gap-2 px-3 sm:px-5 py-1.5 sm:py-2 rounded-xl sm:rounded-2xl border shadow-xl transition-all duration-300 ${currentTheme.boxBg} ${currentTheme.boxBorder}`}>
+              <Swords className={`w-3.5 h-3.5 sm:w-4 sm:h-4 animate-pulse ${currentTheme.accentText}`} />
+              <span className="text-[10px] sm:text-xs font-black uppercase tracking-wider text-white">
+                <span className="sm:hidden">1v1 DUEL • ទី{selectedGrade}</span>
+                <span className="hidden sm:inline">1v1 DUEL ARENA • ថ្នាក់ទី {selectedGrade}</span>
+              </span>
+              <span className={`text-[9px] sm:text-[11px] px-1.5 sm:px-2.5 py-0.5 rounded-lg font-bold border transition-all duration-300 items-center gap-1 hidden sm:flex ${currentTheme.badgeClass}`}>
+                <CurrentGradeIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                <span>{selectedGrade >= 11 ? (selectedStream === 'science' ? 'វិទ្យាសាស្ត្រពិត' : 'វិទ្យាសាស្ត្រសង្គម') : `${currentTheme.shortLevel}`}</span>
+              </span>
+              <span className="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-lg bg-amber-500/20 text-amber-300 font-black border border-amber-400/30">
+                +500 XP
+              </span>
             </div>
 
-            {/* 3-Column VS Arena Stage */}
-            <div className="grid grid-cols-1 md:grid-cols-11 gap-4 sm:gap-6 items-center w-full max-w-4xl relative z-10">
+            {/* ── 3-Column VS Arena Stage ── ALWAYS horizontal (side-by-side) */}
+            <div className="grid grid-cols-[1fr_auto_1fr] gap-2 sm:gap-4 md:gap-6 items-center w-full max-w-4xl relative z-10">
               
               {/* Host Hero Card (Left, Blue/Cyan Corner) */}
-              <div className="md:col-span-4 bg-gradient-to-b from-[#0e1d3e]/95 to-[#081024]/95 p-6 rounded-3xl border-2 border-cyan-500/40 shadow-2xl shadow-cyan-950/50 relative flex flex-col items-center text-center">
-                <div className="w-full flex items-center justify-between pb-3 mb-3 border-b border-cyan-500/20">
-                  <span className="text-xs font-black text-cyan-300 flex items-center gap-1.5 uppercase tracking-wider">
-                    <Crown className="w-4 h-4 text-amber-400 fill-amber-400" />
-                    BLUE CORNER
+              <div className="bg-gradient-to-b from-[#0e1d3e]/95 to-[#081024]/95 p-3 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl border-2 border-cyan-500/40 shadow-2xl shadow-cyan-950/50 relative flex flex-col items-center text-center min-w-0">
+                <div className="w-full flex items-center justify-between pb-2 sm:pb-3 mb-2 sm:mb-3 border-b border-cyan-500/20">
+                  <span className="text-[9px] sm:text-xs font-black text-cyan-300 flex items-center gap-1 uppercase tracking-wider">
+                    <Crown className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400 fill-amber-400" />
+                    <span className="hidden sm:inline">BLUE CORNER</span>
                   </span>
-                  <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-black border border-emerald-500/40 flex items-center gap-1">
-                    <Check className="w-3.5 h-3.5 text-emerald-400" /> READY
+                  <span className="text-[9px] sm:text-[11px] px-1.5 sm:px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-black border border-emerald-500/40 flex items-center gap-0.5 sm:gap-1">
+                    <Check className="w-3 h-3 text-emerald-400" /> <span className="hidden sm:inline">READY</span>
                   </span>
                 </div>
 
-                <div className="relative my-3">
+                <div className="relative my-1 sm:my-3">
                   <div className="absolute inset-0 rounded-full bg-cyan-500/20 blur-lg animate-pulse" />
                   <PlayerAvatarWithFrame
                     avatar={hostPlayer?.avatar}
                     frame={hostPlayer?.avatarFrame || hostPlayer?.avatar_frame}
                     name={hostPlayer?.name}
-                    size="xl"
-                    className="scale-110 drop-shadow-2xl relative z-10"
+                    size="lg"
+                    className="drop-shadow-2xl relative z-10"
                   />
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 border border-cyan-300 text-[11px] font-black text-white shadow-lg z-20 whitespace-nowrap">
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-2 sm:px-3 py-0.5 rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 border border-cyan-300 text-[10px] sm:text-[11px] font-black text-white shadow-lg z-20 whitespace-nowrap">
                     Lv.{hostPlayer?.level || 1}
                   </div>
                 </div>
 
-                <h3 className="text-base sm:text-lg font-black text-white tracking-tight truncate max-w-[220px] mt-2">
+                <h3 className="text-xs sm:text-base md:text-lg font-black text-white tracking-tight truncate w-full mt-2">
                   {hostPlayer?.name || 'សុខ វិបុល'}
                 </h3>
-                <p className="text-xs text-slate-300 font-medium flex items-center gap-1.5 mt-1 truncate max-w-[220px]">
-                  <Building2 className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
+                <p className="text-[10px] sm:text-xs text-slate-300 font-medium flex items-center gap-1 mt-0.5 sm:mt-1 truncate w-full justify-center">
+                  <Building2 className="w-3 h-3 text-cyan-400 flex-shrink-0" />
                   <span className="truncate">{hostPlayer?.school || 'វិទ្យាល័យជាតិ'}</span>
                 </p>
 
-                <div className="mt-3.5 w-full pt-3 border-t border-cyan-500/20 flex items-center justify-between text-xs">
-                  <span className="text-slate-400 font-semibold">សមត្ថភាព (XP):</span>
-                  <span className="font-mono font-black text-cyan-300 text-sm">
-                    {(hostPlayer?.xp || 500).toLocaleString()} XP
+                <div className="mt-2 sm:mt-3.5 w-full pt-2 sm:pt-3 border-t border-cyan-500/20 flex items-center justify-between text-[10px] sm:text-xs">
+                  <span className="text-slate-400 font-semibold hidden sm:inline">សមត្ថភាព (XP):</span>
+                  <span className="text-slate-400 font-semibold sm:hidden">XP:</span>
+                  <span className="font-mono font-black text-cyan-300 text-[11px] sm:text-sm">
+                    {(hostPlayer?.xp || 500).toLocaleString()}
                   </span>
                 </div>
               </div>
 
               {/* Center VS & Holographic Digital Countdown Radar */}
-              <div className="md:col-span-3 flex flex-col items-center justify-center py-2 relative">
+              <div className="flex flex-col items-center justify-center py-1 sm:py-2 relative px-1">
                 
                 {/* 3-2-1 Digital Countdown Sphere */}
-                <div className="relative my-3">
+                <div className="relative">
                   {/* Rotating Neon Glow Rings */}
-                  <div className="w-28 h-28 sm:w-32 sm:h-32 rounded-full border-2 border-dashed border-indigo-400/50 animate-spin flex items-center justify-center pointer-events-none" style={{ animationDuration: '6s' }} />
-                  <div className="absolute inset-2 rounded-full border border-cyan-400/30 animate-pulse pointer-events-none" />
+                  <div className="w-20 h-20 sm:w-28 sm:h-28 md:w-32 md:h-32 rounded-full border-2 border-dashed border-indigo-400/50 animate-spin flex items-center justify-center pointer-events-none" style={{ animationDuration: '6s' }} />
+                  <div className="absolute inset-1.5 sm:inset-2 rounded-full border border-cyan-400/30 animate-pulse pointer-events-none" />
                   
                   {/* Countdown Center Circle */}
-                  <div className={`absolute inset-3 rounded-full flex flex-col items-center justify-center shadow-2xl backdrop-blur-md transition-all duration-300 ${
+                  <div className={`absolute inset-2.5 sm:inset-3 rounded-full flex flex-col items-center justify-center shadow-2xl backdrop-blur-md transition-all duration-300 ${
                     countdownNum === 'START!'
                       ? 'bg-gradient-to-br from-emerald-600 via-teal-600 to-cyan-600 border-2 border-emerald-300 shadow-[0_0_40px_rgba(16,185,129,0.9)] scale-110'
                       : countdownNum === 1
@@ -1944,13 +1942,13 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                   }`}>
                     {countdownNum === 'START!' ? (
                       <div className="flex flex-col items-center animate-bounce">
-                        <Swords className="w-6 h-6 text-white mb-1" />
-                        <span className="font-black text-sm sm:text-base text-white tracking-wider font-mono">
+                        <Swords className="w-4 h-4 sm:w-6 sm:h-6 text-white mb-0.5" />
+                        <span className="font-black text-[10px] sm:text-sm text-white tracking-wider font-mono">
                           START!
                         </span>
                       </div>
                     ) : (
-                      <span className="font-mono font-black text-4xl sm:text-5xl text-white drop-shadow-md animate-pulse">
+                      <span className="font-mono font-black text-3xl sm:text-4xl md:text-5xl text-white drop-shadow-md animate-pulse">
                         {countdownNum}
                       </span>
                     )}
@@ -1958,51 +1956,52 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                 </div>
 
                 {/* Subtitle Status */}
-                <div className="mt-2">
-                  <span className="text-xs sm:text-sm font-black tracking-wider text-indigo-300">
-                    {countdownNum === 'START!' ? 'ការប្រកួតចាប់ផ្តើម!' : countdownNum === 1 ? 'ត្រៀមប្រកួត (Get Ready)' : countdownNum === 2 ? 'ផ្ចង់អារម្មណ៍ (Focus)' : 'ត្រៀមខ្លួន (Ready)'}
+                <div className="mt-1.5 sm:mt-2">
+                  <span className="text-[10px] sm:text-xs md:text-sm font-black tracking-wider text-indigo-300">
+                    {countdownNum === 'START!' ? 'ចាប់ផ្តើម!' : countdownNum === 1 ? 'ត្រៀមប្រកួត' : countdownNum === 2 ? 'ផ្ចង់អារម្មណ៍' : 'ត្រៀមខ្លួន'}
                   </span>
                 </div>
               </div>
 
               {/* Challenger Hero Card (Right, Crimson Corner) */}
-              <div className="md:col-span-4 bg-gradient-to-b from-[#341124]/95 to-[#1c0813]/95 p-6 rounded-3xl border-2 border-rose-500/40 shadow-2xl shadow-rose-950/50 relative flex flex-col items-center text-center">
-                <div className="w-full flex items-center justify-between pb-3 mb-3 border-b border-rose-500/20">
-                  <span className="text-xs font-black text-rose-300 flex items-center gap-1.5 uppercase tracking-wider">
-                    <Swords className="w-4 h-4 text-rose-400" />
-                    RED CORNER
+              <div className="bg-gradient-to-b from-[#341124]/95 to-[#1c0813]/95 p-3 sm:p-5 md:p-6 rounded-2xl sm:rounded-3xl border-2 border-rose-500/40 shadow-2xl shadow-rose-950/50 relative flex flex-col items-center text-center min-w-0">
+                <div className="w-full flex items-center justify-between pb-2 sm:pb-3 mb-2 sm:mb-3 border-b border-rose-500/20">
+                  <span className="text-[9px] sm:text-xs font-black text-rose-300 flex items-center gap-1 uppercase tracking-wider">
+                    <Swords className="w-3 h-3 sm:w-4 sm:h-4 text-rose-400" />
+                    <span className="hidden sm:inline">RED CORNER</span>
                   </span>
-                  <span className="text-[11px] px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-black border border-emerald-500/40 flex items-center gap-1">
-                    <Check className="w-3.5 h-3.5 text-emerald-400" /> READY
+                  <span className="text-[9px] sm:text-[11px] px-1.5 sm:px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 font-black border border-emerald-500/40 flex items-center gap-0.5 sm:gap-1">
+                    <Check className="w-3 h-3 text-emerald-400" /> <span className="hidden sm:inline">READY</span>
                   </span>
                 </div>
 
-                <div className="relative my-3">
+                <div className="relative my-1 sm:my-3">
                   <div className="absolute inset-0 rounded-full bg-rose-500/20 blur-lg animate-pulse" />
                   <PlayerAvatarWithFrame
                     avatar={challengerPlayer?.avatar}
                     frame={challengerPlayer?.avatarFrame || challengerPlayer?.avatar_frame}
                     name={challengerPlayer?.name}
-                    size="xl"
-                    className="scale-110 drop-shadow-2xl relative z-10"
+                    size="lg"
+                    className="drop-shadow-2xl relative z-10"
                   />
-                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-0.5 rounded-full bg-gradient-to-r from-rose-600 to-pink-600 border border-rose-300 text-[11px] font-black text-white shadow-lg z-20 whitespace-nowrap">
+                  <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-2 sm:px-3 py-0.5 rounded-full bg-gradient-to-r from-rose-600 to-pink-600 border border-rose-300 text-[10px] sm:text-[11px] font-black text-white shadow-lg z-20 whitespace-nowrap">
                     Lv.{challengerPlayer?.level || 1}
                   </div>
                 </div>
 
-                <h3 className="text-base sm:text-lg font-black text-white tracking-tight truncate max-w-[220px] mt-2">
+                <h3 className="text-xs sm:text-base md:text-lg font-black text-white tracking-tight truncate w-full mt-2">
                   {challengerPlayer?.name || 'គូប្រជែង'}
                 </h3>
-                <p className="text-xs text-slate-300 font-medium flex items-center gap-1.5 mt-1 truncate max-w-[220px]">
-                  <Building2 className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
+                <p className="text-[10px] sm:text-xs text-slate-300 font-medium flex items-center gap-1 mt-0.5 sm:mt-1 truncate w-full justify-center">
+                  <Building2 className="w-3 h-3 text-rose-400 flex-shrink-0" />
                   <span className="truncate">{challengerPlayer?.school || 'វិទ្យាល័យ'}</span>
                 </p>
 
-                <div className="mt-3.5 w-full pt-3 border-t border-rose-500/20 flex items-center justify-between text-xs">
-                  <span className="text-slate-400 font-semibold">សមត្ថភាព (XP):</span>
-                  <span className="font-mono font-black text-rose-300 text-sm">
-                    {(challengerPlayer?.xp || 500).toLocaleString()} XP
+                <div className="mt-2 sm:mt-3.5 w-full pt-2 sm:pt-3 border-t border-rose-500/20 flex items-center justify-between text-[10px] sm:text-xs">
+                  <span className="text-slate-400 font-semibold hidden sm:inline">សមត្ថភាព (XP):</span>
+                  <span className="text-slate-400 font-semibold sm:hidden">XP:</span>
+                  <span className="font-mono font-black text-rose-300 text-[11px] sm:text-sm">
+                    {(challengerPlayer?.xp || 500).toLocaleString()}
                   </span>
                 </div>
               </div>
@@ -2010,8 +2009,9 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             </div>
 
             {/* Bottom Target Goal */}
-            <p className="text-xs text-slate-400 font-medium">
-              ឆ្លើយឱ្យបានត្រឹមត្រូវ ៦ សំណួរមុនគេដើម្បីទទួលជ័យជម្នះ (First to 6 Correct Points Wins)
+            <p className="text-[10px] sm:text-xs text-slate-400 font-medium">
+              <span className="hidden sm:inline">ឆ្លើយឱ្យបានត្រឹមត្រូវ ៦ សំណួរមុនគេដើម្បីទទួលជ័យជម្នះ (First to 6 Correct Points Wins)</span>
+              <span className="sm:hidden">ឆ្លើយត្រឹមត្រូវ ៦ មុនគេ = ជ័យជម្នះ 🏆</span>
             </p>
           </div>
         )}
@@ -2020,18 +2020,16 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
         {/* STEP 3: LIVE TURN-BASED BATTLE */}
         {/* ========================================================================= */}
         {currentStep === 'battle' && (
-          <div className="p-3 sm:p-5 md:p-7 flex-1 flex flex-col overflow-y-auto space-y-3 sm:space-y-4 animate-fade-in" style={{ WebkitOverflowScrolling: 'touch' }}>
+          <div className="p-2.5 sm:p-5 md:p-7 flex-1 flex flex-col overflow-y-auto space-y-2.5 sm:space-y-4 animate-fade-in" style={{ WebkitOverflowScrolling: 'touch' }}>
 
-            {/* ── Top Score HUD ── Fully Responsive: stacks on mobile, side-by-side on sm+ */}
-            <div className="bg-[#0a1226]/90 backdrop-blur-sm p-2.5 sm:p-3.5 rounded-2xl border border-slate-700/60 shadow-lg">
-
-              {/* Mobile-first: flex-col on tiny screens, row on sm+ */}
-              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-3">
+            {/* ── Score HUD ── ALWAYS side-by-side on every device */}
+            <div className="bg-[#0a1226]/90 backdrop-blur-sm p-2 sm:p-3 rounded-xl sm:rounded-2xl border border-slate-700/60 shadow-lg">
+              <div className="grid grid-cols-[1fr_auto_1fr] gap-1.5 sm:gap-3 items-center">
 
                 {/* Host HUD */}
-                <div className={`flex-1 flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 rounded-xl transition-all min-w-0 ${
+                <div className={`flex items-center gap-1.5 sm:gap-2.5 p-1.5 sm:p-2.5 rounded-lg sm:rounded-xl transition-all min-w-0 ${
                   activeTurn === 'host' 
-                    ? 'bg-indigo-950/60 border border-indigo-500/70 shadow-lg shadow-indigo-950/50 ring-2 ring-indigo-500/40' 
+                    ? 'bg-indigo-950/60 border border-indigo-500/70 shadow-lg shadow-indigo-950/50 ring-1 sm:ring-2 ring-indigo-500/40' 
                     : 'opacity-70 bg-slate-900/40 border border-slate-800'
                 }`}>
                   <div className="relative flex-shrink-0">
@@ -2042,94 +2040,55 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                       size="sm"
                     />
                     {activeTurn === 'host' && (
-                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-emerald-400 rounded-full animate-ping" />
+                      <div className="absolute -top-0.5 -right-0.5 w-2 h-2 sm:w-3 sm:h-3 bg-emerald-400 rounded-full animate-ping" />
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-1 text-[11px] sm:text-xs font-semibold">
-                      <span className="text-slate-200 truncate font-bold max-w-[45%] sm:max-w-none">
-                        {hostPlayer?.name}
-                      </span>
-                      <div className="flex items-center gap-1.5 flex-shrink-0">
-                        {activeTurn === 'host' && (
-                          <span className="hidden sm:inline text-[9px] px-1.5 py-0.5 rounded bg-indigo-500/30 text-indigo-300 border border-indigo-500/40 whitespace-nowrap">
-                            កំពុងឆ្លើយ
-                          </span>
-                        )}
-                        <span className="text-cyan-400 font-mono font-black text-[11px] sm:text-xs">{isHost ? myScore : opponentScore}<span className="hidden sm:inline"> pts</span></span>
-                      </div>
+                    <div className="flex items-center justify-between gap-0.5 text-[10px] sm:text-xs font-semibold">
+                      <span className="text-slate-200 truncate font-bold">{hostPlayer?.name}</span>
+                      <span className="text-cyan-400 font-mono font-black text-[10px] sm:text-xs flex-shrink-0">{isHost ? myScore : opponentScore}</span>
                     </div>
-
-                    {/* 6 Correct Progress Meter */}
-                    <div className="flex items-center gap-1 sm:gap-1.5 mt-1">
-                      <span className="text-[9px] sm:text-[10px] font-mono text-emerald-400 font-black flex items-center gap-0.5 flex-shrink-0">
-                        <Trophy className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-400" /> {hostCorrectCount}/6
+                    <div className="flex items-center gap-0.5 sm:gap-1.5 mt-0.5 sm:mt-1">
+                      <span className="text-[8px] sm:text-[10px] font-mono text-emerald-400 font-black flex items-center gap-0.5 flex-shrink-0">
+                        <Trophy className="w-2 h-2 sm:w-3 sm:h-3 text-amber-400" /> {hostCorrectCount}/6
                       </span>
-                      <div className="flex-1 h-1.5 sm:h-2 bg-slate-900 rounded-full overflow-hidden flex gap-0.5 sm:gap-1 p-0.5 border border-slate-800">
+                      <div className="flex-1 h-1 sm:h-2 bg-slate-900 rounded-full overflow-hidden flex gap-px sm:gap-0.5 p-px border border-slate-800">
                         {[...Array(6)].map((_, i) => (
-                          <div
-                            key={i}
-                            className={`flex-1 h-full rounded-full transition-all duration-300 ${
-                              i < hostCorrectCount 
-                                ? 'bg-gradient-to-r from-emerald-400 to-teal-400 shadow-[0_0_8px_rgba(52,211,153,0.9)]' 
-                                : 'bg-slate-800'
-                            }`}
-                          />
+                          <div key={i} className={`flex-1 h-full rounded-full transition-all duration-300 ${i < hostCorrectCount ? 'bg-gradient-to-r from-emerald-400 to-teal-400 shadow-[0_0_6px_rgba(52,211,153,0.8)]' : 'bg-slate-800'}`} />
                         ))}
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {/* Round & Target Badge — compact pill on mobile, centered block on sm+ */}
-                <div className="flex sm:flex-col items-center justify-center gap-1.5 sm:gap-0.5 px-2 py-1 sm:py-0 sm:px-0 order-first sm:order-none self-center">
-                  <span className="text-[10px] font-mono text-slate-400 font-bold whitespace-nowrap">
-                    {currentQIndex + 1}/{questions.length}
-                  </span>
-                  <span className="text-[9px] text-amber-400 font-mono font-black whitespace-nowrap">Win: 6</span>
+                {/* Center: Round & Win Target */}
+                <div className="flex flex-col items-center justify-center px-1 sm:px-2">
+                  <span className="text-[9px] sm:text-[10px] font-mono text-slate-400 font-bold whitespace-nowrap">{currentQIndex + 1}/{questions.length}</span>
+                  <span className="text-[8px] sm:text-[9px] text-amber-400 font-mono font-black whitespace-nowrap">Win: 6</span>
                 </div>
 
                 {/* Challenger HUD */}
-                <div className={`flex-1 flex items-center gap-2 sm:gap-3 p-2 sm:p-2.5 rounded-xl transition-all min-w-0 ${
+                <div className={`flex items-center gap-1.5 sm:gap-2.5 p-1.5 sm:p-2.5 rounded-lg sm:rounded-xl transition-all min-w-0 ${
                   activeTurn === 'challenger' 
-                    ? 'bg-rose-950/60 border border-rose-500/70 shadow-lg shadow-rose-950/50 ring-2 ring-rose-500/40' 
+                    ? 'bg-rose-950/60 border border-rose-500/70 shadow-lg shadow-rose-950/50 ring-1 sm:ring-2 ring-rose-500/40' 
                     : 'opacity-70 bg-slate-900/40 border border-slate-800'
                 }`}>
                   <div className="min-w-0 flex-1">
-                    <div className="flex items-center justify-between gap-1 text-[11px] sm:text-xs font-semibold">
-                      <span className="text-rose-400 font-mono font-black text-[11px] sm:text-xs flex-shrink-0">{!isHost ? myScore : opponentScore}<span className="hidden sm:inline"> pts</span></span>
-                      <div className="flex items-center gap-1.5 min-w-0">
-                        {activeTurn === 'challenger' && (
-                          <span className="hidden sm:inline text-[9px] px-1.5 py-0.5 rounded bg-rose-500/30 text-rose-300 border border-rose-500/40 whitespace-nowrap">
-                            កំពុងឆ្លើយ
-                          </span>
-                        )}
-                        <span className="text-slate-200 truncate font-bold max-w-[70%] sm:max-w-none">
-                          {challengerPlayer?.name}
-                        </span>
-                      </div>
+                    <div className="flex items-center justify-between gap-0.5 text-[10px] sm:text-xs font-semibold">
+                      <span className="text-rose-400 font-mono font-black text-[10px] sm:text-xs flex-shrink-0">{!isHost ? myScore : opponentScore}</span>
+                      <span className="text-slate-200 truncate font-bold text-right">{challengerPlayer?.name}</span>
                     </div>
-
-                    {/* 6 Correct Progress Meter */}
-                    <div className="flex items-center gap-1 sm:gap-1.5 mt-1">
-                      <div className="flex-1 h-1.5 sm:h-2 bg-slate-900 rounded-full overflow-hidden flex gap-0.5 sm:gap-1 p-0.5 border border-slate-800">
+                    <div className="flex items-center gap-0.5 sm:gap-1.5 mt-0.5 sm:mt-1">
+                      <div className="flex-1 h-1 sm:h-2 bg-slate-900 rounded-full overflow-hidden flex gap-px sm:gap-0.5 p-px border border-slate-800">
                         {[...Array(6)].map((_, i) => (
-                          <div
-                            key={i}
-                            className={`flex-1 h-full rounded-full transition-all duration-300 ${
-                              i < challengerCorrectCount 
-                                ? 'bg-gradient-to-r from-rose-400 to-pink-400 shadow-[0_0_8px_rgba(251,113,133,0.9)]' 
-                                : 'bg-slate-800'
-                            }`}
-                          />
+                          <div key={i} className={`flex-1 h-full rounded-full transition-all duration-300 ${i < challengerCorrectCount ? 'bg-gradient-to-r from-rose-400 to-pink-400 shadow-[0_0_6px_rgba(251,113,133,0.8)]' : 'bg-slate-800'}`} />
                         ))}
                       </div>
-                      <span className="text-[9px] sm:text-[10px] font-mono text-rose-400 font-black flex items-center gap-0.5 flex-shrink-0">
-                        <Trophy className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-400" /> {challengerCorrectCount}/6
+                      <span className="text-[8px] sm:text-[10px] font-mono text-rose-400 font-black flex items-center gap-0.5 flex-shrink-0">
+                        <Trophy className="w-2 h-2 sm:w-3 sm:h-3 text-amber-400" /> {challengerCorrectCount}/6
                       </span>
                     </div>
                   </div>
-
                   <div className="relative flex-shrink-0">
                     <PlayerAvatarWithFrame
                       avatar={challengerPlayer?.avatar}
@@ -2138,7 +2097,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                       size="sm"
                     />
                     {activeTurn === 'challenger' && (
-                      <div className="absolute -top-1 -right-1 w-3 h-3 bg-rose-400 rounded-full animate-ping" />
+                      <div className="absolute -top-0.5 -right-0.5 w-2 h-2 sm:w-3 sm:h-3 bg-rose-400 rounded-full animate-ping" />
                     )}
                   </div>
                 </div>
@@ -2146,53 +2105,45 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
               </div>
             </div>
 
-            {/* ── Turn Announcement Banner ── Responsive text */}
-            <div className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border text-center text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all ${
+            {/* ── Turn Announcement Banner */}
+            <div className={`p-2 sm:p-3 rounded-xl sm:rounded-2xl border text-center text-[10px] sm:text-xs font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all ${
               isMyTurn
                 ? 'bg-gradient-to-r from-indigo-600/20 via-purple-600/25 to-indigo-600/20 border-indigo-500/50 text-indigo-200 shadow-md ring-1 ring-indigo-400/40'
                 : 'bg-slate-900/80 border-slate-800 text-slate-400'
             }`}>
               {isMyTurn ? (
                 <>
-                  <Zap className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 animate-bounce flex-shrink-0" />
-                  <span className="leading-snug">
-                    <strong className="hidden sm:inline">ដល់វេនរបស់អ្នកឆ្លើយ (Your Turn)</strong>
-                    <strong className="sm:hidden">វេនអ្នក (Your Turn)</strong>
-                    <span className="hidden sm:inline"> — ជ្រើសរើសចម្លើយត្រឹមត្រូវខាងក្រោម</span>
-                    {' '}({secondsLeft}s)
+                  <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400 animate-bounce flex-shrink-0" />
+                  <span>
+                    <strong>វេនអ្នក (Your Turn)</strong> ({secondsLeft}s)
                   </span>
                 </>
               ) : (
                 <>
-                  <Clock className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 animate-spin flex-shrink-0" style={{ animationDuration: '4s' }} />
-                  <span className="leading-snug">
-                    <span className="hidden sm:inline">វេនរបស់ <strong>{activePlayerName}</strong> កំពុងឆ្លើយ... សូមរង់ចាំឆ្លាស់វេន</span>
-                    <span className="sm:hidden"><strong>{activePlayerName}</strong> កំពុងឆ្លើយ...</span>
-                  </span>
+                  <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-slate-400 animate-spin flex-shrink-0" style={{ animationDuration: '4s' }} />
+                  <span><strong>{activePlayerName}</strong> កំពុងឆ្លើយ...</span>
                 </>
               )}
             </div>
 
-            {/* ── Question Card ── Never clips text, wraps gracefully on all screens */}
-            <div className="bg-gradient-to-b from-[#0e1730] to-[#080d1e] rounded-2xl sm:rounded-3xl p-4 sm:p-6 md:p-8 text-center border border-slate-700/60 shadow-xl relative overflow-hidden">
-              {/* Decorative subtle glow */}
+            {/* ── Question Card */}
+            <div className="bg-gradient-to-b from-[#0e1730] to-[#080d1e] rounded-xl sm:rounded-3xl p-3 sm:p-6 md:p-8 text-center border border-slate-700/60 shadow-xl relative overflow-hidden">
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-20 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-              <span className="text-[9px] sm:text-[10px] font-black text-indigo-400 uppercase tracking-widest block mb-2 font-mono relative z-[1]">
+              <span className="text-[8px] sm:text-[10px] font-black text-indigo-400 uppercase tracking-widest block mb-1.5 sm:mb-2 font-mono relative z-[1]">
                 {`${currentQ?.subject ? currentQ.subject + ' • ' : ''}${currentQ?.category || (selectedStream === 'social' ? 'Social Science' : 'Natural Science')} #${currentQIndex + 1}`}
               </span>
               <h3
-                className="text-sm sm:text-lg md:text-2xl font-black text-white leading-relaxed relative z-[1]"
+                className="text-[13px] sm:text-lg md:text-2xl font-black text-white leading-relaxed relative z-[1]"
                 style={{ overflowWrap: 'anywhere', wordBreak: 'break-word', hyphens: 'auto' }}
               >
                 {currentQ.q}
               </h3>
             </div>
 
-            {/* ── 4 Answer Options ── Single column on mobile, 2 cols on sm+ */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+            {/* ── 4 Answer Options */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-3">
               {currentQ.options.map((option, idx) => {
                 const config = BUTTON_CONFIGS[idx % 4];
-
                 const isSelectedByPlayer = turnResult && turnResult.selectedIdx === idx;
                 const isCorrectOption = idx === currentQ.answer;
 
@@ -2218,24 +2169,21 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                     type="button"
                     disabled={!isMyTurn || turnStatus === 'turn_ended'}
                     onClick={() => handleSelectOption(idx)}
-                    className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl border flex items-center gap-2.5 sm:gap-3.5 transition-all text-left ${
+                    className={`p-2.5 sm:p-4 rounded-xl sm:rounded-2xl border flex items-center gap-2 sm:gap-3.5 transition-all text-left ${
                       isMyTurn && turnStatus === 'playing' 
                         ? 'cursor-pointer hover:border-indigo-400 hover:bg-slate-800/90 active:scale-[0.98] shadow-md' 
                         : ''
                     } ${btnStyle}`}
                   >
-                    {/* Number Badge */}
-                    <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl border flex items-center justify-center flex-shrink-0 font-mono font-black text-xs sm:text-sm shadow-xs ${config.badge}`}>
+                    <div className={`w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl border flex items-center justify-center flex-shrink-0 font-mono font-black text-[11px] sm:text-sm shadow-xs ${config.badge}`}>
                       {config.num}
                     </div>
                     <span
-                      className="text-xs sm:text-sm font-bold flex-1 leading-snug"
+                      className="text-[11px] sm:text-sm font-bold flex-1 leading-snug"
                       style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}
                     >
                       {option}
                     </span>
-
-                    {/* Result Icon on Reveal */}
                     {turnStatus === 'turn_ended' && isCorrectOption && (
                       <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 flex-shrink-0 animate-bounce" />
                     )}
@@ -2247,45 +2195,36 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
               })}
             </div>
 
-            {/* ── Turn Result & 3-2-1 Countdown Bar ── Responsive footer */}
-            <div className="bg-[#0a1226]/90 backdrop-blur-sm rounded-xl sm:rounded-2xl p-2.5 sm:p-3.5 border border-slate-700/60 text-[11px] sm:text-xs animate-fade-in min-h-[44px] sm:min-h-[52px] shadow-md">
+            {/* ── Turn Result & Countdown ── ALWAYS single row */}
+            <div className="bg-[#0a1226]/90 backdrop-blur-sm rounded-xl sm:rounded-2xl p-2 sm:p-3.5 border border-slate-700/60 text-[10px] sm:text-xs animate-fade-in shadow-md">
               {turnStatus === 'playing' ? (
-                <div className="flex items-center gap-2 text-slate-300 font-medium">
-                  <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 flex-shrink-0" />
-                  <span className="leading-snug">
+                <div className="flex items-center gap-1.5 sm:gap-2 text-slate-300 font-medium">
+                  <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400 flex-shrink-0" />
+                  <span>
                     {isMyTurn
-                      ? <><span className="hidden sm:inline">ជ្រើសរើសចម្លើយមួយខាងលើ (15s)...</span><span className="sm:hidden">ជ្រើសចម្លើយ ({secondsLeft}s)...</span></>
-                      : <><span className="hidden sm:inline">កំពុងរង់ចាំ {activePlayerName} ជ្រើសរើសចម្លើយ...</span><span className="sm:hidden">រង់ចាំ {activePlayerName}...</span></>}
+                      ? `ជ្រើសចម្លើយ (${secondsLeft}s)...`
+                      : `រង់ចាំ ${activePlayerName}...`}
                   </span>
                 </div>
               ) : (
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                  <div className="flex items-center gap-1.5 min-w-0">
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-1 min-w-0">
                     {turnResult?.isCorrect ? (
-                      <span className="text-emerald-400 font-black flex items-center gap-1 leading-snug">
-                        <CheckCircle2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-400 flex-shrink-0" /> 
-                        <span className="truncate">
-                          <span className="hidden sm:inline">{activePlayerName} ឆ្លើយត្រឹមត្រូវ! (+{turnResult.scoreEarned} pts) [{activeTurn === 'host' ? hostCorrectCount : challengerCorrectCount}/6]</span>
-                          <span className="sm:hidden">✓ +{turnResult.scoreEarned}pts [{activeTurn === 'host' ? hostCorrectCount : challengerCorrectCount}/6]</span>
-                        </span>
+                      <span className="text-emerald-400 font-black flex items-center gap-1 truncate">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                        <span className="truncate">✓ +{turnResult.scoreEarned}pts [{activeTurn === 'host' ? hostCorrectCount : challengerCorrectCount}/6]</span>
                       </span>
                     ) : (
-                      <span className="text-rose-400 font-black flex items-center gap-1 leading-snug">
-                        <XCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-400 flex-shrink-0" /> 
-                        <span className="truncate">
-                          <span className="hidden sm:inline">{activePlayerName} {turnResult?.isTimeout ? 'អស់ពេលឆ្លើយ' : 'ឆ្លើយមិនត្រឹមត្រូវ'}</span>
-                          <span className="sm:hidden">{turnResult?.isTimeout ? 'អស់ពេល' : 'មិនត្រឹមត្រូវ'}</span>
-                        </span>
+                      <span className="text-rose-400 font-black flex items-center gap-1 truncate">
+                        <XCircle className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
+                        <span className="truncate">{turnResult?.isTimeout ? 'អស់ពេល' : 'មិនត្រឹមត្រូវ'}</span>
                       </span>
                     )}
                   </div>
-
-                  <div className="flex items-center gap-1.5 sm:gap-2 bg-indigo-600/25 px-2.5 sm:px-3 py-1 sm:py-1.5 rounded-lg sm:rounded-xl border border-indigo-500/40 text-indigo-200 font-black font-mono shadow-sm self-end sm:self-auto flex-shrink-0">
-                    <span className="leading-snug">
-                      <span className="hidden sm:inline">ឆ្លាស់វេនទៅ {nextPlayerName} ក្នុង</span>
-                      <span className="sm:hidden">វេនបន្ទាប់</span>
-                    </span>
-                    <span className="w-5 h-5 sm:w-6 sm:h-6 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px] sm:text-xs animate-bounce shadow-md flex-shrink-0">
+                  <div className="flex items-center gap-1.5 bg-indigo-600/25 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-indigo-500/40 text-indigo-200 font-black font-mono flex-shrink-0">
+                    <span className="hidden sm:inline">វេនបន្ទាប់</span>
+                    <span className="sm:hidden">Next</span>
+                    <span className="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px] animate-bounce shadow-md">
                       {nextTurnCountdown}
                     </span>
                   </div>
