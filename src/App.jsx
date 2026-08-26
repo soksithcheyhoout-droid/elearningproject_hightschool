@@ -141,20 +141,24 @@ function MainApp() {
     const myId = String(student.id || '');
     const myUsername = (student.username || '').toLowerCase();
 
-    // 1. Polling fallback (every 1.5 seconds)
+    // 1. Polling fallback (every 1.0 second for instant sync across devices)
     const checkInvites = async () => {
       try {
         const res = await api.getStudentInvites(student.id || student.username);
-        if (res && Array.isArray(res.invites) && res.invites.length > 0) {
-          const latest = res.invites[res.invites.length - 1];
-          if (latest && latest.status === 'pending') {
+        if (res && Array.isArray(res.invites)) {
+          const activePending = res.invites.filter((i) => i.status === 'pending');
+          if (activePending.length > 0) {
+            const latest = activePending[activePending.length - 1];
             setIncomingInvite(latest);
+          } else {
+            // If server has no pending invites (canceled by host or expired), DISMISS IMMEDIATELY!
+            setIncomingInvite(null);
           }
         }
       } catch (e) {}
     };
 
-    const timer = setInterval(checkInvites, 1500);
+    const timer = setInterval(checkInvites, 1000);
 
     // 2. BroadcastChannel for instant zero-latency popup across browser tabs
     let bc = null;
@@ -172,7 +176,7 @@ function MainApp() {
         } else if (e.data && e.data.type === 'CANCEL_INVITE') {
           setIncomingInvite((curr) => {
             if (!curr) return null;
-            if (curr.roomCode === e.data.roomCode || String(curr.toStudentId) === String(e.data.toStudentId)) {
+            if (!e.data.toStudentId || String(curr.toStudentId) === String(e.data.toStudentId) || curr.roomCode === e.data.roomCode) {
               return null;
             }
             return curr;
@@ -191,16 +195,6 @@ function MainApp() {
     try {
       playSound.click();
       
-      // 1. Verify if room is alive and host is still waiting
-      const check = await api.getArenaRoom(inv.roomCode);
-      if (!check || !check.success || !check.room || check.room.status === 'host_left' || check.room.hostLeft || !check.room.host) {
-        playSound.wrong();
-        setIncomingInvite(null);
-        setMatchCanceledToast('ម្ចាស់បន្ទប់ (Admin) បានបោះបង់ ឬបិទការប្រកួតហើយ!');
-        setTimeout(() => setMatchCanceledToast(''), 4500);
-        return;
-      }
-
       const studentPayload = {
         id: student.id || 1,
         name: student.name || student.fullName || student.username,
@@ -212,7 +206,27 @@ function MainApp() {
         avatar: api.formatAvatarUrl(student.avatar),
         avatarFrame: student.avatarFrame || student.avatar_frame || ''
       };
-      await api.respondMatchInvite(inv.id, studentPayload, true);
+
+      // 1. Respond and verify invitation is still valid on server
+      const respondRes = await api.respondMatchInvite(inv.id, studentPayload, true);
+      if (!respondRes || !respondRes.success || respondRes.canceled || respondRes.error) {
+        playSound.wrong();
+        setIncomingInvite(null);
+        setMatchCanceledToast('ម្ចាស់បន្ទប់ (Admin) បានបោះបង់ ឬបិទការប្រកួតហើយ!');
+        setTimeout(() => setMatchCanceledToast(''), 4500);
+        return;
+      }
+
+      // 2. Verify if room is alive and host is still waiting
+      const check = await api.getArenaRoom(inv.roomCode);
+      if (!check || !check.success || !check.room || check.room.status === 'host_left' || check.room.hostLeft || !check.room.host) {
+        playSound.wrong();
+        setIncomingInvite(null);
+        setMatchCanceledToast('ម្ចាស់បន្ទប់ (Admin) បានបោះបង់ ឬបិទការប្រកួតហើយ!');
+        setTimeout(() => setMatchCanceledToast(''), 4500);
+        return;
+      }
+
       setDuelRoomCode(inv.roomCode);
       setDuelHostStudent(check.room.host || inv.fromStudent);
       setIsDuelOpen(true);

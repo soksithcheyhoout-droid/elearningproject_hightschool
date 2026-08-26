@@ -284,13 +284,11 @@ export const cancelInvite = (req, res) => {
     if (inviteId && pendingInvites.has(inviteId)) {
       pendingInvites.delete(inviteId);
     }
-    if (roomCode) {
-      for (const [id, inv] of pendingInvites.entries()) {
-        if (inv.roomCode === roomCode) {
-          if (!toStudentId || String(inv.toStudentId) === String(toStudentId)) {
-            pendingInvites.delete(id);
-          }
-        }
+    for (const [id, inv] of pendingInvites.entries()) {
+      const matchRoom = !roomCode || inv.roomCode === roomCode;
+      const matchStudent = !toStudentId || String(inv.toStudentId) === String(toStudentId);
+      if (matchRoom && matchStudent) {
+        pendingInvites.delete(id);
       }
     }
     return res.json({ success: true, message: 'Invite canceled successfully' });
@@ -307,7 +305,10 @@ export const respondInvite = (req, res) => {
     const { student, accept } = req.body;
     const invite = pendingInvites.get(inviteId);
     if (!invite) {
-      return res.status(404).json({ error: 'Invitation expired or not found' });
+      return res.status(404).json({ 
+        error: 'ការអញ្ជើញត្រូវបានបោះបង់ ឬផុតកំណត់ហើយ (Invitation canceled or expired)', 
+        canceled: true 
+      });
     }
 
     invite.status = accept ? 'accepted' : 'declined';
@@ -315,12 +316,18 @@ export const respondInvite = (req, res) => {
 
     if (accept && student) {
       const room = activeRooms.get(invite.roomCode);
-      if (room) {
+      if (room && room.status !== 'host_left' && !room.hostLeft && room.host) {
         room.challenger = student;
         room.challengerReady = false;
         room.challengerLeft = false;
         room.status = 'waiting_ready';
         room.lastActive = Date.now();
+      } else {
+        pendingInvites.delete(inviteId);
+        return res.status(404).json({
+          error: 'ម្ចាស់បន្ទប់ (Admin) បានបោះបង់ ឬបិទការប្រកួតហើយ!',
+          canceled: true
+        });
       }
     } else if (!accept) {
       // Auto-delete declined invite after 4.8 seconds

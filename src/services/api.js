@@ -630,6 +630,24 @@ export const api = {
   },
 
   getStudentInvites: async (studentId) => {
+    try {
+      const res = await fetch(`${API_BASE}/arena/invitations/${studentId}`);
+      if (res.ok) {
+        const data = await res.json();
+        if (data && Array.isArray(data.invites)) {
+          // Keep local storage in sync with authoritative server state
+          try {
+            const active = JSON.parse(localStorage.getItem('khmer_elearn_invites') || '[]');
+            const activeServerIds = new Set(data.invites.map(i => i.id));
+            const synced = active.filter(i => activeServerIds.has(i.id));
+            localStorage.setItem('khmer_elearn_invites', JSON.stringify(synced));
+          } catch (e) {}
+          return data;
+        }
+      }
+    } catch (err) {}
+
+    // Fallback only if offline / server disconnected
     let localInvites = [];
     try {
       const active = JSON.parse(localStorage.getItem('khmer_elearn_invites') || '[]');
@@ -639,16 +657,6 @@ export const api = {
         Date.now() - i.timestamp < 25000
       );
     } catch (e) {}
-
-    try {
-      const res = await fetch(`${API_BASE}/arena/invitations/${studentId}`);
-      if (res.ok) {
-        const data = await res.json();
-        if (data && Array.isArray(data.invites) && data.invites.length > 0) {
-          return data;
-        }
-      }
-    } catch (err) {}
 
     return { invites: localInvites };
   },
@@ -676,9 +684,13 @@ export const api = {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ student, accept })
       });
-      return await res.json();
+      const data = await res.json();
+      if (!res.ok || data.error || data.canceled) {
+        return { success: false, canceled: true, error: data?.error || 'ការអញ្ជើញត្រូវបានបោះបង់ហើយ' };
+      }
+      return data;
     } catch (err) {
-      return { success: true };
+      return { success: false, error: 'Network connection failed' };
     }
   },
 
