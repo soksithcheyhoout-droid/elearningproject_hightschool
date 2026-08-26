@@ -82,6 +82,7 @@ function MainApp() {
   const [duelRoomCode, setDuelRoomCode] = useState(null);
   const [duelHostStudent, setDuelHostStudent] = useState(null);
   const [incomingInvite, setIncomingInvite] = useState(null);
+  const [matchCanceledToast, setMatchCanceledToast] = useState('');
   const [isSearchModalOpen, setIsSearchModalOpen] = useState(false);
 
   // Grand MoEYS Entrance Intro Splash Animation State (Session-Aware for instant repeat navigation)
@@ -118,9 +119,11 @@ function MainApp() {
   const setTabAndUrl = (tab) => {
     setActiveTab(tab);
     const targetPath = tab === 'home' ? '/' : `/${tab}`;
-    if (window.location.pathname !== targetPath) {
-      window.history.pushState({ tab }, '', targetPath);
-    }
+    try {
+      if (window.location.pathname !== targetPath) {
+        window.history.pushState(null, '', targetPath);
+      }
+    } catch (e) {}
   };
 
   useEffect(() => {
@@ -131,20 +134,22 @@ function MainApp() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Real-Time Match Invitation Listener & Poller for Current Logged-in Student
+  // Real-Time Incoming Match Invitations Polling & Syncing (Cross-Tabs & Cross-Users)
   useEffect(() => {
     if (!student?.id && !student?.username) return;
 
-    const myId = String(student?.id || '');
-    const myUsername = (student?.username || '').toLowerCase();
+    const myId = String(student.id || '');
+    const myUsername = (student.username || '').toLowerCase();
 
-    // 1. Poller
+    // 1. Polling fallback (every 1.5 seconds)
     const checkInvites = async () => {
       try {
-        const res = await api.getStudentInvites(student?.id || student?.username);
-        if (res && res.invites && res.invites.length > 0) {
-          const latest = res.invites[0];
-          setIncomingInvite(latest);
+        const res = await api.getStudentInvites(student.id || student.username);
+        if (res && Array.isArray(res.invites) && res.invites.length > 0) {
+          const latest = res.invites[res.invites.length - 1];
+          if (latest && latest.status === 'pending') {
+            setIncomingInvite(latest);
+          }
         }
       } catch (e) {}
     };
@@ -164,6 +169,14 @@ function MainApp() {
               playSound.click();
             } catch (err) {}
           }
+        } else if (e.data && e.data.type === 'CANCEL_INVITE') {
+          setIncomingInvite((curr) => {
+            if (!curr) return null;
+            if (curr.roomCode === e.data.roomCode || String(curr.toStudentId) === String(e.data.toStudentId)) {
+              return null;
+            }
+            return curr;
+          });
         }
       };
     }
@@ -177,6 +190,17 @@ function MainApp() {
   const handleAcceptInvite = async (inv) => {
     try {
       playSound.click();
+      
+      // 1. Verify if room is alive and host is still waiting
+      const check = await api.getArenaRoom(inv.roomCode);
+      if (!check || !check.success || !check.room || check.room.status === 'host_left' || check.room.hostLeft || !check.room.host) {
+        playSound.wrong();
+        setIncomingInvite(null);
+        setMatchCanceledToast('ម្ចាស់បន្ទប់ (Admin) បានបោះបង់ ឬបិទការប្រកួតហើយ!');
+        setTimeout(() => setMatchCanceledToast(''), 4500);
+        return;
+      }
+
       const studentPayload = {
         id: student.id || 1,
         name: student.name || student.fullName || student.username,
@@ -190,10 +214,15 @@ function MainApp() {
       };
       await api.respondMatchInvite(inv.id, studentPayload, true);
       setDuelRoomCode(inv.roomCode);
-      setDuelHostStudent(inv.fromStudent);
+      setDuelHostStudent(check.room.host || inv.fromStudent);
       setIsDuelOpen(true);
       setIncomingInvite(null);
-    } catch (e) {}
+    } catch (e) {
+      playSound.wrong();
+      setIncomingInvite(null);
+      setMatchCanceledToast('ម្ចាស់បន្ទប់ (Admin) បានបោះបង់ ឬបិទការប្រកួតហើយ!');
+      setTimeout(() => setMatchCanceledToast(''), 4500);
+    }
   };
 
   const handleDeclineInvite = async (inv) => {
@@ -407,6 +436,29 @@ function MainApp() {
         </main>
 
       </div>
+
+      {/* Real-Time Match Canceled Notification Toast */}
+      {matchCanceledToast && (
+        <div className="fixed top-4 left-1/2 -translate-x-1/2 z-[10002] w-[96%] max-w-md animate-slide-down font-kantumruy">
+          <div className="bg-rose-950/95 backdrop-blur-xl border border-rose-500/80 text-white rounded-2xl px-4 py-3 shadow-[0_8px_32px_rgba(244,63,94,0.5)] flex items-center justify-between gap-3">
+            <div className="flex items-center gap-3 min-w-0">
+              <div className="w-8 h-8 rounded-xl bg-rose-500/20 border border-rose-400/40 flex items-center justify-center flex-shrink-0">
+                <X className="w-4 h-4 text-rose-300" />
+              </div>
+              <p className="text-xs sm:text-sm font-bold text-rose-100 truncate">
+                {matchCanceledToast}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={() => setMatchCanceledToast('')}
+              className="p-1 rounded-lg text-rose-300 hover:text-white hover:bg-rose-800/40 transition-colors cursor-pointer flex-shrink-0"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Real-Time Floating Incoming Match Invitation Alert Toast */}
       {incomingInvite && !isDuelOpen && (

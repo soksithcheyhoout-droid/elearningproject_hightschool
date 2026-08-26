@@ -21,6 +21,7 @@ import {
   requestRematch,
   kickChallenger,
   sendInvite,
+  cancelInvite,
   getStudentInvites,
   respondInvite,
   getRoomInviteStatus
@@ -73,6 +74,7 @@ router.post('/arena/room/:roomCode/rematch', requestRematch);
 router.post('/arena/room/:roomCode/leave', leaveRoom);
 router.get('/arena/invitations/:studentId', getStudentInvites);
 router.post('/arena/invite/send', sendInvite);
+router.post('/arena/invite/cancel', cancelInvite);
 router.post('/arena/invite/respond', respondInvite);
 router.get('/arena/invite/status/:roomCode', getRoomInviteStatus);
 

@@ -583,7 +583,7 @@ export const api = {
     // Instant multi-tab synchronization via localStorage & BroadcastChannel
     try {
       const active = JSON.parse(localStorage.getItem('khmer_elearn_invites') || '[]');
-      const clean = active.filter(i => Date.now() - i.timestamp < 60000);
+      const clean = active.filter(i => Date.now() - i.timestamp < 25000);
       clean.push(inviteObj);
       localStorage.setItem('khmer_elearn_invites', JSON.stringify(clean));
 
@@ -605,6 +605,30 @@ export const api = {
     }
   },
 
+  cancelMatchInvite: async (roomCode, toStudentId) => {
+    try {
+      const active = JSON.parse(localStorage.getItem('khmer_elearn_invites') || '[]');
+      const cleaned = active.filter(i => !(i.roomCode === roomCode && (!toStudentId || String(i.toStudentId) === String(toStudentId))));
+      localStorage.setItem('khmer_elearn_invites', JSON.stringify(cleaned));
+
+      if (typeof BroadcastChannel !== 'undefined') {
+        const bc = new BroadcastChannel('khmer_elearn_arena_channel');
+        bc.postMessage({ type: 'CANCEL_INVITE', roomCode, toStudentId });
+      }
+    } catch (e) {}
+
+    try {
+      const res = await fetch(`${API_BASE}/arena/invite/cancel`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ roomCode, toStudentId })
+      });
+      return await res.json();
+    } catch (err) {
+      return { success: true };
+    }
+  },
+
   getStudentInvites: async (studentId) => {
     let localInvites = [];
     try {
@@ -612,7 +636,7 @@ export const api = {
       localInvites = active.filter(i => 
         (String(i.toStudentId) === String(studentId) || (i.toUsername && i.toUsername === studentId)) && 
         i.status === 'pending' && 
-        Date.now() - i.timestamp < 60000
+        Date.now() - i.timestamp < 25000
       );
     } catch (e) {}
 

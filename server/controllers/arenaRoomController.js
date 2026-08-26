@@ -83,8 +83,11 @@ export const joinRoom = (req, res) => {
     }
 
     const room = activeRooms.get(roomCode);
-    if (!room) {
-      return res.status(404).json({ error: 'រកមិនឃើញបន្ទប់ប្រកួតនេះទេ (Room not found)' });
+    if (!room || room.status === 'host_left' || room.hostLeft || !room.host) {
+      return res.status(404).json({ 
+        error: 'ម្ចាស់បន្ទប់ (Admin) បានបោះបង់ ឬបិទការប្រកួតហើយ! (Host has canceled the match)',
+        canceled: true 
+      });
     }
 
     // Reset kicked and challenger-left flags upon valid join/re-entry
@@ -106,8 +109,11 @@ export const getRoom = (req, res) => {
   try {
     const { roomCode } = req.params;
     const room = activeRooms.get(roomCode);
-    if (!room) {
-      return res.status(404).json({ error: 'Room not found' });
+    if (!room || room.status === 'host_left' || room.hostLeft || !room.host) {
+      return res.status(404).json({ 
+        error: 'ម្ចាស់បន្ទប់ (Admin) បានបោះបង់ ឬបិទការប្រកួតហើយ! (Host has canceled the match)',
+        canceled: true 
+      });
     }
     room.lastActive = Date.now();
     return res.json({ success: true, room });
@@ -237,7 +243,7 @@ export const sendInvite = (req, res) => {
   }
 };
 
-// Fetch Pending Invitations for a Student
+// Fetch Pending Invitations for a Student (Active rooms only & 25s max TTL)
 export const getStudentInvites = (req, res) => {
   try {
     const { studentId } = req.params;
@@ -246,7 +252,20 @@ export const getStudentInvites = (req, res) => {
     const invites = [];
 
     for (const [id, inv] of pendingInvites.entries()) {
-      if (inv.toStudentId === sId && inv.status === 'pending' && now - inv.timestamp < 3 * 60 * 1000) {
+      // 25 second max TTL
+      if (now - inv.timestamp > 25 * 1000) {
+        pendingInvites.delete(id);
+        continue;
+      }
+
+      // Check if room is still alive & active
+      const room = activeRooms.get(inv.roomCode);
+      if (!room || room.status === 'host_left' || room.hostLeft || !room.host) {
+        pendingInvites.delete(id);
+        continue;
+      }
+
+      if (inv.toStudentId === sId && inv.status === 'pending') {
         invites.push(inv);
       }
     }
@@ -255,6 +274,29 @@ export const getStudentInvites = (req, res) => {
   } catch (err) {
     console.error('[Get Student Invites Error]:', err);
     return res.status(500).json({ error: 'Failed to get invites' });
+  }
+};
+
+// Cancel Sent Match Invitation
+export const cancelInvite = (req, res) => {
+  try {
+    const { roomCode, toStudentId, inviteId } = req.body;
+    if (inviteId && pendingInvites.has(inviteId)) {
+      pendingInvites.delete(inviteId);
+    }
+    if (roomCode) {
+      for (const [id, inv] of pendingInvites.entries()) {
+        if (inv.roomCode === roomCode) {
+          if (!toStudentId || String(inv.toStudentId) === String(toStudentId)) {
+            pendingInvites.delete(id);
+          }
+        }
+      }
+    }
+    return res.json({ success: true, message: 'Invite canceled successfully' });
+  } catch (err) {
+    console.error('[Cancel Invite Error]:', err);
+    return res.status(500).json({ error: 'Failed to cancel invite' });
   }
 };
 

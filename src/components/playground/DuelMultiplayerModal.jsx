@@ -370,6 +370,28 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     return () => clearInterval(cdTimer);
   }, [declinedCooldowns]);
 
+  // Auto-expire pending invites after 20 seconds so host is never stuck
+  useEffect(() => {
+    const hasPending = Object.values(invitedStudentsMap).some((s) => s === 'pending');
+    if (!hasPending) return;
+
+    const timer = setTimeout(() => {
+      setInvitedStudentsMap((prev) => {
+        const next = { ...prev };
+        let changed = false;
+        Object.keys(next).forEach((k) => {
+          if (next[k] === 'pending') {
+            delete next[k];
+            changed = true;
+          }
+        });
+        return changed ? next : prev;
+      });
+    }, 20000);
+
+    return () => clearTimeout(timer);
+  }, [invitedStudentsMap]);
+
   // Invite Modal State
   const [showInviteModal, setShowInviteModal] = useState(false);
   const [inviteSearch, setInviteSearch] = useState('');
@@ -719,7 +741,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
       api.joinArenaRoom(initialRoomCode, currentStudentPayload)
         .then((res) => {
-          if (res && res.success && res.room) {
+          if (res && res.success && res.room && res.room.status !== 'host_left' && !res.room.hostLeft && res.room.host) {
             if (res.room.host) setHostPlayer(res.room.host);
             if (res.room.challenger) setChallengerPlayer(res.room.challenger);
             if (res.room.grade) setSelectedGrade(String(res.room.grade));
@@ -727,7 +749,18 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             if (Array.isArray(res.room.questions) && res.room.questions.length > 0) {
               setQuestions(res.room.questions);
             }
+          } else {
+            setHostWarningNotice('ម្ចាស់បន្ទប់ (Admin) បានបោះបង់ ឬបិទការប្រកួតហើយ!');
+            setTimeout(() => {
+              if (typeof onClose === 'function') onClose();
+            }, 1800);
           }
+        })
+        .catch(() => {
+          setHostWarningNotice('ម្ចាស់បន្ទប់ (Admin) បានបោះបង់ ឬបិទការប្រកួតហើយ!');
+          setTimeout(() => {
+            if (typeof onClose === 'function') onClose();
+          }, 1800);
         });
     } else if (isHost && student) {
       const initialPool = getRandomizedGameQuestions(game, 24, selectedGrade, selectedStream);
@@ -785,12 +818,14 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
           return;
         }
 
-        // Check if opponent left the room (NOT triggered by host kick)
-        if (room.status === 'host_left' || room.hostLeft) {
+        // Check if host canceled / left the room
+        if (room.status === 'host_left' || room.hostLeft || !room.host) {
           if (!isHost) {
-            // Host left — close the modal immediately for challenger
             setChallengerPlayer(null);
-            if (typeof onClose === 'function') onClose();
+            setHostWarningNotice('ម្ចាស់បន្ទប់ (Admin) បានបោះបង់ ឬបិទការប្រកួតហើយ!');
+            setTimeout(() => {
+              if (typeof onClose === 'function') onClose();
+            }, 1800);
             return;
           }
         } else if ((room.status === 'opponent_left' || room.challengerLeft || (isHost && !room.challenger && currentStep !== 'lobby')) && !hostKickedRef.current) {
@@ -983,6 +1018,22 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     } catch (e) { }
   };
 
+  // Cancel Sent Match Invitation
+  const handleCancelInvite = async (user) => {
+    if (soundEnabled) playSound.click();
+    setInvitedStudentsMap((prev) => {
+      const copy = { ...prev };
+      delete copy[user.id];
+      return copy;
+    });
+    setInviteFeedback(`បានបោះបង់ការអញ្ជើញទៅកាន់ ${user.full_name || user.username}`);
+    setTimeout(() => setInviteFeedback(''), 2500);
+
+    try {
+      await api.cancelMatchInvite(roomCode, user.id);
+    } catch (e) {}
+  };
+
   // Host Triggers Duel with Ready Validation
   const handleStartDuel = async () => {
     if (!challengerPlayer) {
@@ -1021,7 +1072,16 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     if (soundEnabled) playSound.click();
     try {
       await api.leaveArenaRoom(roomCode, student?.id, student?.username);
+      await api.cancelMatchInvite(roomCode);
     } catch (e) { }
+
+    // Broadcast cancel match to any invited students tabs
+    if (typeof BroadcastChannel !== 'undefined') {
+      try {
+        const bc = new BroadcastChannel('khmer_elearn_arena_channel');
+        bc.postMessage({ type: 'CANCEL_INVITE', roomCode });
+      } catch (e) {}
+    }
 
     // Full state cleanup
     setChallengerPlayer(null);
@@ -2377,6 +2437,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                 onClick={() => {
                   setShowInviteModal(false);
                   setInviteFeedback('');
+                  setInvitedStudentsMap({});
                 }}
                 className="text-slate-400 hover:text-white cursor-pointer"
               >
@@ -2455,9 +2516,20 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                         </div>
 
                         {status === 'pending' ? (
-                          <div className="px-3 py-1.5 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-medium flex items-center gap-1.5 flex-shrink-0">
-                            <Loader2 className="w-3 h-3 animate-spin" />
-                            <span>កំពុងរង់ចាំ...</span>
+                          <div className="flex items-center gap-1.5 flex-shrink-0">
+                            <div className="px-2.5 py-1.5 rounded-lg bg-amber-500/15 border border-amber-500/30 text-amber-300 text-xs font-medium flex items-center gap-1.5">
+                              <Loader2 className="w-3 h-3 animate-spin" />
+                              <span>កំពុងរង់ចាំ...</span>
+                            </div>
+                            <button
+                              type="button"
+                              onClick={() => handleCancelInvite(user)}
+                              className="px-2 py-1.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/30 text-rose-300 border border-rose-500/40 text-[11px] font-bold transition-all cursor-pointer flex items-center gap-1"
+                              title="បោះបង់ការអញ្ជើញ"
+                            >
+                              <X className="w-3 h-3 text-rose-400" />
+                              <span className="hidden sm:inline">បោះបង់</span>
+                            </button>
                           </div>
                         ) : status === 'declined' || (declinedCooldowns[user.id] > 0) ? (
                           <div className="px-3 py-1.5 rounded-lg bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-medium flex items-center gap-1.5 flex-shrink-0 animate-pulse">
@@ -2491,6 +2563,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                 onClick={() => {
                   setShowInviteModal(false);
                   setInviteFeedback('');
+                  setInvitedStudentsMap({});
                 }}
                 className="px-4 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 font-medium text-xs transition-colors cursor-pointer"
               >
