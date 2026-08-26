@@ -274,7 +274,7 @@ function MainApp() {
   }
 
   return (
-    <div className={`${activeTab === 'chat' ? 'h-screen overflow-hidden' : 'min-h-screen'} bg-[#f4f7fb] flex flex-col font-kantumruy relative selection:bg-blue-500 selection:text-white`}>
+    <div className={`${activeTab === 'chat' ? 'h-[100dvh] overflow-hidden' : 'min-h-screen'} bg-[#f4f7fb] flex flex-col font-kantumruy relative selection:bg-blue-500 selection:text-white`}>
       
       {/* 🎓 Subtle Ambient Lighting Orbs */}
       <div className="fixed inset-0 pointer-events-none select-none z-0 overflow-hidden">
@@ -312,7 +312,7 @@ function MainApp() {
         />
 
         {/* Dynamic Center Canvas View */}
-        <main className={`flex-1 flex flex-col min-w-0 ${activeTab === 'chat' ? 'h-[calc(100dvh-64px)] md:h-[calc(100vh-92px)] min-h-0 overflow-hidden p-0' : 'overflow-x-hidden pb-16 md:pb-0'}`}>
+        <main className={`flex-1 flex flex-col min-w-0 ${activeTab === 'chat' ? 'min-h-0 overflow-hidden p-0' : 'overflow-x-hidden pb-16 md:pb-0'}`} style={activeTab === 'chat' ? {minHeight:0, flex:'1 1 0%'} : undefined}>
           
           {/* HOME TAB */}
           {activeTab === 'home' && (

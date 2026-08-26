@@ -1103,7 +1103,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
   });
 
   return (
-    <div className="w-full max-w-[1600px] mx-auto h-full flex-1 flex flex-col bg-white border-0 md:border border-slate-200 rounded-none md:rounded-3xl shadow-none md:shadow-lg overflow-hidden font-kantumruy select-none">
+    <div className="w-full max-w-[1600px] mx-auto h-full flex-1 flex flex-col bg-white border-0 md:border border-slate-200 rounded-none md:rounded-3xl shadow-none md:shadow-lg overflow-hidden font-kantumruy select-none" style={{minHeight:0}}>
       
       {/* Header Bar */}
       <div className="bg-white border-b border-slate-200 px-2.5 sm:px-6 py-2 sm:py-3 flex items-center justify-between gap-2 flex-shrink-0 select-none shadow-2xs">
@@ -1385,7 +1385,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
         {/* RIGHT COLUMN: ACTIVE CHAT CANVAS */}
         <div className={`flex-1 flex flex-col bg-[#f8fafc] overflow-hidden relative ${
           mobileChatView === 'chat' ? 'flex' : 'hidden md:flex'
-        }`}>
+        }`} style={{minHeight:0}}>
           
           {/* Active Chat Header */}
           <div className="bg-white border-b border-slate-200 px-2.5 sm:px-6 py-2 sm:py-3 flex items-center justify-between flex-shrink-0 shadow-2xs gap-1.5">
@@ -1898,7 +1898,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
           </div>
 
           {/* Input Bar Form */}
-          <div className="bg-white border-t border-slate-200 p-1.5 sm:p-3 flex-shrink-0 relative z-40 pb-[max(0.5rem,env(safe-area-inset-bottom))] shadow-xs w-full max-w-full overflow-visible">
+          <div className="bg-white border-t border-slate-200 px-1.5 sm:px-3 py-1.5 sm:py-2.5 flex-shrink-0 relative z-40 shadow-xs w-full max-w-full overflow-visible" style={{paddingBottom:'max(6px, env(safe-area-inset-bottom, 6px))'}}>
             <form onSubmit={handleSendMessage} className="flex items-center gap-1 sm:gap-2 relative w-full max-w-full">
               
               {/* 1. Native Clean Emoji / Reaction Trigger Button */}
@@ -2026,7 +2026,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                 {isGifPickerOpen && (
                   <div 
                     onClick={(e) => e.stopPropagation()}
-                    className="absolute bottom-full left-0 sm:-left-20 mb-3 w-[calc(100vw-32px)] max-w-xs sm:max-w-[460px] bg-white/98 backdrop-blur-2xl rounded-2xl border border-slate-200 shadow-2xl p-3 z-[100] animate-scale-up select-none ring-1 ring-black/10 font-kantumruy drop-shadow-2xl"
+                    className="absolute bottom-full left-0 sm:-left-20 mb-3 w-[calc(100vw-24px)] sm:w-[460px] max-w-[460px] bg-white/98 backdrop-blur-2xl rounded-2xl border border-slate-200 shadow-2xl p-3 z-[100] animate-scale-up select-none ring-1 ring-black/10 font-kantumruy drop-shadow-2xl"
                   >
                     <div className="flex items-center justify-between pb-2 border-b border-slate-100 gap-2">
                       <div className="flex items-center gap-2">
@@ -2074,12 +2074,12 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                       ))}
                     </div>
 
-                    <div className="grid grid-cols-2 gap-2 pt-2 max-h-56 overflow-y-auto pr-1">
+                    <div className="grid grid-cols-2 gap-2 pt-2 max-h-72 sm:max-h-80 overflow-y-auto pr-1 [scrollbar-width:thin]">
                       {filteredGifs.map((gif) => (
                         <div
                           key={gif.id}
                           onClick={() => handleSendGif(gif)}
-                          className="group/gif relative h-24 rounded-2xl overflow-hidden bg-slate-900/10 border border-slate-200 hover:border-indigo-500 shadow-2xs hover:shadow-md cursor-pointer transition-all hover:scale-[1.02]"
+                          className="group/gif relative h-28 sm:h-32 rounded-2xl overflow-hidden bg-slate-900/10 border border-slate-200 hover:border-indigo-500 shadow-2xs hover:shadow-md cursor-pointer transition-all hover:scale-[1.02]"
                         >
                           <img
                             src={gif.url}
