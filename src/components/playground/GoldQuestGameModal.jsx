@@ -35,7 +35,7 @@ export default function GoldQuestGameModal({ game, onClose }) {
   const [soundEnabled, setSoundEnabled] = useState(true);
 
   // Dynamic Randomized Question Pool
-  const [questions, setQuestions] = useState(() => getRandomizedGameQuestions(game, 6));
+  const [questions, setQuestions] = useState(() => getRandomizedGameQuestions(game, 6, student?.grade, student?.stream));
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [gameState, setGameState] = useState('question'); // 'question' | 'chest_pick' | 'game_over'
   const [selectedOption, setSelectedOption] = useState(null);
@@ -118,7 +118,7 @@ export default function GoldQuestGameModal({ game, onClose }) {
   };
 
   const handleRestart = () => {
-    setQuestions(getRandomizedGameQuestions(game, 6));
+    setQuestions(getRandomizedGameQuestions(game, 6, student?.grade, student?.stream));
     setCurrentQIndex(0);
     setGameState('question');
     setSelectedOption(null);

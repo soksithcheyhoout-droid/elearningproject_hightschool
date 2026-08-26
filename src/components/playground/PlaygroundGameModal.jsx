@@ -27,7 +27,7 @@ export default function PlaygroundGameModal({ game, onClose }) {
   const levelInfo = computeLevelData(student.xp);
 
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [questions, setQuestions] = useState(() => getRandomizedGameQuestions(game, 8));
+  const [questions, setQuestions] = useState(() => getRandomizedGameQuestions(game, 8, student?.grade, student?.stream));
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswerSubmitted, setIsAnswerSubmitted] = useState(false);
@@ -41,21 +41,25 @@ export default function PlaygroundGameModal({ game, onClose }) {
   const autoNextTimerRef = useRef(null);
   const countdownIntervalRef = useRef(null);
 
-  // Prevent background scroll & fetch from 12,000 question bank
+  // Prevent background scroll & fetch additional questions if needed
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     let isSubscribed = true;
-    fetchLiveExamQuestions({
-      stream: game?.stream || 'science',
-      subjectKey: game?.subjectKey || '',
-      grade: student?.grade || game?.grade || '12',
-      limit: 12,
-      random: true
-    }).then((livePool) => {
-      if (isSubscribed && Array.isArray(livePool) && livePool.length > 0) {
-        setQuestions(livePool);
-      }
-    });
+
+    // Only fetch live master pool if game has no predefined questions
+    if (!game?.questions || game.questions.length === 0) {
+      fetchLiveExamQuestions({
+        stream: game?.stream || student?.stream || 'science',
+        subjectKey: game?.subjectKey || '',
+        grade: student?.grade || game?.grade || '12',
+        limit: 12,
+        random: true
+      }).then((livePool) => {
+        if (isSubscribed && Array.isArray(livePool) && livePool.length > 0) {
+          setQuestions(livePool);
+        }
+      });
+    }
 
     return () => {
       isSubscribed = false;
@@ -151,7 +155,7 @@ export default function PlaygroundGameModal({ game, onClose }) {
   const handleRestart = () => {
     clearTimeout(autoNextTimerRef.current);
     clearInterval(countdownIntervalRef.current);
-    setQuestions(getRandomizedGameQuestions(game, 6));
+    setQuestions(getRandomizedGameQuestions(game, 8, student?.grade, student?.stream));
     setCurrentQIndex(0);
     setSelectedOption(null);
     setIsAnswerSubmitted(false);

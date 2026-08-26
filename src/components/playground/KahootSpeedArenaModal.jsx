@@ -25,7 +25,7 @@ export default function KahootSpeedArenaModal({ game, onClose }) {
   const { addXP, student } = useAuth();
   const [soundEnabled, setSoundEnabled] = useState(true);
 
-  const [questions, setQuestions] = useState(() => getRandomizedGameQuestions(game, 6));
+  const [questions, setQuestions] = useState(() => getRandomizedGameQuestions(game, 6, student?.grade, student?.stream));
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswerSubmitted, setIsAnswerSubmitted] = useState(false);
@@ -141,7 +141,7 @@ export default function KahootSpeedArenaModal({ game, onClose }) {
   const handleRestart = () => {
     clearTimeout(autoNextTimerRef.current);
     clearInterval(countdownIntervalRef.current);
-    setQuestions(getRandomizedGameQuestions(game, 6));
+    setQuestions(getRandomizedGameQuestions(game, 6, student?.grade, student?.stream));
     setCurrentQIndex(0);
     setSelectedOption(null);
     setIsAnswerSubmitted(false);
