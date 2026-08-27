@@ -111,14 +111,14 @@ const STREAM_THEMES = {
     subtitleKm: 'គណិតវិទ្យា, រូបវិទ្យា, គីមីវិទ្យា, ជីវវិទ្យា',
     icon: Atom,
     accentText: 'text-cyan-400',
-    headerBadge: 'bg-cyan-500/20 text-cyan-300 border-cyan-500/40',
-    headerIconBox: 'bg-cyan-500/20 border border-cyan-500/40 text-cyan-400',
+    headerBadge: 'bg-cyan-500/15 text-cyan-300 border-cyan-400/40',
+    headerIconBox: 'bg-cyan-500/20 border border-cyan-400/50 text-cyan-300 shadow-[0_0_15px_rgba(6,182,212,0.3)]',
     glowBg: 'bg-cyan-500/20',
-    boxBg: 'bg-gradient-to-br from-[#06182c]/95 via-[#081226]/95 to-[#040915]/95',
-    boxBorder: 'border-cyan-500/40 shadow-cyan-950/50 ring-1 ring-cyan-500/20',
-    badgeClass: 'text-cyan-300 bg-cyan-500/20 border-cyan-400/50 shadow-cyan-500/20',
-    cardActive: 'bg-gradient-to-r from-cyan-950/90 via-indigo-950/90 to-blue-950/90 border-cyan-400/80 shadow-lg shadow-cyan-950/60 ring-2 ring-cyan-500/50 scale-[1.01]',
-    cardInactive: 'bg-[#0a1226]/80 border-slate-800 hover:border-slate-700 opacity-70 hover:opacity-100'
+    boxBg: 'bg-[#0a1324]/95',
+    boxBorder: 'border-cyan-500/40 shadow-[0_10px_35px_rgba(6,182,212,0.15)] ring-1 ring-cyan-500/20',
+    badgeClass: 'text-cyan-300 bg-cyan-500/20 border-cyan-400/50 shadow-[0_0_12px_rgba(6,182,212,0.25)]',
+    cardActive: 'bg-gradient-to-br from-[#0c2b48] via-[#091f35] to-[#061424] border-2 border-cyan-400 shadow-[0_0_24px_rgba(6,182,212,0.35)] ring-2 ring-cyan-400/30 scale-[1.01]',
+    cardInactive: 'bg-[#080f1e]/90 border-slate-800/90 hover:border-cyan-500/40 hover:bg-[#0c182e] text-slate-400 hover:text-slate-200 group'
   },
   social: {
     id: 'social',
@@ -128,14 +128,14 @@ const STREAM_THEMES = {
     subtitleKm: 'ភាសាខ្មែរ, ប្រវត្តិវិទ្យា, ភូមិវិទ្យា, សីលធម៌-ពលរដ្ឋ',
     icon: BookOpen,
     accentText: 'text-amber-400',
-    headerBadge: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
-    headerIconBox: 'bg-amber-500/20 border border-amber-500/40 text-amber-400',
+    headerBadge: 'bg-amber-500/15 text-amber-300 border-amber-400/40',
+    headerIconBox: 'bg-amber-500/20 border border-amber-400/50 text-amber-300 shadow-[0_0_15px_rgba(245,158,11,0.3)]',
     glowBg: 'bg-amber-500/20',
-    boxBg: 'bg-gradient-to-br from-[#261505]/95 via-[#1a0f05]/95 to-[#0f0802]/95',
-    boxBorder: 'border-amber-500/40 shadow-amber-950/50 ring-1 ring-amber-500/20',
-    badgeClass: 'text-amber-300 bg-amber-500/20 border-amber-400/50 shadow-amber-500/20',
-    cardActive: 'bg-gradient-to-r from-amber-950/90 via-rose-950/90 to-purple-950/90 border-amber-400/80 shadow-lg shadow-amber-950/60 ring-2 ring-amber-500/50 scale-[1.01]',
-    cardInactive: 'bg-[#0a1226]/80 border-slate-800 hover:border-slate-700 opacity-70 hover:opacity-100'
+    boxBg: 'bg-[#0a1324]/95',
+    boxBorder: 'border-amber-500/40 shadow-[0_10px_35px_rgba(245,158,11,0.15)] ring-1 ring-amber-500/20',
+    badgeClass: 'text-amber-300 bg-amber-500/20 border-amber-400/50 shadow-[0_0_12px_rgba(245,158,11,0.25)]',
+    cardActive: 'bg-gradient-to-br from-[#382006] via-[#271503] to-[#160b02] border-2 border-amber-400 shadow-[0_0_24px_rgba(245,158,11,0.35)] ring-2 ring-amber-400/30 scale-[1.01]',
+    cardInactive: 'bg-[#080f1e]/90 border-slate-800/90 hover:border-amber-500/40 hover:bg-[#1a1208] text-slate-400 hover:text-slate-200 group'
   },
   random: {
     id: 'random',
@@ -145,14 +145,14 @@ const STREAM_THEMES = {
     subtitleKm: 'ចម្រុះមុខវិជ្ជាវិទ្យាសាស្ត្រពិត & វិទ្យាសាស្ត្រសង្គម',
     icon: Sparkles,
     accentText: 'text-emerald-400',
-    headerBadge: 'bg-emerald-500/20 text-emerald-300 border-emerald-500/40',
-    headerIconBox: 'bg-emerald-500/20 border border-emerald-500/40 text-emerald-400',
+    headerBadge: 'bg-emerald-500/15 text-emerald-300 border-emerald-400/40',
+    headerIconBox: 'bg-emerald-500/20 border border-emerald-400/50 text-emerald-300 shadow-[0_0_15px_rgba(16,185,129,0.3)]',
     glowBg: 'bg-emerald-500/20',
-    boxBg: 'bg-gradient-to-br from-[#062018]/95 via-[#061712]/95 to-[#030e0b]/95',
-    boxBorder: 'border-emerald-500/40 shadow-emerald-950/50 ring-1 ring-emerald-500/20',
-    badgeClass: 'text-emerald-300 bg-emerald-500/20 border-emerald-400/50 shadow-emerald-500/20',
-    cardActive: 'bg-gradient-to-r from-emerald-950/90 via-teal-950/90 to-indigo-950/90 border-emerald-400/80 shadow-lg shadow-emerald-950/60 ring-2 ring-emerald-500/50 scale-[1.01]',
-    cardInactive: 'bg-[#0a1226]/80 border-slate-800 hover:border-slate-700 opacity-70 hover:opacity-100'
+    boxBg: 'bg-[#0a1324]/95',
+    boxBorder: 'border-emerald-500/40 shadow-[0_10px_35px_rgba(16,185,129,0.15)] ring-1 ring-emerald-500/20',
+    badgeClass: 'text-emerald-300 bg-emerald-500/20 border-emerald-400/50 shadow-[0_0_12px_rgba(16,185,129,0.25)]',
+    cardActive: 'bg-gradient-to-br from-[#063324] via-[#042419] to-[#02140e] border-2 border-emerald-400 shadow-[0_0_24px_rgba(16,185,129,0.35)] ring-2 ring-emerald-400/30 scale-[1.01]',
+    cardInactive: 'bg-[#080f1e]/90 border-slate-800/90 hover:border-emerald-500/40 hover:bg-[#091a14] text-slate-400 hover:text-slate-200 group'
   }
 };
 
@@ -1502,7 +1502,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                       type="button"
                       disabled={!isHost}
                       onClick={() => handleSelectStream('science')}
-                      className={`p-3 rounded-xl border text-left transition-all duration-200 flex items-center justify-between gap-2.5 ${
+                      className={`p-3 sm:p-3.5 rounded-2xl border text-left transition-all duration-200 flex items-center justify-between gap-2.5 ${
                         selectedStream === 'science'
                           ? STREAM_THEMES.science.cardActive
                           : STREAM_THEMES.science.cardInactive
@@ -1510,18 +1510,32 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                       title={!isHost ? 'ម្ចាស់បន្ទប់ (Admin) ជាអ្នកកំណត់ផ្នែកប្រកួត' : 'ជ្រើសរើសវិទ្យាសាស្ត្រពិត'}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-8 h-8 rounded-lg bg-cyan-500/20 border border-cyan-400/40 text-cyan-300 flex items-center justify-center flex-shrink-0 shadow-inner">
-                          <Atom className="w-4 h-4" />
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
+                          selectedStream === 'science'
+                            ? 'bg-cyan-500/25 border border-cyan-300/60 text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.45)]'
+                            : 'bg-slate-800/80 border border-slate-700/80 text-slate-400 group-hover:text-cyan-300 group-hover:border-cyan-500/40'
+                        }`}>
+                          <Atom className="w-4.5 h-4.5" />
                         </div>
                         <div className="min-w-0">
-                          <h5 className="text-xs font-black text-white truncate flex items-center gap-1">
+                          <h5 className="text-xs font-black text-white truncate flex items-center gap-1.5">
                             <span>វិទ្យាសាស្ត្រពិត</span>
-                            {selectedStream === 'science' && <span className="text-[8px] px-1 py-0.2 rounded bg-cyan-500/20 text-cyan-300 border border-cyan-500/40 font-bold">ជ្រើស</span>}
+                            {selectedStream === 'science' && (
+                              <span className="text-[8.5px] px-1.5 py-0.2 rounded-md bg-cyan-400 text-slate-950 font-black tracking-wide shadow-2xs">
+                                ជ្រើស
+                              </span>
+                            )}
                           </h5>
-                          <p className="text-[9.5px] text-slate-300 truncate">គណិត, រូប, គីមី, ជីវៈ</p>
+                          <p className={`text-[10px] truncate transition-colors ${
+                            selectedStream === 'science' ? 'text-cyan-100/80 font-medium' : 'text-slate-400 group-hover:text-slate-300'
+                          }`}>
+                            គណិត, រូប, គីមី, ជីវៈ
+                          </p>
                         </div>
                       </div>
-                      {selectedStream === 'science' && <CheckCircle2 className="w-4 h-4 text-cyan-400 flex-shrink-0" />}
+                      {selectedStream === 'science' && (
+                        <CheckCircle2 className="w-5 h-5 text-cyan-300 fill-cyan-400/20 flex-shrink-0 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
+                      )}
                     </button>
 
                     {/* 2. Social Stream */}
@@ -1529,7 +1543,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                       type="button"
                       disabled={!isHost}
                       onClick={() => handleSelectStream('social')}
-                      className={`p-3 rounded-xl border text-left transition-all duration-200 flex items-center justify-between gap-2.5 ${
+                      className={`p-3 sm:p-3.5 rounded-2xl border text-left transition-all duration-200 flex items-center justify-between gap-2.5 ${
                         selectedStream === 'social'
                           ? STREAM_THEMES.social.cardActive
                           : STREAM_THEMES.social.cardInactive
@@ -1537,18 +1551,32 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                       title={!isHost ? 'ម្ចាស់បន្ទប់ (Admin) ជាអ្នកកំណត់ផ្នែកប្រកួត' : 'ជ្រើសរើសវិទ្យាសាស្ត្រសង្គម'}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-8 h-8 rounded-lg bg-amber-500/20 border border-amber-400/40 text-amber-300 flex items-center justify-center flex-shrink-0 shadow-inner">
-                          <BookOpen className="w-4 h-4" />
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
+                          selectedStream === 'social'
+                            ? 'bg-amber-500/25 border border-amber-300/60 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.45)]'
+                            : 'bg-slate-800/80 border border-slate-700/80 text-slate-400 group-hover:text-amber-300 group-hover:border-amber-500/40'
+                        }`}>
+                          <BookOpen className="w-4.5 h-4.5" />
                         </div>
                         <div className="min-w-0">
-                          <h5 className="text-xs font-black text-white truncate flex items-center gap-1">
+                          <h5 className="text-xs font-black text-white truncate flex items-center gap-1.5">
                             <span>វិទ្យាសាស្ត្រសង្គម</span>
-                            {selectedStream === 'social' && <span className="text-[8px] px-1 py-0.2 rounded bg-amber-500/20 text-amber-300 border border-amber-500/40 font-bold">ជ្រើស</span>}
+                            {selectedStream === 'social' && (
+                              <span className="text-[8.5px] px-1.5 py-0.2 rounded-md bg-amber-400 text-slate-950 font-black tracking-wide shadow-2xs">
+                                ជ្រើស
+                              </span>
+                            )}
                           </h5>
-                          <p className="text-[9.5px] text-slate-300 truncate">ភាសាខ្មែរ, ប្រវត្តិ, ភូមិ, ពលរដ្ឋ</p>
+                          <p className={`text-[10px] truncate transition-colors ${
+                            selectedStream === 'social' ? 'text-amber-100/80 font-medium' : 'text-slate-400 group-hover:text-slate-300'
+                          }`}>
+                            ភាសាខ្មែរ, ប្រវត្តិ, ភូមិ, ពលរដ្ឋ
+                          </p>
                         </div>
                       </div>
-                      {selectedStream === 'social' && <CheckCircle2 className="w-4 h-4 text-amber-400 flex-shrink-0" />}
+                      {selectedStream === 'social' && (
+                        <CheckCircle2 className="w-5 h-5 text-amber-300 fill-amber-400/20 flex-shrink-0 drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
+                      )}
                     </button>
 
                     {/* 3. Random / Mixed Stream */}
@@ -1556,7 +1584,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                       type="button"
                       disabled={!isHost}
                       onClick={() => handleSelectStream('random')}
-                      className={`p-3 rounded-xl border text-left transition-all duration-200 flex items-center justify-between gap-2.5 ${
+                      className={`p-3 sm:p-3.5 rounded-2xl border text-left transition-all duration-200 flex items-center justify-between gap-2.5 ${
                         selectedStream === 'random'
                           ? STREAM_THEMES.random.cardActive
                           : STREAM_THEMES.random.cardInactive
@@ -1564,18 +1592,32 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                       title={!isHost ? 'ម្ចាស់បន្ទប់ (Admin) ជាអ្នកកំណត់ផ្នែកប្រកួត' : 'ជ្រើសរើសសំណួរចម្រុះ'}
                     >
                       <div className="flex items-center gap-2.5 min-w-0">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-500/20 border border-emerald-400/40 text-emerald-300 flex items-center justify-center flex-shrink-0 shadow-inner">
-                          <Sparkles className="w-4 h-4" />
+                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
+                          selectedStream === 'random'
+                            ? 'bg-emerald-500/25 border border-emerald-300/60 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.45)]'
+                            : 'bg-slate-800/80 border border-slate-700/80 text-slate-400 group-hover:text-emerald-300 group-hover:border-emerald-500/40'
+                        }`}>
+                          <Sparkles className="w-4.5 h-4.5" />
                         </div>
                         <div className="min-w-0">
-                          <h5 className="text-xs font-black text-white truncate flex items-center gap-1">
+                          <h5 className="text-xs font-black text-white truncate flex items-center gap-1.5">
                             <span>សំណួរចម្រុះ (Random)</span>
-                            {selectedStream === 'random' && <span className="text-[8px] px-1 py-0.2 rounded bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 font-bold">ជ្រើស</span>}
+                            {selectedStream === 'random' && (
+                              <span className="text-[8.5px] px-1.5 py-0.2 rounded-md bg-emerald-400 text-slate-950 font-black tracking-wide shadow-2xs">
+                                ជ្រើស
+                              </span>
+                            )}
                           </h5>
-                          <p className="text-[9.5px] text-slate-300 truncate">ចម្រុះវិទ្យាសាស្ត្រ & សង្គម</p>
+                          <p className={`text-[10px] truncate transition-colors ${
+                            selectedStream === 'random' ? 'text-emerald-100/80 font-medium' : 'text-slate-400 group-hover:text-slate-300'
+                          }`}>
+                            ចម្រុះវិទ្យាសាស្ត្រ & សង្គម
+                          </p>
                         </div>
                       </div>
-                      {selectedStream === 'random' && <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />}
+                      {selectedStream === 'random' && (
+                        <CheckCircle2 className="w-5 h-5 text-emerald-300 fill-emerald-400/20 flex-shrink-0 drop-shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
+                      )}
                     </button>
 
                   </div>
