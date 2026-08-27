@@ -348,7 +348,7 @@ function MainApp() {
       <div className="h-[102px] sm:h-[110px] flex-shrink-0 w-full" aria-hidden="true" />
 
       {/* Main Content Body */}
-      <div className={`flex-1 flex w-full overflow-x-clip ${activeTab === 'chat' ? 'min-h-0 overflow-hidden' : ''}`}>
+      <div className={`flex-1 flex w-full overflow-x-clip md:pl-72 ${activeTab === 'chat' ? 'min-h-0 overflow-hidden' : ''}`}>
         
         {/* Left Navigation Sidebar */}
         <Sidebar

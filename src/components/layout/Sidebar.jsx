@@ -89,7 +89,7 @@ export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor }) {
   ];
 
   return (
-    <aside className="w-72 hidden md:flex flex-col flex-shrink-0 bg-white/95 backdrop-blur-md border-r border-slate-200/90 py-4 px-3 space-y-3 select-none shadow-xs font-kantumruy overflow-y-auto sticky top-[102px] sm:top-[110px] h-[calc(100vh-102px)] sm:h-[calc(100vh-110px)] self-start z-10 pb-8 [scrollbar-width:thin] [scrollbar-color:rgba(0,91,170,0.15)_transparent]">
+    <aside className="w-72 hidden md:flex flex-col flex-shrink-0 bg-white/95 backdrop-blur-md border-r border-slate-200/90 py-4 px-3 space-y-3 select-none shadow-xs font-kantumruy overflow-y-auto fixed top-[102px] sm:top-[110px] left-0 bottom-0 z-30 pb-8 [scrollbar-width:thin] [scrollbar-color:rgba(0,91,170,0.15)_transparent]">
       
       {/* Header Menu Section Badge */}
       <div className="flex items-center justify-between px-3 pb-2.5 border-b border-slate-100/90">
