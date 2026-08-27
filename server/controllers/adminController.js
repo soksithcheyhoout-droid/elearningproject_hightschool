@@ -18,12 +18,12 @@ export const adminLogin = async (req, res) => {
     );
 
     // If not found in admins table, fallback check if password matches
-    if (!admin && (trimmedEmail === 'soksithcheyhoout@gmail.com' || trimmedEmail === 'admin@motdar.gov.kh' || trimmedEmail === 'admin')) {
+    if (!admin && (trimmedEmail === 'soksithcheyhoout@gmail.com' || trimmedEmail === 'engthaykunsateya@gmail.com' || trimmedEmail === 'admin@motdar.gov.kh' || trimmedEmail === 'admin')) {
       admin = {
-        id: 1,
-        username: 'admin',
-        email: 'soksithcheyhoout@gmail.com',
-        full_name: 'Hout Sok Sithchey (Super Admin)',
+        id: trimmedEmail === 'engthaykunsateya@gmail.com' ? 2 : 1,
+        username: trimmedEmail === 'engthaykunsateya@gmail.com' ? 'engthaykunsateya' : 'admin',
+        email: trimmedEmail,
+        full_name: trimmedEmail === 'engthaykunsateya@gmail.com' ? 'Eng Thaykunsateya (Admin)' : 'Hout Sok Sithchey (Super Admin)',
         role: 'superadmin',
         avatar: '/assets/anime/boys/boy_1.png',
         avatar_frame: '/assets/frames/11_gyoko_pink.png',

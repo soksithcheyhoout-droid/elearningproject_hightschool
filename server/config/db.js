@@ -78,6 +78,34 @@ const defaultDbState = {
       streak_days: 1,
       created_at: new Date().toISOString(),
       updated_at: new Date().toISOString()
+    },
+    {
+      id: 4,
+      username: 'engthaykunsateya',
+      password_hash: '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy', // 123456
+      full_name: 'អេង ថៃគុនសត្យា',
+      full_name_en: 'ENG THAYKUNSATEYA',
+      first_name: 'Thaykunsateya',
+      last_name: 'Eng',
+      nickname: 'engthaykunsateya',
+      student_id: 'BACII-000003',
+      email: 'engthaykunsateya@gmail.com',
+      phone: '08566901800',
+      google_id: null,
+      auth_provider: 'google',
+      grade: '12',
+      stream: 'science',
+      school: 'វិទ្យាល័យ ព្រះស៊ីសុវត្ថិ',
+      province: 'រាជធានីភ្នំពេញ',
+      avatar: '/assets/anime/boys/boy_1.png',
+      avatar_frame: '/assets/frames/11_gyoko_pink.png',
+      xp: 3200,
+      level: 7,
+      rank_title_km: 'អ្នកប្រាជ្ញថ្នាក់ជាតិ (National Scholar)',
+      rank_title_en: 'National Scholar',
+      streak_days: 10,
+      created_at: new Date().toISOString(),
+      updated_at: new Date().toISOString()
     }
   ],
   auth_otps: [],
@@ -101,6 +129,24 @@ const defaultDbState = {
       title_en: 'New Scholar',
       color: '#38bdf8',
       unlocked_at: new Date().toISOString()
+    },
+    {
+      id: 3,
+      student_id: 4,
+      badge_id: 'b-welcome',
+      title_km: 'សិស្សថ្មី (New Scholar)',
+      title_en: 'New Scholar',
+      color: '#38bdf8',
+      unlocked_at: new Date().toISOString()
+    },
+    {
+      id: 4,
+      student_id: 4,
+      badge_id: 'b-google',
+      title_km: 'ផ្ទៀងផ្ទាត់ដោយ Google (Google Verified)',
+      title_en: 'Google Verified',
+      color: '#4285F4',
+      unlocked_at: new Date().toISOString()
     }
   ],
   arena_matches: [],
@@ -117,7 +163,27 @@ function loadDatabase() {
       const raw = fs.readFileSync(dbFilePath, 'utf8');
       const parsed = JSON.parse(raw);
       inMemoryData = { ...defaultDbState, ...parsed };
+      if (!Array.isArray(inMemoryData.students)) inMemoryData.students = [];
       if (!Array.isArray(inMemoryData.exams)) inMemoryData.exams = [];
+      if (!Array.isArray(inMemoryData.student_badges)) inMemoryData.student_badges = [];
+
+      // Auto-Seed & Self-Heal: Ensure all core seed students always exist across any deploy or disk restart
+      defaultDbState.students.forEach((seedStudent) => {
+        const existingIdx = inMemoryData.students.findIndex(
+          (s) => (s.email && s.email.toLowerCase() === seedStudent.email.toLowerCase()) ||
+                 (s.username && s.username.toLowerCase() === seedStudent.username.toLowerCase())
+        );
+        if (existingIdx === -1) {
+          inMemoryData.students.push({ ...seedStudent });
+        } else {
+          // Keep email and verified fields updated
+          if (!inMemoryData.students[existingIdx].email && seedStudent.email) {
+            inMemoryData.students[existingIdx].email = seedStudent.email;
+          }
+        }
+      });
+
+      saveDatabase();
     } else {
       saveDatabase();
     }

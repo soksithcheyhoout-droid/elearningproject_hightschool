@@ -3,6 +3,23 @@ import { db } from './config/db.js';
 
 const nationalStudents = [
   {
+    username: 'engthaykunsateya',
+    full_name: 'អេង ថៃគុនសត្យា',
+    full_name_en: 'Eng Thaykunsateya',
+    email: 'engthaykunsateya@gmail.com',
+    password_hash: '$2a$10$N9qo8uLOickgx2ZMRZoMyeIjZAgcfl7p92ldGxad68LJZdL17lhWy',
+    grade: '12',
+    stream: 'science',
+    school: 'វិទ្យាល័យ ព្រះស៊ីសុវត្ថិ',
+    province: 'រាជធានីភ្នំពេញ',
+    avatar: '/assets/anime/boys/boy_1.png',
+    avatar_frame: '/assets/frames/11_gyoko_pink.png',
+    xp: 3200,
+    level: 7,
+    rank_title_km: 'អ្នកប្រាជ្ញថ្នាក់ជាតិ (National Scholar)',
+    streak_days: 10
+  },
+  {
     username: 'sothea.chem',
     full_name: 'គឹម សុធា',
     full_name_en: 'Kim Sothea',
