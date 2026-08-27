@@ -1249,6 +1249,35 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
   };
 
+  // Filter available registered students for Invite modal (Excludes current student)
+  const filteredStudents = (realStudents || []).filter((u) => {
+    const currentId = student?.id;
+    const currentUsername = (student?.username || student?.nickname || '').trim().toLowerCase();
+    const currentEmail = (student?.email || '').trim().toLowerCase();
+    const currentName = (student?.full_name || student?.fullName || student?.name || '').trim().toLowerCase();
+
+    const uId = u.id;
+    const uUsername = (u.username || u.nickname || '').trim().toLowerCase();
+    const uEmail = (u.email || '').trim().toLowerCase();
+    const uName = (u.full_name || u.name || '').trim().toLowerCase();
+
+    // Check if u is the current user
+    const isSelf = (currentId && uId && String(currentId) === String(uId)) ||
+      (currentUsername && uUsername && currentUsername === uUsername) ||
+      (currentEmail && uEmail && currentEmail === uEmail) ||
+      (currentName && uName && currentName === uName) ||
+      (student?.studentId && u.student_id && String(student.studentId) === String(u.student_id));
+
+    const query = (inviteSearch || '').trim().toLowerCase();
+    if (!query) return !isSelf;
+    return !isSelf && (
+      uName.includes(query) ||
+      uUsername.includes(query) ||
+      uEmail.includes(query) ||
+      (u.school && u.school.toLowerCase().includes(query))
+    );
+  });
+
   return createPortal(
     <div className="fixed inset-0 z-[99999] flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-lg animate-fade-in font-kantumruy overflow-y-auto">
       
