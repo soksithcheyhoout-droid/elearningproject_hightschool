@@ -703,39 +703,46 @@ function MainApp() {
 
         return (
           <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden select-none font-kantumruy">
-            {/* Curved White Bar Container */}
-            <div className="relative bg-white border-t border-slate-100/90 shadow-[0_-8px_30px_rgba(0,0,0,0.1)] rounded-t-[28px] h-[66px] flex items-center px-1 pb-[calc(0.35rem+env(safe-area-inset-bottom,0px))]">
+            {/* Main White Bar Container */}
+            <div className="relative bg-white border-t border-slate-200/80 shadow-[0_-6px_25px_rgba(0,0,0,0.08)] h-[66px] flex items-center px-1 pb-[calc(0.35rem+env(safe-area-inset-bottom,0px))]">
               
-              {/* Dynamic Curved Cutout Scoop (Follows Active Tab) */}
+              {/* Dynamic Curved Cutout Scoop (Smooth S-curve Notch) */}
               <svg
-                className="absolute -top-[16px] w-[72px] h-[20px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] drop-shadow-[0_-3px_5px_rgba(0,0,0,0.03)]"
+                className="absolute -top-[1px] w-[80px] h-[30px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-10"
                 style={{
-                  left: `calc(${activeIndex * (100 / 6)}% + ${(100 / 6) / 2}% - 36px)`
+                  left: `calc(${activeIndex * (100 / 6)}% + ${(100 / 6) / 2}% - 40px)`
                 }}
-                viewBox="0 0 72 20"
+                viewBox="0 0 80 30"
                 fill="none"
               >
                 <path
-                  d="M0 0 C 14 0, 18 18, 36 18 C 54 18, 58 0, 72 0 L 72 20 L 0 20 Z"
-                  fill="#ffffff"
+                  d="M0 0 C 16 0, 22 26, 40 26 C 58 26, 64 0, 80 0 L 80 0 L 0 0 Z"
+                  fill="#f8fafc"
+                />
+                <path
+                  d="M0 0 C 16 0, 22 26, 40 26 C 58 26, 64 0, 80 0"
+                  stroke="#e2e8f0"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  fill="none"
                 />
               </svg>
 
               {/* Floating Active Circular Bubble */}
               <div
-                className="absolute -top-[22px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-20"
+                className="absolute -top-[18px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-20"
                 style={{
                   left: `calc(${activeIndex * (100 / 6)}% + ${(100 / 6) / 2}%)`,
                   transform: 'translateX(-50%)'
                 }}
               >
-                <div className="w-[48px] h-[48px] rounded-full bg-gradient-to-tr from-[#ff4765] to-[#ff6b8b] text-white flex items-center justify-center shadow-[0_8px_20px_rgba(255,71,101,0.5)] border-[3.5px] border-white">
-                  {activeIndex === 0 && <Home className="w-5 h-5 animate-scaleIn" />}
-                  {activeIndex === 1 && <BookOpen className="w-5 h-5 animate-scaleIn" />}
-                  {activeIndex === 2 && <Gamepad2 className="w-5 h-5 animate-scaleIn" />}
-                  {activeIndex === 3 && <GraduationCap className="w-5 h-5 animate-scaleIn" />}
-                  {activeIndex === 4 && <MessageSquare className="w-5 h-5 animate-scaleIn" />}
-                  {activeIndex === 5 && <Bot className="w-5 h-5 animate-scaleIn" />}
+                <div className="w-[48px] h-[48px] rounded-full bg-gradient-to-tr from-[#00828a] to-[#0ea5e9] text-white flex items-center justify-center shadow-[0_6px_20px_rgba(0,130,138,0.45)] border-[3.5px] border-white">
+                  {activeIndex === 0 && <Home className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
+                  {activeIndex === 1 && <BookOpen className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
+                  {activeIndex === 2 && <Gamepad2 className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
+                  {activeIndex === 3 && <GraduationCap className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
+                  {activeIndex === 4 && <MessageSquare className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
+                  {activeIndex === 5 && <Bot className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
                 </div>
               </div>
 
@@ -754,7 +761,7 @@ function MainApp() {
                     {/* Inactive Icon or Spacing Placeholder */}
                     <div className="relative flex items-center justify-center h-6">
                       {!isActive ? (
-                        <IconComponent className={`w-5 h-5 text-slate-400 group-hover:text-slate-600 transition-colors ${item.id === 'playground' ? 'text-amber-500/80' : ''}`} />
+                        <IconComponent className={`w-5 h-5 text-slate-600 group-hover:text-slate-900 transition-colors stroke-[1.8] ${item.id === 'playground' ? 'text-amber-500' : ''}`} />
                       ) : (
                         <div className="h-2" />
                       )}
@@ -772,7 +779,7 @@ function MainApp() {
                     <span
                       className={`text-[9.5px] font-bold transition-all ${
                         isActive
-                          ? 'text-[#ff4765] font-black scale-105 mt-1'
+                          ? 'text-[#00828a] font-black scale-105 mt-2'
                           : 'text-slate-500 group-hover:text-slate-800'
                       }`}
                     >
