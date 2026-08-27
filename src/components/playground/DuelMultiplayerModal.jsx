@@ -49,7 +49,7 @@ import {
 } from 'lucide-react';
 import { useAuth, computeLevelData } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
-import { getRandomizedGameQuestions, fetchLiveExamQuestions, expandQuestionsTo8Options } from '../../utils/gamePoolManager';
+import { getRandomizedGameQuestions, fetchLiveExamQuestions, expandQuestionsTo8Options, resetGameSessionQuestions } from '../../utils/gamePoolManager';
 import api from '../../services/api';
 
 // High-end Avatar with Frame Renderer
@@ -836,6 +836,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   const handleSelectStream = async (newStream) => {
     if (!isHost) return;
     if (soundEnabled) playSound.click();
+    resetGameSessionQuestions();
     setSelectedStream(newStream);
 
     const freshQuestions = expandQuestionsTo8Options(getRandomizedGameQuestions(null, 24, student?.grade || '12', newStream));
@@ -1025,13 +1026,16 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     setMyRematchRequested(true);
     if (soundEnabled) playSound.click();
 
+    // Reset session seen questions so fresh questions from the whole bank are chosen
+    resetGameSessionQuestions();
+
     // Fetch completely fresh 24-question pool using the CURRENT selectedStream
-    let freshQuestions = getRandomizedGameQuestions(
+    let freshQuestions = expandQuestionsTo8Options(getRandomizedGameQuestions(
       isSpecificGameCard && game?.stream === selectedStream ? game : null,
       24,
       student?.grade || '12',
       selectedStream
-    );
+    ));
 
     try {
       const livePool = await fetchLiveExamQuestions({
@@ -1042,7 +1046,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
         random: true
       });
       if (Array.isArray(livePool) && livePool.length > 0) {
-        freshQuestions = livePool;
+        freshQuestions = expandQuestionsTo8Options(livePool);
       }
     } catch (e) {}
 

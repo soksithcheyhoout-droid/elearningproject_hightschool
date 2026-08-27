@@ -18,7 +18,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
-import { getRandomizedGameQuestions, fetchLiveExamQuestions } from '../../utils/gamePoolManager';
+import { getRandomizedGameQuestions, fetchLiveExamQuestions, resetGameSessionQuestions } from '../../utils/gamePoolManager';
 import VictoryRewardCelebration from './VictoryRewardCelebration';
 import AcademicTextRenderer from '../common/AcademicTextRenderer';
 
@@ -157,7 +157,8 @@ export default function KahootSpeedArenaModal({ game, onClose }) {
   const handleRestart = () => {
     clearTimeout(autoNextTimerRef.current);
     clearInterval(countdownIntervalRef.current);
-    setQuestions(getRandomizedGameQuestions(game, 6, student?.grade, game?.stream || student?.stream));
+    resetGameSessionQuestions();
+    setQuestions(getRandomizedGameQuestions(game, 8, student?.grade, game?.stream || student?.stream));
     setCurrentQIndex(0);
     setSelectedOption(null);
     setIsAnswerSubmitted(false);

@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
-import { getRandomizedGameQuestions, fetchLiveExamQuestions } from '../../utils/gamePoolManager';
+import { getRandomizedGameQuestions, fetchLiveExamQuestions, resetGameSessionQuestions } from '../../utils/gamePoolManager';
 import AcademicTextRenderer from '../common/AcademicTextRenderer';
 
 const CHEST_REWARDS = [
@@ -134,7 +134,8 @@ export default function GoldQuestGameModal({ game, onClose }) {
   };
 
   const handleRestart = () => {
-    setQuestions(getRandomizedGameQuestions(game, 6, student?.grade, game?.stream || student?.stream));
+    resetGameSessionQuestions();
+    setQuestions(getRandomizedGameQuestions(game, 8, student?.grade, game?.stream || student?.stream));
     setCurrentQIndex(0);
     setGameState('question');
     setSelectedOption(null);

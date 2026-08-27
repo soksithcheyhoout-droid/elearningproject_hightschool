@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { useAuth, computeLevelData } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
-import { getRandomizedGameQuestions, fetchLiveExamQuestions } from '../../utils/gamePoolManager';
+import { getRandomizedGameQuestions, fetchLiveExamQuestions, resetGameSessionQuestions } from '../../utils/gamePoolManager';
 import AcademicTextRenderer from '../common/AcademicTextRenderer';
 
 export default function BossBattleGameModal({ game, onClose }) {
@@ -256,7 +256,8 @@ export default function BossBattleGameModal({ game, onClose }) {
   };
 
   const handleRestart = () => {
-    setQuestions(getRandomizedGameQuestions(game, 6, student?.grade, game?.stream || student?.stream));
+    resetGameSessionQuestions();
+    setQuestions(getRandomizedGameQuestions(game, 8, student?.grade, game?.stream || student?.stream));
     setPlayerHp(100);
     setBossHp(boss.maxHp);
     setCurrentQIndex(0);

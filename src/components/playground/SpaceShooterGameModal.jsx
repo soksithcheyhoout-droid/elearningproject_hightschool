@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
-import { getRandomizedGameQuestions } from '../../utils/gamePoolManager';
+import { getRandomizedGameQuestions, resetGameSessionQuestions } from '../../utils/gamePoolManager';
 
 export default function SpaceShooterGameModal({ game, onClose }) {
   const { addXP, student } = useAuth();
@@ -428,6 +428,7 @@ export default function SpaceShooterGameModal({ game, onClose }) {
   };
 
   const handleRestart = () => {
+    resetGameSessionQuestions();
     const fresh = getRandomizedGameQuestions(game, 15, student?.grade || '12', game?.stream || student?.stream || 'science');
     setQuestions(fresh);
     setCurrentQIndex(0);

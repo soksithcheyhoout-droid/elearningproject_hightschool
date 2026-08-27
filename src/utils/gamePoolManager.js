@@ -2,50 +2,35 @@ import { playgroundGamesData } from '../data/playgroundGamesData.js';
 import { quizData } from '../data/quizData.js';
 import { arenaMasterQuestionBank } from '../data/arenaMasterQuestionBank.js';
 
-// Persistent session and cross-play memory to guarantee questions never repeat
-const STORAGE_KEY = 'motdar_seen_questions_v2';
-const MAX_PERSISTENT_MEMORY = 1200;
+// In-Match / Session Seen Questions Set (Guarantees NO duplicate questions during an active match/game)
+const activeSessionSeenSet = new Set();
 
-function loadSeenQuestions() {
-  try {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed)) return new Set(parsed);
-      }
-    }
-  } catch (e) {}
-  return new Set();
-}
-
-function saveSeenQuestions(set) {
-  try {
-    if (typeof window !== 'undefined' && window.localStorage) {
-      const arr = Array.from(set).slice(-MAX_PERSISTENT_MEMORY);
-      localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
-    }
-  } catch (e) {}
-}
-
-const recentSessionQuestionSet = loadSeenQuestions();
-
+/**
+ * Record questions as seen in the current game session so they won't repeat during this match
+ * @param {Array} questions - Questions that have been displayed or picked
+ */
 export function recordQuestionsAsSeen(questions) {
   if (!Array.isArray(questions)) return;
   questions.forEach((q) => {
     if (q) {
-      const key = q.id || (typeof q.q === 'string' ? q.q.trim() : null);
-      if (key) recentSessionQuestionSet.add(key);
+      const idKey = q.id ? String(q.id).trim() : null;
+      const textKey = typeof q.q === 'string' ? q.q.replace(/\s*\((ថ្នាក់ទី|Grade)\s*\d+\)/gi, '').replace(/\*\*/g, '').trim().toLowerCase() : null;
+      if (idKey) activeSessionSeenSet.add(idKey);
+      if (textKey) activeSessionSeenSet.add(textKey);
     }
   });
+}
 
-  if (recentSessionQuestionSet.size > MAX_PERSISTENT_MEMORY) {
-    const arr = Array.from(recentSessionQuestionSet);
-    const trimmed = arr.slice(arr.length - Math.floor(MAX_PERSISTENT_MEMORY / 2));
-    recentSessionQuestionSet.clear();
-    trimmed.forEach((k) => recentSessionQuestionSet.add(k));
-  }
-  saveSeenQuestions(recentSessionQuestionSet);
+/**
+ * Reset seen questions so starting a new match (New Game / Rematch / Restart) draws freshly from the entire pool
+ */
+export function resetGameSessionQuestions() {
+  activeSessionSeenSet.clear();
+}
+
+// Backward compatibility alias
+export function clearSeenQuestions() {
+  activeSessionSeenSet.clear();
 }
 
 /**
@@ -84,8 +69,17 @@ export function shuffleQuestionOptions(question) {
   };
 }
 
-const SCIENCE_SUBJECTS = new Set(['គណិតវិទ្យា', 'រូបវិទ្យា', 'គីមីវិទ្យា', 'ជីវវិទ្យា', 'ផែនដីវិទ្យា', 'math', 'physics', 'chemistry', 'biology', 'earth', 'stem', 'stem-cs']);
-const SOCIAL_SUBJECTS = new Set(['ភាសាខ្មែរ', 'អក្សរសាស្ត្រខ្មែរ', 'ប្រវត្តិវិទ្យា', 'ភូមិវិទ្យា', 'សីលធម៌-ពលរដ្ឋ', 'សេដ្ឋកិច្ច', 'ភាសាអង់គ្លេស', 'khmer', 'history', 'geography', 'civics', 'morals', 'economics', 'english']);
+const SCIENCE_SUBJECTS = new Set([
+  'គណិតវិទ្យា', 'រូបវិទ្យា', 'គីមីវិទ្យា', 'ជីវវិទ្យា', 'ផែនដីវិទ្យា', 
+  'math', 'physics', 'chemistry', 'biology', 'earth', 'stem', 'stem-cs'
+]);
+
+const SOCIAL_SUBJECTS = new Set([
+  'ភាសាខ្មែរ', 'ភាសាខ្មែរ និងអក្សរសាស្ត្រ', 'អក្សរសាស្ត្រខ្មែរ', 
+  'ប្រវត្តិវិទ្យា', 'ភូមិវិទ្យា', 'សីលធម៌-ពលរដ្ឋ', 'សីលធម៌ និងពលរដ្ឋវិទ្យា', 
+  'សីលធម៌-ពលរដ្ឋ & សេដ្ឋកិច្ច', 'សេដ្ឋកិច្ច', 'ភាសាអង់គ្លេស', 
+  'khmer', 'history', 'geography', 'civics', 'morals', 'economics', 'english'
+]);
 
 /**
  * Generate a randomized pool of unique, non-repeating questions for a game session
@@ -96,13 +90,12 @@ const SOCIAL_SUBJECTS = new Set(['ភាសាខ្មែរ', 'អក្សរ
  */
 export function getRandomizedGameQuestions(game, count = 20, grade = null, stream = null) {
   const requestedStream = stream || game?.stream || 'science';
-  const gameStream = game?.stream || 'science';
 
   let rawPool = [];
   const targetSubjectKey = game?.subjectKey;
   const targetSubject = game?.subject;
 
-  // 1. Harvest from Arena Master Bank (2,400 questions)
+  // 1. Harvest from Arena Master Bank (6,000+ balanced questions)
   if (Array.isArray(arenaMasterQuestionBank)) {
     arenaMasterQuestionBank.forEach((item) => {
       if (!item || !item.q) return;
@@ -118,9 +111,9 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
         if (requestedStream === 'random' || requestedStream === 'all') {
           matchesStream = true;
         } else if (requestedStream === 'social') {
-          matchesStream = (item.stream === 'social' || SOCIAL_SUBJECTS.has(item.subject) || SOCIAL_SUBJECTS.has(item.subjectKey)) && !SCIENCE_SUBJECTS.has(item.subject);
+          matchesStream = item.stream === 'social' || SOCIAL_SUBJECTS.has(item.subject) || SOCIAL_SUBJECTS.has(item.subjectKey);
         } else {
-          matchesStream = (item.stream === 'science' || SCIENCE_SUBJECTS.has(item.subject) || SCIENCE_SUBJECTS.has(item.subjectKey)) && !SOCIAL_SUBJECTS.has(item.subject);
+          matchesStream = item.stream === 'science' || SCIENCE_SUBJECTS.has(item.subject) || SCIENCE_SUBJECTS.has(item.subjectKey);
         }
 
         if (matchesStream) {
@@ -183,7 +176,7 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
     });
   }
 
-  // Deduplicate and filter out seen questions
+  // Deduplicate and strictly filter out questions already shown in this match
   const seenTexts = new Set();
   const unseenPool = [];
   const fallbackSeenPool = [];
@@ -193,7 +186,7 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
 
   randomizedRaw.forEach((q) => {
     if (!q || !q.q) return;
-    // Normalize core question text by stripping grade tags and whitespace to prevent repeated core questions
+    // Normalize core question text
     const cleanText = q.q.replace(/\s*\((ថ្នាក់ទី|Grade)\s*\d+\)/gi, '').replace(/\*\*/g, '').trim();
     const coreKey = cleanText.toLowerCase();
     if (seenTexts.has(coreKey)) return;
@@ -210,8 +203,10 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
       if (targetG >= 10 && qG < 7) return; // Keep high school away from 1st grade
     }
 
-    const qKey = q.id || coreKey;
-    if (recentSessionQuestionSet.has(qKey) || recentSessionQuestionSet.has(coreKey)) {
+    const qIdKey = q.id ? String(q.id).trim() : null;
+    const isAlreadySeenInMatch = (qIdKey && activeSessionSeenSet.has(qIdKey)) || activeSessionSeenSet.has(coreKey);
+
+    if (isAlreadySeenInMatch) {
       fallbackSeenPool.push(q);
     } else {
       unseenPool.push(q);
@@ -226,7 +221,7 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
   const shuffledCandidates = shuffleArray(finalCandidates);
   const selectedQuestions = shuffledCandidates.slice(0, Math.min(count, shuffledCandidates.length));
 
-  // Record selected questions as seen
+  // Record selected questions as seen in this match
   recordQuestionsAsSeen(selectedQuestions);
 
   // Deeply shuffle choices and balance option lengths for every single question
@@ -247,7 +242,7 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
 export async function fetchLiveExamQuestions({ stream = 'science', subjectKey = '', grade = '12', limit = 24, random = true } = {}) {
   try {
     const API_URL = import.meta.env.VITE_API_URL || '/api';
-    const recentExcluded = Array.from(recentSessionQuestionSet).slice(-80).join(',');
+    const recentExcluded = Array.from(activeSessionSeenSet).slice(-80).join(',');
 
     const params = new URLSearchParams({
       stream: stream === 'random' ? 'all' : stream,
@@ -271,7 +266,7 @@ export async function fetchLiveExamQuestions({ stream = 'science', subjectKey = 
     console.warn('[Live Exam Pool Fetch Warning]:', err.message);
   }
 
-  // Fallback to rich local synchronous pool (2,400+ questions)
+  // Fallback to rich local synchronous pool (6,000+ questions)
   return getRandomizedGameQuestions(null, limit, grade, stream);
 }
 
@@ -279,6 +274,64 @@ export async function fetchLiveExamQuestions({ stream = 'science', subjectKey = 
 // ADVANCED SEMANTIC CATEGORY BANKS (Ensures 100% Authentic 8 Choices)
 // =========================================================================
 const SEMANTIC_BANKS = {
+  composition_parts: [
+    '៣ ផ្នែក (សេចក្តីផ្តើម, តួសេចក្តី, សេចក្តីបញ្ចប់)',
+    '២ ផ្នែក (សេចក្តីផ្តើម និងតួសេចក្តី)',
+    '៤ ផ្នែក (ផ្តើម, អធិប្បាយ, ពិភាក្សា, បញ្ចប់)',
+    '៥ ផ្នែក (ផ្តើម, ពន្យល់, ពិភាក្សា, ប្រៀបធៀប, បញ្ចប់)',
+    '១ ផ្នែក (តួសេចក្តីតែមួយគត់)',
+    '៦ ផ្នែក (តាមលំដាប់លំដោយក្បួនខ្នាត)',
+    '៧ ផ្នែក (តាមក្បួនតែងនិពន្ធបុរាណ)',
+    'គ្មានរចនាសម្ព័ន្ធកំណត់ជាក់លាក់ឡើយ'
+  ],
+  poem_metre: [
+    '៧ ឃ្លា និង ២៨ ព្យាង្គ (៤ ព្យាង្គក្នុងមួយឃ្លា)',
+    '៤ ឃ្លា និង ២២ ព្យាង្គ (៥-៦-៥-៦ ព្យាង្គ)',
+    '៣ ឃ្លា និង ១៨ ព្យាង្គ (៦ ព្យាង្គក្នុងមួយឃ្លា)',
+    '៤ ឃ្លា និង ១៦ ព្យាង្គ (៤ ព្យាង្គក្នុងមួយឃ្លា)',
+    '៤ ឃ្លា និង ២០ ព្យាង្គ (៤-៦-៤-៦ ព្យាង្គ)',
+    '៤ ឃ្លា និង ២៨ ព្យាង្គ (៧ ព្យាង្គក្នុងមួយឃ្លា)',
+    '៤ ឃ្លា និង ២៤ ព្យាង្គ (៦ ព្យាង្គក្នុងមួយឃ្លា)',
+    '៥ ឃ្លា និង ២៥ ព្យាង្គ (៥ ព្យាង្គក្នុងមួយឃ្លា)'
+  ],
+  essay_steps: [
+    'លំនាំបញ្ហា ចំណូលបញ្ហា និងចំណោទបញ្ហា',
+    'ពន្យល់ពាក្យ លើកឧទាហរណ៍ និងបូកសរុប',
+    'ការពិភាក្សា វាយតម្លៃ និងមតិផ្ទាល់ខ្លួន',
+    'ការដកស្រង់សម្រង់សម្តី និងការអរគុណ',
+    'ការបកស្រាយទឡ្ហីករណ៍ និងភស្តុតាង',
+    'ការប្រៀបធៀបគំនិត និងការសន្និដ្ឋាន'
+  ],
+  history_dates: [
+    '៩ វិច្ឆិកា ១៩៥៣ (ទិវាបុណ្យឯករាជ្យជាតិ)',
+    '២៣ តុលា ១៩៩១ (កិច្ចព្រមព្រៀងសន្តិភាពក្រុងប៉ារីស)',
+    '២៤ កញ្ញា ១៩៩៣ (ប្រកាសឱ្យប្រើរដ្ឋធម្មនុញ្ញ)',
+    '៧ មករា ១៩៧៩ (ទិវាជ័យជម្នះលើរបបប្រល័យពូជសាសន៍)',
+    '១៧ មេសា ១៩៧៥ (របបកម្ពុជាប្រជាធិបតេយ្យ)',
+    '១១ សីហា ១៨៦៣ (សន្ធិសញ្ញាអាណាព្យាបាលបារាំង)',
+    '២៩ ធ្នូ ១៩៩៨ (ទិវាបញ្ចប់សង្គ្រាមស៊ីវិលទាំងស្រុង)',
+    '៣០ មេសា ១៩៩៩ (កម្ពុជាចូលជាសមាជិកអាស៊ាន)'
+  ],
+  civics_powers: [
+    'អំណាចនីតិប្បញ្ញត្តិ អំណាចនីតិប្រតិបត្តិ និងអំណាចតុលាការ',
+    'អំណាចយោធា អំណាចនគរបាល និងអំណាចសេដ្ឋកិច្ច',
+    'អំណាចសារព័ត៌មាន អំណាចធនាគារ និងអំណាចពាណិជ្ជកម្ម',
+    'អំណាចរដ្ឋបាល អំណាចសាសនា និងអំណាចកសិកម្ម',
+    'អំណាចគយ អំណាចពន្ធដារ និងអំណាចរតនាគារ',
+    'អំណាចព្រឹទ្ធសភា អំណាចក្រុមប្រឹក្សា និងអំណាចសាលាក្រុង',
+    'អំណាចពាណិជ្ជកម្ម អំណាចដឹកជញ្ជូន និងអំណាចឧស្សាហកម្ម',
+    'អំណាចអធិការកិច្ច អំណាចសវនកម្ម និងអំណាចត្រួតពិនិត្យ'
+  ],
+  economy_pillars: [
+    'កាត់ដេរ កសិកម្ម ទេសចរណ៍ និងសំណង់',
+    'ឧស្សាហកម្មធុនធ្ងន់ អវកាស និងរ៉ែប្រេង',
+    'នេសាទសមុទ្រ រថភ្លើង និងយានយន្ត',
+    'គីមីឥន្ធនៈ គ្រឿងអគ្គិសនី និងដែកថែប',
+    'អាកាសចរណ៍ បច្ចេកវិទ្យាកុំព្យូទ័រ និងនាវាចរណ៍',
+    'ពាណិជ្ជកម្មអន្តរជាតិ សិប្បកម្ម និងថាមពលនុយក្លេអ៊ែរ',
+    'ការស្រាវជ្រាវជីវបច្ចេកវិទ្យា និងគ្រឿងយន្ត',
+    'សេវាកម្មធនាគារ ការកែច្នៃត្បូងពេជ្រ និងអគ្គិសនី'
+  ],
   strait: [
     'ច្រកសមុទ្រម៉ាឡាកា (Strait of Malacca)',
     'ច្រកសមុទ្រស៊ុនដា (Sunda Strait)',
@@ -388,13 +441,13 @@ const SEMANTIC_BANKS = {
     'តម្លៃកិត្តិយស និងសេចក្តីថ្លៃថ្នូររបស់មនុស្ស'
   ],
   author: [
-    'ញ៉ុក ថែម',
-    'នូ ហាច',
-    'រីម គីន',
-    'ឌឹក គាម',
-    'ភិក្ខុសោម',
+    'ញ៉ុក ថែម (១៩៣៦)',
+    'នូ ហាច (១៩៤៩)',
+    'រីម គីន (១៩៣៨)',
+    'ឌឹក គាម និង ពៅ ស៊ីផូ (១៩៦៥)',
+    'ភិក្ខុសោម (១៩១៥)',
     'ព្រះបាទអង្គឌួង',
-    'ក្រមង៉ុយ',
+    'ក្រមង៉ុយ (១៩៣០)',
     'សន្ធរវោហារម៉ុក',
     'អ៊ុំ ស៊ូ',
     'សុង ស៊ីវ',
@@ -430,13 +483,19 @@ const globalAllDistractors = [];
 if (Array.isArray(arenaMasterQuestionBank)) {
   arenaMasterQuestionBank.forEach((item) => {
     if (!item || !Array.isArray(item.options)) return;
-    const sub = item.subject || item.subjectKey || 'general';
+    const sub = item.subject || 'general';
+    const subKey = item.subjectKey || 'general';
     if (!globalDistractorsBySubject[sub]) globalDistractorsBySubject[sub] = [];
+    if (!globalDistractorsBySubject[subKey]) globalDistractorsBySubject[subKey] = [];
     item.options.forEach((opt, idx) => {
       if (idx !== item.answer && typeof opt === 'string' && opt.trim()) {
         const text = opt.trim();
-        globalDistractorsBySubject[sub].push(text);
-        globalAllDistractors.push(text);
+        // Only include complete meaningful sentences/phrases (at least 2 chars)
+        if (text.length >= 2) {
+          globalDistractorsBySubject[sub].push(text);
+          if (subKey !== sub) globalDistractorsBySubject[subKey].push(text);
+          globalAllDistractors.push(text);
+        }
       }
     });
   });
@@ -451,6 +510,11 @@ function detectSemanticCategory(question, options) {
     ...(Array.isArray(options) ? options : [])
   ].join(' ').toLowerCase();
 
+  if (combinedText.includes('ផ្នែក') || combinedText.includes('រចនាសម្ព័ន្ធ')) return 'composition_parts';
+  if (combinedText.includes('ល្បះ') || combinedText.includes('ឃ្លា') || combinedText.includes('ព្យាង្គ') || combinedText.includes('កាព្យ') || combinedText.includes('កាកគតិ') || combinedText.includes('ព្រហ្មគីតិ')) return 'poem_metre';
+  if (combinedText.includes('សេចក្តីផ្តើម') || combinedText.includes('តួសេចក្តី') || combinedText.includes('សេចក្តីបញ្ចប់') || combinedText.includes('លំនាំបញ្ហា')) return 'essay_steps';
+  if (combinedText.includes('អំណាច') && (combinedText.includes('នីតិ') || combinedText.includes('រដ្ឋ'))) return 'civics_powers';
+  if (combinedText.includes('សសរស្តម្ភ') || combinedText.includes('សេដ្ឋកិច្ច')) return 'economy_pillars';
   if (combinedText.includes('ច្រកសមុទ្រ')) return 'strait';
   if (combinedText.includes('ទន្លេ') || combinedText.includes('ស្ទឹង')) return 'river';
   if (combinedText.includes('កោះ')) return 'island';
@@ -458,8 +522,9 @@ function detectSemanticCategory(question, options) {
   if (combinedText.includes('ខេត្ត')) return 'province';
   if (combinedText.includes('ប្រទេស')) return 'country';
   if (combinedText.includes('ព្រះបាទ') || combinedText.includes('រជ្ជកាល')) return 'king';
+  if (combinedText.includes('ថ្ងៃ') || combinedText.includes('ឆ្នាំ ១៩') || combinedText.includes('សតវត្សរ៍')) return 'history_dates';
   if (combinedText.includes('តម្លៃ') || combinedText.includes('កុលាបប៉ៃលិន') || combinedText.includes('ទុំទាវ') || combinedText.includes('ផ្កាស្រពោន')) return 'literature_theme';
-  if (combinedText.includes('និពន្ធ') || combinedText.includes('ញ៉ុក ថែម') || combinedText.includes('នូ ហាច') || combinedText.includes('រីម គីន')) return 'author';
+  if (combinedText.includes('និពន្ធ') || combinedText.includes('ញ៉ុក ថែម') || combinedText.includes('នូ ហាច') || combinedText.includes('រីម គីន') || combinedText.includes('ឌឹក គាម')) return 'author';
   if (combinedText.includes('អាស៊ីត') || combinedText.includes('acid')) return 'acid';
   if (combinedText.includes('kmno4') || combinedText.includes('h2so4') || combinedText.includes('naoh')) return 'compound';
 
@@ -563,48 +628,16 @@ function generateSecretAcademicHint(q, correctAnswer) {
 }
 
 /**
- * Balance the character lengths of options so no single choice stands out as obviously long or short.
+ * Balance the character lengths of options cleanly without appending arbitrary nonsense clauses.
  * @param {Array} options - Array of string options
  * @param {number} correctIdx - The index of the correct answer
- * @returns {Array} - Length-balanced options
+ * @returns {Array} - Clean options
  */
 export function balanceOptionLengths(options, correctIdx = 0) {
   if (!Array.isArray(options) || options.length < 2) return options;
-  const rawCorrect = options[correctIdx] !== undefined ? options[correctIdx] : options[0];
-  const correctOpt = typeof rawCorrect === 'string' ? rawCorrect.trim() : String(rawCorrect || '');
-  const targetLen = correctOpt.length;
-  const isNumeric = options.every((opt) => /^[-+]?\d*\.?\d+(\s*\w+)?$/.test(String(opt).trim()));
-
-  if (isNumeric) {
-    return options.map((opt) => (typeof opt === 'string' ? opt.trim() : String(opt)));
-  }
-
-  // Academic contextual clauses to balance short distractors when the correct answer is elaborate
-  const BALANCING_CLAUSES = [
-    ' និងការអភិវឌ្ឍសង្គមជាតិប្រកបដោយចីរភាព',
-    ' ស្របតាមគោលការណ៍អប់រំ និងប្រពៃណីជាតិ',
-    ' ក្នុងបរិបទសង្គមជាក់ស្តែង និងជីវភាពរស់នៅ',
-    ' ដោយផ្អែកលើការស្រាវជ្រាវត្រឹមត្រូវតាមក្បួនខ្នាត',
-    ' និងគុណធម៌សីលធម៌ខ្ពស់ក្នុងការរស់នៅ',
-    ' ដើម្បីឆ្លុះបញ្ចាំងពីតថភាពសង្គមជាក់ស្តែង',
-    ' និងការថែរក្សាអត្តសញ្ញាណវប្បធម៌ជាតិ',
-    ' ក្នុងការកសាងសន្តិភាព និងវិបុលភាពយូរអង្វែង'
-  ];
-
-  return options.map((opt, idx) => {
+  return options.map((opt) => {
     let text = typeof opt === 'string' ? opt.trim() : String(opt || '');
-    text = text.replace(/ថៅកែចិត្រក/g, 'ថៅកែចៅចិត្ត').replace(/ចិត្រក/g, 'ចៅចិត្ត').replace(/\*\*/g, '');
-
-    if (idx === correctIdx) return text;
-
-    // If correct answer is long (>= 40 chars) and this distractor is too short (< 65% of targetLen)
-    if (targetLen >= 40 && text.length < targetLen * 0.65) {
-      const clause = BALANCING_CLAUSES[idx % BALANCING_CLAUSES.length];
-      if (!text.includes('និង') && !text.includes('ក្នុង') && !text.includes('ដោយ')) {
-        text = `${text}${clause}`;
-      }
-    }
-    return text;
+    return text.replace(/ថៅកែចិត្រក/g, 'ថៅកែចៅចិត្ត').replace(/ចិត្រក/g, 'ចៅចិត្ត').replace(/\*\*/g, '').trim();
   });
 }
 

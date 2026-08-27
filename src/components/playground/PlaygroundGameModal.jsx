@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useAuth, computeLevelData } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
-import { getRandomizedGameQuestions, fetchLiveExamQuestions } from '../../utils/gamePoolManager';
+import { getRandomizedGameQuestions, fetchLiveExamQuestions, resetGameSessionQuestions } from '../../utils/gamePoolManager';
 import VictoryRewardCelebration from './VictoryRewardCelebration';
 import AcademicTextRenderer from '../common/AcademicTextRenderer';
 
@@ -153,6 +153,7 @@ export default function PlaygroundGameModal({ game, onClose }) {
   const handleRestart = () => {
     clearTimeout(autoNextTimerRef.current);
     clearInterval(countdownIntervalRef.current);
+    resetGameSessionQuestions();
     setQuestions(getRandomizedGameQuestions(game, 8, student?.grade, game?.stream || student?.stream));
     setCurrentQIndex(0);
     setSelectedOption(null);
