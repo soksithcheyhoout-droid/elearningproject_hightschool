@@ -352,19 +352,28 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   const hostKickedRef = useRef(false); // Tracks if host just kicked challenger (prevents poller re-firing)
   const lastProcessedTurnRef = useRef(null); // Prevents 700ms poller from restarting the 3-2-1 turn countdown
 
-  const currentQ = (questions && questions[currentQIndex]) || (questions && questions[0]) || (
-    selectedStream === 'social' ? {
-      q: 'តើប្រាសាទអង្គរវត្តត្រូវបានកសាងឡើងក្នុងរជ្ជកាលព្រះបាទណា?',
-      options: ['ព្រះបាទជ័យវរ្ម័នទី៧', 'ព្រះបាទសូរ្យវរ្ម័នទី២', 'ព្រះបាទយសោវរ្ម័នទី១', 'ព្រះបាទឥសានវរ្ម័ន'],
-      answer: 1,
-      explanation: 'ប្រាសាទអង្គរវត្តត្រូវបានកសាងឡើងក្នុងរជ្ជកាលព្រះបាទសូរ្យវរ្ម័នទី២ ក្នុងសតវត្សរ៍ទី១២។'
-    } : {
-      q: 'គណនា lim (x → 2) (x² - 4) / (x - 2) = ?',
-      options: ['0', '2', '4', '8'],
-      answer: 2,
-      explanation: '(x-2)(x+2)/(x-2) = x+2 => 4'
+  const currentQ = useMemo(() => {
+    let q = (questions && questions[currentQIndex]) || (questions && questions[0]);
+    if (!q) {
+      q = selectedStream === 'social' ? {
+        q: 'តើប្រាសាទអង្គរវត្តត្រូវបានកសាងឡើងក្នុងរជ្ជកាលព្រះបាទណា?',
+        options: ['ព្រះបាទជ័យវរ្ម័នទី៧', 'ព្រះបាទសូរ្យវរ្ម័នទី២', 'ព្រះបាទយសោវរ្ម័នទី១', 'ព្រះបាទឥសានវរ្ម័ន'],
+        answer: 1,
+        explanation: 'ប្រាសាទអង្គរវត្តត្រូវបានកសាងឡើងក្នុងរជ្ជកាលព្រះបាទសូរ្យវរ្ម័នទី២ ក្នុងសតវត្សរ៍ទី១២។'
+      } : {
+        q: 'គណនា lim (x → 2) (x² - 4) / (x - 2) = ?',
+        options: ['0', '2', '4', '8'],
+        answer: 2,
+        explanation: '(x-2)(x+2)/(x-2) = x+2 => 4'
+      };
     }
-  );
+    // Strictly guarantee all 8 options (A through H) on the fly
+    if (q && Array.isArray(q.options) && q.options.length < 8) {
+      const [expanded] = expandQuestionsTo8Options([q]);
+      return expanded || q;
+    }
+    return q;
+  }, [questions, currentQIndex, selectedStream]);
 
   const myCorrectCount = isHost ? hostCorrectCount : challengerCorrectCount;
   const opponentCorrectCount = isHost ? challengerCorrectCount : hostCorrectCount;
@@ -511,7 +520,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     clearInterval(countdownIntervalRef.current);
 
     if (Array.isArray(roomQuestions) && roomQuestions.length > 0) {
-      setQuestions(roomQuestions);
+      setQuestions(expandQuestionsTo8Options(roomQuestions));
     }
     lastProcessedTurnRef.current = null;
     setCurrentQIndex(0);
@@ -595,7 +604,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
           if (msg.type === 'STREAM_CHANGED' && msg.stream) {
             setSelectedStream(msg.stream);
             if (Array.isArray(msg.questions) && msg.questions.length > 0) {
-              setQuestions(msg.questions);
+              setQuestions(expandQuestionsTo8Options(msg.questions));
             }
           }
         }
@@ -622,7 +631,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             if (res.room.challenger) setChallengerPlayer(res.room.challenger);
             if (res.room.stream) setSelectedStream(res.room.stream);
             if (Array.isArray(res.room.questions) && res.room.questions.length > 0) {
-              setQuestions(res.room.questions);
+              setQuestions(expandQuestionsTo8Options(res.room.questions));
             }
           } else {
             setHostWarningNotice('ម្ចាស់បន្ទប់ (Admin) បានបោះបង់ ឬបិទការប្រកួតហើយ!');
@@ -638,7 +647,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
           }, 1800);
         });
     } else if (isHost && student) {
-      const initialPool = getRandomizedGameQuestions(game, 24, '12', selectedStream);
+      const initialPool = expandQuestionsTo8Options(getRandomizedGameQuestions(game, 24, '12', selectedStream));
       setQuestions(initialPool);
 
       api.createArenaRoom(roomCode, game?.id || 'sci-m-01', game?.subject || 'គណិតវិទ្យា', currentStudentPayload, initialPool, '12', selectedStream)
@@ -829,7 +838,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     if (soundEnabled) playSound.click();
     setSelectedStream(newStream);
 
-    const freshQuestions = getRandomizedGameQuestions(null, 24, student?.grade || '12', newStream);
+    const freshQuestions = expandQuestionsTo8Options(getRandomizedGameQuestions(null, 24, student?.grade || '12', newStream));
     setQuestions(freshQuestions);
 
     // Broadcast immediately across tabs
@@ -860,10 +869,11 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
         random: true
       }).then((livePool) => {
         if (Array.isArray(livePool) && livePool.length > 0) {
-          setQuestions(livePool);
+          const expandedPool = expandQuestionsTo8Options(livePool);
+          setQuestions(expandedPool);
           api.updateArenaRoom(roomCode, {
             stream: newStream,
-            questions: livePool
+            questions: expandedPool
           });
 
           try {
@@ -873,7 +883,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                 type: 'STREAM_CHANGED',
                 roomCode,
                 stream: newStream,
-                questions: livePool
+                questions: expandedPool
               });
               roomBc.close();
             }
@@ -901,7 +911,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
         setHostPlayer(res.room.host);
         setChallengerPlayer(currentStudentPayload);
         if (Array.isArray(res.room.questions) && res.room.questions.length > 0) {
-          setQuestions(res.room.questions);
+          setQuestions(expandQuestionsTo8Options(res.room.questions));
         }
         setTab('host');
         if (soundEnabled) playSound.click();

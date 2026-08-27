@@ -70,24 +70,105 @@ function shuffle(array) {
   return arr;
 }
 
-// Shuffle options of a single question and recalculate correct answer index
-function shuffleQuestionOptions(question) {
+// Expand questions to 8 choices by borrowing plausible distractors from the full bank pool
+function expandTo8Options(question, allQuestionsPool = []) {
   if (!question || !Array.isArray(question.options) || question.options.length === 0) {
     return question;
+  }
+
+  if (question.options.length >= 8) {
+    let hint = question.hint || '';
+    if (!hint && question.explanation) {
+      hint = question.explanation.length > 80 ? question.explanation.substring(0, 80) + '...' : question.explanation;
+    }
+    return { ...question, hint };
   }
 
   const safeAnswerIndex = typeof question.answer === 'number' && question.answer >= 0 && question.answer < question.options.length
     ? question.answer
     : 0;
 
-  const originalCorrectOption = question.options[safeAnswerIndex];
-  const shuffledOptions = shuffle(question.options);
-  const newAnswerIndex = shuffledOptions.indexOf(originalCorrectOption);
+  const correctAnswer = question.options[safeAnswerIndex];
+  const originalWrongs = question.options.filter((_, idx) => idx !== safeAnswerIndex);
+
+  const existingSet = new Set(question.options.map(o => typeof o === 'string' ? o.trim().toLowerCase() : String(o)));
+  if (typeof correctAnswer === 'string') existingSet.add(correctAnswer.trim().toLowerCase());
+
+  const needed = 8 - question.options.length;
+  const extraDistractors = [];
+
+  // 1. Gather same-subject distractors from full pool
+  const sub = (question.subjectKey || question.subject || '').toLowerCase();
+  const sameSubQuestions = allQuestionsPool.filter(q => (q.subjectKey || q.subject || '').toLowerCase() === sub);
+  const shuffledSameSub = shuffle(sameSubQuestions);
+
+  for (const q of shuffledSameSub) {
+    if (extraDistractors.length >= needed) break;
+    if (Array.isArray(q.options)) {
+      for (let i = 0; i < q.options.length; i++) {
+        if (i !== q.answer && typeof q.options[i] === 'string' && q.options[i].trim()) {
+          const opt = q.options[i].trim();
+          const key = opt.toLowerCase();
+          if (!existingSet.has(key)) {
+            existingSet.add(key);
+            extraDistractors.push(opt);
+            if (extraDistractors.length >= needed) break;
+          }
+        }
+      }
+    }
+  }
+
+  // 2. Gather from general pool
+  if (extraDistractors.length < needed) {
+    const shuffledGeneral = shuffle(allQuestionsPool);
+    for (const q of shuffledGeneral) {
+      if (extraDistractors.length >= needed) break;
+      if (Array.isArray(q.options)) {
+        for (let i = 0; i < q.options.length; i++) {
+          if (i !== q.answer && typeof q.options[i] === 'string' && q.options[i].trim()) {
+            const opt = q.options[i].trim();
+            const key = opt.toLowerCase();
+            if (!existingSet.has(key)) {
+              existingSet.add(key);
+              extraDistractors.push(opt);
+              if (extraDistractors.length >= needed) break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 3. Fallback fillers
+  const fallbackFillers = ['ជម្រើសមិនត្រឹមត្រូវ', 'គ្មានចម្លើយត្រឹមត្រូវ', 'គ្រប់ចម្លើយទាំងអស់សុទ្ធតែត្រឹមត្រូវ', 'ចម្លើយខាងលើមិនត្រឹមត្រូវ'];
+  for (const filler of fallbackFillers) {
+    if (extraDistractors.length >= needed) break;
+    const key = filler.toLowerCase();
+    if (!existingSet.has(key)) {
+      existingSet.add(key);
+      extraDistractors.push(filler);
+    }
+  }
+
+  const all8Options = [correctAnswer, ...originalWrongs, ...extraDistractors.slice(0, needed)];
+  const shuffled8 = shuffle(all8Options);
+  const newAnswerIndex = shuffled8.findIndex(o => o === correctAnswer);
+
+  let hint = question.hint || '';
+  if (!hint) {
+    if (question.explanation) {
+      hint = question.explanation.length > 80 ? question.explanation.substring(0, 80) + '...' : question.explanation;
+    } else if (question.subject) {
+      hint = `ព័ត៌មានជំនួយ៖ សំណួរនេះស្ថិតក្នុងមុខវិជ្ជា ${question.subject}`;
+    }
+  }
 
   return {
     ...question,
-    options: shuffledOptions,
-    answer: newAnswerIndex !== -1 ? newAnswerIndex : 0
+    options: shuffled8,
+    answer: newAnswerIndex !== -1 ? newAnswerIndex : 0,
+    hint: hint || 'សូមគិតឱ្យបានល្អិតល្អន់មុននឹងជ្រើសរើសចម្លើយ'
   };
 }
 
@@ -112,13 +193,6 @@ export const getQuestionBankStats = (req, res) => {
 
 /**
  * GET /api/questions/master-pool
- * Query parameters:
- * - stream: 'science' | 'social' | 'random' | 'all'
- * - subjectKey: 'math' | 'physics' | 'chemistry' | 'biology' | 'khmer' | 'history' | 'geography' | 'civics'
- * - grade: '1' - '12' | 'all'
- * - limit: number (default: 24, max: 200)
- * - random: boolean (default: true)
- * - excludeIds: comma-separated list of question ids or hashes to exclude
  */
 export const getQuestionsFromPool = (req, res) => {
   const bank = getMasterBank();
@@ -143,7 +217,6 @@ export const getQuestionsFromPool = (req, res) => {
   } else if (stream === 'science') {
     pool = [...scienceList];
   } else if (stream === 'random' || stream === 'all' || !stream) {
-    // Balanced interleave from both streams
     const shuffledSci = shuffle(scienceList);
     const shuffledSoc = shuffle(socialList);
     const maxLen = Math.max(shuffledSci.length, shuffledSoc.length);
@@ -182,7 +255,6 @@ export const getQuestionsFromPool = (req, res) => {
     if (exactMatches.length >= reqLimit) {
       pool = exactMatches;
     } else {
-      // Include neighboring grades within the same educational tier
       const tierMatches = pool.filter(q => {
         const qG = parseInt(q.grade, 10) || 12;
         if (targetGradeNum >= 10 && targetGradeNum <= 12) return qG >= 10 && qG <= 12;
@@ -204,8 +276,9 @@ export const getQuestionsFromPool = (req, res) => {
   const parsedLimit = Math.min(Math.max(parseInt(limit, 10) || 24, 1), 200);
   const selected = pool.slice(0, parsedLimit);
 
-  // Deeply shuffle options and re-index correct answer for each individual question
-  const randomizedQuestions = selected.map(q => shuffleQuestionOptions(q));
+  // Expand to 8 options and deeply shuffle options for each individual question
+  const allBank = [...scienceList, ...socialList];
+  const randomizedQuestions = selected.map(q => expandTo8Options(q, allBank));
 
   res.status(200).json({
     success: true,

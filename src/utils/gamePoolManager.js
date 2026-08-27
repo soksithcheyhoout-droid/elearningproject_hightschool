@@ -196,8 +196,8 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
   // Record selected questions as seen
   recordQuestionsAsSeen(selectedQuestions);
 
-  // Deeply shuffle options for every question
-  return selectedQuestions.map((q) => shuffleQuestionOptions(q));
+  // Deeply shuffle and expand every question to 8 options
+  return expandQuestionsTo8Options(selectedQuestions);
 }
 
 /**
@@ -222,7 +222,7 @@ export async function fetchLiveExamQuestions({ stream = 'science', subjectKey = 
     if (res.ok) {
       const data = await res.json();
       if (data && Array.isArray(data.questions) && data.questions.length > 0) {
-        const liveQuestions = data.questions.map((q) => shuffleQuestionOptions(q));
+        const liveQuestions = expandQuestionsTo8Options(data.questions);
         recordQuestionsAsSeen(liveQuestions);
         return liveQuestions;
       }
@@ -235,53 +235,91 @@ export async function fetchLiveExamQuestions({ stream = 'science', subjectKey = 
   return getRandomizedGameQuestions(null, limit, grade, stream);
 }
 
+// Global cache of authentic distractors by subject for robust 8-option expansion
+const globalDistractorsBySubject = {};
+const globalAllDistractors = [];
+
+if (Array.isArray(arenaMasterQuestionBank)) {
+  arenaMasterQuestionBank.forEach((item) => {
+    if (!item || !Array.isArray(item.options)) return;
+    const sub = item.subject || item.subjectKey || 'general';
+    if (!globalDistractorsBySubject[sub]) globalDistractorsBySubject[sub] = [];
+    item.options.forEach((opt, idx) => {
+      if (idx !== item.answer && typeof opt === 'string' && opt.trim()) {
+        const text = opt.trim();
+        globalDistractorsBySubject[sub].push(text);
+        globalAllDistractors.push(text);
+      }
+    });
+  });
+}
+
 /**
- * Expand 4-option questions to 8 options by borrowing plausible distractors
- * from other questions in the pool. Ensures the correct answer is preserved
- * and all 8 options are shuffled with the correct index recalculated.
+ * Expand questions to 8 options by borrowing plausible distractors
+ * from other questions in the pool or global master bank.
+ * Ensures the correct answer is preserved and all 8 options are shuffled.
  * Also generates a hint for each question from its explanation or subject context.
- * @param {Array} questions - Array of question objects with 4 options
+ * @param {Array} questions - Array of question objects
  * @returns {Array} - Questions expanded to 8 unique options each
  */
 export function expandQuestionsTo8Options(questions) {
   if (!Array.isArray(questions) || questions.length === 0) return questions;
 
-  // Build a pool of all wrong answers grouped by subject for smart distractors
-  const wrongOptionsBySubject = {};
-  const allWrongOptions = [];
+  // Build a local pool of all wrong answers grouped by subject
+  const localWrongBySub = {};
+  const localAllWrong = [];
 
   questions.forEach((q) => {
     if (!q || !Array.isArray(q.options)) return;
     const subKey = q.subject || q.subjectKey || 'general';
-    if (!wrongOptionsBySubject[subKey]) wrongOptionsBySubject[subKey] = [];
+    if (!localWrongBySub[subKey]) localWrongBySub[subKey] = [];
     q.options.forEach((opt, idx) => {
-      if (idx !== q.answer && opt) {
-        wrongOptionsBySubject[subKey].push(opt);
-        allWrongOptions.push(opt);
+      if (idx !== q.answer && typeof opt === 'string' && opt.trim()) {
+        localWrongBySub[subKey].push(opt.trim());
+        localAllWrong.push(opt.trim());
       }
     });
   });
 
   return questions.map((q) => {
-    if (!q || !Array.isArray(q.options) || q.options.length < 4) return q;
+    if (!q || !Array.isArray(q.options) || q.options.length === 0) return q;
 
-    const correctAnswer = q.options[q.answer];
-    const originalWrongs = q.options.filter((_, idx) => idx !== q.answer);
+    // If already has 8 options, just ensure hint exists
+    if (q.options.length >= 8) {
+      let hint = q.hint || '';
+      if (!hint) {
+        if (q.explanation) {
+          const clean = q.explanation.replace(/<[^>]+>/g, '').trim();
+          hint = clean.length > 80 ? clean.substring(0, 80) + '...' : clean;
+        } else if (q.subject) {
+          hint = `ព័ត៌មានជំនួយ៖ សំណួរនេះស្ថិតក្នុងមុខវិជ្ជា ${q.subject}`;
+        }
+      }
+      return { ...q, hint };
+    }
 
-    // Gather candidate distractors from same subject first, then all subjects
+    const safeAnswerIdx = typeof q.answer === 'number' && q.answer >= 0 && q.answer < q.options.length ? q.answer : 0;
+    const correctAnswer = q.options[safeAnswerIdx];
+    const originalWrongs = q.options.filter((_, idx) => idx !== safeAnswerIdx);
+
     const subKey = q.subject || q.subjectKey || 'general';
-    const sameSubjectPool = shuffleArray(wrongOptionsBySubject[subKey] || []);
-    const otherPool = shuffleArray(allWrongOptions);
+    const sameSubPool = shuffleArray([
+      ...(localWrongBySub[subKey] || []),
+      ...(globalDistractorsBySubject[subKey] || []),
+      ...(globalDistractorsBySubject[q.subject] || []),
+      ...(globalDistractorsBySubject[q.subjectKey] || [])
+    ]);
+    const generalPool = shuffleArray([...localAllWrong, ...globalAllDistractors]);
 
-    // Existing option texts (lowercase for dedup)
-    const existingSet = new Set(q.options.map((o) => o.trim().toLowerCase()));
-    existingSet.add(correctAnswer.trim().toLowerCase());
+    const existingSet = new Set(q.options.map((o) => typeof o === 'string' ? o.trim().toLowerCase() : String(o)));
+    if (typeof correctAnswer === 'string') existingSet.add(correctAnswer.trim().toLowerCase());
 
+    const neededExtra = Math.max(0, 8 - q.options.length);
     const extraDistractors = [];
 
-    // Try same-subject distractors first (more plausible)
-    for (const candidate of sameSubjectPool) {
-      if (extraDistractors.length >= 4) break;
+    // 1. Try same-subject distractors first (authentic match)
+    for (const candidate of sameSubPool) {
+      if (extraDistractors.length >= neededExtra) break;
       const key = candidate.trim().toLowerCase();
       if (!existingSet.has(key)) {
         existingSet.add(key);
@@ -289,9 +327,9 @@ export function expandQuestionsTo8Options(questions) {
       }
     }
 
-    // Fill remaining from general pool
-    for (const candidate of otherPool) {
-      if (extraDistractors.length >= 4) break;
+    // 2. Fill from general bank pool
+    for (const candidate of generalPool) {
+      if (extraDistractors.length >= neededExtra) break;
       const key = candidate.trim().toLowerCase();
       if (!existingSet.has(key)) {
         existingSet.add(key);
@@ -299,45 +337,53 @@ export function expandQuestionsTo8Options(questions) {
       }
     }
 
-    // If we still don't have enough, generate labeled variants
-    while (extraDistractors.length < 4) {
-      const filler = `ចម្លើយទី ${q.options.length + extraDistractors.length + 1}`;
-      if (!existingSet.has(filler.toLowerCase())) {
-        existingSet.add(filler.toLowerCase());
+    // 3. Fallback subject-themed fillers if needed
+    const subjectThemedFillers = [
+      'ជម្រើសមិនត្រឹមត្រូវ',
+      'គ្មានចម្លើយត្រឹមត្រូវ',
+      'គ្រប់ចម្លើយទាំងអស់សុទ្ធតែត្រឹមត្រូវ',
+      'ចម្លើយខាងលើទាំងអស់មិនត្រឹមត្រូវ',
+      'ជម្រើសកែសម្រួលបន្ថែម',
+      'ចម្លើយមិនទាន់ពេញលេញ'
+    ];
+    for (const filler of subjectThemedFillers) {
+      if (extraDistractors.length >= neededExtra) break;
+      const key = filler.toLowerCase();
+      if (!existingSet.has(key)) {
+        existingSet.add(key);
         extraDistractors.push(filler);
-      } else {
-        extraDistractors.push(`ជម្រើសផ្សេង ${extraDistractors.length + 5}`);
       }
     }
 
-    // Combine all 8 options: correct + 3 original wrongs + 4 new distractors
-    const all8Options = [correctAnswer, ...originalWrongs, ...extraDistractors.slice(0, 4)];
+    // Combine all 8 options: correct + original wrongs + extra distractors
+    const all8Options = [correctAnswer, ...originalWrongs, ...extraDistractors.slice(0, neededExtra)];
     const shuffled8 = shuffleArray(all8Options);
     const newCorrectIdx = shuffled8.findIndex((opt) => opt === correctAnswer);
 
-    // Generate a smart hint from the question's context
-    let hint = '';
-    if (q.explanation) {
-      // Take first 60 chars of explanation as a clue
-      const cleanExplanation = q.explanation.replace(/<[^>]+>/g, '').trim();
-      hint = cleanExplanation.length > 80 ? cleanExplanation.substring(0, 80) + '...' : cleanExplanation;
-    } else if (q.subject) {
-      hint = `ព័ត៌មានជំនួយ៖ សំណួរនេះស្ថិតក្នុងមុខវិជ្ជា ${q.subject}`;
-      if (q.grade) hint += ` (ថ្នាក់ទី${q.grade})`;
+    // Generate a smart hint from explanation or subject context
+    let hint = q.hint || '';
+    if (!hint) {
+      if (q.explanation) {
+        const cleanExp = q.explanation.replace(/<[^>]+>/g, '').trim();
+        hint = cleanExp.length > 80 ? cleanExp.substring(0, 80) + '...' : cleanExp;
+      } else if (q.subject) {
+        hint = `ព័ត៌មានជំនួយ៖ សំណួរនេះស្ថិតក្នុងមុខវិជ្ជា ${q.subject}`;
+        if (q.grade) hint += ` (ថ្នាក់ទី${q.grade})`;
+      }
     }
 
-    // Determine the correct answer letter for the hint (1-indexed)
-    const correctLetter = String.fromCharCode(65 + (newCorrectIdx >= 0 ? newCorrectIdx : 0));
-    const letterHint = `ចម្លើយត្រឹមត្រូវចាប់ផ្តើមដោយអក្សរ "${correctAnswer.charAt(0)}"`;
+    const firstChar = typeof correctAnswer === 'string' && correctAnswer.length > 0 ? correctAnswer.charAt(0) : '';
+    const letterHint = firstChar ? `ចម្លើយត្រឹមត្រូវចាប់ផ្តើមដោយអក្សរ "${firstChar}"` : '';
 
     return {
       ...q,
       options: shuffled8,
       answer: newCorrectIdx >= 0 ? newCorrectIdx : 0,
-      hint: hint || letterHint,
-      letterHint: letterHint,
-      _original4Options: q.options,
-      _original4Answer: q.answer
+      hint: hint || letterHint || 'សូមគិតឱ្យបានល្អិតល្អន់មុននឹងជ្រើសរើសចម្លើយ',
+      letterHint: letterHint || 'ជ្រើសរើសចម្លើយដែលត្រឹមត្រូវបំផុត',
+      _originalOptions: q.options,
+      _originalAnswer: q.answer
     };
   });
 }
+
