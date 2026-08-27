@@ -147,15 +147,41 @@ export default function PlaygroundArenaView() {
               </p>
             </div>
 
-            <div className="flex flex-wrap items-center gap-3 pt-2">
-              <button
-                type="button"
-                onClick={() => setDuelGame(filteredGames[0] || playgroundGamesData[0])}
-                className="px-6 py-3.5 rounded-2xl bg-gradient-to-r from-rose-500 via-red-500 to-amber-500 hover:from-rose-400 hover:to-amber-400 text-white font-black text-xs sm:text-sm flex items-center gap-2.5 shadow-xl hover:shadow-2xl hover:scale-105 transition-all cursor-pointer active:scale-95"
-              >
-                <Swords className="w-4 h-4 fill-white" />
-                <span>{lang === 'km' ? 'បង្កើតបន្ទប់ប្រកួត 1v1 (START 1V1 DUEL)' : 'Start 1v1 Live Duel'}</span>
-              </button>
+            <div className="flex flex-wrap items-center gap-4 pt-2">
+              <div className="hacker-button-container">
+                <button
+                  type="button"
+                  onClick={() => setDuelGame(filteredGames[0] || playgroundGamesData[0])}
+                  className="hacker-button"
+                  data-text={lang === 'km' ? '⚔️ បង្កើតបន្ទប់ប្រកួត 1v1 (START 1V1 DUEL)' : '⚔️ START 1V1 DUEL'}
+                >
+                  <Swords className="w-4 h-4 fill-current relative z-10 text-purple-300" />
+                  <span className="relative z-10 font-bold">{lang === 'km' ? 'បង្កើតបន្ទប់ប្រកួត 1v1 (START 1V1 DUEL)' : 'Start 1v1 Live Duel'}</span>
+                  
+                  <div className="neon-frame" />
+                  <div className="circuit-traces">
+                    <div className="circuit-trace" />
+                    <div className="circuit-trace" />
+                    <div className="circuit-trace" />
+                    <div className="circuit-trace" />
+                    <div className="circuit-trace" />
+                  </div>
+                  <div className="code-fragments">
+                    <span className="code-fragment">0x1A</span>
+                    <span className="code-fragment">1100</span>
+                    <span className="code-fragment">DUEL</span>
+                    <span className="code-fragment">1V1</span>
+                    <span className="code-fragment">WIN</span>
+                  </div>
+                  <div className="interference" />
+                  <div className="scan-bars">
+                    <div className="scan-bar" />
+                    <div className="scan-bar" />
+                    <div className="scan-bar" />
+                  </div>
+                  <div className="text-glow" />
+                </button>
+              </div>
 
               <button
                 type="button"

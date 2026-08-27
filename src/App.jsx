@@ -678,91 +678,113 @@ function MainApp() {
 
 
 
-      {/* Mobile Bottom Navigation Bar (Hidden on Chat Tab to prevent keyboard overlapping input bar) */}
-      {activeTab !== 'chat' && (
-        <nav className="fixed bottom-0 left-0 right-0 z-40 bg-white/95 backdrop-blur-xl border-t border-slate-200 shadow-2xl px-1.5 py-1.5 flex items-center justify-around md:hidden select-none pb-[calc(0.375rem+env(safe-area-inset-bottom,0px))] font-kantumruy">
-          <button
-            type="button"
-            onClick={() => { setTabAndUrl('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-            className={`flex-1 flex flex-col items-center gap-0.5 py-1 rounded-xl text-[9.5px] font-bold transition-all cursor-pointer active:scale-90 ${
-              activeTab === 'home' 
-                ? 'text-[#005baa] bg-blue-50/90 font-black' 
-                : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            <Home className="w-4.5 h-4.5" />
-            <span>{lang === 'km' ? 'ទំព័រដើម' : 'Home'}</span>
-          </button>
+      {/* 🌟 Ultra-Fluid Curved Mobile Bottom Navigation Bar (Hidden on Desktop md:hidden & Chat View) */}
+      {activeTab !== 'chat' && (() => {
+        const getMobileActiveIndex = () => {
+          if (isAITutorOpen) return 5;
+          if (activeTab === 'home' || activeTab === 'dashboard') return 0;
+          if (activeTab === 'courses' || activeTab === 'classroom' || activeTab === 'library') return 1;
+          if (activeTab === 'playground') return 2;
+          if (activeTab === 'bacii') return 3;
+          if (activeTab === 'chat') return 4;
+          return 0;
+        };
 
-          <button
-            type="button"
-            onClick={() => { setTabAndUrl('courses'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-            className={`flex-1 flex flex-col items-center gap-0.5 py-1 rounded-xl text-[9.5px] font-bold transition-all cursor-pointer active:scale-90 ${
-              activeTab === 'courses' 
-                ? 'text-[#005baa] bg-blue-50/90 font-black' 
-                : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            <BookOpen className="w-4.5 h-4.5" />
-            <span>{lang === 'km' ? 'មេរៀន' : 'Lessons'}</span>
-          </button>
+        const activeIndex = getMobileActiveIndex();
 
-          {/* 🎮 ACADEMIC GAME ARENA / PLAYGROUND (RESPONSIVE MOBILE TAB) */}
-          <button
-            type="button"
-            onClick={() => { setTabAndUrl('playground'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-            className={`flex-1 flex flex-col items-center gap-0.5 py-1 rounded-xl text-[9.5px] font-bold transition-all cursor-pointer relative active:scale-90 ${
-              activeTab === 'playground' 
-                ? 'text-amber-600 bg-amber-50/90 font-black shadow-xs' 
-                : 'text-slate-500 hover:text-amber-600'
-            }`}
-          >
-            <div className="relative">
-              <Gamepad2 className={`w-4.5 h-4.5 ${activeTab === 'playground' ? 'text-amber-500 animate-pulse' : 'text-amber-500/80'}`} />
-              <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+        const navItems = [
+          { id: 'home', icon: Home, labelKm: 'ទំព័រដើម', labelEn: 'Home', action: () => { setTabAndUrl('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); } },
+          { id: 'courses', icon: BookOpen, labelKm: 'មេរៀន', labelEn: 'Lessons', action: () => { setTabAndUrl('courses'); window.scrollTo({ top: 0, behavior: 'smooth' }); } },
+          { id: 'playground', icon: Gamepad2, labelKm: 'ហ្គេម', labelEn: 'Games', action: () => { setTabAndUrl('playground'); window.scrollTo({ top: 0, behavior: 'smooth' }); }, badge: true },
+          { id: 'bacii', icon: GraduationCap, labelKm: 'បាក់ឌុប', labelEn: 'Bac II', action: () => { setTabAndUrl('bacii'); window.scrollTo({ top: 0, behavior: 'smooth' }); } },
+          { id: 'chat', icon: MessageSquare, labelKm: 'ជជែក', labelEn: 'Chat', action: () => { setTabAndUrl('chat'); window.scrollTo({ top: 0, behavior: 'smooth' }); }, badgeDot: true },
+          { id: 'ai', icon: Bot, labelKm: 'គ្រូ AI', labelEn: 'AI Tutor', action: () => setIsAITutorOpen(true) }
+        ];
+
+        return (
+          <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden select-none font-kantumruy">
+            {/* Curved White Bar Container */}
+            <div className="relative bg-white border-t border-slate-100/90 shadow-[0_-8px_30px_rgba(0,0,0,0.1)] rounded-t-[28px] h-[66px] flex items-center px-1 pb-[calc(0.35rem+env(safe-area-inset-bottom,0px))]">
+              
+              {/* Dynamic Curved Cutout Scoop (Follows Active Tab) */}
+              <svg
+                className="absolute -top-[16px] w-[72px] h-[20px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] drop-shadow-[0_-3px_5px_rgba(0,0,0,0.03)]"
+                style={{
+                  left: `calc(${activeIndex * (100 / 6)}% + ${(100 / 6) / 2}% - 36px)`
+                }}
+                viewBox="0 0 72 20"
+                fill="none"
+              >
+                <path
+                  d="M0 0 C 14 0, 18 18, 36 18 C 54 18, 58 0, 72 0 L 72 20 L 0 20 Z"
+                  fill="#ffffff"
+                />
+              </svg>
+
+              {/* Floating Active Circular Bubble */}
+              <div
+                className="absolute -top-[22px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-20"
+                style={{
+                  left: `calc(${activeIndex * (100 / 6)}% + ${(100 / 6) / 2}%)`,
+                  transform: 'translateX(-50%)'
+                }}
+              >
+                <div className="w-[48px] h-[48px] rounded-full bg-gradient-to-tr from-[#ff4765] to-[#ff6b8b] text-white flex items-center justify-center shadow-[0_8px_20px_rgba(255,71,101,0.5)] border-[3.5px] border-white">
+                  {activeIndex === 0 && <Home className="w-5 h-5 animate-scaleIn" />}
+                  {activeIndex === 1 && <BookOpen className="w-5 h-5 animate-scaleIn" />}
+                  {activeIndex === 2 && <Gamepad2 className="w-5 h-5 animate-scaleIn" />}
+                  {activeIndex === 3 && <GraduationCap className="w-5 h-5 animate-scaleIn" />}
+                  {activeIndex === 4 && <MessageSquare className="w-5 h-5 animate-scaleIn" />}
+                  {activeIndex === 5 && <Bot className="w-5 h-5 animate-scaleIn" />}
+                </div>
+              </div>
+
+              {/* Navigation Tab Buttons */}
+              {navItems.map((item, index) => {
+                const isActive = index === activeIndex;
+                const IconComponent = item.icon;
+
+                return (
+                  <button
+                    key={item.id}
+                    type="button"
+                    onClick={item.action}
+                    className="flex-1 flex flex-col items-center justify-center h-full relative z-10 cursor-pointer active:scale-95 transition-all group"
+                  >
+                    {/* Inactive Icon or Spacing Placeholder */}
+                    <div className="relative flex items-center justify-center h-6">
+                      {!isActive ? (
+                        <IconComponent className={`w-5 h-5 text-slate-400 group-hover:text-slate-600 transition-colors ${item.id === 'playground' ? 'text-amber-500/80' : ''}`} />
+                      ) : (
+                        <div className="h-2" />
+                      )}
+
+                      {/* Small badge / dots for inactive items */}
+                      {!isActive && item.badge && (
+                        <span className="absolute -top-1 -right-1.5 w-2 h-2 rounded-full bg-amber-500 animate-ping" />
+                      )}
+                      {!isActive && item.badgeDot && (
+                        <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                      )}
+                    </div>
+
+                    {/* Label */}
+                    <span
+                      className={`text-[9.5px] font-bold transition-all ${
+                        isActive
+                          ? 'text-[#ff4765] font-black scale-105 mt-1'
+                          : 'text-slate-500 group-hover:text-slate-800'
+                      }`}
+                    >
+                      {lang === 'km' ? item.labelKm : item.labelEn}
+                    </span>
+                  </button>
+                );
+              })}
             </div>
-            <span className="font-extrabold text-amber-600">{lang === 'km' ? 'ហ្គេម' : 'Games'}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => { setTabAndUrl('bacii'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-            className={`flex-1 flex flex-col items-center gap-0.5 py-1 rounded-xl text-[9.5px] font-bold transition-all cursor-pointer relative active:scale-90 ${
-              activeTab === 'bacii' 
-                ? 'text-rose-600 bg-rose-50/90 font-black' 
-                : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            <GraduationCap className="w-4.5 h-4.5" />
-            <span>{lang === 'km' ? 'បាក់ឌុប' : 'Bac II'}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => { setTabAndUrl('chat'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-            className={`flex-1 flex flex-col items-center gap-0.5 py-1 rounded-xl text-[9.5px] font-bold transition-all cursor-pointer relative active:scale-90 ${
-              activeTab === 'chat' 
-                ? 'text-[#005baa] bg-blue-50/90 font-black' 
-                : 'text-slate-500 hover:text-slate-800'
-            }`}
-          >
-            <div className="relative">
-              <MessageSquare className="w-4.5 h-4.5" />
-              <span className="absolute -top-0.5 -right-0.5 w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-            </div>
-            <span>{lang === 'km' ? 'ជជែក' : 'Chat'}</span>
-          </button>
-
-          <button
-            type="button"
-            onClick={() => setIsAITutorOpen(true)}
-            className="flex-1 flex flex-col items-center gap-0.5 py-1 rounded-xl text-[9.5px] font-bold text-amber-600 hover:text-amber-700 transition-all cursor-pointer active:scale-90"
-          >
-            <Bot className="w-4.5 h-4.5 text-amber-500 animate-bounce" />
-            <span>{lang === 'km' ? 'គ្រូ AI' : 'AI Tutor'}</span>
-          </button>
-        </nav>
-      )}
+          </nav>
+        );
+      })()}
 
     </div>
   );
