@@ -44,7 +44,8 @@ import {
   Layers,
   Target,
   Compass,
-  Rocket
+  Rocket,
+  Bot
 } from 'lucide-react';
 import { useAuth, computeLevelData } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
