@@ -300,9 +300,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
       
       {/* 1. Official MoTDAR Top Utility & Beta Testing Notice Ribbon */}
       <div 
-        className={`w-full bg-gradient-to-r from-[#00224d] via-[#004080] to-[#00224d] text-white py-1 px-3 sm:px-6 text-[10.5px] sm:text-[11px] font-medium transition-all duration-300 select-none border-b border-amber-400/25 ${
-          isScrolled ? 'hidden' : 'block'
-        }`}
+        className="w-full bg-gradient-to-r from-[#00224d] via-[#004080] to-[#00224d] text-white py-1 px-3 sm:px-6 text-[10.5px] sm:text-[11px] font-medium select-none border-b border-amber-400/25 block"
       >
         <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-3">
           <div className="flex items-center gap-2 min-w-0">

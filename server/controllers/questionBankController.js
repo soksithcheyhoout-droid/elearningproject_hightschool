@@ -91,8 +91,8 @@ export const getQuestionBankStats = (req, res) => {
  * Query parameters:
  * - stream: 'science' | 'social'
  * - subjectKey: 'math' | 'physics' | 'chemistry' | 'biology' | 'khmer' | 'history' | 'geography' | 'civics'
- * - grade: '10' | '11' | '12'
- * - limit: number (default: 20, max: 200)
+ * - grade: '1' - '12'
+ * - limit: number (default: 24, max: 200)
  * - random: boolean (default: true)
  */
 export const getQuestionsFromPool = (req, res) => {
@@ -101,7 +101,7 @@ export const getQuestionsFromPool = (req, res) => {
     return res.status(500).json({ error: 'Question bank not available' });
   }
 
-  const { stream, subjectKey, grade, limit = 20, random = 'true' } = req.query;
+  const { stream, subjectKey, grade, limit = 24, random = 'true' } = req.query;
   let pool = [];
 
   if (stream === 'social') {
@@ -116,8 +116,16 @@ export const getQuestionsFromPool = (req, res) => {
     pool = pool.filter(q => q.subjectKey === subjectKey);
   }
 
-  if (grade) {
-    pool = pool.filter(q => String(q.grade) === String(grade));
+  if (grade && grade !== 'all') {
+    const targetGrade = String(grade);
+    const exactMatches = pool.filter(q => String(q.grade) === targetGrade);
+    // If exact grade has enough questions, use exact; otherwise prioritize exact then same stream
+    if (exactMatches.length >= (parseInt(limit, 10) || 24)) {
+      pool = exactMatches;
+    } else if (exactMatches.length > 0) {
+      const rest = pool.filter(q => String(q.grade) !== targetGrade);
+      pool = [...exactMatches, ...rest];
+    }
   }
 
   const shouldRandom = random === 'true' || random === true;
@@ -125,7 +133,7 @@ export const getQuestionsFromPool = (req, res) => {
     pool = shuffle(pool);
   }
 
-  const parsedLimit = Math.min(Math.max(parseInt(limit, 10) || 20, 1), 200);
+  const parsedLimit = Math.min(Math.max(parseInt(limit, 10) || 24, 1), 200);
   const result = pool.slice(0, parsedLimit);
 
   res.status(200).json({

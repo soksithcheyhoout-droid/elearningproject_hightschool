@@ -311,16 +311,19 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   const [challengerCorrectCount, setChallengerCorrectCount] = useState(0);
   const [isOvertime, setIsOvertime] = useState(false);
 
-  // Turn-Based Game State
-  const [activeTurn, setActiveTurn] = useState('host'); // 'host' | 'challenger'
+  // Simultaneous Real-Time Battle State (Both players can answer simultaneously)
   const [turnStatus, setTurnStatus] = useState('playing'); // 'playing' | 'turn_ended'
-  const [turnResult, setTurnResult] = useState(null); // { answeredBy, selectedIdx, isCorrect, scoreEarned }
+  const [turnResult, setTurnResult] = useState(null); // { answeredBy, answeredByName, selectedIdx, isCorrect, scoreEarned }
   const [nextTurnCountdown, setNextTurnCountdown] = useState(3);
   const [secondsLeft, setSecondsLeft] = useState(15);
+  const [myWrongIndices, setMyWrongIndices] = useState(() => new Set());
+  const [wrongFeedbackNotice, setWrongFeedbackNotice] = useState('');
+  const [solvedQuestionsSet, setSolvedQuestionsSet] = useState(() => new Set());
 
   const autoNextTimerRef = useRef(null);
   const countdownIntervalRef = useRef(null);
   const pollingIntervalRef = useRef(null);
+  const botTimerRef = useRef(null);
   const hostKickedRef = useRef(false); // Tracks if host just kicked challenger (prevents poller re-firing)
   const lastProcessedTurnRef = useRef(null); // Prevents 700ms poller from restarting the 3-2-1 turn countdown
 
@@ -338,22 +341,18 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     }
   );
 
-  const isMyTurn = (isHost && activeTurn === 'host') || (!isHost && activeTurn === 'challenger');
-  const activePlayerName = activeTurn === 'host' ? (hostPlayer?.name || 'ម្ចាស់បន្ទប់') : (challengerPlayer?.name || 'គូប្រជែង');
-  const nextPlayerName = activeTurn === 'host' ? (challengerPlayer?.name || 'គូប្រជែង') : (hostPlayer?.name || 'ម្ចាស់បន្ទប់');
-
   const myCorrectCount = isHost ? hostCorrectCount : challengerCorrectCount;
   const opponentCorrectCount = isHost ? challengerCorrectCount : hostCorrectCount;
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
 
-    // Asynchronously enrich questions from question bank
+    // Asynchronously enrich questions from 60k question bank
     let isSubscribed = true;
     fetchLiveExamQuestions({
       stream: selectedStream === 'social' ? 'social' : selectedStream === 'random' ? 'all' : 'science',
       grade: '12',
-      limit: 24,
+      limit: 30,
       random: true
     }).then((livePool) => {
       if (isSubscribed && Array.isArray(livePool) && livePool.length > 0) {
@@ -370,8 +369,16 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
       clearTimeout(autoNextTimerRef.current);
       clearInterval(countdownIntervalRef.current);
       clearInterval(pollingIntervalRef.current);
+      clearTimeout(botTimerRef.current);
     };
   }, []);
+
+  // Reset wrong attempts and timer when question index advances
+  useEffect(() => {
+    setMyWrongIndices(new Set());
+    setWrongFeedbackNotice('');
+    setSecondsLeft(15);
+  }, [currentQIndex]);
 
   // Format student payload for room registration
   const currentStudentPayload = {
@@ -387,10 +394,34 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     isHost: isHost
   };
 
-  // Switch to next turn & question
+  // Helper to add AI Scholar Bot as Challenger opponent
+  const handleAddAIBot = () => {
+    if (soundEnabled) playSound.click();
+    const bot = {
+      id: 'bot_ai_scholar_99',
+      name: '🤖 AI Scholar Bot',
+      username: 'ai.scholar.bot',
+      school: 'វិទ្យាល័យជាតិ (AI Bot ថ្នាក់ជាតិ)',
+      province: 'រាជធានីភ្នំពេញ',
+      level: 10,
+      xp: 4950,
+      avatar: '/assets/anime/boys/boy_2.png',
+      avatarFrame: '/assets/frames/cyberpunk_neon_dragon.png',
+      isHost: false,
+      isBot: true
+    };
+    setChallengerPlayer(bot);
+    setIsChallengerReady(true);
+    setShowInviteModal(false);
+    setInviteFeedback('');
+    setHostWarningNotice('');
+  };
+
+  // Switch to next question (Idempotent for both Host & Challenger)
   const handleSwitchToNextTurn = useCallback(async () => {
     clearTimeout(autoNextTimerRef.current);
     clearInterval(countdownIntervalRef.current);
+    clearTimeout(botTimerRef.current);
 
     // Win condition: Player must reach 6 correct answers
     if (hostCorrectCount >= 6 || challengerCorrectCount >= 6) {
@@ -404,33 +435,33 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
       return;
     }
 
-    // Prepare next question
+    // Prepare next question from 60k pool without repeating solved ones
     let extra = [];
     if (currentQIndex + 1 >= questions.length) {
-      extra = getRandomizedGameQuestions(game, 15, '12', selectedStream);
+      extra = getRandomizedGameQuestions(game, 20, '12', selectedStream).filter(
+        q => !solvedQuestionsSet.has(q?.id || q?.q)
+      );
       setQuestions((prev) => [...prev, ...extra]);
     }
 
     const nextIdx = currentQIndex + 1;
-    const nextActiveTurn = activeTurn === 'host' ? 'challenger' : 'host';
     setCurrentQIndex(nextIdx);
-    setActiveTurn(nextActiveTurn);
+    setMyWrongIndices(new Set());
+    setWrongFeedbackNotice('');
     setTurnStatus('playing');
     setTurnResult(null);
     setSecondsLeft(15);
     setNextTurnCountdown(3);
 
-    // Both Host & Challenger can invoke nextTurn with currentQIndex idempotency
     try {
       await api.nextTurn(roomCode, currentQIndex, extra);
     } catch (e) { }
-  }, [currentQIndex, questions.length, activeTurn, roomCode, hostCorrectCount, challengerCorrectCount, myCorrectCount, opponentCorrectCount, addXP, game]);
+  }, [currentQIndex, questions.length, roomCode, hostCorrectCount, challengerCorrectCount, myCorrectCount, opponentCorrectCount, addXP, game, selectedStream, solvedQuestionsSet]);
 
-  // Start 3-2-1 countdown after an answer is submitted (Guaranteed 1 execution per turn)
+  // Start 3-2-1 countdown after an answer is solved (Guaranteed 1 execution per question)
   const triggerTurnEndCountdown = useCallback((result) => {
     if (!result) return;
 
-    // Deduplication check: Do NOT restart countdown if already processing this turn
     const turnKey = result.turnId || `${result.answeredBy}_${result.timestamp || ''}_${result.selectedIdx}`;
     if (lastProcessedTurnRef.current === turnKey) {
       return;
@@ -452,7 +483,6 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     clearTimeout(autoNextTimerRef.current);
 
     let countRemaining = 3;
-
     countdownIntervalRef.current = setInterval(() => {
       countRemaining -= 1;
       if (countRemaining >= 1) {
@@ -472,13 +502,15 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   const startMatch = (roomQuestions = null) => {
     clearTimeout(autoNextTimerRef.current);
     clearInterval(countdownIntervalRef.current);
+    clearTimeout(botTimerRef.current);
 
     if (Array.isArray(roomQuestions) && roomQuestions.length > 0) {
       setQuestions(roomQuestions);
     }
     lastProcessedTurnRef.current = null;
     setCurrentQIndex(0);
-    setActiveTurn('host');
+    setMyWrongIndices(new Set());
+    setWrongFeedbackNotice('');
     setTurnStatus('playing');
     setTurnResult(null);
     setMyScore(0);
@@ -1040,14 +1072,15 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     setTab('host');
   };
 
-  // Timeout handler for 15s round - RUNS ONLY ON ACTIVE PLAYER'S BROWSER
+  // Timeout handler for 15s round (Advances when timer expires)
   const handleRoundTimeout = useCallback(() => {
-    if (turnStatus === 'turn_ended' || currentStep !== 'battle' || !isMyTurn) return;
+    if (turnStatus === 'turn_ended' || currentStep !== 'battle') return;
 
     const now = Date.now();
     const timeoutResult = {
-      turnId: `turn_to_${now}_${activeTurn}`,
-      answeredBy: activeTurn,
+      turnId: `turn_to_${now}_${currentQIndex}`,
+      answeredBy: 'none',
+      answeredByName: 'គ្មានកីឡាករ',
       selectedIdx: -1,
       isCorrect: false,
       scoreEarned: 0,
@@ -1057,16 +1090,18 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
       timestamp: now
     };
 
-    try {
-      api.submitTurnAnswer(roomCode, isHost, -1, false, 0, true);
-    } catch (e) { }
+    if (isHost) {
+      try {
+        api.submitTurnAnswer(roomCode, isHost, -1, false, 0, true);
+      } catch (e) { }
+    }
 
     triggerTurnEndCountdown(timeoutResult);
-  }, [turnStatus, currentStep, isMyTurn, activeTurn, hostCorrectCount, challengerCorrectCount, roomCode, isHost, triggerTurnEndCountdown]);
+  }, [turnStatus, currentStep, currentQIndex, hostCorrectCount, challengerCorrectCount, roomCode, isHost, triggerTurnEndCountdown]);
 
-  // Question Timer (15s) - ONLY RUNS WHEN IT'S THIS PLAYER'S TURN
+  // Question Timer (15s) - Active for both players during round
   useEffect(() => {
-    if (currentStep !== 'battle' || turnStatus === 'turn_ended' || !isMyTurn) return;
+    if (currentStep !== 'battle' || turnStatus === 'turn_ended') return;
 
     const timer = setInterval(() => {
       setSecondsLeft((prev) => {
@@ -1083,37 +1118,113 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     }, 1000);
 
     return () => clearInterval(timer);
-  }, [currentStep, currentQIndex, turnStatus, isMyTurn, handleRoundTimeout, soundEnabled]);
+  }, [currentStep, currentQIndex, turnStatus, handleRoundTimeout, soundEnabled]);
 
-  // Active Player clicks an answer option
+  // AI Scholar Bot Simulation (When playing 1v1 vs Bot)
+  useEffect(() => {
+    if (currentStep !== 'battle' || turnStatus !== 'playing' || !challengerPlayer?.isBot || !isHost) return;
+
+    clearTimeout(botTimerRef.current);
+
+    // Bot decides to answer between 4.2s and 8.0s
+    const botDelay = 4200 + Math.random() * 3800;
+    botTimerRef.current = setTimeout(() => {
+      if (turnStatus !== 'playing') return;
+
+      // Bot accuracy ~75%
+      const willBeCorrect = Math.random() < 0.75;
+      let botChoice = currentQ.answer;
+
+      if (!willBeCorrect) {
+        const wrongOpts = currentQ.options.map((_, i) => i).filter(i => i !== currentQ.answer);
+        botChoice = wrongOpts[Math.floor(Math.random() * wrongOpts.length)];
+      }
+
+      if (botChoice === currentQ.answer) {
+        if (soundEnabled) playSound.correct();
+        const botPoints = 500 + Math.max(secondsLeft - 4, 1) * 25;
+        const nextChalCount = challengerCorrectCount + 1;
+        setOpponentScore(prev => prev + botPoints);
+        setChallengerCorrectCount(nextChalCount);
+
+        const qKey = currentQ?.id || currentQ?.q || `q_${currentQIndex}`;
+        setSolvedQuestionsSet(prev => new Set([...prev, qKey]));
+
+        const now = Date.now();
+        const result = {
+          turnId: `bot_win_${now}_${currentQIndex}`,
+          answeredBy: 'challenger',
+          answeredByName: challengerPlayer.name || 'AI Scholar Bot',
+          selectedIdx: botChoice,
+          isCorrect: true,
+          scoreEarned: botPoints,
+          isTimeout: false,
+          hostCorrectCount,
+          challengerCorrectCount: nextChalCount,
+          timestamp: now
+        };
+        triggerTurnEndCountdown(result);
+      } else {
+        if (soundEnabled) playSound.wrong();
+        setWrongFeedbackNotice(`${challengerPlayer.name || 'AI Scholar Bot'} បានឆ្លើយខុស! ឱកាសរបស់អ្នក!`);
+        setTimeout(() => setWrongFeedbackNotice(''), 3000);
+      }
+    }, botDelay);
+
+    return () => clearTimeout(botTimerRef.current);
+  }, [currentStep, currentQIndex, turnStatus, challengerPlayer, isHost, currentQ, secondsLeft, hostCorrectCount, challengerCorrectCount, soundEnabled, triggerTurnEndCountdown]);
+
+  // Player clicks an answer option (Wrong = Retry, Correct = First to solve wins round)
   const handleSelectOption = async (idx) => {
-    if (!isMyTurn || turnStatus === 'turn_ended' || currentStep !== 'battle') return;
+    if (turnStatus === 'turn_ended' || currentStep !== 'battle') return;
+    if (myWrongIndices.has(idx)) return; // Already tried this option and it was wrong
 
     const isCorrect = idx === currentQ.answer;
-    let pointsEarned = 0;
+
+    // CASE 1: WRONG ANSWER -> Mark as wrong, play feedback, KEEP QUESTION ACTIVE FOR RETRY!
+    if (!isCorrect) {
+      if (soundEnabled) playSound.wrong();
+      setMyWrongIndices((prev) => new Set([...prev, idx]));
+      setWrongFeedbackNotice('❌ ចម្លើយមិនត្រឹមត្រូវ! សូមសាកល្បងជ្រើសរើសចម្លើយផ្សេងទៀត...');
+      setTimeout(() => setWrongFeedbackNotice(''), 3000);
+
+      try {
+        api.submitTurnAnswer(roomCode, isHost, idx, false, 0, false);
+      } catch (e) { }
+      return;
+    }
+
+    // CASE 2: CORRECT ANSWER -> FIRST PLAYER TO ANSWER WINS THE QUESTION ROUND!
+    if (soundEnabled) playSound.correct();
+    try {
+      confetti({ particleCount: 70, spread: 70, origin: { y: 0.65 } });
+    } catch (e) { }
+
+    const pointsEarned = 550 + secondsLeft * 30;
+    setMyScore((prev) => prev + pointsEarned);
 
     let nextHostCorrect = hostCorrectCount;
     let nextChallengerCorrect = challengerCorrectCount;
 
-    if (isCorrect) {
-      pointsEarned = 600 + secondsLeft * 25;
-      setMyScore((prev) => prev + pointsEarned);
-
-      if (isHost) {
-        nextHostCorrect += 1;
-        setHostCorrectCount(nextHostCorrect);
-      } else {
-        nextChallengerCorrect += 1;
-        setChallengerCorrectCount(nextChallengerCorrect);
-      }
+    if (isHost) {
+      nextHostCorrect += 1;
+      setHostCorrectCount(nextHostCorrect);
+    } else {
+      nextChallengerCorrect += 1;
+      setChallengerCorrectCount(nextChallengerCorrect);
     }
 
+    const qKey = currentQ?.id || currentQ?.q || `q_${currentQIndex}`;
+    setSolvedQuestionsSet((prev) => new Set([...prev, qKey]));
+
+    const myName = isHost ? (hostPlayer?.name || 'ម្ចាស់បន្ទប់') : (challengerPlayer?.name || 'គូប្រជែង');
     const now = Date.now();
     const result = {
-      turnId: `turn_ans_${now}_${isHost ? 'host' : 'chal'}_${idx}`,
+      turnId: `turn_win_${now}_${isHost ? 'host' : 'chal'}_${idx}`,
       answeredBy: isHost ? 'host' : 'challenger',
+      answeredByName: myName,
       selectedIdx: idx,
-      isCorrect,
+      isCorrect: true,
       scoreEarned: pointsEarned,
       isTimeout: false,
       hostCorrectCount: nextHostCorrect,
@@ -1121,12 +1232,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
       timestamp: now
     };
 
-    // Immediately trigger evaluation & 3-2-1 countdown on this client
     triggerTurnEndCountdown(result);
 
-    // Sync turn result with backend room
     try {
-      await api.submitTurnAnswer(roomCode, isHost, idx, isCorrect, pointsEarned, false);
+      await api.submitTurnAnswer(roomCode, isHost, idx, true, pointsEarned, false);
     } catch (e) { }
   };
 
@@ -1724,14 +1833,34 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                           ចុចប៊ូតុងខាងក្រោមដើម្បីអញ្ជើញ ឬចែករំលែក PIN
                         </span>
                         
-                        {/* Custom Valorant Slanted Invite Button */}
-                        <div className="valorant-btn-borders mt-3.5">
+                        {/* Action Buttons: Invite & Instant AI Bot */}
+                        <div className="flex flex-col sm:flex-row items-center gap-2 mt-3.5">
+                          <div className="valorant-btn-borders">
+                            <button
+                              type="button"
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                fetchStudents();
+                                setShowInviteModal(true);
+                              }}
+                              className="valorant-invite-btn py-2 px-3.5"
+                            >
+                              <UserPlus className="w-4 h-4 text-rose-400" />
+                              <span>អញ្ជើញកីឡាករ (INVITE)</span>
+                            </button>
+                          </div>
+
                           <button
                             type="button"
-                            className="valorant-invite-btn"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleAddAIBot();
+                            }}
+                            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-black shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all border border-purple-400/40"
+                            title="លេងជាមួយ AI Scholar Bot ភ្លាមៗ"
                           >
-                            <UserPlus className="w-4 h-4 text-rose-400" />
-                            <span>អញ្ជើញកីឡាករ (INVITE)</span>
+                            <Bot className="w-3.5 h-3.5 text-amber-300 animate-bounce" />
+                            <span>លេងជាមួយ AI Bot</span>
                           </button>
                         </div>
                       </div>
@@ -1989,21 +2118,17 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
         )}
 
         {/* ========================================================================= */}
-        {/* STEP 3: LIVE TURN-BASED BATTLE */}
+        {/* STEP 3: LIVE SIMULTANEOUS 1V1 RACE BATTLE */}
         {/* ========================================================================= */}
         {currentStep === 'battle' && (
           <div className="p-2.5 sm:p-5 md:p-7 flex-1 flex flex-col overflow-y-auto space-y-2.5 sm:space-y-4 animate-fade-in" style={{ WebkitOverflowScrolling: 'touch' }}>
 
-            {/* ── Score HUD ── ALWAYS side-by-side on every device */}
+            {/* ── Score HUD ── Real-Time Progress for Both Players */}
             <div className="bg-[#0a1226]/90 backdrop-blur-sm p-2 sm:p-3 rounded-xl sm:rounded-2xl border border-slate-700/60 shadow-lg">
               <div className="grid grid-cols-[1fr_auto_1fr] gap-1.5 sm:gap-3 items-center">
 
                 {/* Host HUD */}
-                <div className={`flex items-center gap-1.5 sm:gap-2.5 p-1.5 sm:p-2.5 rounded-lg sm:rounded-xl transition-all min-w-0 ${
-                  activeTurn === 'host' 
-                    ? 'bg-indigo-950/60 border border-indigo-500/70 shadow-lg shadow-indigo-950/50 ring-1 sm:ring-2 ring-indigo-500/40' 
-                    : 'opacity-70 bg-slate-900/40 border border-slate-800'
-                }`}>
+                <div className="flex items-center gap-1.5 sm:gap-2.5 p-1.5 sm:p-2.5 rounded-lg sm:rounded-xl transition-all min-w-0 bg-indigo-950/60 border border-cyan-500/50 shadow-md">
                   <div className="relative flex-shrink-0">
                     <PlayerAvatarWithFrame
                       avatar={hostPlayer?.avatar}
@@ -2011,9 +2136,6 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                       name={hostPlayer?.name}
                       size="sm"
                     />
-                    {activeTurn === 'host' && (
-                      <div className="absolute -top-0.5 -right-0.5 w-2 h-2 sm:w-3 sm:h-3 bg-emerald-400 rounded-full animate-ping" />
-                    )}
                   </div>
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-0.5 text-[10px] sm:text-xs font-semibold">
@@ -2040,11 +2162,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                 </div>
 
                 {/* Challenger HUD */}
-                <div className={`flex items-center gap-1.5 sm:gap-2.5 p-1.5 sm:p-2.5 rounded-lg sm:rounded-xl transition-all min-w-0 ${
-                  activeTurn === 'challenger' 
-                    ? 'bg-rose-950/60 border border-rose-500/70 shadow-lg shadow-rose-950/50 ring-1 sm:ring-2 ring-rose-500/40' 
-                    : 'opacity-70 bg-slate-900/40 border border-slate-800'
-                }`}>
+                <div className="flex items-center gap-1.5 sm:gap-2.5 p-1.5 sm:p-2.5 rounded-lg sm:rounded-xl transition-all min-w-0 bg-rose-950/60 border border-rose-500/50 shadow-md">
                   <div className="min-w-0 flex-1">
                     <div className="flex items-center justify-between gap-0.5 text-[10px] sm:text-xs font-semibold">
                       <span className="text-rose-400 font-mono font-black text-[10px] sm:text-xs flex-shrink-0">{!isHost ? myScore : opponentScore}</span>
@@ -2068,35 +2186,40 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                       name={challengerPlayer?.name}
                       size="sm"
                     />
-                    {activeTurn === 'challenger' && (
-                      <div className="absolute -top-0.5 -right-0.5 w-2 h-2 sm:w-3 sm:h-3 bg-rose-400 rounded-full animate-ping" />
-                    )}
                   </div>
                 </div>
 
               </div>
             </div>
 
-            {/* ── Turn Announcement Banner */}
-            <div className={`p-2 sm:p-3 rounded-xl sm:rounded-2xl border text-center text-[10px] sm:text-xs font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all ${
-              isMyTurn
-                ? 'bg-gradient-to-r from-indigo-600/20 via-purple-600/25 to-indigo-600/20 border-indigo-500/50 text-indigo-200 shadow-md ring-1 ring-indigo-400/40'
-                : 'bg-slate-900/80 border-slate-800 text-slate-400'
-            }`}>
-              {isMyTurn ? (
-                <>
-                  <Zap className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400 animate-bounce flex-shrink-0" />
-                  <span>
-                    <strong>វេនអ្នក (Your Turn)</strong> ({secondsLeft}s)
-                  </span>
-                </>
-              ) : (
-                <>
-                  <Clock className="w-3 h-3 sm:w-4 sm:h-4 text-slate-400 animate-spin flex-shrink-0" style={{ animationDuration: '4s' }} />
-                  <span><strong>{activePlayerName}</strong> កំពុងឆ្លើយ...</span>
-                </>
-              )}
-            </div>
+            {/* ── Race Status & Wrong Feedback Banner */}
+            {wrongFeedbackNotice ? (
+              <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl border text-center text-[10px] sm:text-xs font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all bg-rose-500/20 border-rose-500/50 text-rose-200 animate-pulse shadow-md">
+                <AlertTriangle className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
+                <span>{wrongFeedbackNotice}</span>
+              </div>
+            ) : turnStatus === 'playing' ? (
+              <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl border text-center text-[10px] sm:text-xs font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all bg-gradient-to-r from-indigo-600/20 via-purple-600/25 to-indigo-600/20 border-indigo-500/50 text-indigo-200 shadow-md ring-1 ring-indigo-400/40">
+                <Zap className="w-3.5 h-3.5 text-amber-400 animate-bounce flex-shrink-0" />
+                <span>
+                  <strong>ការប្រណាំងល្បឿន (Speed Duel)</strong> • អ្នកណាឆ្លើយត្រូវមុនគេ ឈ្នះពិន្ទុ! ({secondsLeft}s)
+                </span>
+              </div>
+            ) : (
+              <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl border text-center text-[10px] sm:text-xs font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all bg-emerald-500/20 border-emerald-500/50 text-emerald-200 shadow-md">
+                {turnResult?.isCorrect ? (
+                  <>
+                    <Trophy className="w-3.5 h-3.5 text-amber-400 animate-bounce flex-shrink-0" />
+                    <span><strong>{turnResult.answeredByName || (turnResult.answeredBy === 'host' ? hostPlayer?.name : challengerPlayer?.name)}</strong> ឆ្លើយត្រូវមុនគេ! (+{turnResult.scoreEarned} pts)</span>
+                  </>
+                ) : (
+                  <>
+                    <Clock className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
+                    <span>អស់ពេល! គ្មានកីឡាករណាឆ្លើយត្រឹមត្រូវទេ</span>
+                  </>
+                )}
+              </div>
+            )}
 
             {/* ── Question Card */}
             <div className="bg-gradient-to-b from-[#0e1730] to-[#080d1e] rounded-xl sm:rounded-3xl p-3 sm:p-6 md:p-8 text-center border border-slate-700/60 shadow-xl relative overflow-hidden">
@@ -2112,26 +2235,26 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
               </h3>
             </div>
 
-            {/* ── 4 Answer Options */}
+            {/* ── 4 Answer Options (Simultaneous Clickable with Retry) */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-3">
               {currentQ.options.map((option, idx) => {
                 const config = BUTTON_CONFIGS[idx % 4];
-                const isSelectedByPlayer = turnResult && turnResult.selectedIdx === idx;
+                const isWrongForMe = myWrongIndices.has(idx);
                 const isCorrectOption = idx === currentQ.answer;
 
-                let btnStyle = 'bg-[#0e1730] border-slate-800 hover:border-slate-700 text-slate-200';
+                let btnStyle = 'bg-[#0e1730] border-slate-800 hover:border-indigo-400 hover:bg-slate-800/90 text-slate-200 cursor-pointer shadow-md';
 
                 if (turnStatus === 'turn_ended') {
                   if (isCorrectOption) {
-                    btnStyle = 'bg-emerald-950/80 border-emerald-400 text-emerald-200 ring-2 ring-emerald-400/60 shadow-lg shadow-emerald-950/60';
-                  } else if (isSelectedByPlayer && !turnResult?.isCorrect) {
+                    btnStyle = 'bg-emerald-950/90 border-emerald-400 text-emerald-200 ring-2 ring-emerald-400/80 shadow-lg shadow-emerald-950/80 scale-[1.01]';
+                  } else if (turnResult?.selectedIdx === idx && !turnResult?.isCorrect) {
                     btnStyle = 'bg-rose-950/80 border-rose-500 text-rose-300 ring-2 ring-rose-500/40';
                   } else {
                     btnStyle = 'bg-[#080d1a] border-slate-800/80 text-slate-600 opacity-40';
                   }
                 } else {
-                  if (!isMyTurn) {
-                    btnStyle = 'bg-[#080d1a] border-slate-800/80 text-slate-500 opacity-50 cursor-not-allowed';
+                  if (isWrongForMe) {
+                    btnStyle = 'bg-rose-950/70 border-rose-500/60 text-rose-300 opacity-60 cursor-not-allowed line-through';
                   }
                 }
 
@@ -2139,16 +2262,12 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                   <button
                     key={idx}
                     type="button"
-                    disabled={!isMyTurn || turnStatus === 'turn_ended'}
+                    disabled={turnStatus === 'turn_ended' || isWrongForMe}
                     onClick={() => handleSelectOption(idx)}
-                    className={`p-2.5 sm:p-4 rounded-xl sm:rounded-2xl border flex items-center gap-2 sm:gap-3.5 transition-all text-left ${
-                      isMyTurn && turnStatus === 'playing' 
-                        ? 'cursor-pointer hover:border-indigo-400 hover:bg-slate-800/90 active:scale-[0.98] shadow-md' 
-                        : ''
-                    } ${btnStyle}`}
+                    className={`p-2.5 sm:p-4 rounded-xl sm:rounded-2xl border flex items-center gap-2 sm:gap-3.5 transition-all text-left active:scale-[0.98] ${btnStyle}`}
                   >
-                    <div className={`w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl border flex items-center justify-center flex-shrink-0 font-mono font-black text-[11px] sm:text-sm shadow-xs ${config.badge}`}>
-                      {config.num}
+                    <div className={`w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl border flex items-center justify-center flex-shrink-0 font-mono font-black text-[11px] sm:text-sm shadow-xs ${isWrongForMe ? 'bg-rose-600/30 border-rose-500/50 text-rose-300' : config.badge}`}>
+                      {isWrongForMe ? '✕' : config.num}
                     </div>
                     <span
                       className="text-[11px] sm:text-sm font-bold flex-1 leading-snug"
@@ -2159,7 +2278,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                     {turnStatus === 'turn_ended' && isCorrectOption && (
                       <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 flex-shrink-0 animate-bounce" />
                     )}
-                    {turnStatus === 'turn_ended' && isSelectedByPlayer && !turnResult?.isCorrect && (
+                    {isWrongForMe && (
                       <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-rose-400 flex-shrink-0 animate-pulse" />
                     )}
                   </button>
@@ -2170,13 +2289,16 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             {/* ── Turn Result & Countdown ── ALWAYS single row */}
             <div className="bg-[#0a1226]/90 backdrop-blur-sm rounded-xl sm:rounded-2xl p-2 sm:p-3.5 border border-slate-700/60 text-[10px] sm:text-xs animate-fade-in shadow-md">
               {turnStatus === 'playing' ? (
-                <div className="flex items-center gap-1.5 sm:gap-2 text-slate-300 font-medium">
-                  <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400 flex-shrink-0" />
-                  <span>
-                    {isMyTurn
-                      ? `ជ្រើសចម្លើយ (${secondsLeft}s)...`
-                      : `រង់ចាំ ${activePlayerName}...`}
-                  </span>
+                <div className="flex items-center justify-between text-slate-300 font-medium">
+                  <div className="flex items-center gap-1.5 sm:gap-2">
+                    <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400 flex-shrink-0" />
+                    <span>ជ្រើសចម្លើយត្រឹមត្រូវមុនគេ ({secondsLeft}s)...</span>
+                  </div>
+                  {myWrongIndices.size > 0 && (
+                    <span className="text-[10px] text-amber-300 font-mono font-bold bg-amber-500/10 px-2 py-0.5 rounded-lg border border-amber-500/30">
+                      បានឆ្លើយខុស {myWrongIndices.size} លើក • សាកល្បងម្តងទៀត
+                    </span>
+                  )}
                 </div>
               ) : (
                 <div className="flex items-center justify-between gap-2">
@@ -2184,7 +2306,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                     {turnResult?.isCorrect ? (
                       <span className="text-emerald-400 font-black flex items-center gap-1 truncate">
                         <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
-                        <span className="truncate">✓ +{turnResult.scoreEarned}pts [{activeTurn === 'host' ? hostCorrectCount : challengerCorrectCount}/6]</span>
+                        <span className="truncate">✓ +{turnResult.scoreEarned}pts [{hostCorrectCount}:{challengerCorrectCount}]</span>
                       </span>
                     ) : (
                       <span className="text-rose-400 font-black flex items-center gap-1 truncate">
@@ -2194,7 +2316,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                     )}
                   </div>
                   <div className="flex items-center gap-1.5 bg-indigo-600/25 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-indigo-500/40 text-indigo-200 font-black font-mono flex-shrink-0">
-                    <span className="hidden sm:inline">វេនបន្ទាប់</span>
+                    <span className="hidden sm:inline">សំណួរបន្ទាប់</span>
                     <span className="sm:hidden">Next</span>
                     <span className="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px] animate-bounce shadow-md">
                       {nextTurnCountdown}
@@ -2377,6 +2499,32 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                   placeholder="ស្វែងរកឈ្មោះសិស្ស ឬសាលារៀន..."
                   className="w-full bg-[#080e1e] border border-slate-700 rounded-xl pl-9 pr-3 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-indigo-500"
                 />
+              </div>
+
+              {/* Instant Option: AI Scholar Bot */}
+              <div className="p-3 rounded-xl bg-gradient-to-r from-purple-950/80 via-indigo-950/80 to-slate-900/90 border border-purple-500/40 flex items-center justify-between gap-3 shadow-md">
+                <div className="flex items-center gap-3 min-w-0">
+                  <div className="w-10 h-10 rounded-full bg-purple-600/30 border border-purple-400/50 flex items-center justify-center flex-shrink-0 text-amber-300">
+                    <Bot className="w-5 h-5 animate-pulse" />
+                  </div>
+                  <div className="min-w-0">
+                    <h5 className="text-xs font-black text-white truncate flex items-center gap-1.5">
+                      <span>🤖 AI Scholar Bot (ថ្នាក់ជាតិ)</span>
+                      <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">ONLINE</span>
+                    </h5>
+                    <span className="text-[10px] text-purple-300 block truncate">
+                      កម្រិត Lv.10 • ឆ្លើយរហ័ស 1v1 Race Practice
+                    </span>
+                  </div>
+                </div>
+                <button
+                  type="button"
+                  onClick={handleAddAIBot}
+                  className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md transition-all cursor-pointer flex-shrink-0 active:scale-95 border border-purple-400/50 flex items-center gap-1"
+                >
+                  <Bot className="w-3.5 h-3.5" />
+                  <span>ជ្រើសរើស (SELECT)</span>
+                </button>
               </div>
 
               {loadingStudents ? (

@@ -367,7 +367,7 @@ export const getRoomInviteStatus = (req, res) => {
   }
 };
 
-// Player submits answer for their active turn
+// Player submits answer attempt (Simultaneous permission to answer: Wrong = retry, Correct = win round)
 export const submitTurnAnswer = (req, res) => {
   try {
     const { roomCode } = req.params;
@@ -377,23 +377,44 @@ export const submitTurnAnswer = (req, res) => {
       return res.status(404).json({ error: 'Room not found' });
     }
 
-    if (isHost) {
-      if (typeof scoreEarned === 'number') room.hostScore += scoreEarned;
-      if (isCorrect) room.hostCorrectCount = (room.hostCorrectCount || 0) + 1;
-    } else {
-      if (typeof scoreEarned === 'number') room.challengerScore += scoreEarned;
-      if (isCorrect) room.challengerCorrectCount = (room.challengerCorrectCount || 0) + 1;
+    const now = Date.now();
+
+    // CASE 1: WRONG ANSWER (Player can retry, question stays open!)
+    if (!isCorrect && !isTimeout) {
+      room.lastAttempt = {
+        answeredBy: isHost ? 'host' : 'challenger',
+        selectedIdx: typeof selectedIdx === 'number' ? selectedIdx : -1,
+        isCorrect: false,
+        timestamp: now
+      };
+      room.lastActive = now;
+      return res.json({ success: true, room, isWrongAttempt: true, canRetry: true });
+    }
+
+    // CASE 2: CORRECT ANSWER OR TIMEOUT (Resolves question round)
+    // If round already ended by the other player for this question index, avoid double counting
+    if (room.turnStatus === 'turn_ended' && !isTimeout) {
+      return res.json({ success: true, room, alreadyResolved: true });
+    }
+
+    if (isCorrect) {
+      if (isHost) {
+        if (typeof scoreEarned === 'number') room.hostScore += scoreEarned;
+        room.hostCorrectCount = (room.hostCorrectCount || 0) + 1;
+      } else {
+        if (typeof scoreEarned === 'number') room.challengerScore += scoreEarned;
+        room.challengerCorrectCount = (room.challengerCorrectCount || 0) + 1;
+      }
     }
 
     // Check if anyone reached 6 correct answers
     const hasHostWon = (room.hostCorrectCount || 0) >= 6;
     const hasChallengerWon = (room.challengerCorrectCount || 0) >= 6;
-    const now = Date.now();
 
     room.turnStatus = 'turn_ended';
     room.turnResult = {
       turnId: `turn_${now}_${Math.random().toString(36).substring(2, 7)}`,
-      answeredBy: isHost ? 'host' : 'challenger',
+      answeredBy: isTimeout ? 'none' : (isHost ? 'host' : 'challenger'),
       selectedIdx: typeof selectedIdx === 'number' ? selectedIdx : -1,
       isCorrect: !!isCorrect,
       scoreEarned: scoreEarned || 0,
