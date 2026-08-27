@@ -156,6 +156,13 @@ const STREAM_THEMES = {
   }
 };
 
+const BUTTON_CONFIGS = [
+  { num: 'A', badge: 'bg-indigo-600/30 border-indigo-400/60 text-indigo-200', icon: Triangle },
+  { num: 'B', badge: 'bg-cyan-600/30 border-cyan-400/60 text-cyan-200', icon: Diamond },
+  { num: 'C', badge: 'bg-amber-600/30 border-amber-400/60 text-amber-200', icon: Circle },
+  { num: 'D', badge: 'bg-emerald-600/30 border-emerald-400/60 text-emerald-200', icon: Square }
+];
+
 export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = null, initialHost = null }) {
   const { student, addXP } = useAuth();
   const levelInfo = computeLevelData(student?.xp || 3568);
