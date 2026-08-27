@@ -1,12 +1,15 @@
 /**
  * MoEYS Ministry Teacher AI Integration Service
- * Connects directly to the live Python AI Knowledge Engine with offline educational fallback.
+ * Connects directly to the Live Academic AI Knowledge Engine.
  */
+
+const AI_API_KEY = import.meta.env.VITE_AI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY || '';
+const AI_MODELS = ['gemini-3-flash-preview', 'gemini-3.1-flash-lite', 'gemini-flash-latest', 'gemma-4-26b-a4b-it'];
 
 const STORAGE_KEY = 'motdar_ai_key';
 
 export function getStoredGeminiKey() {
-  return localStorage.getItem(STORAGE_KEY) || '';
+  return localStorage.getItem(STORAGE_KEY) || AI_API_KEY;
 }
 
 export function saveStoredGeminiKey(key) {
@@ -18,7 +21,7 @@ export function saveStoredGeminiKey(key) {
 }
 
 export async function askMinistryAI(userPrompt, chatHistory = []) {
-  // 1. Query Pure Dynamic Node.js Live Knowledge & Google Engine via /api/ai/chat
+  // 1. First Priority: Query Backend API endpoint /api/ai/chat
   try {
     const apiRes = await fetch('/api/ai/chat', {
       method: 'POST',
@@ -32,11 +35,59 @@ export async function askMinistryAI(userPrompt, chatHistory = []) {
       }
     }
   } catch (backendErr) {
-    console.warn('Backend AI Tutor call notice:', backendErr);
+    console.warn('Backend AI Tutor call notice, using direct client AI engine:', backendErr);
   }
 
-  // 2. Intelligent Dynamic Fallback
-  return `**🎓 លោកគ្រូ AI ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ (MoTDAR) ៖**\n\nបាទប្អូន! លោកគ្រូបានទទួលសំណួរ «**${userPrompt}**» រួចហើយ។ សូមប្អូនពិនិត្យមើលការភ្ជាប់អ៊ីនធឺណិត ឬសាកល្បងសួរម្តងទៀតណា៎!`;
+  // 2. Second Priority: Direct Client-Side AI Call with User API Key
+  const activeKey = getStoredGeminiKey() || AI_API_KEY;
+  if (activeKey) {
+    const systemPrompt = `អ្នកគឺជា «លោកគ្រូ AI អប់រំជាតិ» នៃប្រព័ន្ធអប់រំឌីជីថលកម្ពុជា (MoEYS / MoTDAR)។
+តួនាទីរបស់អ្នក៖
+- ឆ្លើយតបជាភាសាខ្មែរយ៉ាងរលូន សុភាពរាបសារ និងច្បាស់លាស់ជាមួយសិស្សានុសិស្ស។
+- សម្រាប់មុខវិជ្ជាវិទ្យាសាស្ត្រ (គណិត, រូប, គីមី, ជីវវិទ្យា)៖ បង្ហាញរូបមន្ត ជំហានគណនាលម្អិត និងសេចក្តីសន្និដ្ឋានត្រឹមត្រូវ ១០០%។
+- សម្រាប់មុខវិជ្ជាសង្គម (អក្សរសាស្ត្រ, ប្រវត្តិ, ភូមិ, ពលរដ្ឋ)៖ ពន្យល់កាលបរិច្ឆេទ ព្រឹត្តិការណ៍ ចលនាអក្សរសិល្ប៍ និងច្បាប់ឱ្យបានស៊ីជម្រៅ។
+- ប្រើប្រាស់ Markdown (ចំណងជើង, តារាង, បញ្ជី, LaTeX Formulas $$...$$) ដើម្បីឱ្យអានងាយយល់ និងមានរបៀបរៀបរយ។
+- ហាមដាច់ខាតកុំនិយាយ ឬលើកឡើងពីឈ្មោះក្រុមហ៊ុន AI ឬឈ្មោះម៉ូដែលបច្ចេកវិទ្យាណាមួយឡើយ។`;
+
+    const formattedContents = [];
+    if (Array.isArray(chatHistory) && chatHistory.length > 0) {
+      for (const m of chatHistory.slice(-4)) {
+        const role = (m.sender === 'user' || m.role === 'user') ? 'user' : 'model';
+        const text = m.text || m.content || '';
+        if (text) formattedContents.push({ role, parts: [{ text }] });
+      }
+    }
+    formattedContents.push({
+      role: 'user',
+      parts: [{ text: `${systemPrompt}\n\nសំណួររបស់សិស្ស៖ ${userPrompt}` }]
+    });
+
+    for (const model of AI_MODELS) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(activeKey)}`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: formattedContents,
+            generationConfig: { temperature: 0.7, maxOutputTokens: 2048 }
+          })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (reply && reply.trim().length > 10) {
+            return reply.trim();
+          }
+        }
+      } catch (err) {
+        console.warn(`Direct model ${model} notice:`, err.message);
+      }
+    }
+  }
+
+  // 3. Fallback: Offline High-School Knowledge Engine
+  return fallbackStudyEngine(userPrompt);
 }
 
 export const askGeminiAI = askMinistryAI;
