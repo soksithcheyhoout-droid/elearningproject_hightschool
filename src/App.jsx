@@ -397,7 +397,7 @@ function MainApp() {
 
           {/* BAC II MASTER HUB TAB */}
           {activeTab === 'bacii' && (
-            <div className="animate-fadeIn">
+            <div className="max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-8 space-y-6 animate-fadeIn overflow-x-hidden">
               <BacIIHubView />
             </div>
           )}
@@ -414,21 +414,21 @@ function MainApp() {
 
           {/* DIGITAL LIBRARY TAB */}
           {activeTab === 'library' && (
-            <div className="animate-fadeIn">
+            <div className="max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-8 space-y-6 animate-fadeIn overflow-x-hidden">
               <DigitalLibraryView />
             </div>
           )}
 
           {/* VIRTUAL STEM LAB TAB */}
           {activeTab === 'lab' && (
-            <div className="animate-fadeIn">
+            <div className="max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-8 space-y-6 animate-fadeIn overflow-x-hidden">
               <VirtualLabView />
             </div>
           )}
 
           {/* ACADEMIC PLAYGROUND ARENA TAB */}
           {activeTab === 'playground' && (
-            <div className="animate-fadeIn">
+            <div className="max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-8 space-y-6 animate-fadeIn overflow-x-hidden">
               <PlaygroundArenaView />
             </div>
           )}
