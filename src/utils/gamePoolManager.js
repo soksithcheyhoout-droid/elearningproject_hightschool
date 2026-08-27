@@ -193,9 +193,11 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
 
   randomizedRaw.forEach((q) => {
     if (!q || !q.q) return;
-    const cleanText = q.q.trim();
-    if (seenTexts.has(cleanText)) return;
-    seenTexts.add(cleanText);
+    // Normalize core question text by stripping grade tags and whitespace to prevent repeated core questions
+    const cleanText = q.q.replace(/\s*\((ថ្នាក់ទី|Grade)\s*\d+\)/gi, '').replace(/\*\*/g, '').trim();
+    const coreKey = cleanText.toLowerCase();
+    if (seenTexts.has(coreKey)) return;
+    seenTexts.add(coreKey);
 
     // Hard stream guard
     if (requestedStream === 'social' && SCIENCE_SUBJECTS.has(q.subject) && !SOCIAL_SUBJECTS.has(q.subject)) return;
@@ -208,8 +210,8 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
       if (targetG >= 10 && qG < 7) return; // Keep high school away from 1st grade
     }
 
-    const qKey = q.id || cleanText;
-    if (recentSessionQuestionSet.has(qKey)) {
+    const qKey = q.id || coreKey;
+    if (recentSessionQuestionSet.has(qKey) || recentSessionQuestionSet.has(coreKey)) {
       fallbackSeenPool.push(q);
     } else {
       unseenPool.push(q);
@@ -227,8 +229,15 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
   // Record selected questions as seen
   recordQuestionsAsSeen(selectedQuestions);
 
-  // Deeply shuffle choices for every single question
-  return selectedQuestions.map(q => shuffleQuestionOptions(q));
+  // Deeply shuffle choices and balance option lengths for every single question
+  return selectedQuestions.map((q) => {
+    const cleanedQ = {
+      ...q,
+      q: (q.q || '').replace(/ថៅកែចិត្រក/g, 'ថៅកែចៅចិត្ត').replace(/ចិត្រក/g, 'ចៅចិត្ត').replace(/\*\*/g, ''),
+      explanation: (q.explanation || '').replace(/ថៅកែចិត្រក/g, 'ថៅកែចៅចិត្ត').replace(/ចិត្រក/g, 'ចៅចិត្ត').replace(/\*\*/g, '')
+    };
+    return shuffleQuestionOptions(cleanedQ);
+  });
 }
 
 /**
@@ -554,6 +563,52 @@ function generateSecretAcademicHint(q, correctAnswer) {
 }
 
 /**
+ * Balance the character lengths of options so no single choice stands out as obviously long or short.
+ * @param {Array} options - Array of string options
+ * @param {number} correctIdx - The index of the correct answer
+ * @returns {Array} - Length-balanced options
+ */
+export function balanceOptionLengths(options, correctIdx = 0) {
+  if (!Array.isArray(options) || options.length < 2) return options;
+  const rawCorrect = options[correctIdx] !== undefined ? options[correctIdx] : options[0];
+  const correctOpt = typeof rawCorrect === 'string' ? rawCorrect.trim() : String(rawCorrect || '');
+  const targetLen = correctOpt.length;
+  const isNumeric = options.every((opt) => /^[-+]?\d*\.?\d+(\s*\w+)?$/.test(String(opt).trim()));
+
+  if (isNumeric) {
+    return options.map((opt) => (typeof opt === 'string' ? opt.trim() : String(opt)));
+  }
+
+  // Academic contextual clauses to balance short distractors when the correct answer is elaborate
+  const BALANCING_CLAUSES = [
+    ' និងការអភិវឌ្ឍសង្គមជាតិប្រកបដោយចីរភាព',
+    ' ស្របតាមគោលការណ៍អប់រំ និងប្រពៃណីជាតិ',
+    ' ក្នុងបរិបទសង្គមជាក់ស្តែង និងជីវភាពរស់នៅ',
+    ' ដោយផ្អែកលើការស្រាវជ្រាវត្រឹមត្រូវតាមក្បួនខ្នាត',
+    ' និងគុណធម៌សីលធម៌ខ្ពស់ក្នុងការរស់នៅ',
+    ' ដើម្បីឆ្លុះបញ្ចាំងពីតថភាពសង្គមជាក់ស្តែង',
+    ' និងការថែរក្សាអត្តសញ្ញាណវប្បធម៌ជាតិ',
+    ' ក្នុងការកសាងសន្តិភាព និងវិបុលភាពយូរអង្វែង'
+  ];
+
+  return options.map((opt, idx) => {
+    let text = typeof opt === 'string' ? opt.trim() : String(opt || '');
+    text = text.replace(/ថៅកែចិត្រក/g, 'ថៅកែចៅចិត្ត').replace(/ចិត្រក/g, 'ចៅចិត្ត').replace(/\*\*/g, '');
+
+    if (idx === correctIdx) return text;
+
+    // If correct answer is long (>= 40 chars) and this distractor is too short (< 65% of targetLen)
+    if (targetLen >= 40 && text.length < targetLen * 0.65) {
+      const clause = BALANCING_CLAUSES[idx % BALANCING_CLAUSES.length];
+      if (!text.includes('និង') && !text.includes('ក្នុង') && !text.includes('ដោយ')) {
+        text = `${text}${clause}`;
+      }
+    }
+    return text;
+  });
+}
+
+/**
  * Expand questions to 8 options by borrowing type-matched, length-consistent distractors.
  * Ensures the correct answer is preserved, all 8 options are shuffled, and no giveaways occur.
  * @param {Array} questions - Array of question objects
@@ -566,27 +621,30 @@ export function expandQuestionsTo8Options(questions) {
     if (!q || !Array.isArray(q.options) || q.options.length === 0) return q;
 
     const safeAnswerIdx = typeof q.answer === 'number' && q.answer >= 0 && q.answer < q.options.length ? q.answer : 0;
-    const correctAnswer = q.options[safeAnswerIdx];
-    const originalWrongs = q.options.filter((_, idx) => idx !== safeAnswerIdx);
+    const rawCorrect = q.options[safeAnswerIdx];
+    const correctAnswer = (typeof rawCorrect === 'string' ? rawCorrect : String(rawCorrect || '')).replace(/ថៅកែចិត្រក/g, 'ថៅកែចៅចិត្ត').replace(/ចិត្រក/g, 'ចៅចិត្ត').replace(/\*\*/g, '').trim();
+    
+    const originalWrongs = q.options
+      .filter((_, idx) => idx !== safeAnswerIdx)
+      .map((opt) => (typeof opt === 'string' ? opt : String(opt || '')).replace(/ថៅកែចិត្រក/g, 'ថៅកែចៅចិត្ត').replace(/ចិត្រក/g, 'ចៅចិត្ត').replace(/\*\*/g, '').trim());
 
-    // If already has 8 options, ensure hint is secret & high quality
+    // If already has 8 options, ensure hint is secret & options balanced
     if (q.options.length >= 8) {
       const secretHint = q.hint || generateSecretAcademicHint(q, correctAnswer);
-      return { ...q, hint: secretHint };
+      const balanced = balanceOptionLengths(q.options, safeAnswerIdx);
+      return { ...q, options: balanced, hint: secretHint };
     }
 
-    const existingSet = new Set(q.options.map((o) => typeof o === 'string' ? o.trim().toLowerCase() : String(o)));
-    if (typeof correctAnswer === 'string') existingSet.add(correctAnswer.trim().toLowerCase());
-
-    const neededExtra = Math.max(0, 8 - q.options.length);
+    const existingSet = new Set([correctAnswer.toLowerCase(), ...originalWrongs.map((o) => o.toLowerCase())]);
+    const neededExtra = Math.max(0, 8 - (1 + originalWrongs.length));
     const extraDistractors = [];
 
-    // Calculate average length of existing options to prevent length-based giveaways
-    const avgLen = q.options.reduce((acc, opt) => acc + (typeof opt === 'string' ? opt.length : 4), 0) / q.options.length;
-    const isAllNumeric = q.options.every((opt) => /^[-+]?\d*\.?\d+(\s*\w+)?$/.test(String(opt).trim()));
+    // Calculate length of correct answer to prevent length-based giveaways
+    const targetLen = correctAnswer.length;
+    const isAllNumeric = [correctAnswer, ...originalWrongs].every((opt) => /^[-+]?\d*\.?\d+(\s*\w+)?$/.test(String(opt).trim()));
 
     // 1. Try Semantic Category Bank (e.g. Strait, River, King, Theme, etc.)
-    const semanticCat = detectSemanticCategory(q, q.options);
+    const semanticCat = detectSemanticCategory(q, [correctAnswer, ...originalWrongs]);
     if (semanticCat && Array.isArray(SEMANTIC_BANKS[semanticCat])) {
       const candidates = shuffleArray(SEMANTIC_BANKS[semanticCat]);
       for (const cand of candidates) {
@@ -601,7 +659,7 @@ export function expandQuestionsTo8Options(questions) {
 
     // 2. If Numeric, generate consistent numeric distractors with same units
     if (isAllNumeric && extraDistractors.length < neededExtra) {
-      const numericDistractors = generateNumericDistractors(q.options, neededExtra - extraDistractors.length);
+      const numericDistractors = generateNumericDistractors([correctAnswer, ...originalWrongs], neededExtra - extraDistractors.length);
       for (const num of numericDistractors) {
         if (extraDistractors.length >= neededExtra) break;
         const key = num.toLowerCase();
@@ -624,8 +682,10 @@ export function expandQuestionsTo8Options(questions) {
       for (const candidate of sameSubPool) {
         if (extraDistractors.length >= neededExtra) break;
         const key = candidate.trim().toLowerCase();
-        // Strict length filter: candidate length must be within 0.45x - 2.0x of average length
-        const isLengthConsistent = Math.abs(candidate.length - avgLen) <= Math.max(8, avgLen * 0.75);
+        // Candidate length must be reasonably close to target length
+        const isLengthConsistent = targetLen < 25 
+          ? candidate.length < 35 
+          : Math.abs(candidate.length - targetLen) <= Math.max(15, targetLen * 0.6);
         if (!existingSet.has(key) && isLengthConsistent) {
           existingSet.add(key);
           extraDistractors.push(candidate.trim());
@@ -639,7 +699,9 @@ export function expandQuestionsTo8Options(questions) {
       for (const candidate of generalPool) {
         if (extraDistractors.length >= neededExtra) break;
         const key = candidate.trim().toLowerCase();
-        const isLengthConsistent = Math.abs(candidate.length - avgLen) <= Math.max(12, avgLen * 0.9);
+        const isLengthConsistent = targetLen < 25 
+          ? candidate.length < 35 
+          : Math.abs(candidate.length - targetLen) <= Math.max(18, targetLen * 0.7);
         if (!existingSet.has(key) && isLengthConsistent) {
           existingSet.add(key);
           extraDistractors.push(candidate.trim());
@@ -650,32 +712,39 @@ export function expandQuestionsTo8Options(questions) {
     // 5. If still short, generate length-matched Khmer variations
     while (extraDistractors.length < neededExtra) {
       let filler = '';
-      if (avgLen > 20) {
-        filler = `ជម្រើសវិភាគបន្ថែមទី ${extraDistractors.length + 1}`;
+      if (targetLen > 35) {
+        filler = `ការវិភាគ និងការស្រាវជ្រាវបែបវិទ្យាសាស្ត្របន្ថែមទី ${extraDistractors.length + 1}`;
       } else if (isAllNumeric) {
         filler = `${extraDistractors.length + 10}`;
       } else {
-        filler = `ជម្រើសទី ${q.options.length + extraDistractors.length + 1}`;
+        filler = `ជម្រើសវិភាគទី ${extraDistractors.length + 1}`;
       }
 
       if (!existingSet.has(filler.toLowerCase())) {
         existingSet.add(filler.toLowerCase());
         extraDistractors.push(filler);
       } else {
-        extraDistractors.push(`ជម្រើសផ្សេង ${extraDistractors.length + 5}`);
+        extraDistractors.push(`ជម្រើសវិភាគបន្ថែម ${extraDistractors.length + 5}`);
       }
     }
 
     // Combine all 8 options: correct + original wrongs + extra distractors
-    const all8Options = [correctAnswer, ...originalWrongs, ...extraDistractors.slice(0, neededExtra)];
-    const shuffled8 = shuffleArray(all8Options);
-    const newCorrectIdx = shuffled8.findIndex((opt) => opt === correctAnswer);
+    const all8Raw = [correctAnswer, ...originalWrongs, ...extraDistractors.slice(0, neededExtra)];
+    
+    // Balance option lengths so no single choice stands out by length
+    const all8Balanced = balanceOptionLengths(all8Raw, 0);
+    const balancedCorrectAnswer = all8Balanced[0];
+
+    const shuffled8 = shuffleArray(all8Balanced);
+    const newCorrectIdx = shuffled8.findIndex((opt) => opt === balancedCorrectAnswer);
 
     // Generate Secret Academic Hint
-    const secretHint = generateSecretAcademicHint(q, correctAnswer);
+    const secretHint = generateSecretAcademicHint(q, balancedCorrectAnswer);
 
     return {
       ...q,
+      q: (q.q || '').replace(/ថៅកែចិត្រក/g, 'ថៅកែចៅចិត្ត').replace(/ចិត្រក/g, 'ចៅចិត្ត').replace(/\*\*/g, ''),
+      explanation: (q.explanation || '').replace(/ថៅកែចិត្រក/g, 'ថៅកែចៅចិត្ត').replace(/ចិត្រក/g, 'ចៅចិត្ត').replace(/\*\*/g, ''),
       options: shuffled8,
       answer: newCorrectIdx >= 0 ? newCorrectIdx : 0,
       hint: secretHint,
