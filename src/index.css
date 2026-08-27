@@ -742,3 +742,208 @@ div[class*="extension-floating"] {
   background-color: white;
 }
 
+/* ==========================================================================
+   Cyberpunk / Glowing Tech Neon Input (.ds-label)
+   ========================================================================== */
+.ds-label {
+  letter-spacing: 0.05em;
+  transition: all 0.5s ease;
+  position: relative;
+  font-size: 15px;
+  background: #333333;
+  border: none;
+  color: #ffffff;
+  display: block;
+  width: 100%;
+  padding: 4px 6px;
+  text-align: left;
+  border-radius: 8px;
+  box-sizing: border-box;
+}
+
+.ds-label:hover,
+.ds-label:focus-within {
+  letter-spacing: 0.1em;
+  background: #ff1867;
+  color: #ff1867;
+  box-shadow: 0 0 35px rgba(255, 24, 103, 0.65);
+}
+
+.ds-label.ds-cyan:hover,
+.ds-label.ds-cyan:focus-within {
+  background: #00f0ff;
+  color: #00f0ff;
+  box-shadow: 0 0 35px rgba(0, 240, 255, 0.65);
+}
+
+.ds-label.ds-amber:hover,
+.ds-label.ds-amber:focus-within {
+  background: #f59e0b;
+  color: #f59e0b;
+  box-shadow: 0 0 35px rgba(245, 158, 11, 0.65);
+}
+
+.ds-label::before {
+  content: "";
+  position: absolute;
+  inset: 2px;
+  background: #181c24;
+  border-radius: 6px;
+  z-index: 0;
+}
+
+.ds-label span {
+  position: relative;
+  z-index: 1;
+  display: flex;
+  align-items: center;
+  width: 100%;
+}
+
+.ds-label i {
+  position: absolute;
+  inset: 0;
+  display: block;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.ds-label i::before {
+  content: "";
+  position: absolute;
+  border: 2px solid #ff1867;
+  width: 7px;
+  height: 4px;
+  top: -3.5px;
+  left: 80%;
+  background: #181c24;
+  transform: translateX(-50%);
+  transition: 0.5s;
+  border-radius: 1px;
+}
+
+.ds-label.ds-cyan i::before {
+  border-color: #00f0ff;
+}
+
+.ds-label.ds-amber i::before {
+  border-color: #f59e0b;
+}
+
+.ds-label:hover i::before,
+.ds-label:focus-within i::before {
+  width: 26px;
+  left: 20%;
+}
+
+.ds-label i::after {
+  content: "";
+  position: absolute;
+  border: 2px solid #ff1867;
+  width: 7px;
+  height: 4px;
+  bottom: -3.5px;
+  left: 20%;
+  background: #181c24;
+  transform: translateX(-50%);
+  transition: 0.5s;
+  border-radius: 1px;
+}
+
+.ds-label.ds-cyan i::after {
+  border-color: #00f0ff;
+}
+
+.ds-label.ds-amber i::after {
+  border-color: #f59e0b;
+}
+
+.ds-label:hover i::after,
+.ds-label:focus-within i::after {
+  width: 26px;
+  left: 80%;
+}
+
+.ds-input-icon {
+  position: absolute;
+  top: 50%;
+  left: 24px;
+  transform: translate(-50%, -50%);
+  background-color: transparent;
+  padding: 0.25em;
+  border-radius: 6px;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 34px;
+  height: 34px;
+  opacity: 0.55;
+  color: #ffffff;
+  transition: all 0.5s ease;
+  pointer-events: none;
+}
+
+.ds_textinput {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  padding-left: 48px;
+  font-size: 14px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  padding-right: 12px;
+  width: 100%;
+  color: #ffffff;
+  pointer-events: auto;
+  font-family: inherit;
+}
+
+.ds_textinput::placeholder {
+  color: #64748b;
+  opacity: 0.8;
+}
+
+.ds_textinput:focus ~ .ds-input-icon,
+.ds-label:focus-within .ds-input-icon,
+.ds_textinput:hover ~ .ds-input-icon,
+.ds-label:hover .ds-input-icon {
+  opacity: 1;
+  color: #ff1867;
+}
+
+.ds-label.ds-cyan:focus-within .ds-input-icon,
+.ds-label.ds-cyan:hover .ds-input-icon {
+  color: #00f0ff;
+}
+
+.ds-label.ds-amber:focus-within .ds-input-icon,
+.ds-label.ds-amber:hover .ds-input-icon {
+  color: #f59e0b;
+}
+
+.ds_select {
+  background-color: transparent;
+  border: none;
+  outline: none;
+  padding-left: 48px;
+  font-size: 14px;
+  padding-top: 12px;
+  padding-bottom: 12px;
+  padding-right: 32px;
+  width: 100%;
+  color: #ffffff;
+  pointer-events: auto;
+  font-family: inherit;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+}
+
+.ds_select option {
+  background-color: #181c24;
+  color: #ffffff;
+  padding: 8px 12px;
+}
+
+
