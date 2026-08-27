@@ -14,7 +14,79 @@ export function cleanRawMarkdown(str) {
 }
 
 /**
- * Format inline text by converting **bold** into <strong>, handling math symbols, etc.
+ * Render mathematical radicals (Square root with true overbar/vinculum)
+ * Works flawlessly across Android, iOS (iPhone/iPad), Windows, macOS, and Linux
+ */
+export function renderMathRadicals(text) {
+  if (!text || typeof text !== 'string') return text;
+
+  // Match √(expression) or √expression
+  const parts = [];
+  let remaining = text;
+  // Regex to match √(contents inside parens) OR √ followed by algebraic tokens
+  const radicalRegex = /√\(([^)]+)\)|√([a-zA-Z0-9²³⁴⁵⁶⁷⁸⁹\d\w+\-*.\/]+)/;
+
+  let keyCounter = 0;
+  while (remaining) {
+    const match = remaining.match(radicalRegex);
+    if (!match) {
+      parts.push(remaining);
+      break;
+    }
+
+    const matchIndex = match.index;
+    if (matchIndex > 0) {
+      parts.push(remaining.substring(0, matchIndex));
+    }
+
+    const innerExpression = match[1] !== undefined ? match[1] : match[2];
+    parts.push(
+      <span
+        key={`radical-${keyCounter++}`}
+        className="inline-flex items-baseline font-mono font-medium mx-0.5 whitespace-nowrap align-baseline"
+      >
+        <span className="text-[1.18em] leading-none select-none font-bold text-indigo-600 dark:text-cyan-400 mr-[-1px]">
+          √
+        </span>
+        <span className="border-t-[1.6px] border-current pt-[0.5px] px-1 font-semibold leading-tight inline-block bg-indigo-50/40 dark:bg-cyan-950/30 rounded-t-2xs">
+          {renderInlineMathTokens(innerExpression)}
+        </span>
+      </span>
+    );
+
+    remaining = remaining.substring(matchIndex + match[0].length);
+  }
+
+  return parts;
+}
+
+/**
+ * Render inline mathematical tokens (powers, fractions, limits, subscripts)
+ */
+function renderInlineMathTokens(text) {
+  if (!text || typeof text !== 'string') return text;
+
+  // Handle superscripts / exponents like ^(2x) or ^2
+  if (text.includes('^')) {
+    const expParts = text.split(/\^(\([^)]+\)|[a-zA-Z0-9+-]+)/g);
+    return expParts.map((p, idx) => {
+      if (idx % 2 === 1) {
+        const cleanExp = p.replace(/^\(|\)$/g, '');
+        return (
+          <sup key={idx} className="text-[0.75em] font-bold text-indigo-600 dark:text-cyan-400">
+            {cleanExp}
+          </sup>
+        );
+      }
+      return p;
+    });
+  }
+
+  return text;
+}
+
+/**
+ * Format inline text by converting **bold**, *italic*, and math tokens with true radicals
  */
 export function renderInlineFormatted(text) {
   if (!text || typeof text !== 'string') return null;
@@ -28,27 +100,32 @@ export function renderInlineFormatted(text) {
     if (part.startsWith('***') && part.endsWith('***')) {
       const inner = part.slice(3, -3);
       return (
-        <strong key={index} className="font-extrabold text-[#003366] bg-amber-100/70 px-1.5 py-0.5 rounded-md border border-amber-200/80 mx-0.5">
-          {inner}
+        <strong
+          key={index}
+          className="font-extrabold text-[#003366] bg-amber-100/70 px-1.5 py-0.5 rounded-md border border-amber-200/80 mx-0.5"
+        >
+          {renderMathRadicals(inner)}
         </strong>
       );
     }
 
     if (part.startsWith('**') && part.endsWith('**')) {
       const inner = part.slice(2, -2);
-      // Check if it's a key heading or formula
       const isOfficial = inner.includes('ដំណោះស្រាយ') || inner.includes('ក្រសួង') || inner.includes('ចម្លើយ');
       if (isOfficial) {
         return (
-          <strong key={index} className="font-black text-[#003366] bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200/60 inline-flex items-center gap-1 my-0.5">
+          <strong
+            key={index}
+            className="font-black text-[#003366] bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200/60 inline-flex items-center gap-1 my-0.5"
+          >
             <span className="w-2 h-2 rounded-full bg-[#005baa] inline-block" />
-            {inner}
+            {renderMathRadicals(inner)}
           </strong>
         );
       }
       return (
         <strong key={index} className="font-black text-[#003366] tracking-tight">
-          {inner}
+          {renderMathRadicals(inner)}
         </strong>
       );
     }
@@ -57,56 +134,50 @@ export function renderInlineFormatted(text) {
       const inner = part.slice(1, -1);
       return (
         <span key={index} className="font-semibold text-slate-800 italic">
-          {inner}
+          {renderMathRadicals(inner)}
         </span>
       );
     }
 
     // Clean any stray asterisks that failed regex
     const cleaned = part.replace(/\*/g, '');
-    return <span key={index}>{cleaned}</span>;
+    return <React.Fragment key={index}>{renderMathRadicals(cleaned)}</React.Fragment>;
   });
 }
 
 /**
- * Check if a line represents a math equation or formula
+ * Check if a line is a PURE standalone mathematical formula/equation
+ * (e.g. `(√(1+4x) - 1)/... = 4x/...` or `= 2 × 1 × (1/2) = 1` or `lim (x → 0) ...`)
+ * Does NOT treat Khmer explanatory sentences as dark boxes!
  */
-function isMathFormulaLine(line) {
+function isPureStandaloneMathEquation(line) {
   const t = line.trim();
   if (!t) return false;
+
+  // If line contains significant Khmer words, it is an explanatory sentence, NOT a standalone equation box
+  const khmerCharCount = (t.match(/[\u1780-\u17FF]/g) || []).length;
+  if (khmerCharCount > 8) {
+    return false;
+  }
+
+  // Pure standalone equations usually start with =, (, lim, ∫, or contain heavy operators with few words
   return (
-    t.includes('lim (') ||
-    t.includes('lim(') ||
-    t.includes('∫') ||
-    t.includes('√(') ||
-    t.includes('√') ||
-    t.includes('Δ =') ||
-    t.includes('Δ\' =') ||
-    t.includes('x(t) =') ||
-    t.includes('Em =') ||
-    t.includes('pH =') ||
-    t.includes('Vm(') ||
-    t.includes('Z = √') ||
-    t.includes('T0 =') ||
-    t.includes('cos(') ||
-    t.includes('sin(') ||
-    t.includes('tan(') ||
-    t.includes('10^') ||
-    t.includes('10⁻') ||
-    t.includes('→') ||
-    t.includes('±') ||
-    t.includes('×') ||
-    t.includes('∧') ||
-    t.includes('²') ||
-    t.includes('³') ||
-    t.includes('dx') ||
-    t.includes('mol/s') ||
-    t.includes('Hz')
+    t.startsWith('=') ||
+    t.startsWith('(') ||
+    t.startsWith('lim') ||
+    t.startsWith('∫') ||
+    t.startsWith('Δ') ||
+    t.includes(' = ') ||
+    t.includes(' ⇌ ') ||
+    t.includes(' => ') ||
+    t.includes(' / [') ||
+    t.includes(') / (')
   );
 }
 
 /**
  * High-performance, Beautiful Khmer Academic Text & Formula Renderer
+ * Fully responsive on Android, iPhone, iPad, Windows, macOS, Linux
  */
 export default function AcademicTextRenderer({
   content = '',
@@ -123,7 +194,7 @@ export default function AcademicTextRenderer({
   const rawLines = content.split('\n');
 
   return (
-    <div className={`space-y-2.5 font-kantumruy leading-relaxed text-slate-800 break-words ${baseTextSize} ${className}`}>
+    <div className={`space-y-2 font-kantumruy leading-relaxed text-slate-800 break-words ${baseTextSize} ${className}`}>
       {rawLines.map((line, lineIdx) => {
         const trimmed = line.trim();
         if (!trimmed) {
@@ -131,7 +202,7 @@ export default function AcademicTextRenderer({
         }
 
         // 1. Official Section Header (e.g. **ដំណោះស្រាយផ្លូវការ...** or I. ផ្តើមសេចក្តី)
-        const isMajorHeader = 
+        const isMajorHeader =
           (trimmed.startsWith('**') && trimmed.endsWith('**') && (trimmed.includes('ដំណោះស្រាយ') || trimmed.includes('ខ្លឹមសារ'))) ||
           /^(I|II|III|IV|V|ជំពូក|មេរៀន|ផ្នែក|កត្តា)\./.test(trimmed);
 
@@ -186,26 +257,26 @@ export default function AcademicTextRenderer({
           }
         }
 
-        // 3. Mathematical Formula / Long equation lines
-        if (mathBox && isMathFormulaLine(trimmed)) {
+        // 3. Pure Standalone Mathematical Formula Lines
+        if (mathBox && isPureStandaloneMathEquation(trimmed)) {
           return (
             <div
               key={lineIdx}
-              className="my-1.5 p-2 sm:p-2.5 rounded-xl bg-slate-900 text-cyan-200 border border-slate-700/80 font-mono text-[11.5px] sm:text-xs leading-relaxed shadow-xs overflow-x-auto no-scrollbar touch-pan-x [scrollbar-width:none] flex items-center justify-between gap-3 group"
+              className="my-1.5 p-2.5 sm:p-3 rounded-xl bg-[#091122] text-cyan-200 border border-slate-700/80 font-mono text-[12px] sm:text-xs leading-relaxed shadow-sm overflow-x-auto no-scrollbar touch-pan-x [scrollbar-width:none] flex items-center justify-between gap-3 group"
             >
-              <div className="whitespace-nowrap tracking-wide select-all">
+              <div className="whitespace-nowrap tracking-wide select-all flex-1">
                 {renderInlineFormatted(trimmed)}
               </div>
-              <span className="text-[9px] font-sans font-bold text-slate-500 bg-slate-800 px-1.5 py-0.5 rounded border border-slate-700 flex-shrink-0 hidden sm:inline-block">
-                FORMULA
+              <span className="text-[9px] font-sans font-bold text-cyan-400/70 bg-cyan-950/60 px-1.5 py-0.5 rounded border border-cyan-800/40 flex-shrink-0 hidden sm:inline-block">
+                MATH
               </span>
             </div>
           );
         }
 
-        // 4. Default standard paragraph line
+        // 4. Default standard paragraph line (renders Khmer text + beautiful inline math radicals)
         return (
-          <p key={lineIdx} className="leading-relaxed">
+          <p key={lineIdx} className="leading-relaxed text-slate-800">
             {renderInlineFormatted(trimmed)}
           </p>
         );
