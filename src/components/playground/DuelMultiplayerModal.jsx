@@ -312,12 +312,13 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   const [challengerCorrectCount, setChallengerCorrectCount] = useState(0);
   const [isOvertime, setIsOvertime] = useState(false);
 
-  // Simultaneous Real-Time Battle State (Both players can answer simultaneously)
+  // Simultaneous Real-Time Battle State (Both players can answer simultaneously with 1 attempt each)
   const [turnStatus, setTurnStatus] = useState('playing'); // 'playing' | 'turn_ended'
-  const [turnResult, setTurnResult] = useState(null); // { answeredBy, answeredByName, selectedIdx, isCorrect, scoreEarned }
+  const [turnResult, setTurnResult] = useState(null); // { answeredBy, answeredByName, selectedIdx, isCorrect, scoreEarned, isAllWrong }
   const [nextTurnCountdown, setNextTurnCountdown] = useState(3);
-  const [secondsLeft, setSecondsLeft] = useState(15);
-  const [myWrongIndices, setMyWrongIndices] = useState(() => new Set());
+  const [secondsLeft, setSecondsLeft] = useState(60);
+  const [myChosenIdx, setMyChosenIdx] = useState(null); // Index selected by this player (locks out after 1 click)
+  const [opponentWrongIdx, setOpponentWrongIdx] = useState(null); // Index selected wrongly by opponent
   const [wrongFeedbackNotice, setWrongFeedbackNotice] = useState('');
   const [solvedQuestionsSet, setSolvedQuestionsSet] = useState(() => new Set());
 
@@ -372,11 +373,12 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     };
   }, []);
 
-  // Reset wrong attempts and timer when question index advances
+  // Reset wrong attempts and timer to 60s when question index advances
   useEffect(() => {
-    setMyWrongIndices(new Set());
+    setMyChosenIdx(null);
+    setOpponentWrongIdx(null);
     setWrongFeedbackNotice('');
-    setSecondsLeft(15);
+    setSecondsLeft(60);
   }, [currentQIndex]);
 
   // Format student payload for room registration
@@ -421,11 +423,12 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
     const nextIdx = currentQIndex + 1;
     setCurrentQIndex(nextIdx);
-    setMyWrongIndices(new Set());
+    setMyChosenIdx(null);
+    setOpponentWrongIdx(null);
     setWrongFeedbackNotice('');
     setTurnStatus('playing');
     setTurnResult(null);
-    setSecondsLeft(15);
+    setSecondsLeft(60);
     setNextTurnCountdown(3);
 
     try {
@@ -483,7 +486,8 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     }
     lastProcessedTurnRef.current = null;
     setCurrentQIndex(0);
-    setMyWrongIndices(new Set());
+    setMyChosenIdx(null);
+    setOpponentWrongIdx(null);
     setWrongFeedbackNotice('');
     setTurnStatus('playing');
     setTurnResult(null);
@@ -495,7 +499,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     setMyRematchRequested(false);
     setOpponentRematchRequested(false);
     setOpponentLeftNotice('');
-    setSecondsLeft(15);
+    setSecondsLeft(60);
     setNextTurnCountdown(3);
     setCurrentStep('battle');
   };
@@ -718,10 +722,19 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
           startCountdown(room.questions);
         }
 
-        // Synchronize Turn Result when other player finishes their turn
+        // Synchronize Turn Result when other player finishes their turn or both answer wrong
         if (currentStep === 'battle') {
           if (room.turnStatus === 'turn_ended' && room.turnResult) {
             triggerTurnEndCountdown(room.turnResult);
+          }
+
+          // Synchronize opponent wrong attempt if playing
+          if (room.wrongAttempts) {
+            if (isHost && room.wrongAttempts.challenger !== null && typeof room.wrongAttempts.challenger === 'number') {
+              setOpponentWrongIdx(room.wrongAttempts.challenger);
+            } else if (!isHost && room.wrongAttempts.host !== null && typeof room.wrongAttempts.host === 'number') {
+              setOpponentWrongIdx(room.wrongAttempts.host);
+            }
           }
 
           // Advance turn on challenger when host progresses
@@ -730,7 +743,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             setActiveTurn(room.activeTurn || 'host');
             setTurnStatus('playing');
             setTurnResult(null);
-            setSecondsLeft(15);
+            setMyChosenIdx(null);
+            setOpponentWrongIdx(null);
+            setWrongFeedbackNotice('');
+            setSecondsLeft(60);
             setNextTurnCountdown(3);
           }
 
@@ -1046,7 +1062,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     setTab('host');
   };
 
-  // Timeout handler for 15s round (Advances when timer expires)
+  // Timeout handler for 60s round (Advances when timer expires)
   const handleRoundTimeout = useCallback(() => {
     if (turnStatus === 'turn_ended' || currentStep !== 'battle') return;
 
@@ -1057,6 +1073,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
       answeredByName: 'គ្មានកីឡាករ',
       selectedIdx: -1,
       isCorrect: false,
+      isAllWrong: false,
       scoreEarned: 0,
       isTimeout: true,
       hostCorrectCount,
@@ -1073,7 +1090,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     triggerTurnEndCountdown(timeoutResult);
   }, [turnStatus, currentStep, currentQIndex, hostCorrectCount, challengerCorrectCount, roomCode, isHost, triggerTurnEndCountdown]);
 
-  // Question Timer (15s) - Active for both players during round
+  // Question Timer (60s / 1 min) - Active for both players during round
   useEffect(() => {
     if (currentStep !== 'battle' || turnStatus === 'turn_ended') return;
 
@@ -1084,7 +1101,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
           handleRoundTimeout();
           return 0;
         }
-        if (prev <= 4 && soundEnabled) {
+        if (prev <= 5 && soundEnabled) {
           playSound.timerWarning();
         }
         return prev - 1;
@@ -1094,22 +1111,47 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     return () => clearInterval(timer);
   }, [currentStep, currentQIndex, turnStatus, handleRoundTimeout, soundEnabled]);
 
-  // Player clicks an answer option (Wrong = Retry, Correct = First to solve wins round)
+  // Player clicks an answer option (1 Attempt only: Wrong = locked out, Both Wrong = change question, Correct = wins round)
   const handleSelectOption = async (idx) => {
     if (turnStatus === 'turn_ended' || currentStep !== 'battle') return;
-    if (myWrongIndices.has(idx)) return; // Already tried this option and it was wrong
+    if (myChosenIdx !== null) return; // User already chose for this question (1 attempt only!)
 
+    setMyChosenIdx(idx);
     const isCorrect = idx === currentQ.answer;
 
-    // CASE 1: WRONG ANSWER -> Mark as wrong, play feedback, KEEP QUESTION ACTIVE FOR RETRY!
+    // CASE 1: WRONG ANSWER -> Mark as wrong and lock out current player!
     if (!isCorrect) {
       if (soundEnabled) playSound.wrong();
-      setMyWrongIndices((prev) => new Set([...prev, idx]));
-      setWrongFeedbackNotice('❌ ចម្លើយមិនត្រឹមត្រូវ! សូមសាកល្បងជ្រើសរើសចម្លើយផ្សេងទៀត...');
-      setTimeout(() => setWrongFeedbackNotice(''), 3000);
+      setWrongFeedbackNotice('❌ អ្នកបានជ្រើសរើសខុស! អ្នកមិនអាចជ្រើសរើសម្តងទៀតលើសំណួរនេះទេ');
+
+      // Check if opponent is already wrong OR playing alone
+      const isBothWrong = challengerPlayer
+        ? (opponentWrongIdx !== null)
+        : true;
+
+      if (isBothWrong) {
+        const now = Date.now();
+        const allWrongResult = {
+          turnId: `turn_all_wrong_${now}_${currentQIndex}`,
+          answeredBy: 'both_wrong',
+          answeredByName: 'គ្មានអ្នកឆ្លើយត្រូវ (ឆ្លើយខុសទាំងអស់)',
+          selectedIdx: idx,
+          isCorrect: false,
+          isAllWrong: true,
+          isTimeout: false,
+          scoreEarned: 0,
+          hostCorrectCount,
+          challengerCorrectCount,
+          timestamp: now
+        };
+        triggerTurnEndCountdown(allWrongResult);
+      }
 
       try {
-        api.submitTurnAnswer(roomCode, isHost, idx, false, 0, false);
+        const res = await api.submitTurnAnswer(roomCode, isHost, idx, false, 0, false);
+        if (res && res.room && res.room.turnStatus === 'turn_ended' && res.room.turnResult) {
+          triggerTurnEndCountdown(res.room.turnResult);
+        }
       } catch (e) { }
       return;
     }
@@ -1117,10 +1159,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     // CASE 2: CORRECT ANSWER -> FIRST PLAYER TO ANSWER WINS THE QUESTION ROUND!
     if (soundEnabled) playSound.correct();
     try {
-      confetti({ particleCount: 70, spread: 70, origin: { y: 0.65 } });
+      confetti({ particleCount: 75, spread: 75, origin: { y: 0.65 } });
     } catch (e) { }
 
-    const pointsEarned = 550 + secondsLeft * 30;
+    const pointsEarned = 550 + secondsLeft * 10;
     setMyScore((prev) => prev + pointsEarned);
 
     let nextHostCorrect = hostCorrectCount;
@@ -1145,6 +1187,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
       answeredByName: myName,
       selectedIdx: idx,
       isCorrect: true,
+      isAllWrong: false,
       scoreEarned: pointsEarned,
       isTimeout: false,
       hostCorrectCount: nextHostCorrect,
@@ -1265,10 +1308,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
           <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
             {currentStep === 'battle' && (
-              <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center font-mono font-black text-[11px] sm:text-xs border ${
-                secondsLeft <= 4 
-                  ? 'bg-rose-500/20 text-rose-300 border-rose-500/40 animate-pulse' 
-                  : 'bg-slate-800 text-slate-200 border-slate-700'
+              <div className={`px-2 sm:px-2.5 h-8 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center font-mono font-black text-[11px] sm:text-xs border transition-colors ${
+                secondsLeft <= 10 
+                  ? 'bg-rose-500/25 text-rose-300 border-rose-500/50 animate-pulse shadow-[0_0_10px_rgba(244,63,94,0.4)]' 
+                  : 'bg-slate-800/90 text-amber-300 border-slate-700/80 shadow-xs'
               }`}>
                 {secondsLeft}s
               </div>
@@ -2139,32 +2182,51 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
               </div>
             </div>
 
-            {/* ── Race Status & Wrong Feedback Banner */}
-            {wrongFeedbackNotice ? (
-              <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl border text-center text-[10px] sm:text-xs font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all bg-rose-500/20 border-rose-500/50 text-rose-200 animate-pulse shadow-md">
-                <AlertTriangle className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
-                <span>{wrongFeedbackNotice}</span>
-              </div>
-            ) : turnStatus === 'playing' ? (
-              <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl border text-center text-[10px] sm:text-xs font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all bg-gradient-to-r from-indigo-600/20 via-purple-600/25 to-indigo-600/20 border-indigo-500/50 text-indigo-200 shadow-md ring-1 ring-indigo-400/40">
-                <Zap className="w-3.5 h-3.5 text-amber-400 animate-bounce flex-shrink-0" />
-                <span>
-                  <strong>ការប្រណាំងល្បឿន (Speed Duel)</strong> • អ្នកណាឆ្លើយត្រូវមុនគេ ឈ្នះពិន្ទុ! ({secondsLeft}s)
-                </span>
-              </div>
-            ) : (
-              <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl border text-center text-[10px] sm:text-xs font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all bg-emerald-500/20 border-emerald-500/50 text-emerald-200 shadow-md">
+            {/* ── Race Status & Feedback Banner */}
+            {turnStatus === 'turn_ended' ? (
+              <div className={`p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl border text-center text-xs font-black flex items-center justify-center gap-2 transition-all shadow-md ${
+                turnResult?.isCorrect
+                  ? 'bg-gradient-to-r from-emerald-950/90 to-teal-950/90 border-emerald-500/70 text-emerald-200 ring-1 ring-emerald-400/50'
+                  : turnResult?.isAllWrong
+                    ? 'bg-gradient-to-r from-rose-950/90 to-amber-950/90 border-rose-500/70 text-rose-200 ring-1 ring-rose-400/50'
+                    : 'bg-slate-900/90 border-slate-700 text-slate-300'
+              }`}>
                 {turnResult?.isCorrect ? (
                   <>
-                    <Trophy className="w-3.5 h-3.5 text-amber-400 animate-bounce flex-shrink-0" />
-                    <span><strong>{turnResult.answeredByName || (turnResult.answeredBy === 'host' ? hostPlayer?.name : challengerPlayer?.name)}</strong> ឆ្លើយត្រូវមុនគេ! (+{turnResult.scoreEarned} pts)</span>
+                    <Trophy className="w-4 h-4 text-amber-400 animate-bounce flex-shrink-0" />
+                    <span>
+                      <strong>{turnResult.answeredByName || (turnResult.answeredBy === 'host' ? hostPlayer?.name : challengerPlayer?.name)}</strong> ឆ្លើយត្រូវមុនគេ! (+{turnResult.scoreEarned} pts) • ចម្លើយ៖ <span className="text-emerald-300 font-bold underline">{currentQ.options[currentQ.answer]}</span>
+                    </span>
+                  </>
+                ) : turnResult?.isAllWrong ? (
+                  <>
+                    <XCircle className="w-4 h-4 text-rose-400 animate-pulse flex-shrink-0" />
+                    <span>
+                      <strong>ឆ្លើយខុសទាំងអស់ (All Selected Wrong)!</strong> • ចម្លើយត្រឹមត្រូវគឺ៖ <span className="text-emerald-300 font-bold underline">{currentQ.options[currentQ.answer]}</span>
+                    </span>
                   </>
                 ) : (
                   <>
-                    <Clock className="w-3.5 h-3.5 text-slate-400 flex-shrink-0" />
-                    <span>អស់ពេល! គ្មានកីឡាករណាឆ្លើយត្រឹមត្រូវទេ</span>
+                    <Clock className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                    <span>
+                      <strong>អស់ពេល (Timeout 60s)!</strong> • ចម្លើយត្រឹមត្រូវគឺ៖ <span className="text-emerald-300 font-bold underline">{currentQ.options[currentQ.answer]}</span>
+                    </span>
                   </>
                 )}
+              </div>
+            ) : myChosenIdx !== null ? (
+              <div className="p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl border text-center text-xs font-bold flex items-center justify-center gap-2 transition-all bg-rose-950/80 border-rose-500/60 text-rose-200 animate-pulse shadow-md ring-1 ring-rose-500/40">
+                <AlertTriangle className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                <span>
+                  ❌ <strong>អ្នកបានជ្រើសរើសខុស!</strong> អ្នកមិនអាចជ្រើសរើសម្តងទៀតលើសំណួរនេះទេ • {challengerPlayer ? `កំពុងរង់ចាំគូប្រជែង (${secondsLeft}s)...` : 'កំពុងផ្លាស់ប្តូរសំណួរ...'}
+                </span>
+              </div>
+            ) : (
+              <div className="p-2 sm:p-3 rounded-xl sm:rounded-2xl border text-center text-[11px] sm:text-xs font-bold flex items-center justify-center gap-1.5 sm:gap-2 transition-all bg-gradient-to-r from-indigo-600/20 via-purple-600/25 to-indigo-600/20 border-indigo-500/50 text-indigo-200 shadow-md ring-1 ring-indigo-400/40">
+                <Zap className="w-3.5 h-3.5 text-amber-400 animate-bounce flex-shrink-0" />
+                <span>
+                  <strong>ការប្រណាំងល្បឿន (Speed Duel)</strong> • ម្នាក់មានសិទ្ធិជ្រើសរើស ១ លើក ({secondsLeft}s)
+                </span>
               </div>
             )}
 
@@ -2182,26 +2244,47 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
               </h3>
             </div>
 
-            {/* ── 4 Answer Options (Simultaneous Clickable with Retry) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-3">
+            {/* ── 4 Answer Options (1 Attempt per player) */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
               {currentQ.options.map((option, idx) => {
                 const config = BUTTON_CONFIGS[idx % 4];
-                const isWrongForMe = myWrongIndices.has(idx);
                 const isCorrectOption = idx === currentQ.answer;
+                const isMyChosen = myChosenIdx === idx;
+                const isOpponentWrong = opponentWrongIdx === idx;
+                const hasAttempted = myChosenIdx !== null;
 
-                let btnStyle = 'bg-[#0e1730] border-slate-800 hover:border-indigo-400 hover:bg-slate-800/90 text-slate-200 cursor-pointer shadow-md';
+                let btnStyle = '';
+                let iconBadgeStyle = config.badge;
+                let badgeContent = config.num;
 
                 if (turnStatus === 'turn_ended') {
                   if (isCorrectOption) {
-                    btnStyle = 'bg-emerald-950/90 border-emerald-400 text-emerald-200 ring-2 ring-emerald-400/80 shadow-lg shadow-emerald-950/80 scale-[1.01]';
-                  } else if (turnResult?.selectedIdx === idx && !turnResult?.isCorrect) {
-                    btnStyle = 'bg-rose-950/80 border-rose-500 text-rose-300 ring-2 ring-rose-500/40';
+                    // ALWAYS Highlight the Correct Answer in Glowing Green when turn ends!
+                    btnStyle = 'bg-gradient-to-r from-emerald-950/95 via-teal-950/90 to-emerald-950/95 border-2 border-emerald-400 text-emerald-100 ring-2 ring-emerald-400/80 shadow-[0_0_25px_rgba(16,185,129,0.5)] scale-[1.01]';
+                    iconBadgeStyle = 'bg-emerald-500 text-slate-950 font-black border-emerald-300';
+                    badgeContent = '✓';
+                  } else if (isMyChosen && !isCorrectOption) {
+                    btnStyle = 'bg-rose-950/85 border-2 border-rose-500 text-rose-300 ring-2 ring-rose-500/40 line-through opacity-80';
+                    iconBadgeStyle = 'bg-rose-600/40 border-rose-500 text-rose-300';
+                    badgeContent = '✕';
+                  } else if (isOpponentWrong && !isCorrectOption) {
+                    btnStyle = 'bg-rose-950/50 border border-rose-600/50 text-rose-300 opacity-60';
                   } else {
-                    btnStyle = 'bg-[#080d1a] border-slate-800/80 text-slate-600 opacity-40';
+                    btnStyle = 'bg-[#080d1a]/80 border-slate-800/80 text-slate-600 opacity-40';
                   }
                 } else {
-                  if (isWrongForMe) {
-                    btnStyle = 'bg-rose-950/70 border-rose-500/60 text-rose-300 opacity-60 cursor-not-allowed line-through';
+                  // PLAYING STATE
+                  if (isMyChosen) {
+                    // Current user chose this and was wrong (locked out)
+                    btnStyle = 'bg-rose-950/80 border-2 border-rose-500 text-rose-300 ring-2 ring-rose-500/40 line-through cursor-not-allowed';
+                    iconBadgeStyle = 'bg-rose-600/40 border-rose-500 text-rose-300';
+                    badgeContent = '✕';
+                  } else if (hasAttempted) {
+                    // User already chose another option and is locked out
+                    btnStyle = 'bg-[#080d1a]/60 border-slate-800/80 text-slate-500 opacity-40 cursor-not-allowed';
+                  } else {
+                    // User can still choose
+                    btnStyle = 'bg-[#0e1730] border border-slate-700/80 hover:border-indigo-400 hover:bg-slate-800/90 text-slate-200 cursor-pointer shadow-md hover:scale-[1.01]';
                   }
                 }
 
@@ -2209,63 +2292,68 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                   <button
                     key={idx}
                     type="button"
-                    disabled={turnStatus === 'turn_ended' || isWrongForMe}
+                    disabled={turnStatus === 'turn_ended' || hasAttempted}
                     onClick={() => handleSelectOption(idx)}
-                    className={`p-2.5 sm:p-4 rounded-xl sm:rounded-2xl border flex items-center gap-2 sm:gap-3.5 transition-all text-left active:scale-[0.98] ${btnStyle}`}
+                    className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl border flex items-center gap-2.5 sm:gap-3.5 transition-all text-left active:scale-[0.98] ${btnStyle}`}
                   >
-                    <div className={`w-7 h-7 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl border flex items-center justify-center flex-shrink-0 font-mono font-black text-[11px] sm:text-sm shadow-xs ${isWrongForMe ? 'bg-rose-600/30 border-rose-500/50 text-rose-300' : config.badge}`}>
-                      {isWrongForMe ? '✕' : config.num}
+                    <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl border flex items-center justify-center flex-shrink-0 font-mono font-black text-[11px] sm:text-sm shadow-xs transition-all ${iconBadgeStyle}`}>
+                      {badgeContent}
                     </div>
                     <span
-                      className="text-[11px] sm:text-sm font-bold flex-1 leading-snug"
+                      className="text-[11.5px] sm:text-sm font-bold flex-1 leading-snug"
                       style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}
                     >
                       {option}
                     </span>
                     {turnStatus === 'turn_ended' && isCorrectOption && (
-                      <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 flex-shrink-0 animate-bounce" />
+                      <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 animate-bounce drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
                     )}
-                    {isWrongForMe && (
-                      <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-rose-400 flex-shrink-0 animate-pulse" />
+                    {((turnStatus === 'turn_ended' && isMyChosen && !isCorrectOption) || (turnStatus === 'playing' && isMyChosen)) && (
+                      <XCircle className="w-5 h-5 text-rose-400 flex-shrink-0 animate-pulse drop-shadow-[0_0_8px_rgba(244,63,94,0.8)]" />
                     )}
                   </button>
                 );
               })}
             </div>
 
-            {/* ── Turn Result & Countdown ── ALWAYS single row */}
-            <div className="bg-[#0a1226]/90 backdrop-blur-sm rounded-xl sm:rounded-2xl p-2 sm:p-3.5 border border-slate-700/60 text-[10px] sm:text-xs animate-fade-in shadow-md">
+            {/* ── Turn Result & Countdown Footer */}
+            <div className="bg-[#0a1226]/90 backdrop-blur-sm rounded-xl sm:rounded-2xl p-2.5 sm:p-3.5 border border-slate-700/60 text-xs animate-fade-in shadow-md">
               {turnStatus === 'playing' ? (
                 <div className="flex items-center justify-between text-slate-300 font-medium">
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    <Sparkles className="w-3 h-3 sm:w-4 sm:h-4 text-amber-400 flex-shrink-0" />
-                    <span>ជ្រើសចម្លើយត្រឹមត្រូវមុនគេ ({secondsLeft}s)...</span>
+                  <div className="flex items-center gap-2">
+                    <Clock className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                    <span>ពេលនៅសល់៖ <strong className="font-mono text-amber-300 text-sm">{secondsLeft}s</strong> (1 នាទីក្នុងមួយសំណួរ)</span>
                   </div>
-                  {myWrongIndices.size > 0 && (
-                    <span className="text-[10px] text-amber-300 font-mono font-bold bg-amber-500/10 px-2 py-0.5 rounded-lg border border-amber-500/30">
-                      បានឆ្លើយខុស {myWrongIndices.size} លើក • សាកល្បងម្តងទៀត
+                  {myChosenIdx !== null && (
+                    <span className="text-[10px] text-rose-300 font-bold bg-rose-500/15 px-2.5 py-1 rounded-lg border border-rose-500/30">
+                      🔒 ជាប់សោរ (Locked Out)
                     </span>
                   )}
                 </div>
               ) : (
                 <div className="flex items-center justify-between gap-2">
-                  <div className="flex items-center gap-1 min-w-0">
+                  <div className="flex items-center gap-1.5 min-w-0">
                     {turnResult?.isCorrect ? (
-                      <span className="text-emerald-400 font-black flex items-center gap-1 truncate">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                      <span className="text-emerald-400 font-black flex items-center gap-1.5 truncate">
+                        <CheckCircle2 className="w-4 h-4 text-emerald-400 flex-shrink-0" />
                         <span className="truncate">✓ +{turnResult.scoreEarned}pts [{hostCorrectCount}:{challengerCorrectCount}]</span>
                       </span>
+                    ) : turnResult?.isAllWrong ? (
+                      <span className="text-rose-400 font-black flex items-center gap-1.5 truncate">
+                        <XCircle className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                        <span className="truncate">ខុសទាំងអស់ (All Selected Wrong)</span>
+                      </span>
                     ) : (
-                      <span className="text-rose-400 font-black flex items-center gap-1 truncate">
-                        <XCircle className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
-                        <span className="truncate">{turnResult?.isTimeout ? 'អស់ពេល' : 'មិនត្រឹមត្រូវ'}</span>
+                      <span className="text-amber-400 font-black flex items-center gap-1.5 truncate">
+                        <Clock className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                        <span className="truncate">អស់ពេល (60s Timeout)</span>
                       </span>
                     )}
                   </div>
-                  <div className="flex items-center gap-1.5 bg-indigo-600/25 px-2 sm:px-3 py-1 sm:py-1.5 rounded-lg border border-indigo-500/40 text-indigo-200 font-black font-mono flex-shrink-0">
+                  <div className="flex items-center gap-1.5 bg-indigo-600/25 px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-xl border border-indigo-500/40 text-indigo-200 font-black font-mono flex-shrink-0">
                     <span className="hidden sm:inline">សំណួរបន្ទាប់</span>
                     <span className="sm:hidden">Next</span>
-                    <span className="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10px] animate-bounce shadow-md">
+                    <span className="w-5 h-5 rounded-full bg-indigo-600 text-white flex items-center justify-center text-[10.5px] animate-bounce shadow-md">
                       {nextTurnCountdown}
                     </span>
                   </div>

@@ -367,7 +367,7 @@ export const getRoomInviteStatus = (req, res) => {
   }
 };
 
-// Player submits answer attempt (Simultaneous permission to answer: Wrong = retry, Correct = win round)
+// Player submits answer attempt (One attempt per player: Wrong = locked out, Both Wrong / Correct = resolve round)
 export const submitTurnAnswer = (req, res) => {
   try {
     const { roomCode } = req.params;
@@ -378,17 +378,53 @@ export const submitTurnAnswer = (req, res) => {
     }
 
     const now = Date.now();
+    if (!room.wrongAttempts) {
+      room.wrongAttempts = { host: null, challenger: null };
+    }
 
-    // CASE 1: WRONG ANSWER (Player can retry, question stays open!)
+    // CASE 1: WRONG ANSWER
     if (!isCorrect && !isTimeout) {
+      if (isHost) {
+        room.wrongAttempts.host = typeof selectedIdx === 'number' ? selectedIdx : -1;
+      } else {
+        room.wrongAttempts.challenger = typeof selectedIdx === 'number' ? selectedIdx : -1;
+      }
+
       room.lastAttempt = {
         answeredBy: isHost ? 'host' : 'challenger',
         selectedIdx: typeof selectedIdx === 'number' ? selectedIdx : -1,
         isCorrect: false,
         timestamp: now
       };
+
+      // Check if BOTH players have chosen wrong OR single player mode
+      const isBothWrong = room.challenger
+        ? (room.wrongAttempts.host !== null && room.wrongAttempts.challenger !== null)
+        : (room.wrongAttempts.host !== null || room.wrongAttempts.challenger !== null);
+
+      if (isBothWrong) {
+        room.turnStatus = 'turn_ended';
+        room.turnResult = {
+          turnId: `turn_all_wrong_${now}_${room.currentQIndex}`,
+          answeredBy: 'both_wrong',
+          answeredByName: 'គ្មានអ្នកឆ្លើយត្រូវ (ឆ្លើយខុសទាំងអស់)',
+          selectedIdx: typeof selectedIdx === 'number' ? selectedIdx : -1,
+          isCorrect: false,
+          isAllWrong: true,
+          isTimeout: false,
+          scoreEarned: 0,
+          hostWrongIdx: room.wrongAttempts.host,
+          challengerWrongIdx: room.wrongAttempts.challenger,
+          hostCorrectCount: room.hostCorrectCount || 0,
+          challengerCorrectCount: room.challengerCorrectCount || 0,
+          timestamp: now
+        };
+        room.lastActive = now;
+        return res.json({ success: true, room, allWrong: true });
+      }
+
       room.lastActive = now;
-      return res.json({ success: true, room, isWrongAttempt: true, canRetry: true });
+      return res.json({ success: true, room, isWrongAttempt: true, canRetry: false });
     }
 
     // CASE 2: CORRECT ANSWER OR TIMEOUT (Resolves question round)
@@ -417,6 +453,7 @@ export const submitTurnAnswer = (req, res) => {
       answeredBy: isTimeout ? 'none' : (isHost ? 'host' : 'challenger'),
       selectedIdx: typeof selectedIdx === 'number' ? selectedIdx : -1,
       isCorrect: !!isCorrect,
+      isAllWrong: false,
       scoreEarned: scoreEarned || 0,
       isTimeout: !!isTimeout,
       hostCorrectCount: room.hostCorrectCount,
@@ -477,6 +514,7 @@ export const nextTurn = (req, res) => {
     room.activeTurn = room.activeTurn === 'host' ? 'challenger' : 'host';
     room.turnStatus = 'playing';
     room.turnResult = null;
+    room.wrongAttempts = { host: null, challenger: null };
     room.lastActive = Date.now();
 
     return res.json({ success: true, room });
