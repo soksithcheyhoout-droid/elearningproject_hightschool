@@ -324,7 +324,6 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   const autoNextTimerRef = useRef(null);
   const countdownIntervalRef = useRef(null);
   const pollingIntervalRef = useRef(null);
-  const botTimerRef = useRef(null);
   const hostKickedRef = useRef(false); // Tracks if host just kicked challenger (prevents poller re-firing)
   const lastProcessedTurnRef = useRef(null); // Prevents 700ms poller from restarting the 3-2-1 turn countdown
 
@@ -370,7 +369,6 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
       clearTimeout(autoNextTimerRef.current);
       clearInterval(countdownIntervalRef.current);
       clearInterval(pollingIntervalRef.current);
-      clearTimeout(botTimerRef.current);
     };
   }, []);
 
@@ -395,34 +393,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     isHost: isHost
   };
 
-  // Helper to add AI Scholar Bot as Challenger opponent
-  const handleAddAIBot = () => {
-    if (soundEnabled) playSound.click();
-    const bot = {
-      id: 'bot_ai_scholar_99',
-      name: '🤖 AI Scholar Bot',
-      username: 'ai.scholar.bot',
-      school: 'វិទ្យាល័យជាតិ (AI Bot ថ្នាក់ជាតិ)',
-      province: 'រាជធានីភ្នំពេញ',
-      level: 10,
-      xp: 4950,
-      avatar: '/assets/anime/boys/boy_2.png',
-      avatarFrame: '/assets/frames/cyberpunk_neon_dragon.png',
-      isHost: false,
-      isBot: true
-    };
-    setChallengerPlayer(bot);
-    setIsChallengerReady(true);
-    setShowInviteModal(false);
-    setInviteFeedback('');
-    setHostWarningNotice('');
-  };
-
   // Switch to next question (Idempotent for both Host & Challenger)
   const handleSwitchToNextTurn = useCallback(async () => {
     clearTimeout(autoNextTimerRef.current);
     clearInterval(countdownIntervalRef.current);
-    clearTimeout(botTimerRef.current);
 
     // Win condition: Player must reach 6 correct answers
     if (hostCorrectCount >= 6 || challengerCorrectCount >= 6) {
@@ -503,7 +477,6 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   const startMatch = (roomQuestions = null) => {
     clearTimeout(autoNextTimerRef.current);
     clearInterval(countdownIntervalRef.current);
-    clearTimeout(botTimerRef.current);
 
     if (Array.isArray(roomQuestions) && roomQuestions.length > 0) {
       setQuestions(roomQuestions);
@@ -1120,60 +1093,6 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
     return () => clearInterval(timer);
   }, [currentStep, currentQIndex, turnStatus, handleRoundTimeout, soundEnabled]);
-
-  // AI Scholar Bot Simulation (When playing 1v1 vs Bot)
-  useEffect(() => {
-    if (currentStep !== 'battle' || turnStatus !== 'playing' || !challengerPlayer?.isBot || !isHost) return;
-
-    clearTimeout(botTimerRef.current);
-
-    // Bot decides to answer between 4.2s and 8.0s
-    const botDelay = 4200 + Math.random() * 3800;
-    botTimerRef.current = setTimeout(() => {
-      if (turnStatus !== 'playing') return;
-
-      // Bot accuracy ~75%
-      const willBeCorrect = Math.random() < 0.75;
-      let botChoice = currentQ.answer;
-
-      if (!willBeCorrect) {
-        const wrongOpts = currentQ.options.map((_, i) => i).filter(i => i !== currentQ.answer);
-        botChoice = wrongOpts[Math.floor(Math.random() * wrongOpts.length)];
-      }
-
-      if (botChoice === currentQ.answer) {
-        if (soundEnabled) playSound.correct();
-        const botPoints = 500 + Math.max(secondsLeft - 4, 1) * 25;
-        const nextChalCount = challengerCorrectCount + 1;
-        setOpponentScore(prev => prev + botPoints);
-        setChallengerCorrectCount(nextChalCount);
-
-        const qKey = currentQ?.id || currentQ?.q || `q_${currentQIndex}`;
-        setSolvedQuestionsSet(prev => new Set([...prev, qKey]));
-
-        const now = Date.now();
-        const result = {
-          turnId: `bot_win_${now}_${currentQIndex}`,
-          answeredBy: 'challenger',
-          answeredByName: challengerPlayer.name || 'AI Scholar Bot',
-          selectedIdx: botChoice,
-          isCorrect: true,
-          scoreEarned: botPoints,
-          isTimeout: false,
-          hostCorrectCount,
-          challengerCorrectCount: nextChalCount,
-          timestamp: now
-        };
-        triggerTurnEndCountdown(result);
-      } else {
-        if (soundEnabled) playSound.wrong();
-        setWrongFeedbackNotice(`${challengerPlayer.name || 'AI Scholar Bot'} បានឆ្លើយខុស! ឱកាសរបស់អ្នក!`);
-        setTimeout(() => setWrongFeedbackNotice(''), 3000);
-      }
-    }, botDelay);
-
-    return () => clearTimeout(botTimerRef.current);
-  }, [currentStep, currentQIndex, turnStatus, challengerPlayer, isHost, currentQ, secondsLeft, hostCorrectCount, challengerCorrectCount, soundEnabled, triggerTurnEndCountdown]);
 
   // Player clicks an answer option (Wrong = Retry, Correct = First to solve wins round)
   const handleSelectOption = async (idx) => {
@@ -1834,34 +1753,19 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                           ចុចប៊ូតុងខាងក្រោមដើម្បីអញ្ជើញ ឬចែករំលែក PIN
                         </span>
                         
-                        {/* Action Buttons: Invite & Instant AI Bot */}
-                        <div className="flex flex-col sm:flex-row items-center gap-2 mt-3.5">
-                          <div className="valorant-btn-borders">
-                            <button
-                              type="button"
-                              onClick={(e) => {
-                                e.stopPropagation();
-                                fetchStudents();
-                                setShowInviteModal(true);
-                              }}
-                              className="valorant-invite-btn py-2 px-3.5"
-                            >
-                              <UserPlus className="w-4 h-4 text-rose-400" />
-                              <span>អញ្ជើញកីឡាករ (INVITE)</span>
-                            </button>
-                          </div>
-
+                        {/* Custom Valorant Slanted Invite Button */}
+                        <div className="valorant-btn-borders mt-3.5">
                           <button
                             type="button"
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleAddAIBot();
+                              fetchStudents();
+                              setShowInviteModal(true);
                             }}
-                            className="px-3.5 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white text-xs font-black shadow-md flex items-center gap-1.5 cursor-pointer active:scale-95 transition-all border border-purple-400/40"
-                            title="លេងជាមួយ AI Scholar Bot ភ្លាមៗ"
+                            className="valorant-invite-btn py-2 px-5"
                           >
-                            <Bot className="w-3.5 h-3.5 text-amber-300 animate-bounce" />
-                            <span>លេងជាមួយ AI Bot</span>
+                            <UserPlus className="w-4 h-4 text-rose-400" />
+                            <span>អញ្ជើញកីឡាករ (INVITE)</span>
                           </button>
                         </div>
                       </div>
@@ -2503,30 +2407,6 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
               </div>
 
               {/* Instant Option: AI Scholar Bot */}
-              <div className="p-3 rounded-xl bg-gradient-to-r from-purple-950/80 via-indigo-950/80 to-slate-900/90 border border-purple-500/40 flex items-center justify-between gap-3 shadow-md">
-                <div className="flex items-center gap-3 min-w-0">
-                  <div className="w-10 h-10 rounded-full bg-purple-600/30 border border-purple-400/50 flex items-center justify-center flex-shrink-0 text-amber-300">
-                    <Bot className="w-5 h-5 animate-pulse" />
-                  </div>
-                  <div className="min-w-0">
-                    <h5 className="text-xs font-black text-white truncate flex items-center gap-1.5">
-                      <span>🤖 AI Scholar Bot (ថ្នាក់ជាតិ)</span>
-                      <span className="text-[9px] px-1.5 py-0.2 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/40">ONLINE</span>
-                    </h5>
-                    <span className="text-[10px] text-purple-300 block truncate">
-                      កម្រិត Lv.10 • ឆ្លើយរហ័ស 1v1 Race Practice
-                    </span>
-                  </div>
-                </div>
-                <button
-                  type="button"
-                  onClick={handleAddAIBot}
-                  className="px-3 py-1.5 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold text-xs shadow-md transition-all cursor-pointer flex-shrink-0 active:scale-95 border border-purple-400/50 flex items-center gap-1"
-                >
-                  <Bot className="w-3.5 h-3.5" />
-                  <span>ជ្រើសរើស (SELECT)</span>
-                </button>
-              </div>
 
               {loadingStudents ? (
                 <div className="py-8 text-center text-slate-400 text-xs flex flex-col items-center gap-2">
