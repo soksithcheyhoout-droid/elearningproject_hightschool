@@ -1036,7 +1036,7 @@ export default function LoginView() {
                       )}
                     </button>
 
-                    <div className="flex items-center justify-between pt-1 text-[11px] text-slate-400 border-t border-white/10">
+                    <div className="flex items-center justify-center pt-1 text-[11px] text-slate-400 border-t border-white/10">
                       <div className="flex items-center gap-1.5">
                         <span>{lang === 'km' ? 'មិនទាន់មានគណនី?' : "No account?"}</span>
                         <button
@@ -1047,15 +1047,6 @@ export default function LoginView() {
                           {lang === 'km' ? 'ចុះឈ្មោះសិស្សថ្មី' : 'Register now'}
                         </button>
                       </div>
-
-                      <button
-                        type="button"
-                        onClick={() => { window.location.href = '/admin'; }}
-                        className="text-amber-400/80 hover:text-amber-300 hover:underline font-bold flex items-center gap-1 cursor-pointer transition-colors"
-                      >
-                        <ShieldCheck className="w-3 h-3 text-amber-400" />
-                        <span>{lang === 'km' ? 'ផ្ទាំងបញ្ជា Admin' : 'Admin Portal'}</span>
-                      </button>
                     </div>
                   </div>
                 </div>
