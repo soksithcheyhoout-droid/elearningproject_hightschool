@@ -61,7 +61,7 @@ export default function KhmerPrideSection() {
   ];
 
   return (
-    <section className="relative overflow-hidden rounded-3xl font-kantumruy border-2 border-amber-400/40 shadow-2xl" id="khmer-pride-section">
+    <section className="relative overflow-hidden rounded-2xl sm:rounded-3xl font-kantumruy border-2 border-amber-400/40 shadow-2xl" id="khmer-pride-section">
 
       {/* ═══════ HIGH-VISIBILITY TENOR CAMBODIA FLAG GIF ═══════ */}
       <div className="absolute inset-0 z-0 overflow-hidden">
@@ -78,23 +78,23 @@ export default function KhmerPrideSection() {
       </div>
 
       {/* ═══════ FOREGROUND CONTENT ═══════ */}
-      <div className="relative z-10 p-6 sm:p-10 lg:p-12 space-y-8">
+      <div className="relative z-10 p-4 sm:p-10 lg:p-12 space-y-5 sm:space-y-8">
 
         {/* ── HEADER ── */}
-        <div className="text-center space-y-3 max-w-3xl mx-auto">
+        <div className="text-center space-y-2.5 sm:space-y-3 max-w-3xl mx-auto">
           
           {/* Top National Emblem Ribbon */}
-          <div className="inline-flex items-center gap-2.5 bg-slate-950/80 backdrop-blur-xl px-5 py-2 rounded-full border border-amber-400/50 shadow-xl">
-            <span className="text-2xl">🇰🇭</span>
-            <span className="text-amber-300 font-black text-xs sm:text-sm tracking-wider font-kantumruy drop-shadow">
+          <div className="inline-flex items-center gap-2 sm:gap-2.5 bg-slate-950/80 backdrop-blur-xl px-3.5 sm:px-5 py-1.5 sm:py-2 rounded-full border border-amber-400/50 shadow-xl">
+            <span className="text-lg sm:text-2xl">🇰🇭</span>
+            <span className="text-amber-300 font-black text-[10px] sm:text-sm tracking-wider font-kantumruy drop-shadow">
               ជាតិ សាសនា ព្រះមហាក្សត្រ
             </span>
-            <span className="text-2xl">🇰🇭</span>
+            <span className="text-lg sm:text-2xl">🇰🇭</span>
           </div>
 
           {/* Main Title with glowing shadow */}
           <div className="space-y-1">
-            <h2 className="text-3xl sm:text-5xl font-black text-white font-moul leading-[1.6] drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]">
+            <h2 className="text-2xl sm:text-5xl font-black text-white font-moul leading-[1.6] drop-shadow-[0_4px_20px_rgba(0,0,0,0.9)]">
               មោទនភាពជាតិខ្មែរ ២០២៦
             </h2>
             <p className="text-amber-300 font-extrabold text-sm sm:text-base tracking-widest uppercase drop-shadow">
@@ -102,21 +102,21 @@ export default function KhmerPrideSection() {
             </p>
           </div>
 
-          <p className="text-white text-xs sm:text-sm font-medium leading-relaxed max-w-xl mx-auto drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] bg-slate-950/50 p-2.5 rounded-xl border border-white/10 backdrop-blur-sm">
+          <p className="text-white text-[10.5px] sm:text-sm font-medium leading-relaxed max-w-xl mx-auto drop-shadow-[0_2px_8px_rgba(0,0,0,0.8)] bg-slate-950/50 p-2 sm:p-2.5 rounded-xl border border-white/10 backdrop-blur-sm">
             ស្មារតីសាមគ្គីភាពការពារទឹកដី អធិបតេយ្យភាពជាតិ និងលើកតម្កើងមោទនភាពវប្បធម៌ខ្មែរដ៏រុងរឿង។
           </p>
 
           {/* Badges */}
-          <div className="flex items-center justify-center gap-2.5 flex-wrap pt-1">
-            <span className="px-3.5 py-1.5 rounded-full bg-red-950/80 border border-red-500/60 text-red-200 text-xs font-bold flex items-center gap-1.5 backdrop-blur-md shadow-md">
+          <div className="flex items-center justify-center gap-1.5 sm:gap-2.5 flex-wrap pt-1">
+            <span className="px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-red-950/80 border border-red-500/60 text-red-200 text-[10px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 backdrop-blur-md shadow-md">
               <Flame className="w-3.5 h-3.5 text-red-400" />
               <span>ការពារទឹកដី ២០២៦</span>
             </span>
-            <span className="px-3.5 py-1.5 rounded-full bg-blue-950/80 border border-blue-500/60 text-blue-200 text-xs font-bold flex items-center gap-1.5 backdrop-blur-md shadow-md">
+            <span className="px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-blue-950/80 border border-blue-500/60 text-blue-200 text-[10px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 backdrop-blur-md shadow-md">
               <Crown className="w-3.5 h-3.5 text-amber-300" />
               <span>ប្រាសាទព្រះវិហារខ្មែរ</span>
             </span>
-            <span className="px-3.5 py-1.5 rounded-full bg-emerald-950/80 border border-emerald-500/60 text-emerald-200 text-xs font-bold flex items-center gap-1.5 backdrop-blur-md shadow-md">
+            <span className="px-2.5 sm:px-3.5 py-1 sm:py-1.5 rounded-full bg-emerald-950/80 border border-emerald-500/60 text-emerald-200 text-[10px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 backdrop-blur-md shadow-md">
               <Sparkles className="w-3.5 h-3.5 text-emerald-300" />
               <span>កម្ពុជាក្រោមដួងចិត្តខ្មែរ</span>
             </span>
@@ -129,14 +129,14 @@ export default function KhmerPrideSection() {
             
             {/* Active Story Card */}
             <div
-              className={`lg:col-span-3 relative rounded-2xl overflow-hidden p-6 sm:p-8 min-h-[250px] flex flex-col justify-between transition-all duration-700 bg-gradient-to-br ${stories[activeStory].bg} border-2 border-white/30 shadow-2xl backdrop-blur-md`}
+              className={`lg:col-span-3 relative rounded-2xl overflow-hidden p-4 sm:p-8 min-h-[200px] sm:min-h-[250px] flex flex-col justify-between transition-all duration-700 bg-gradient-to-br ${stories[activeStory].bg} border-2 border-white/30 shadow-2xl backdrop-blur-md`}
               style={{ boxShadow: `0 15px 40px ${stories[activeStory].accent}40` }}
             >
               <div className="relative z-10 space-y-2.5">
                 <span className="text-4xl block drop-shadow-md">
                   {stories[activeStory].icon}
                 </span>
-                <h3 className="text-xl sm:text-2xl font-black text-white font-kantumruy leading-snug drop-shadow-md">
+                <h3 className="text-base sm:text-2xl font-black text-white font-kantumruy leading-snug drop-shadow-md">
                   {stories[activeStory].title}
                 </h3>
                 <p className="text-xs font-bold" style={{ color: stories[activeStory].accent }}>
@@ -226,14 +226,14 @@ export default function KhmerPrideSection() {
 
         {/* ── PATRIOTIC SLOGAN BANNER ── */}
         <div className="max-w-4xl mx-auto">
-          <div className="relative rounded-2xl overflow-hidden p-6 sm:p-8 text-center bg-slate-950/85 border-2 border-amber-400/60 backdrop-blur-xl shadow-2xl space-y-3">
-            <div className="inline-flex items-center gap-4 text-3xl sm:text-5xl select-none">
+          <div className="relative rounded-2xl overflow-hidden p-4 sm:p-8 text-center bg-slate-950/85 border-2 border-amber-400/60 backdrop-blur-xl shadow-2xl space-y-2.5 sm:space-y-3">
+            <div className="inline-flex items-center gap-3 sm:gap-4 text-2xl sm:text-5xl select-none">
               <span className="animate-bounce" style={{ animationDuration: '2.5s' }}>🇰🇭</span>
               <span className="text-amber-400 font-black">⚔️</span>
               <span className="animate-bounce" style={{ animationDuration: '2.5s', animationDelay: '0.4s' }}>🇰🇭</span>
             </div>
 
-            <h3 className="text-xl sm:text-3xl font-black text-amber-300 font-moul leading-relaxed drop-shadow-md">
+            <h3 className="text-lg sm:text-3xl font-black text-amber-300 font-moul leading-relaxed drop-shadow-md">
               ទឹកដីខ្មែរ មិនអាចឱ្យនរណារំលោភបំពានបានឡើយ!
             </h3>
             
@@ -241,16 +241,16 @@ export default function KhmerPrideSection() {
               "Khmer Land & Heritage Shall Stand United Forever!"
             </p>
 
-            <div className="flex items-center justify-center gap-3 pt-2 flex-wrap">
-              <span className="px-4 py-2 rounded-xl bg-blue-900/60 border border-blue-400 text-blue-200 text-xs font-bold flex items-center gap-2 shadow-md">
+            <div className="flex items-center justify-center gap-2 sm:gap-3 pt-2 flex-wrap">
+              <span className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-blue-900/60 border border-blue-400 text-blue-200 text-[10px] sm:text-xs font-bold flex items-center gap-1.5 sm:gap-2 shadow-md">
                 <Shield className="w-4 h-4 text-blue-300" />
                 <span>ការពារទឹកដីមាតុភូមិ</span>
               </span>
-              <span className="px-4 py-2 rounded-xl bg-red-900/60 border border-red-400 text-red-200 text-xs font-bold flex items-center gap-2 shadow-md">
+              <span className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-red-900/60 border border-red-400 text-red-200 text-[10px] sm:text-xs font-bold flex items-center gap-1.5 sm:gap-2 shadow-md">
                 <Heart className="w-4 h-4 text-red-400 fill-red-400" />
                 <span>ស្មារតីស្នេហាជាតិ</span>
               </span>
-              <span className="px-4 py-2 rounded-xl bg-amber-900/60 border border-amber-400 text-amber-200 text-xs font-bold flex items-center gap-2 shadow-md">
+              <span className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-amber-900/60 border border-amber-400 text-amber-200 text-[10px] sm:text-xs font-bold flex items-center gap-1.5 sm:gap-2 shadow-md">
                 <Star className="w-4 h-4 text-amber-300 fill-amber-300" />
                 <span>មោទនភាពជាតិខ្មែរ</span>
               </span>

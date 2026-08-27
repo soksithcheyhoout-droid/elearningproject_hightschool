@@ -65,7 +65,7 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
     <div className="space-y-4 font-kantumruy">
       
       {/* Main Official MoTDAR Hero Banner */}
-      <div className="bg-[#001a38] rounded-3xl p-6 sm:p-8 lg:p-10 text-white shadow-xl border border-white/15 relative overflow-hidden">
+      <div className="bg-[#001a38] rounded-2xl sm:rounded-3xl p-4 sm:p-7 lg:p-10 text-white shadow-xl border border-white/15 relative overflow-hidden">
         
         {/* Real Education Academic Campus Background Image with Luxury Overlay */}
         <div className="absolute inset-0 z-0 pointer-events-none select-none">
@@ -80,11 +80,11 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
         </div>
 
         {/* Ambient Gradient Lighting Orbs */}
-        <div className="absolute top-0 right-1/4 w-96 h-96 bg-blue-400/20 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/3 w-80 h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-72 sm:w-96 h-72 sm:h-96 bg-blue-400/20 rounded-full blur-3xl pointer-events-none" />
+        <div className="absolute bottom-0 left-1/3 w-64 sm:w-80 h-64 sm:h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* Subtle Watermark Logo in Banner Background */}
-        <div className="absolute -right-10 sm:right-[12%] md:right-[16%] top-1/2 -translate-y-1/2 w-64 h-64 sm:w-80 sm:h-80 md:w-96 md:h-96 pointer-events-none select-none opacity-20 mix-blend-screen z-0">
+        <div className="absolute -right-10 sm:right-[12%] md:right-[16%] top-1/2 -translate-y-1/2 w-48 sm:w-80 h-48 sm:h-80 md:w-96 md:h-96 pointer-events-none select-none opacity-15 sm:opacity-20 mix-blend-screen z-0">
           <img
             src="/assets/moeys-crest-transparent.png"
             alt="Ministry Logo Background"
@@ -92,24 +92,24 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
           />
         </div>
 
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
           
           {/* Left Column: Heading, Subtitle & Primary Actions */}
-          <div className="lg:col-span-7 space-y-5">
+          <div className="lg:col-span-7 space-y-4 sm:space-y-5 min-w-0">
             
             {/* National Badges */}
-            <div className="flex flex-wrap items-center gap-2">
-              <div className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-3.5 py-1 rounded-full border border-white/20 text-xs font-bold text-amber-300 shadow-2xs">
+            <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
+              <div className="inline-flex items-center gap-1.5 bg-white/10 backdrop-blur-md px-2.5 sm:px-3.5 py-1 rounded-full border border-white/20 text-[10px] sm:text-xs font-bold text-amber-300 shadow-2xs shrink-0">
                 <img
                   src="/assets/moeys-crest-transparent.png"
                   alt="Ministry Crest"
-                  className="w-4 h-4 object-contain"
+                  className="w-3.5 h-3.5 sm:w-4 sm:h-4 object-contain"
                 />
-                <span>{t('ministryName') || (lang === 'km' ? 'ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ និងការស្រាវជ្រាវកម្រិតខ្ពស់' : 'Ministry of Talent Development & Advanced Research')}</span>
+                <span className="truncate max-w-[240px] sm:max-w-none">{t('ministryName') || (lang === 'km' ? 'ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ និងការស្រាវជ្រាវកម្រិតខ្ពស់' : 'Ministry of Talent Development & Advanced Research')}</span>
               </div>
-              <span className="bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 text-xs font-black px-3.5 py-1 rounded-full shadow-xs flex items-center gap-1.5 border border-amber-300">
+              <span className="bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 text-[10px] sm:text-xs font-black px-2.5 sm:px-3.5 py-1 rounded-full shadow-xs flex items-center gap-1.5 border border-amber-300 shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping" />
-                {lang === 'km' ? 'កំណែសាកល្បង BETA TEST v2.5' : 'BETA TESTING v2.5'}
+                {lang === 'km' ? 'BETA TEST v2.5' : 'BETA TESTING v2.5'}
               </span>
               <span className="bg-white/15 text-blue-100 text-xs font-semibold px-3 py-1 rounded-full border border-white/20 hidden sm:inline-flex">
                 {lang === 'km' ? 'ថ្នាក់ទី១០ ទី១១ ទី១២' : 'Grades 10, 11, 12'}
@@ -117,21 +117,21 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
             </div>
 
             {/* Main Title */}
-            <div className="space-y-2.5">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-black text-white leading-tight tracking-tight">
+            <div className="space-y-1.5 sm:space-y-2.5">
+              <h1 className="text-xl sm:text-3xl md:text-4xl font-black text-white leading-tight tracking-tight">
                 {t('heroTitle') || (lang === 'km' ? 'មជ្ឈមណ្ឌលសិក្សាឌីជីថលកម្រិតវិទ្យាល័យជាតិ' : 'National Secondary E-Learning Portal')}
               </h1>
-              <p className="text-xs sm:text-sm text-blue-100/90 leading-relaxed max-w-xl font-medium">
+              <p className="text-xs sm:text-sm text-blue-100/90 leading-relaxed max-w-xl font-medium line-clamp-3 sm:line-clamp-none">
                 {t('heroDesc')}
               </p>
             </div>
 
-            {/* Action Buttons */}
-            <div className="flex flex-wrap items-center gap-3 pt-1">
+            {/* Action Buttons (Full width stacked on mobile, row on tablet/desktop) */}
+            <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2.5 sm:gap-3 pt-1">
               <button
                 type="button"
                 onClick={onStartLearning}
-                className="px-6 py-3 rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 text-xs sm:text-sm font-black shadow-lg shadow-amber-400/25 active:scale-95 transition-all flex items-center gap-2 cursor-pointer border border-amber-200"
+                className="px-5 sm:px-6 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl bg-gradient-to-r from-amber-400 via-amber-300 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 text-xs sm:text-sm font-black shadow-lg shadow-amber-400/25 active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer border border-amber-200"
               >
                 <Play className="w-4 h-4 fill-slate-950 text-slate-950" />
                 <span>{t('startLearning') || (lang === 'km' ? 'ចូលរៀនតាមមុខវិជ្ជា' : 'Start Learning')}</span>
@@ -140,7 +140,7 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
               <button
                 type="button"
                 onClick={onExploreBacII}
-                className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-5 py-3 rounded-2xl text-xs sm:text-sm font-bold transition-all border border-white/25 shadow-md flex items-center gap-2 cursor-pointer active:scale-95"
+                className="bg-white/10 hover:bg-white/20 backdrop-blur-md text-white px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl sm:rounded-2xl text-xs sm:text-sm font-bold transition-all border border-white/25 shadow-md flex items-center justify-center gap-2 cursor-pointer active:scale-95"
               >
                 <FileText className="w-4 h-4 text-amber-300" />
                 <span>{t('exploreBacII') || (lang === 'km' ? 'ទាញយកវិញ្ញាសាបាក់ឌុប' : 'Explore BacII Papers')}</span>
@@ -149,32 +149,32 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
             </div>
 
             {/* Institutional Stats */}
-            <div className="grid grid-cols-3 gap-3 pt-4 border-t border-white/15 max-w-lg text-xs text-white">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-amber-400/15 border border-amber-400/30 flex items-center justify-center">
-                  <Users className="w-4 h-4 text-amber-300 flex-shrink-0" />
+            <div className="grid grid-cols-3 gap-1.5 sm:gap-3 pt-3 sm:pt-4 border-t border-white/15 max-w-lg text-xs text-white">
+              <div className="flex items-center gap-1.5 sm:gap-2.5">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-amber-400/15 border border-amber-400/30 flex items-center justify-center shrink-0">
+                  <Users className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-300" />
                 </div>
-                <div>
-                  <p className="font-extrabold text-white font-cinzel text-sm leading-none">35,000+</p>
-                  <p className="text-[10px] text-blue-200 mt-0.5">{lang === 'km' ? 'សិស្សទូទាំងប្រទេស' : 'Nationwide Students'}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-emerald-400/15 border border-emerald-400/30 flex items-center justify-center">
-                  <BookCheck className="w-4 h-4 text-emerald-300 flex-shrink-0" />
-                </div>
-                <div>
-                  <p className="font-extrabold text-white font-cinzel text-sm leading-none">100%</p>
-                  <p className="text-[10px] text-blue-200 mt-0.5">{lang === 'km' ? 'សៀវភៅពុម្ពផ្លូវការ' : 'Official Curriculum'}</p>
+                <div className="min-w-0">
+                  <p className="font-extrabold text-white font-cinzel text-xs sm:text-sm leading-none truncate">35,000+</p>
+                  <p className="text-[8.5px] sm:text-[10px] text-blue-200 mt-0.5 truncate">{lang === 'km' ? 'សិស្សទូទាំងប្រទេស' : 'Students'}</p>
                 </div>
               </div>
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-xl bg-yellow-400/15 border border-yellow-400/30 flex items-center justify-center">
-                  <Award className="w-4 h-4 text-yellow-300 flex-shrink-0" />
+              <div className="flex items-center gap-1.5 sm:gap-2.5">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-emerald-400/15 border border-emerald-400/30 flex items-center justify-center shrink-0">
+                  <BookCheck className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-emerald-300" />
                 </div>
-                <div>
-                  <p className="font-extrabold text-white font-cinzel text-sm leading-none">{lang === 'km' ? 'និទ្ទេស A' : 'Grade A'}</p>
-                  <p className="text-[10px] text-blue-200 mt-0.5">{lang === 'km' ? 'អត្រាជោគជ័យខ្ពស់' : 'High Pass Rate'}</p>
+                <div className="min-w-0">
+                  <p className="font-extrabold text-white font-cinzel text-xs sm:text-sm leading-none truncate">100%</p>
+                  <p className="text-[8.5px] sm:text-[10px] text-blue-200 mt-0.5 truncate">{lang === 'km' ? 'សៀវភៅពុម្ពផ្លូវការ' : 'Official'}</p>
+                </div>
+              </div>
+              <div className="flex items-center gap-1.5 sm:gap-2.5">
+                <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-yellow-400/15 border border-yellow-400/30 flex items-center justify-center shrink-0">
+                  <Award className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-yellow-300" />
+                </div>
+                <div className="min-w-0">
+                  <p className="font-extrabold text-white font-cinzel text-xs sm:text-sm leading-none truncate">{lang === 'km' ? 'និទ្ទេស A' : 'Grade A'}</p>
+                  <p className="text-[8.5px] sm:text-[10px] text-blue-200 mt-0.5 truncate">{lang === 'km' ? 'អត្រាខ្ពស់' : 'High Pass'}</p>
                 </div>
               </div>
             </div>
@@ -183,53 +183,53 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
 
           {/* Right Column: Royal Navy Glass Countdown & Stream Hub Card */}
           <div className="lg:col-span-5">
-            <div className="bg-white/10 backdrop-blur-xl text-white rounded-3xl p-5 sm:p-6 shadow-2xl border border-white/20 space-y-4">
+            <div className="bg-white/10 backdrop-blur-xl text-white rounded-2xl sm:rounded-3xl p-3 sm:p-6 shadow-2xl border border-white/20 space-y-2.5 sm:space-y-4">
               
               {/* Card Header with August 10-11 Exam Date */}
-              <div className="flex items-center justify-between border-b border-white/15 pb-3">
-                <div className="flex items-center gap-2 font-extrabold text-xs sm:text-[13px] text-amber-300">
-                  <Calendar className="w-4 h-4 text-amber-400" />
-                  <span>{lang === 'km' ? 'រាប់ថយក្រោយការប្រឡងបាក់ឌុប' : 'BacII Exam Countdown'}</span>
+              <div className="flex items-center justify-between border-b border-white/15 pb-2.5 sm:pb-3">
+                <div className="flex items-center gap-1.5 sm:gap-2 font-extrabold text-xs sm:text-[13px] text-amber-300">
+                  <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
+                  <span className="truncate">{lang === 'km' ? 'រាប់ថយក្រោយការប្រឡងបាក់ឌុប' : 'BacII Exam Countdown'}</span>
                 </div>
-                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 font-mono shadow-2xs">
+                <span className="text-[9.5px] sm:text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-400/40 font-mono shadow-2xs shrink-0">
                   {lang === 'km' ? '១០-១១ សីហា' : 'Aug 10-11'}
                 </span>
               </div>
 
               {/* 4 Clean Countdown Boxes */}
-              <div className="grid grid-cols-4 gap-2">
-                <div className="bg-white/10 border border-white/15 rounded-2xl p-2.5 text-center shadow-2xs">
-                  <div className="font-black text-xl sm:text-2xl text-amber-300 font-cinzel leading-none">
+              <div className="grid grid-cols-4 gap-1 sm:gap-2">
+                <div className="bg-white/10 border border-white/15 rounded-xl sm:rounded-2xl p-2 sm:p-2.5 text-center shadow-2xs">
+                  <div className="font-black text-lg sm:text-2xl text-amber-300 font-cinzel leading-none">
                     {timeLeft.days}
                   </div>
-                  <div className="text-[10px] text-blue-200 font-bold mt-1 uppercase tracking-wider">
+                  <div className="text-[8.5px] sm:text-[10px] text-blue-200 font-bold mt-1 uppercase tracking-wider">
                     {t('days')}
                   </div>
                 </div>
 
-                <div className="bg-white/10 border border-white/15 rounded-2xl p-2.5 text-center shadow-2xs">
-                  <div className="font-black text-xl sm:text-2xl text-amber-300 font-cinzel leading-none">
+                <div className="bg-white/10 border border-white/15 rounded-xl sm:rounded-2xl p-2 sm:p-2.5 text-center shadow-2xs">
+                  <div className="font-black text-lg sm:text-2xl text-amber-300 font-cinzel leading-none">
                     {timeLeft.hours}
                   </div>
-                  <div className="text-[10px] text-blue-200 font-bold mt-1 uppercase tracking-wider">
+                  <div className="text-[8.5px] sm:text-[10px] text-blue-200 font-bold mt-1 uppercase tracking-wider">
                     {t('hours')}
                   </div>
                 </div>
 
-                <div className="bg-white/10 border border-white/15 rounded-2xl p-2.5 text-center shadow-2xs">
-                  <div className="font-black text-xl sm:text-2xl text-amber-300 font-cinzel leading-none">
+                <div className="bg-white/10 border border-white/15 rounded-xl sm:rounded-2xl p-2 sm:p-2.5 text-center shadow-2xs">
+                  <div className="font-black text-lg sm:text-2xl text-amber-300 font-cinzel leading-none">
                     {timeLeft.minutes}
                   </div>
-                  <div className="text-[10px] text-blue-200 font-bold mt-1 uppercase tracking-wider">
+                  <div className="text-[8.5px] sm:text-[10px] text-blue-200 font-bold mt-1 uppercase tracking-wider">
                     {t('minutes')}
                   </div>
                 </div>
 
-                <div className="bg-white/10 border border-white/15 rounded-2xl p-2.5 text-center shadow-2xs">
-                  <div className="font-black text-xl sm:text-2xl text-sky-400 font-cinzel leading-none">
+                <div className="bg-white/10 border border-white/15 rounded-xl sm:rounded-2xl p-2 sm:p-2.5 text-center shadow-2xs">
+                  <div className="font-black text-lg sm:text-2xl text-sky-400 font-cinzel leading-none">
                     {timeLeft.seconds}
                   </div>
-                  <div className="text-[10px] text-blue-200 font-bold mt-1 uppercase tracking-wider">
+                  <div className="text-[8.5px] sm:text-[10px] text-blue-200 font-bold mt-1 uppercase tracking-wider">
                     {t('seconds')}
                   </div>
                 </div>
@@ -237,66 +237,66 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
 
               {/* Stream Switcher */}
               <div className="space-y-2 pt-1 border-t border-white/15">
-                <label className="text-[11px] font-bold text-blue-200 block">
+                <label className="text-[10.5px] sm:text-[11px] font-bold text-blue-200 block">
                   {lang === 'km' ? 'មុខវិជ្ជាគោលតាមផ្នែក (Focus Subjects):' : 'Core Stream Subjects:'}
                 </label>
-                <div className="grid grid-cols-2 gap-2 text-xs font-bold">
+                <div className="grid grid-cols-2 gap-1.5 sm:gap-2 text-xs font-bold">
                   <button
                     type="button"
                     onClick={() => setActiveHeroStream('science')}
-                    className={`py-2 px-3 rounded-xl border transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                    className={`py-1.5 sm:py-2 px-2 sm:px-3 rounded-xl border transition-all flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer text-[11px] sm:text-xs ${
                       activeHeroStream === 'science'
                         ? 'bg-blue-500/30 text-white border-blue-400 font-extrabold shadow-sm ring-1 ring-blue-400/40'
                         : 'bg-white/5 text-blue-200 border-white/15 hover:bg-white/10'
                     }`}
                   >
-                    <Atom className="w-3.5 h-3.5 text-sky-400" />
-                    <span>{lang === 'km' ? 'វិទ្យាសាស្ត្រពិត' : 'Science Stream'}</span>
+                    <Atom className="w-3.5 h-3.5 text-sky-400 shrink-0" />
+                    <span className="truncate">{lang === 'km' ? 'វិទ្យាសាស្ត្រពិត' : 'Science Stream'}</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => setActiveHeroStream('social')}
-                    className={`py-2 px-3 rounded-xl border transition-all flex items-center justify-center gap-1.5 cursor-pointer ${
+                    className={`py-1.5 sm:py-2 px-2 sm:px-3 rounded-xl border transition-all flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer text-[11px] sm:text-xs ${
                       activeHeroStream === 'social'
                         ? 'bg-amber-500/30 text-amber-200 border-amber-400 font-extrabold shadow-sm ring-1 ring-amber-400/40'
                         : 'bg-white/5 text-amber-200/80 border-white/15 hover:bg-white/10'
                     }`}
                   >
-                    <Landmark className="w-3.5 h-3.5 text-amber-400" />
-                    <span>{lang === 'km' ? 'វិទ្យាសាស្ត្រសង្គម' : 'Social Sciences'}</span>
+                    <Landmark className="w-3.5 h-3.5 text-amber-400 shrink-0" />
+                    <span className="truncate">{lang === 'km' ? 'វិទ្យាសាស្ត្រសង្គម' : 'Social Sciences'}</span>
                   </button>
                 </div>
 
                 {/* Core subjects badge list */}
-                <div className="flex flex-wrap gap-1.5 pt-1">
+                <div className="flex flex-wrap gap-1 sm:gap-1.5 pt-0.5 overflow-hidden">
                   {activeHeroStream === 'science' ? (
                     <>
-                      <span className="bg-white/10 text-blue-100 text-[10.5px] font-bold px-2.5 py-0.5 rounded-lg border border-white/15">
+                      <span className="bg-white/10 text-blue-100 text-[8.5px] sm:text-[10.5px] font-bold px-1.5 sm:px-2 py-0.5 rounded-lg border border-white/15">
                         {lang === 'km' ? 'គណិតវិទ្យា (១២៥)' : 'Mathematics (125)'}
                       </span>
-                      <span className="bg-white/10 text-blue-100 text-[10.5px] font-bold px-2.5 py-0.5 rounded-lg border border-white/15">
+                      <span className="bg-white/10 text-blue-100 text-[8.5px] sm:text-[10.5px] font-bold px-1.5 sm:px-2 py-0.5 rounded-lg border border-white/15">
                         {lang === 'km' ? 'រូបវិទ្យា (៧៥)' : 'Physics (75)'}
                       </span>
-                      <span className="bg-white/10 text-blue-100 text-[10.5px] font-bold px-2.5 py-0.5 rounded-lg border border-white/15">
+                      <span className="bg-white/10 text-blue-100 text-[8.5px] sm:text-[10.5px] font-bold px-1.5 sm:px-2.5 py-0.5 rounded-lg border border-white/15">
                         {lang === 'km' ? 'គីមីវិទ្យា (៧៥)' : 'Chemistry (75)'}
                       </span>
-                      <span className="bg-white/10 text-blue-100 text-[10.5px] font-bold px-2.5 py-0.5 rounded-lg border border-white/15">
+                      <span className="bg-white/10 text-blue-100 text-[8.5px] sm:text-[10.5px] font-bold px-1.5 sm:px-2.5 py-0.5 rounded-lg border border-white/15">
                         {lang === 'km' ? 'ជីវវិទ្យា (៧៥)' : 'Biology (75)'}
                       </span>
                     </>
                   ) : (
                     <>
-                      <span className="bg-white/10 text-amber-200 text-[10.5px] font-bold px-2.5 py-0.5 rounded-lg border border-white/15">
+                      <span className="bg-white/10 text-amber-200 text-[8.5px] sm:text-[10.5px] font-bold px-1.5 sm:px-2.5 py-0.5 rounded-lg border border-white/15">
                         {lang === 'km' ? 'អក្សរសាស្ត្រ (១២៥)' : 'Khmer Lit (125)'}
                       </span>
-                      <span className="bg-white/10 text-amber-200 text-[10.5px] font-bold px-2.5 py-0.5 rounded-lg border border-white/15">
+                      <span className="bg-white/10 text-amber-200 text-[8.5px] sm:text-[10.5px] font-bold px-1.5 sm:px-2.5 py-0.5 rounded-lg border border-white/15">
                         {lang === 'km' ? 'ប្រវត្តិវិទ្យា (៧៥)' : 'History (75)'}
                       </span>
-                      <span className="bg-white/10 text-amber-200 text-[10.5px] font-bold px-2.5 py-0.5 rounded-lg border border-white/15">
+                      <span className="bg-white/10 text-amber-200 text-[8.5px] sm:text-[10.5px] font-bold px-1.5 sm:px-2.5 py-0.5 rounded-lg border border-white/15">
                         {lang === 'km' ? 'ភូមិវិទ្យា (៧៥)' : 'Geography (75)'}
                       </span>
-                      <span className="bg-white/10 text-amber-200 text-[10.5px] font-bold px-2.5 py-0.5 rounded-lg border border-white/15">
+                      <span className="bg-white/10 text-amber-200 text-[8.5px] sm:text-[10.5px] font-bold px-1.5 sm:px-2.5 py-0.5 rounded-lg border border-white/15">
                         {lang === 'km' ? 'សីលធម៌ (៧៥)' : 'Civics (75)'}
                       </span>
                     </>
@@ -305,7 +305,7 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
               </div>
 
               {/* Bottom Quick Action */}
-              <div className="pt-2 border-t border-white/15 flex items-center justify-between text-xs">
+              <div className="pt-2 border-t border-white/15 flex items-center justify-between text-[10px] sm:text-xs">
                 <span className="text-blue-200 font-bold text-[11px] flex items-center gap-1.5">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                   <span>{lang === 'km' ? 'កំពុងរៀន៖ ១,៤២០ នាក់' : 'Active Students: 1,420'}</span>

@@ -51,6 +51,32 @@
       font-size: 16px !important;
     }
   }
+
+  /* Prevent horizontal overflow at all levels */
+  html, body, #root {
+    overflow-x: hidden;
+    max-width: 100vw;
+  }
+
+  #root {
+    width: 100%;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  /* Universal box-sizing for proper mobile layout */
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+}
+
+/* Hide scrollbar utility for horizontal scroll areas */
+.scrollbar-none {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-none::-webkit-scrollbar {
+  display: none;
 }
 
 /* Custom Scrollbars */

@@ -108,24 +108,24 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
             />
           </div>
 
-          <div className="relative z-10 p-4 sm:p-8 lg:p-10 flex flex-col lg:flex-row items-start lg:items-center justify-between gap-5 sm:gap-8">
+          <div className="relative z-10 p-3 sm:p-7 lg:p-10 flex flex-col lg:flex-row items-stretch lg:items-center justify-between gap-4 sm:gap-8">
             
             {/* Left Content */}
-            <div className="space-y-3 sm:space-y-4 max-w-2xl">
+            <div className="space-y-2.5 sm:space-y-4 max-w-2xl min-w-0">
               
               {/* Badges line */}
               <div className="flex flex-wrap items-center gap-1.5 sm:gap-2">
-                <span className="px-2.5 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-amber-400 text-slate-950 font-black text-[10px] sm:text-xs uppercase tracking-wider flex items-center gap-1 sm:gap-1.5 shadow-sm font-cinzel">
+                <span className="px-2.5 sm:px-3.5 py-0.5 sm:py-1 rounded-full bg-amber-400 text-slate-950 font-black text-[9.5px] sm:text-xs uppercase tracking-wider flex items-center gap-1 sm:gap-1.5 shadow-sm font-cinzel shrink-0">
                   <ShieldCheck className="w-3.5 h-3.5 text-slate-950" />
                   <span>{lang === 'km' ? 'កម្មវិធីសិក្សាជាតិផ្លូវការ' : 'Official Curriculum'}</span>
                 </span>
                 
-                <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-white/15 backdrop-blur-md text-blue-100 text-[10px] sm:text-xs font-bold border border-white/20 flex items-center gap-1">
+                <span className="px-2.5 sm:px-3 py-0.5 sm:py-1 rounded-full bg-white/15 backdrop-blur-md text-blue-100 text-[9.5px] sm:text-xs font-bold border border-white/20 flex items-center gap-1 shrink-0">
                   <GraduationCap className="w-3 h-3 text-amber-300" />
                   <span>{lang === 'km' ? 'ថ្នាក់ទី ១ ដល់ ទី ១២' : 'Grades 1 to 12'}</span>
                 </span>
 
-                <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[10px] sm:text-xs font-bold flex items-center gap-1">
+                <span className="px-2 sm:px-2.5 py-0.5 sm:py-1 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 text-[9.5px] sm:text-xs font-bold flex items-center gap-1 shrink-0">
                   <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                   <span>{lang === 'km' ? '១០០% ឥតគិតថ្លៃ' : '100% Free'}</span>
                 </span>
@@ -133,7 +133,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
 
               {/* Title & Subtitle */}
               <div className="space-y-1 sm:space-y-2">
-                <h1 className="text-xl sm:text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight">
+                <h1 className="text-lg sm:text-3xl lg:text-4xl font-black text-white leading-tight tracking-tight">
                   {lang === 'km' ? 'កម្មវិធីសិក្សាចំណេះទូទៅ ថ្នាក់ទី ១-១២' : 'Cambodian National Curriculum (Grades 1–12)'}
                 </h1>
                 <p className="text-xs sm:text-sm text-blue-100/90 leading-relaxed font-medium line-clamp-2 sm:line-clamp-none max-w-xl">
@@ -144,7 +144,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
               </div>
 
               {/* Quick Search Input */}
-              <div className="relative max-w-md pt-1">
+              <div className="relative w-full max-w-md pt-0.5">
                 <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
                 <input
                   type="text"
@@ -166,9 +166,9 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
             </div>
 
             {/* Right Ministry Accreditation Card */}
-            <div className="w-full lg:w-auto bg-slate-950/60 backdrop-blur-md rounded-2xl sm:rounded-3xl p-3.5 sm:p-5 border border-white/20 space-y-3 sm:space-y-4 shadow-lg flex-shrink-0">
-              <div className="flex items-center gap-3">
-                <div className="w-11 h-11 sm:w-14 sm:h-14 rounded-xl sm:rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center p-1.5 sm:p-2 border border-white/30 shadow-inner flex-shrink-0">
+            <div className="w-full lg:w-72 bg-slate-950/60 backdrop-blur-md rounded-2xl sm:rounded-3xl p-2.5 sm:p-4 border border-white/20 space-y-2 sm:space-y-3 shadow-lg shrink-0">
+              <div className="flex items-center gap-2.5">
+                <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl bg-white/15 backdrop-blur-sm flex items-center justify-center p-1.5 border border-white/30 shadow-inner shrink-0">
                   <img
                     src="/assets/moeys-crest-transparent.png"
                     alt="MoTDAR Crest"
@@ -176,10 +176,10 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
                   />
                 </div>
                 <div className="min-w-0">
-                  <h4 className="text-xs sm:text-sm font-black text-amber-300 font-cinzel tracking-wider uppercase">
+                  <h4 className="text-[11px] sm:text-xs font-black text-amber-300 font-cinzel tracking-wider uppercase truncate">
                     ក្រសួងអប់រំ យុវជន និងកីឡា
                   </h4>
-                  <p className="text-[10px] sm:text-xs text-blue-200 font-medium">
+                  <p className="text-[9.5px] sm:text-[11px] text-blue-200 font-medium truncate">
                     MoEYS National E-Learning Platform
                   </p>
                 </div>
@@ -204,67 +204,67 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
       )}
 
       {/* 🧭 UNIFIED FILTER BAR (Stream Switcher + Grade 1-12 Selector Ribbon) */}
-      <div className="bg-white p-3.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm space-y-3.5">
+      <div className="bg-white p-2.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm space-y-2.5 sm:space-y-3 overflow-hidden">
         
         {/* Top Row: Stream Switcher & Status */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 sm:gap-4">
+        <div className="flex flex-col md:flex-row md:items-center justify-between gap-2.5 sm:gap-4">
           <div className="min-w-0">
-            <div className="flex items-center gap-1.5 sm:gap-2 mb-1 flex-wrap">
-              <span className="bg-[#002b5b] text-amber-300 text-[9px] sm:text-[10px] font-black uppercase tracking-wider px-2.5 py-0.5 rounded-full shadow-2xs font-mono">
+            <div className="flex items-center gap-1.5 sm:gap-2 mb-0.5 flex-wrap">
+              <span className="bg-[#002b5b] text-amber-300 text-[8.5px] sm:text-[10px] font-black uppercase tracking-wider px-2 sm:px-2.5 py-0.5 rounded-full shadow-2xs font-mono">
                 MoTDAR STANDARDS
               </span>
-              <span className="text-[10.5px] sm:text-xs text-slate-500 font-bold">
-                • {filteredSubjects.length} {lang === 'km' ? 'មុខវិជ្ជាសរុប' : 'Subjects Available'} ({lang === 'km' ? 'វិទ្យាសាស្ត្រ' : 'Science'}: {scienceSubjects.length}, {lang === 'km' ? 'សង្គម' : 'Social'}: {socialSubjects.length})
+              <span className="text-[10px] sm:text-xs text-slate-500 font-bold truncate">
+                • {filteredSubjects.length} {lang === 'km' ? 'មុខវិជ្ជាសរុប' : 'Subjects'} ({lang === 'km' ? 'វិទ្យាសាស្ត្រ' : 'Science'}: {scienceSubjects.length}, {lang === 'km' ? 'សង្គម' : 'Social'}: {socialSubjects.length})
               </span>
             </div>
-            <h2 className="text-sm sm:text-lg font-black text-[#002b5b] tracking-tight">
+            <h2 className="text-xs sm:text-lg font-black text-[#002b5b] tracking-tight">
               {lang === 'km' ? 'តារាងមុខវិជ្ជា និងមេរៀនតាមកម្រិតថ្នាក់' : 'Select Grade & Stream'}
             </h2>
           </div>
 
-          {/* Right Stream Filter Pills */}
-          <div className="grid grid-cols-3 sm:flex items-center gap-1 sm:gap-2 font-kantumruy text-xs w-full sm:w-auto">
+          {/* Right Stream Filter Pills (Smooth scrollable on mobile) */}
+          <div className="flex items-center gap-1.5 sm:gap-2 font-kantumruy text-xs overflow-x-auto pb-1 sm:pb-0 scrollbar-none flex-nowrap w-full md:w-auto">
             <button
               onClick={() => setFilterStream('all')}
-              className={`py-2 px-1.5 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl transition-all font-black flex items-center justify-center gap-1 text-[11px] sm:text-xs cursor-pointer active:scale-95 ${
+              className={`py-1.5 px-3 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl transition-all font-black flex items-center justify-center gap-1 text-[10.5px] sm:text-xs cursor-pointer active:scale-95 shrink-0 ${
                 filterStream === 'all'
                   ? 'bg-gradient-to-r from-[#005baa] to-[#003875] text-white shadow-md'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
               }`}
             >
-              <Layers className="w-3.5 h-3.5 flex-shrink-0" />
-              <span className="truncate">{lang === 'km' ? 'ទាំងអស់' : 'All'} ({curriculumData.length})</span>
+              <Layers className="w-3.5 h-3.5 shrink-0" />
+              <span className="whitespace-nowrap">{lang === 'km' ? 'ទាំងអស់' : 'All'} ({curriculumData.length})</span>
             </button>
             
             <button
               onClick={() => setFilterStream('science')}
-              className={`py-2 px-1.5 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl transition-all font-black flex items-center justify-center gap-1 text-[11px] sm:text-xs cursor-pointer active:scale-95 ${
+              className={`py-1.5 px-3 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl transition-all font-black flex items-center justify-center gap-1 text-[10.5px] sm:text-xs cursor-pointer active:scale-95 shrink-0 ${
                 filterStream === 'science'
                   ? 'bg-gradient-to-r from-[#005baa] to-[#003875] text-white shadow-md'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
               }`}
             >
-              <Atom className="w-3.5 h-3.5 text-sky-500 flex-shrink-0" />
-              <span className="truncate">{lang === 'km' ? 'វិទ្យាសាស្ត្រ' : 'Science'} ({totalScienceCount})</span>
+              <Atom className="w-3.5 h-3.5 text-sky-500 shrink-0" />
+              <span className="whitespace-nowrap">{lang === 'km' ? 'វិទ្យាសាស្ត្រ' : 'Science'} ({totalScienceCount})</span>
             </button>
             
             <button
               onClick={() => setFilterStream('social')}
-              className={`py-2 px-1.5 sm:px-4 sm:py-2.5 rounded-xl sm:rounded-2xl transition-all font-black flex items-center justify-center gap-1 text-[11px] sm:text-xs cursor-pointer active:scale-95 ${
+              className={`py-1.5 px-3 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl transition-all font-black flex items-center justify-center gap-1 text-[10.5px] sm:text-xs cursor-pointer active:scale-95 shrink-0 ${
                 filterStream === 'social'
                   ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md'
                   : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
               }`}
             >
-              <BookOpen className="w-3.5 h-3.5 text-amber-600 flex-shrink-0" />
-              <span className="truncate">{lang === 'km' ? 'សង្គម' : 'Social'} ({totalSocialCount})</span>
+              <BookOpen className="w-3.5 h-3.5 text-amber-600 shrink-0" />
+              <span className="whitespace-nowrap">{lang === 'km' ? 'សង្គម' : 'Social'} ({totalSocialCount})</span>
             </button>
           </div>
         </div>
 
         {/* Bottom Row: Comprehensive Grade 1-12 Selector Ribbon */}
-        <div className="pt-2.5 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2.5">
-          <div className="flex items-center gap-1.5 sm:gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none text-xs">
+        <div className="pt-2 sm:pt-2.5 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-2.5">
+          <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none flex-nowrap text-xs w-full sm:w-auto -mx-0.5 px-0.5">
             <span className="text-[11px] font-bold text-slate-500 whitespace-nowrap mr-1 hidden lg:inline">
               កម្រិតថ្នាក់ (Grade):
             </span>
@@ -273,7 +273,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
             <button
               type="button"
               onClick={() => setFilterGrade('all')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              className={`px-2.5 sm:px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                 filterGrade === 'all'
                   ? 'bg-indigo-600 text-white shadow-xs'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -285,7 +285,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
             <button
               type="button"
               onClick={() => setFilterGrade('primary')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              className={`px-2.5 sm:px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                 filterGrade === 'primary' || filterGrade === '1-6'
                   ? 'bg-sky-600 text-white shadow-xs'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -297,7 +297,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
             <button
               type="button"
               onClick={() => setFilterGrade('junior')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              className={`px-2.5 sm:px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                 filterGrade === 'junior' || filterGrade === '7-9'
                   ? 'bg-violet-600 text-white shadow-xs'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -309,7 +309,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
             <button
               type="button"
               onClick={() => setFilterGrade('high')}
-              className={`px-3 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer whitespace-nowrap ${
+              className={`px-2.5 sm:px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                 filterGrade === 'high' || filterGrade === '10-12'
                   ? 'bg-amber-600 text-white shadow-xs'
                   : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -320,13 +320,13 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
           </div>
 
           {/* Individual Grade Pills 1 to 12 */}
-          <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0 scrollbar-none">
+          <div className="flex items-center gap-1 overflow-x-auto pb-1 sm:pb-0 scrollbar-none flex-nowrap">
             {['1', '2', '3', '4', '5', '6', '7', '8', '9', '10', '11', '12'].map((g) => (
               <button
                 key={g}
                 type="button"
                 onClick={() => setFilterGrade(g)}
-                className={`w-7 h-7 rounded-lg text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center flex-shrink-0 ${
+                className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center shrink-0 ${
                   filterGrade === g
                     ? 'bg-indigo-600 text-white shadow-xs scale-105 ring-2 ring-indigo-400/40'
                     : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
@@ -341,7 +341,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
 
       </div>
 
-      {/* 1. Science Stream Section (2 COLUMNS ON MOBILE!) */}
+      {/* 1. Science Stream Section */}
       {(filterStream === 'all' || filterStream === 'science') && scienceSubjects.length > 0 && (
         <div className="space-y-3 sm:space-y-4">
           <div className="flex items-center justify-between bg-white p-3 sm:p-4 rounded-2xl border border-slate-200 shadow-xs">
@@ -360,24 +360,24 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
             </span>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
             {scienceSubjects.map((sub) => {
               const Icon = iconMap[sub.icon] || BookOpen;
               return (
                 <div
                   key={sub.id}
                   onClick={() => onSelectSubject(sub)}
-                  className="group cursor-pointer flex flex-col justify-between p-3 sm:p-5 bg-white border border-slate-200/90 hover:border-[#005baa] hover:shadow-xl transition-all duration-300 rounded-2xl sm:rounded-3xl relative overflow-hidden active:scale-[0.98]"
+                  className="group cursor-pointer flex flex-col justify-between p-3.5 sm:p-5 bg-white border border-slate-200/90 hover:border-[#005baa] hover:shadow-xl transition-all duration-300 rounded-2xl sm:rounded-3xl relative overflow-hidden active:scale-[0.98]"
                 >
                   <div className="relative z-10 space-y-2 sm:space-y-3">
                     
                     {/* Header Row */}
                     <div className="flex items-start justify-between gap-1.5">
                       <div 
-                        className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-2xs transition-transform duration-300 group-hover:scale-110"
+                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-2xs transition-transform duration-300 group-hover:scale-110 shrink-0"
                         style={{ backgroundColor: `${sub.color}15`, border: `1px solid ${sub.color}30` }}
                       >
-                        <Icon className="w-4 h-4 sm:w-6 sm:h-6" style={{ color: sub.color }} />
+                        <Icon className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: sub.color }} />
                       </div>
 
                       <span className="text-[8.5px] sm:text-[9.5px] font-black uppercase tracking-wider px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-blue-50 text-[#005baa] border border-blue-200 font-mono">
@@ -387,7 +387,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
 
                     {/* Subject Title & Teacher */}
                     <div className="space-y-0.5 sm:space-y-1">
-                      <h4 className="font-black text-xs sm:text-base text-[#002b5b] group-hover:text-[#005baa] transition-colors leading-tight line-clamp-1">
+                      <h4 className="font-black text-sm sm:text-base text-[#002b5b] group-hover:text-[#005baa] transition-colors leading-tight line-clamp-1">
                         {lang === 'km' ? sub.nameKm : sub.nameEn}
                       </h4>
                       <p className="text-[9.5px] sm:text-xs text-[#005baa] font-bold flex items-center gap-1">
@@ -396,24 +396,24 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
                       </p>
                     </div>
 
-                    {/* Description (Hidden on mobile for sleek 2-col balance) */}
-                    <p className="hidden sm:block text-xs text-slate-600 line-clamp-2 leading-relaxed font-medium">
+                    {/* Description */}
+                    <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed font-medium">
                       {lang === 'km' ? sub.descriptionKm : sub.descriptionEn}
                     </p>
 
                     {/* Chapter & Lesson Counters */}
-                    <div className="grid grid-cols-3 gap-1 sm:gap-2 pt-0.5 sm:pt-1 text-slate-600">
-                      <div className="bg-slate-50 p-1 sm:p-2 rounded-xl sm:rounded-2xl border border-slate-200/80 text-center">
-                        <span className="text-slate-400 block text-[8px] sm:text-[9.5px] font-bold">{lang === 'km' ? 'ជំពូក' : 'Chapters'}</span>
-                        <span className="font-black text-[10px] sm:text-xs text-[#002b5b] font-cinzel">{sub.totalChapters}</span>
+                    <div className="grid grid-cols-3 gap-1.5 sm:gap-2 pt-0.5 sm:pt-1 text-slate-600">
+                      <div className="bg-slate-50 p-1.5 sm:p-2 rounded-xl sm:rounded-2xl border border-slate-200/80 text-center">
+                        <span className="text-slate-400 block text-[8.5px] sm:text-[9.5px] font-bold">{lang === 'km' ? 'ជំពូក' : 'Chapters'}</span>
+                        <span className="font-black text-xs sm:text-sm text-[#002b5b] font-cinzel">{sub.totalChapters}</span>
                       </div>
-                      <div className="bg-slate-50 p-1 sm:p-2 rounded-xl sm:rounded-2xl border border-slate-200/80 text-center">
-                        <span className="text-slate-400 block text-[8px] sm:text-[9.5px] font-bold">{lang === 'km' ? 'មេរៀន' : 'Lessons'}</span>
-                        <span className="font-black text-[10px] sm:text-xs text-[#002b5b] font-cinzel">{sub.totalLessons}</span>
+                      <div className="bg-slate-50 p-1.5 sm:p-2 rounded-xl sm:rounded-2xl border border-slate-200/80 text-center">
+                        <span className="text-slate-400 block text-[8.5px] sm:text-[9.5px] font-bold">{lang === 'km' ? 'មេរៀន' : 'Lessons'}</span>
+                        <span className="font-black text-xs sm:text-sm text-[#002b5b] font-cinzel">{sub.totalLessons}</span>
                       </div>
-                      <div className="bg-slate-50 p-1 sm:p-2 rounded-xl sm:rounded-2xl border border-slate-200/80 text-center">
-                        <span className="text-slate-400 block text-[8px] sm:text-[9.5px] font-bold">{lang === 'km' ? 'លំហាត់' : 'Quizzes'}</span>
-                        <span className="font-black text-[10px] sm:text-xs text-amber-700 font-cinzel">{sub.quizzesCount}</span>
+                      <div className="bg-slate-50 p-1.5 sm:p-2 rounded-xl sm:rounded-2xl border border-slate-200/80 text-center">
+                        <span className="text-slate-400 block text-[8.5px] sm:text-[9.5px] font-bold">{lang === 'km' ? 'លំហាត់' : 'Quizzes'}</span>
+                        <span className="font-black text-xs sm:text-sm text-amber-700 font-cinzel">{sub.quizzesCount}</span>
                       </div>
                     </div>
 
@@ -435,12 +435,12 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
                     </div>
 
                     <div className="flex items-center justify-between pt-0.5 sm:pt-1">
-                      <span className="text-[10px] sm:text-xs font-black text-[#005baa] group-hover:translate-x-1 transition-transform flex items-center gap-0.5 sm:gap-1">
+                      <span className="text-[10.5px] sm:text-xs font-black text-[#005baa] group-hover:translate-x-1 transition-transform flex items-center gap-0.5 sm:gap-1">
                         <span>{t('continueLesson') || (lang === 'km' ? 'ចូលរៀន' : 'Study Lesson')}</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                       </span>
-                      <span className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-blue-50 flex items-center justify-center text-[#005baa] group-hover:bg-[#005baa] group-hover:text-white transition-colors shadow-2xs">
-                        <PlayCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
+                      <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-blue-50 flex items-center justify-center text-[#005baa] group-hover:bg-[#005baa] group-hover:text-white transition-colors shadow-2xs">
+                        <PlayCircle className="w-4 h-4" />
                       </span>
                     </div>
                   </div>
@@ -452,7 +452,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
         </div>
       )}
 
-      {/* 2. Social Science Stream Section (2 COLUMNS ON MOBILE!) */}
+      {/* 2. Social Science Stream Section */}
       {(filterStream === 'all' || filterStream === 'social') && socialSubjects.length > 0 && (
         <div className="space-y-3 sm:space-y-4 pt-2 sm:pt-4">
           <div className="flex items-center justify-between bg-white p-3 sm:p-4 rounded-2xl border border-slate-200 shadow-xs">
@@ -471,24 +471,24 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
             </span>
           </div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
             {socialSubjects.map((sub) => {
               const Icon = iconMap[sub.icon] || BookOpen;
               return (
                 <div
                   key={sub.id}
                   onClick={() => onSelectSubject(sub)}
-                  className="group cursor-pointer flex flex-col justify-between p-3 sm:p-5 bg-white border border-slate-200/90 hover:border-amber-500 hover:shadow-xl transition-all duration-300 rounded-2xl sm:rounded-3xl relative overflow-hidden active:scale-[0.98]"
+                  className="group cursor-pointer flex flex-col justify-between p-3.5 sm:p-5 bg-white border border-slate-200/90 hover:border-amber-500 hover:shadow-xl transition-all duration-300 rounded-2xl sm:rounded-3xl relative overflow-hidden active:scale-[0.98]"
                 >
                   <div className="relative z-10 space-y-2 sm:space-y-3">
                     
                     {/* Header Row */}
                     <div className="flex items-start justify-between gap-1.5">
                       <div 
-                        className="w-9 h-9 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-2xs transition-transform duration-300 group-hover:scale-110"
+                        className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl sm:rounded-2xl flex items-center justify-center shadow-2xs transition-transform duration-300 group-hover:scale-110 shrink-0"
                         style={{ backgroundColor: `${sub.color}15`, border: `1px solid ${sub.color}30` }}
                       >
-                        <Icon className="w-4 h-4 sm:w-6 sm:h-6" style={{ color: sub.color }} />
+                        <Icon className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: sub.color }} />
                       </div>
 
                       <span className="text-[8.5px] sm:text-[9.5px] font-black uppercase tracking-wider px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-mono">
@@ -498,7 +498,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
 
                     {/* Subject Title & Teacher */}
                     <div className="space-y-0.5 sm:space-y-1">
-                      <h4 className="font-black text-xs sm:text-base text-[#002b5b] group-hover:text-[#ca8a04] transition-colors leading-tight line-clamp-1">
+                      <h4 className="font-black text-sm sm:text-base text-[#002b5b] group-hover:text-[#ca8a04] transition-colors leading-tight line-clamp-1">
                         {lang === 'km' ? sub.nameKm : sub.nameEn}
                       </h4>
                       <p className="text-[9.5px] sm:text-xs text-[#ca8a04] font-bold flex items-center gap-1">
@@ -507,24 +507,24 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
                       </p>
                     </div>
 
-                    {/* Description (Hidden on mobile for sleek 2-col balance) */}
-                    <p className="hidden sm:block text-xs text-slate-600 line-clamp-2 leading-relaxed font-medium">
+                    {/* Description */}
+                    <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed font-medium">
                       {lang === 'km' ? sub.descriptionKm : sub.descriptionEn}
                     </p>
 
                     {/* Chapter & Lesson Counters */}
-                    <div className="grid grid-cols-3 gap-1 sm:gap-2 pt-0.5 sm:pt-1 text-slate-600">
-                      <div className="bg-slate-50 p-1 sm:p-2 rounded-xl sm:rounded-2xl border border-slate-200/80 text-center">
-                        <span className="text-slate-400 block text-[8px] sm:text-[9.5px] font-bold">{lang === 'km' ? 'ជំពូក' : 'Chapters'}</span>
-                        <span className="font-black text-[10px] sm:text-xs text-[#002b5b] font-cinzel">{sub.totalChapters}</span>
+                    <div className="grid grid-cols-3 gap-1.5 sm:gap-2 pt-0.5 sm:pt-1 text-slate-600">
+                      <div className="bg-slate-50 p-1.5 sm:p-2 rounded-xl sm:rounded-2xl border border-slate-200/80 text-center">
+                        <span className="text-slate-400 block text-[8.5px] sm:text-[9.5px] font-bold">{lang === 'km' ? 'ជំពូក' : 'Chapters'}</span>
+                        <span className="font-black text-xs sm:text-sm text-[#002b5b] font-cinzel">{sub.totalChapters}</span>
                       </div>
-                      <div className="bg-slate-50 p-1 sm:p-2 rounded-xl sm:rounded-2xl border border-slate-200/80 text-center">
-                        <span className="text-slate-400 block text-[8px] sm:text-[9.5px] font-bold">{lang === 'km' ? 'មេរៀន' : 'Lessons'}</span>
-                        <span className="font-black text-[10px] sm:text-xs text-[#002b5b] font-cinzel">{sub.totalLessons}</span>
+                      <div className="bg-slate-50 p-1.5 sm:p-2 rounded-xl sm:rounded-2xl border border-slate-200/80 text-center">
+                        <span className="text-slate-400 block text-[8.5px] sm:text-[9.5px] font-bold">{lang === 'km' ? 'មេរៀន' : 'Lessons'}</span>
+                        <span className="font-black text-xs sm:text-sm text-[#002b5b] font-cinzel">{sub.totalLessons}</span>
                       </div>
-                      <div className="bg-slate-50 p-1 sm:p-2 rounded-xl sm:rounded-2xl border border-slate-200/80 text-center">
-                        <span className="text-slate-400 block text-[8px] sm:text-[9.5px] font-bold">{lang === 'km' ? 'លំហាត់' : 'Quizzes'}</span>
-                        <span className="font-black text-[10px] sm:text-xs text-amber-700 font-cinzel">{sub.quizzesCount}</span>
+                      <div className="bg-slate-50 p-1.5 sm:p-2 rounded-xl sm:rounded-2xl border border-slate-200/80 text-center">
+                        <span className="text-slate-400 block text-[8.5px] sm:text-[9.5px] font-bold">{lang === 'km' ? 'លំហាត់' : 'Quizzes'}</span>
+                        <span className="font-black text-xs sm:text-sm text-amber-700 font-cinzel">{sub.quizzesCount}</span>
                       </div>
                     </div>
 
