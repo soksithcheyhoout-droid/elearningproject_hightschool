@@ -49,7 +49,7 @@ import {
 } from 'lucide-react';
 import { useAuth, computeLevelData } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
-import { getRandomizedGameQuestions, fetchLiveExamQuestions } from '../../utils/gamePoolManager';
+import { getRandomizedGameQuestions, fetchLiveExamQuestions, expandQuestionsTo8Options } from '../../utils/gamePoolManager';
 import api from '../../services/api';
 
 // High-end Avatar with Frame Renderer
@@ -160,7 +160,11 @@ const BUTTON_CONFIGS = [
   { num: 'A', badge: 'bg-indigo-600/30 border-indigo-400/60 text-indigo-200', icon: Triangle },
   { num: 'B', badge: 'bg-cyan-600/30 border-cyan-400/60 text-cyan-200', icon: Diamond },
   { num: 'C', badge: 'bg-amber-600/30 border-amber-400/60 text-amber-200', icon: Circle },
-  { num: 'D', badge: 'bg-emerald-600/30 border-emerald-400/60 text-emerald-200', icon: Square }
+  { num: 'D', badge: 'bg-emerald-600/30 border-emerald-400/60 text-emerald-200', icon: Square },
+  { num: 'E', badge: 'bg-rose-600/30 border-rose-400/60 text-rose-200', icon: Triangle },
+  { num: 'F', badge: 'bg-purple-600/30 border-purple-400/60 text-purple-200', icon: Diamond },
+  { num: 'G', badge: 'bg-orange-600/30 border-orange-400/60 text-orange-200', icon: Circle },
+  { num: 'H', badge: 'bg-sky-600/30 border-sky-400/60 text-sky-200', icon: Square }
 ];
 
 export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = null, initialHost = null }) {
@@ -309,12 +313,12 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   // Synchronized Questions Pool (24-question deep pool)
   const [questions, setQuestions] = useState(() => {
     const initialStream = isSpecificGameCard ? (game?.stream || 'science') : (student?.stream || 'science');
-    return getRandomizedGameQuestions(
+    return expandQuestionsTo8Options(getRandomizedGameQuestions(
       isSpecificGameCard && game?.stream === initialStream ? game : null,
-      24,
+      30,
       student?.grade || '12',
       initialStream
-    );
+    ));
   });
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [myScore, setMyScore] = useState(0);
@@ -324,6 +328,13 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   const [hostCorrectCount, setHostCorrectCount] = useState(0);
   const [challengerCorrectCount, setChallengerCorrectCount] = useState(0);
   const [isOvertime, setIsOvertime] = useState(false);
+
+  // 🧠 Hint System State (Professional 8-Choice Mode)
+  const [hintsRemaining, setHintsRemaining] = useState(3);        // 3 hints per match
+  const [fiftyFiftyRemaining, setFiftyFiftyRemaining] = useState(2); // 2 fifty-fifty per match
+  const [hiddenOptions, setHiddenOptions] = useState([]);           // Indices hidden by 50:50
+  const [showHint, setShowHint] = useState(false);                 // Whether hint is visible for current question
+  const [hintText, setHintText] = useState('');                    // Current hint text
 
   // Simultaneous Real-Time Battle State (Both players can answer simultaneously with 1 attempt each)
   const [turnStatus, setTurnStatus] = useState('playing'); // 'playing' | 'turn_ended'
@@ -371,9 +382,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
       random: true
     }).then((livePool) => {
       if (isSubscribed && Array.isArray(livePool) && livePool.length > 0) {
-        setQuestions(livePool);
+        const expanded8 = expandQuestionsTo8Options(livePool);
+        setQuestions(expanded8);
         if (isHost && roomCode) {
-          api.createArenaRoom(roomCode, game?.id || 'arena-1v1-master', game?.subject || 'វិទ្យាសាស្ត្រ', currentStudentPayload, livePool, student?.grade || '12', selectedStream);
+          api.createArenaRoom(roomCode, game?.id || 'arena-1v1-master', game?.subject || 'វិទ្យាសាស្ត្រ', currentStudentPayload, expanded8, student?.grade || '12', selectedStream);
         }
       }
     });
@@ -387,12 +399,15 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     };
   }, []);
 
-  // Reset wrong attempts and timer to 60s when question index advances
+  // Reset wrong attempts, timer, and hint state when question index advances
   useEffect(() => {
     setMyChosenIdx(null);
     setOpponentWrongIdx(null);
     setWrongFeedbackNotice('');
     setSecondsLeft(60);
+    setHiddenOptions([]);
+    setShowHint(false);
+    setHintText('');
   }, [currentQIndex]);
 
   // Format student payload for room registration
@@ -2257,24 +2272,102 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
               </div>
             )}
 
-            {/* ── Question Card */}
-            <div className="bg-gradient-to-b from-[#0e1730] to-[#080d1e] rounded-xl sm:rounded-3xl p-3 sm:p-6 md:p-8 text-center border border-slate-700/60 shadow-xl relative overflow-hidden">
+            {/* ── Question Card with Hint & 50:50 Power-ups */}
+            <div className="bg-gradient-to-b from-[#0e1730] to-[#080d1e] rounded-xl sm:rounded-3xl p-3 sm:p-5 md:p-7 text-center border border-slate-700/60 shadow-xl relative overflow-hidden">
               <div className="absolute top-0 left-1/2 -translate-x-1/2 w-40 h-20 bg-indigo-500/10 rounded-full blur-3xl pointer-events-none" />
-              <span className="text-[8px] sm:text-[10px] font-black text-indigo-400 uppercase tracking-widest block mb-1.5 sm:mb-2 font-mono relative z-[1]">
-                {`${currentQ?.subject ? currentQ.subject + ' • ' : ''}${currentQ?.category || (selectedStream === 'social' ? 'Social Science' : 'Natural Science')} #${currentQIndex + 1}`}
+
+              {/* Subject & Category Badge */}
+              <span className="text-[8px] sm:text-[10px] font-black text-indigo-400 uppercase tracking-widest block mb-1 sm:mb-1.5 font-mono relative z-[1]">
+                {`${currentQ?.subject ? currentQ.subject + ' • ' : ''}${currentQ?.category || (selectedStream === 'social' ? 'SOCIAL SCIENCE' : selectedStream === 'random' ? 'MIXED ACADEMIC' : 'NATURAL SCIENCE')} #${currentQIndex + 1}`}
               </span>
+
+              {/* Question Text */}
               <h3
-                className="text-[13px] sm:text-lg md:text-2xl font-black text-white leading-relaxed relative z-[1]"
+                className="text-[12.5px] sm:text-base md:text-xl font-black text-white leading-relaxed relative z-[1]"
                 style={{ overflowWrap: 'anywhere', wordBreak: 'break-word', hyphens: 'auto' }}
               >
                 {currentQ.q}
               </h3>
+
+              {/* 🧠 Hint & 50:50 Power-Up Buttons (only during playing) */}
+              {turnStatus === 'playing' && myChosenIdx === null && (
+                <div className="flex items-center justify-center gap-2 mt-2.5 sm:mt-3 relative z-[1]">
+                  {/* 💡 Hint Button */}
+                  <button
+                    type="button"
+                    disabled={hintsRemaining <= 0 || showHint}
+                    onClick={() => {
+                      if (hintsRemaining > 0 && !showHint) {
+                        setShowHint(true);
+                        setHintText(currentQ?.hint || currentQ?.letterHint || `មុខវិជ្ជា៖ ${currentQ?.subject || 'ទូទៅ'}`);
+                        setHintsRemaining((prev) => prev - 1);
+                        if (soundEnabled) playSound.click();
+                      }
+                    }}
+                    className={`px-2.5 sm:px-3.5 py-1.5 rounded-lg text-[10px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 transition-all border ${
+                      showHint
+                        ? 'bg-amber-500/25 border-amber-400/60 text-amber-200 cursor-default'
+                        : hintsRemaining > 0
+                          ? 'bg-amber-500/10 border-amber-500/40 text-amber-300 hover:bg-amber-500/25 hover:border-amber-400 cursor-pointer'
+                          : 'bg-slate-900/50 border-slate-700/50 text-slate-600 cursor-not-allowed opacity-50'
+                    }`}
+                  >
+                    <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                    <span>💡 Hint ({hintsRemaining})</span>
+                  </button>
+
+                  {/* 50:50 Button — eliminates 4 wrong options */}
+                  <button
+                    type="button"
+                    disabled={fiftyFiftyRemaining <= 0 || hiddenOptions.length > 0}
+                    onClick={() => {
+                      if (fiftyFiftyRemaining > 0 && hiddenOptions.length === 0 && currentQ) {
+                        const wrongIndices = [];
+                        currentQ.options.forEach((_, idx) => {
+                          if (idx !== currentQ.answer) wrongIndices.push(idx);
+                        });
+                        // Shuffle wrong indices and pick 4 to hide
+                        const shuffledWrong = wrongIndices.sort(() => 0.5 - Math.random());
+                        const toHide = shuffledWrong.slice(0, 4);
+                        setHiddenOptions(toHide);
+                        setFiftyFiftyRemaining((prev) => prev - 1);
+                        if (soundEnabled) playSound.click();
+                      }
+                    }}
+                    className={`px-2.5 sm:px-3.5 py-1.5 rounded-lg text-[10px] sm:text-xs font-bold flex items-center gap-1 sm:gap-1.5 transition-all border ${
+                      hiddenOptions.length > 0
+                        ? 'bg-purple-500/25 border-purple-400/60 text-purple-200 cursor-default'
+                        : fiftyFiftyRemaining > 0
+                          ? 'bg-purple-500/10 border-purple-500/40 text-purple-300 hover:bg-purple-500/25 hover:border-purple-400 cursor-pointer'
+                          : 'bg-slate-900/50 border-slate-700/50 text-slate-600 cursor-not-allowed opacity-50'
+                    }`}
+                  >
+                    <Shield className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
+                    <span>50:50 ({fiftyFiftyRemaining})</span>
+                  </button>
+
+                  {/* 8-CHOICE badge */}
+                  <span className="px-2 sm:px-2.5 py-1 rounded-lg bg-indigo-500/15 border border-indigo-400/40 text-indigo-300 text-[9px] sm:text-[10px] font-black tracking-wider">
+                    8 CHOICES
+                  </span>
+                </div>
+              )}
+
+              {/* Hint Display */}
+              {showHint && hintText && (
+                <div className="mt-2 sm:mt-2.5 p-2 sm:p-2.5 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-200 text-[10px] sm:text-xs font-medium animate-fade-in relative z-[1]">
+                  <Sparkles className="w-3 h-3 text-amber-400 inline mr-1" />
+                  {hintText}
+                </div>
+              )}
             </div>
 
-            {/* ── 4 Answer Options (1 Attempt per player) */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-3">
+            {/* ── 8 Answer Options (A-H) Grid */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-1.5 sm:gap-2.5">
               {currentQ.options.map((option, idx) => {
-                const config = BUTTON_CONFIGS[idx % 4];
+                if (hiddenOptions.includes(idx)) return null; // Hidden by 50:50
+
+                const config = BUTTON_CONFIGS[idx % 8];
                 const isCorrectOption = idx === currentQ.answer;
                 const isMyChosen = myChosenIdx === idx;
                 const isOpponentWrong = opponentWrongIdx === idx;
@@ -2286,7 +2379,6 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
                 if (turnStatus === 'turn_ended') {
                   if (isCorrectOption) {
-                    // ALWAYS Highlight the Correct Answer in Glowing Green when turn ends!
                     btnStyle = 'bg-gradient-to-r from-emerald-950/95 via-teal-950/90 to-emerald-950/95 border-2 border-emerald-400 text-emerald-100 ring-2 ring-emerald-400/80 shadow-[0_0_25px_rgba(16,185,129,0.5)] scale-[1.01]';
                     iconBadgeStyle = 'bg-emerald-500 text-slate-950 font-black border-emerald-300';
                     badgeContent = '✓';
@@ -2300,17 +2392,13 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                     btnStyle = 'bg-[#080d1a]/80 border-slate-800/80 text-slate-600 opacity-40';
                   }
                 } else {
-                  // PLAYING STATE
                   if (isMyChosen) {
-                    // Current user chose this and was wrong (locked out)
                     btnStyle = 'bg-rose-950/80 border-2 border-rose-500 text-rose-300 ring-2 ring-rose-500/40 line-through cursor-not-allowed';
                     iconBadgeStyle = 'bg-rose-600/40 border-rose-500 text-rose-300';
                     badgeContent = '✕';
                   } else if (hasAttempted) {
-                    // User already chose another option and is locked out
                     btnStyle = 'bg-[#080d1a]/60 border-slate-800/80 text-slate-500 opacity-40 cursor-not-allowed';
                   } else {
-                    // User can still choose
                     btnStyle = 'bg-[#0e1730] border border-slate-700/80 hover:border-indigo-400 hover:bg-slate-800/90 text-slate-200 cursor-pointer shadow-md hover:scale-[1.01]';
                   }
                 }
@@ -2321,22 +2409,22 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                     type="button"
                     disabled={turnStatus === 'turn_ended' || hasAttempted}
                     onClick={() => handleSelectOption(idx)}
-                    className={`p-3 sm:p-4 rounded-xl sm:rounded-2xl border flex items-center gap-2.5 sm:gap-3.5 transition-all text-left active:scale-[0.98] ${btnStyle}`}
+                    className={`p-2.5 sm:p-3 rounded-xl sm:rounded-2xl border flex items-center gap-2 sm:gap-3 transition-all text-left active:scale-[0.98] ${btnStyle}`}
                   >
-                    <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl border flex items-center justify-center flex-shrink-0 font-mono font-black text-[11px] sm:text-sm shadow-xs transition-all ${iconBadgeStyle}`}>
+                    <div className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl border flex items-center justify-center flex-shrink-0 font-mono font-black text-[10px] sm:text-xs shadow-xs transition-all ${iconBadgeStyle}`}>
                       {badgeContent}
                     </div>
                     <span
-                      className="text-[11.5px] sm:text-sm font-bold flex-1 leading-snug"
+                      className="text-[10.5px] sm:text-[13px] font-bold flex-1 leading-snug"
                       style={{ overflowWrap: 'anywhere', wordBreak: 'break-word' }}
                     >
                       {option}
                     </span>
                     {turnStatus === 'turn_ended' && isCorrectOption && (
-                      <CheckCircle2 className="w-5 h-5 text-emerald-400 flex-shrink-0 animate-bounce drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
+                      <CheckCircle2 className="w-4 h-4 sm:w-5 sm:h-5 text-emerald-400 flex-shrink-0 animate-bounce drop-shadow-[0_0_8px_rgba(52,211,153,0.8)]" />
                     )}
                     {((turnStatus === 'turn_ended' && isMyChosen && !isCorrectOption) || (turnStatus === 'playing' && isMyChosen)) && (
-                      <XCircle className="w-5 h-5 text-rose-400 flex-shrink-0 animate-pulse drop-shadow-[0_0_8px_rgba(244,63,94,0.8)]" />
+                      <XCircle className="w-4 h-4 sm:w-5 sm:h-5 text-rose-400 flex-shrink-0 animate-pulse drop-shadow-[0_0_8px_rgba(244,63,94,0.8)]" />
                     )}
                   </button>
                 );

@@ -235,4 +235,109 @@ export async function fetchLiveExamQuestions({ stream = 'science', subjectKey = 
   return getRandomizedGameQuestions(null, limit, grade, stream);
 }
 
+/**
+ * Expand 4-option questions to 8 options by borrowing plausible distractors
+ * from other questions in the pool. Ensures the correct answer is preserved
+ * and all 8 options are shuffled with the correct index recalculated.
+ * Also generates a hint for each question from its explanation or subject context.
+ * @param {Array} questions - Array of question objects with 4 options
+ * @returns {Array} - Questions expanded to 8 unique options each
+ */
+export function expandQuestionsTo8Options(questions) {
+  if (!Array.isArray(questions) || questions.length === 0) return questions;
 
+  // Build a pool of all wrong answers grouped by subject for smart distractors
+  const wrongOptionsBySubject = {};
+  const allWrongOptions = [];
+
+  questions.forEach((q) => {
+    if (!q || !Array.isArray(q.options)) return;
+    const subKey = q.subject || q.subjectKey || 'general';
+    if (!wrongOptionsBySubject[subKey]) wrongOptionsBySubject[subKey] = [];
+    q.options.forEach((opt, idx) => {
+      if (idx !== q.answer && opt) {
+        wrongOptionsBySubject[subKey].push(opt);
+        allWrongOptions.push(opt);
+      }
+    });
+  });
+
+  return questions.map((q) => {
+    if (!q || !Array.isArray(q.options) || q.options.length < 4) return q;
+
+    const correctAnswer = q.options[q.answer];
+    const originalWrongs = q.options.filter((_, idx) => idx !== q.answer);
+
+    // Gather candidate distractors from same subject first, then all subjects
+    const subKey = q.subject || q.subjectKey || 'general';
+    const sameSubjectPool = shuffleArray(wrongOptionsBySubject[subKey] || []);
+    const otherPool = shuffleArray(allWrongOptions);
+
+    // Existing option texts (lowercase for dedup)
+    const existingSet = new Set(q.options.map((o) => o.trim().toLowerCase()));
+    existingSet.add(correctAnswer.trim().toLowerCase());
+
+    const extraDistractors = [];
+
+    // Try same-subject distractors first (more plausible)
+    for (const candidate of sameSubjectPool) {
+      if (extraDistractors.length >= 4) break;
+      const key = candidate.trim().toLowerCase();
+      if (!existingSet.has(key)) {
+        existingSet.add(key);
+        extraDistractors.push(candidate);
+      }
+    }
+
+    // Fill remaining from general pool
+    for (const candidate of otherPool) {
+      if (extraDistractors.length >= 4) break;
+      const key = candidate.trim().toLowerCase();
+      if (!existingSet.has(key)) {
+        existingSet.add(key);
+        extraDistractors.push(candidate);
+      }
+    }
+
+    // If we still don't have enough, generate labeled variants
+    while (extraDistractors.length < 4) {
+      const filler = `ចម្លើយទី ${q.options.length + extraDistractors.length + 1}`;
+      if (!existingSet.has(filler.toLowerCase())) {
+        existingSet.add(filler.toLowerCase());
+        extraDistractors.push(filler);
+      } else {
+        extraDistractors.push(`ជម្រើសផ្សេង ${extraDistractors.length + 5}`);
+      }
+    }
+
+    // Combine all 8 options: correct + 3 original wrongs + 4 new distractors
+    const all8Options = [correctAnswer, ...originalWrongs, ...extraDistractors.slice(0, 4)];
+    const shuffled8 = shuffleArray(all8Options);
+    const newCorrectIdx = shuffled8.findIndex((opt) => opt === correctAnswer);
+
+    // Generate a smart hint from the question's context
+    let hint = '';
+    if (q.explanation) {
+      // Take first 60 chars of explanation as a clue
+      const cleanExplanation = q.explanation.replace(/<[^>]+>/g, '').trim();
+      hint = cleanExplanation.length > 80 ? cleanExplanation.substring(0, 80) + '...' : cleanExplanation;
+    } else if (q.subject) {
+      hint = `ព័ត៌មានជំនួយ៖ សំណួរនេះស្ថិតក្នុងមុខវិជ្ជា ${q.subject}`;
+      if (q.grade) hint += ` (ថ្នាក់ទី${q.grade})`;
+    }
+
+    // Determine the correct answer letter for the hint (1-indexed)
+    const correctLetter = String.fromCharCode(65 + (newCorrectIdx >= 0 ? newCorrectIdx : 0));
+    const letterHint = `ចម្លើយត្រឹមត្រូវចាប់ផ្តើមដោយអក្សរ "${correctAnswer.charAt(0)}"`;
+
+    return {
+      ...q,
+      options: shuffled8,
+      answer: newCorrectIdx >= 0 ? newCorrectIdx : 0,
+      hint: hint || letterHint,
+      letterHint: letterHint,
+      _original4Options: q.options,
+      _original4Answer: q.answer
+    };
+  });
+}
