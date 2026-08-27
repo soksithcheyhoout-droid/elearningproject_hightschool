@@ -168,6 +168,7 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
   }
 
   // 2. Gather from playgroundGamesData with STRICT Stream matching
+  // Tag each question with its parent game's stream/subject for dedup guard
   if (Array.isArray(playgroundGamesData)) {
     playgroundGamesData.forEach((g) => {
       if (!g || !Array.isArray(g.questions)) return;
@@ -182,7 +183,11 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
       }
 
       if (matchesStream) {
-        pool.push(...g.questions);
+        g.questions.forEach((q) => {
+          if (q && q.q) {
+            pool.push({ ...q, stream: g.stream, subject: q.subject || g.subject, subjectKey: q.subjectKey || g.subjectKey });
+          }
+        });
       }
     });
   }

@@ -30,7 +30,7 @@ export default function BossBattleGameModal({ game, onClose }) {
   const [soundEnabled, setSoundEnabled] = useState(true);
 
   // Dynamic Randomized Question Pool
-  const [questions, setQuestions] = useState(() => getRandomizedGameQuestions(game, 6, student?.grade, student?.stream));
+  const [questions, setQuestions] = useState(() => getRandomizedGameQuestions(game, 6, student?.grade, game?.stream || student?.stream));
 
   // Boss metadata
   const bossNames = {
@@ -242,7 +242,7 @@ export default function BossBattleGameModal({ game, onClose }) {
   };
 
   const handleRestart = () => {
-    setQuestions(getRandomizedGameQuestions(game, 6, student?.grade, student?.stream));
+    setQuestions(getRandomizedGameQuestions(game, 6, student?.grade, game?.stream || student?.stream));
     setPlayerHp(100);
     setBossHp(boss.maxHp);
     setCurrentQIndex(0);

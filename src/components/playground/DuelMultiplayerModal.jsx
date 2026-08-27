@@ -501,6 +501,8 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     setOpponentLeftNotice('');
     setSecondsLeft(60);
     setNextTurnCountdown(3);
+    // Clear solved questions set so rematch gets fully fresh questions
+    setSolvedQuestionsSet(new Set());
     setCurrentStep('battle');
   };
 
@@ -984,7 +986,13 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     setMyRematchRequested(true);
     if (soundEnabled) playSound.click();
 
-    const freshQuestions = getRandomizedGameQuestions(game, 12);
+    // Generate fresh 24-question pool using the CURRENT selectedStream (not defaulting to science)
+    const freshQuestions = getRandomizedGameQuestions(
+      game?.stream === selectedStream ? game : null,
+      24,
+      '12',
+      selectedStream
+    );
     try {
       const res = await api.requestArenaRematch(roomCode, isHost, freshQuestions);
       if (res && res.bothReady) {

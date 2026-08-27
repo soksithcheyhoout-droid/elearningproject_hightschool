@@ -27,7 +27,7 @@ export default function PlaygroundGameModal({ game, onClose }) {
   const levelInfo = computeLevelData(student.xp);
 
   const [soundEnabled, setSoundEnabled] = useState(true);
-  const [questions, setQuestions] = useState(() => getRandomizedGameQuestions(game, 8, student?.grade, student?.stream));
+  const [questions, setQuestions] = useState(() => getRandomizedGameQuestions(game, 8, student?.grade, game?.stream || student?.stream));
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [selectedOption, setSelectedOption] = useState(null);
   const [isAnswerSubmitted, setIsAnswerSubmitted] = useState(false);
@@ -155,7 +155,7 @@ export default function PlaygroundGameModal({ game, onClose }) {
   const handleRestart = () => {
     clearTimeout(autoNextTimerRef.current);
     clearInterval(countdownIntervalRef.current);
-    setQuestions(getRandomizedGameQuestions(game, 8, student?.grade, student?.stream));
+    setQuestions(getRandomizedGameQuestions(game, 8, student?.grade, game?.stream || student?.stream));
     setCurrentQIndex(0);
     setSelectedOption(null);
     setIsAnswerSubmitted(false);
