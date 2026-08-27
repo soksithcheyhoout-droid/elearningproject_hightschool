@@ -294,14 +294,20 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   }, [challengerPlayer]);
 
   // Stream Customization ('science' | 'social' | 'random')
-  const [selectedStream, setSelectedStream] = useState(() => (student?.stream || game?.stream || 'science'));
+  const isSpecificGameCard = Boolean(game && game.id && game.id !== 'arena-1v1-master' && game.subjectKey);
+  const [selectedStream, setSelectedStream] = useState(() => (isSpecificGameCard ? (game?.stream || 'science') : (student?.stream || 'science')));
   const currentTheme = STREAM_THEMES[selectedStream] || STREAM_THEMES.science;
   const CurrentStreamIcon = currentTheme.icon || Atom;
 
   // Synchronized Questions Pool (24-question deep pool)
   const [questions, setQuestions] = useState(() => {
-    const initialStream = student?.stream || game?.stream || 'science';
-    return getRandomizedGameQuestions(game?.stream === initialStream ? game : null, 24, '12', initialStream);
+    const initialStream = isSpecificGameCard ? (game?.stream || 'science') : (student?.stream || 'science');
+    return getRandomizedGameQuestions(
+      isSpecificGameCard && game?.stream === initialStream ? game : null,
+      24,
+      student?.grade || '12',
+      initialStream
+    );
   });
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [myScore, setMyScore] = useState(0);
@@ -348,18 +354,19 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
 
-    // Asynchronously enrich questions from 60k question bank
+    // Asynchronously enrich questions from 70k master question bank
     let isSubscribed = true;
     fetchLiveExamQuestions({
       stream: selectedStream === 'social' ? 'social' : selectedStream === 'random' ? 'all' : 'science',
-      grade: '12',
+      subjectKey: isSpecificGameCard && game?.stream === selectedStream ? game.subjectKey : '',
+      grade: student?.grade || '12',
       limit: 30,
       random: true
     }).then((livePool) => {
       if (isSubscribed && Array.isArray(livePool) && livePool.length > 0) {
         setQuestions(livePool);
         if (isHost && roomCode) {
-          api.createArenaRoom(roomCode, game?.id || 'sci-m-01', game?.subject || 'គណិតវិទ្យា', currentStudentPayload, livePool, '12', selectedStream);
+          api.createArenaRoom(roomCode, game?.id || 'arena-1v1-master', game?.subject || 'វិទ្យាសាស្ត្រ', currentStudentPayload, livePool, student?.grade || '12', selectedStream);
         }
       }
     });
@@ -800,7 +807,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     if (soundEnabled) playSound.click();
     setSelectedStream(newStream);
 
-    const freshQuestions = getRandomizedGameQuestions(game?.stream === newStream ? game : null, 24, '12', newStream);
+    const freshQuestions = getRandomizedGameQuestions(null, 24, student?.grade || '12', newStream);
     setQuestions(freshQuestions);
 
     // Broadcast immediately across tabs
@@ -823,11 +830,11 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
         questions: freshQuestions
       });
 
-      // Asynchronously enrich with authentic stream-specific questions from 60k bank
+      // Asynchronously enrich with authentic stream-specific questions from 70k bank
       fetchLiveExamQuestions({
-        stream: newStream === 'social' ? 'social' : newStream === 'random' ? 'all' : 'science',
-        grade: '12',
-        limit: 24,
+        stream: newStream,
+        grade: student?.grade || '12',
+        limit: 30,
         random: true
       }).then((livePool) => {
         if (Array.isArray(livePool) && livePool.length > 0) {
@@ -986,13 +993,29 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     setMyRematchRequested(true);
     if (soundEnabled) playSound.click();
 
-    // Generate fresh 24-question pool using the CURRENT selectedStream (not defaulting to science)
-    const freshQuestions = getRandomizedGameQuestions(
-      game?.stream === selectedStream ? game : null,
+    // Fetch completely fresh 24-question pool using the CURRENT selectedStream
+    let freshQuestions = getRandomizedGameQuestions(
+      isSpecificGameCard && game?.stream === selectedStream ? game : null,
       24,
-      '12',
+      student?.grade || '12',
       selectedStream
     );
+
+    try {
+      const livePool = await fetchLiveExamQuestions({
+        stream: selectedStream === 'social' ? 'social' : selectedStream === 'random' ? 'all' : 'science',
+        subjectKey: isSpecificGameCard && game?.stream === selectedStream ? game.subjectKey : '',
+        grade: student?.grade || '12',
+        limit: 24,
+        random: true
+      });
+      if (Array.isArray(livePool) && livePool.length > 0) {
+        freshQuestions = livePool;
+      }
+    } catch (e) {}
+
+    setQuestions(freshQuestions);
+
     try {
       const res = await api.requestArenaRematch(roomCode, isHost, freshQuestions);
       if (res && res.bothReady) {
@@ -1152,134 +1175,94 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
           challengerCorrectCount,
           timestamp: now
         };
-        triggerTurnEndCountdown(allWrongResult);
-      }
 
-      try {
-        const res = await api.submitTurnAnswer(roomCode, isHost, idx, false, 0, false);
-        if (res && res.room && res.room.turnStatus === 'turn_ended' && res.room.turnResult) {
-          triggerTurnEndCountdown(res.room.turnResult);
-        }
-      } catch (e) { }
+        try {
+          await api.submitTurnAnswer(roomCode, isHost, idx, false, 0, false, true);
+        } catch (e) { }
+
+        triggerTurnEndCountdown(allWrongResult);
+      } else {
+        try {
+          await api.submitTurnAnswer(roomCode, isHost, idx, false, 0, false, false);
+        } catch (e) { }
+      }
       return;
     }
 
-    // CASE 2: CORRECT ANSWER -> FIRST PLAYER TO ANSWER WINS THE QUESTION ROUND!
+    // CASE 2: CORRECT ANSWER -> Current player wins the round!
     if (soundEnabled) playSound.correct();
-    try {
-      confetti({ particleCount: 75, spread: 75, origin: { y: 0.65 } });
-    } catch (e) { }
 
-    const pointsEarned = 550 + secondsLeft * 10;
-    setMyScore((prev) => prev + pointsEarned);
+    const newHostCount = isHost ? hostCorrectCount + 1 : hostCorrectCount;
+    const newChallengerCount = isHost ? challengerCorrectCount : challengerCorrectCount + 1;
 
-    let nextHostCorrect = hostCorrectCount;
-    let nextChallengerCorrect = challengerCorrectCount;
+    setHostCorrectCount(newHostCount);
+    setChallengerCorrectCount(newChallengerCount);
 
     if (isHost) {
-      nextHostCorrect += 1;
-      setHostCorrectCount(nextHostCorrect);
+      setMyScore((s) => s + 100);
     } else {
-      nextChallengerCorrect += 1;
-      setChallengerCorrectCount(nextChallengerCorrect);
+      setMyScore((s) => s + 100);
     }
 
-    const qKey = currentQ?.id || currentQ?.q || `q_${currentQIndex}`;
-    setSolvedQuestionsSet((prev) => new Set([...prev, qKey]));
-
-    const myName = isHost ? (hostPlayer?.name || 'ម្ចាស់បន្ទប់') : (challengerPlayer?.name || 'គូប្រជែង');
     const now = Date.now();
-    const result = {
-      turnId: `turn_win_${now}_${isHost ? 'host' : 'chal'}_${idx}`,
+    const correctResult = {
+      turnId: `turn_win_${now}_${currentQIndex}`,
       answeredBy: isHost ? 'host' : 'challenger',
-      answeredByName: myName,
+      answeredByName: isHost ? (hostPlayer?.name || 'ម្ចាស់បន្ទប់') : (challengerPlayer?.name || 'គូប្រជែង'),
       selectedIdx: idx,
       isCorrect: true,
       isAllWrong: false,
-      scoreEarned: pointsEarned,
       isTimeout: false,
-      hostCorrectCount: nextHostCorrect,
-      challengerCorrectCount: nextChallengerCorrect,
+      scoreEarned: 100,
+      hostCorrectCount: newHostCount,
+      challengerCorrectCount: newChallengerCount,
       timestamp: now
     };
 
-    triggerTurnEndCountdown(result);
+    setSolvedQuestionsSet((prev) => new Set([...prev, currentQ?.id || currentQ?.q]));
 
     try {
-      await api.submitTurnAnswer(roomCode, isHost, idx, true, pointsEarned, false);
+      await api.submitTurnAnswer(roomCode, isHost, idx, true, 100, false, false, newHostCount, newChallengerCount);
     } catch (e) { }
+
+    triggerTurnEndCountdown(correctResult);
   };
 
+  // Copy Room Link to Clipboard
   const handleCopyLink = () => {
-    navigator.clipboard.writeText(`http://localhost:5173/?room=${roomCode}`);
+    const url = `${window.location.origin}/playground?room=${roomCode}`;
+    navigator.clipboard.writeText(url);
     setCopied(true);
     setTimeout(() => setCopied(false), 2000);
+    if (soundEnabled) playSound.click();
   };
 
+  // Share via Social Channels
   const handleShareTelegram = () => {
-    const text = encodeURIComponent(`ចូលរួមប្រកួត 1v1 Academic Arena ក្នុងបន្ទប់ #${roomCode}`);
-    const url = encodeURIComponent(`http://localhost:5173/?room=${roomCode}`);
+    const url = encodeURIComponent(`${window.location.origin}/playground?room=${roomCode}`);
+    const text = encodeURIComponent(`⚔️ ចូលរួមសង្វៀនប្រកួត 1v1 Arena ជាមួយខ្ញុំនៅលើ Khmer E-Learning! លេខកូដបន្ទប់ PIN: #${roomCode}`);
     window.open(`https://t.me/share/url?url=${url}&text=${text}`, '_blank');
   };
 
   const handleShareFacebook = () => {
-    const url = encodeURIComponent(`http://localhost:5173/?room=${roomCode}`);
+    const url = encodeURIComponent(`${window.location.origin}/playground?room=${roomCode}`);
     window.open(`https://www.facebook.com/sharer/sharer.php?u=${url}`, '_blank');
   };
 
-  const BUTTON_CONFIGS = [
-    { num: '1', badge: 'bg-indigo-600/30 border-indigo-400/60 text-indigo-200', icon: Triangle },
-    { num: '2', badge: 'bg-cyan-600/30 border-cyan-400/60 text-cyan-200', icon: Diamond },
-    { num: '3', badge: 'bg-amber-600/30 border-amber-400/60 text-amber-200', icon: Circle },
-    { num: '4', badge: 'bg-emerald-600/30 border-emerald-400/60 text-emerald-200', icon: Square }
-  ];
-
-  // Filter available registered students (Excludes ONLY the current logged-in student)
-  const filteredStudents = realStudents.filter((u) => {
-    const currentId = student?.id;
-    const currentUsername = (student?.username || student?.nickname || '').trim().toLowerCase();
-    const currentEmail = (student?.email || '').trim().toLowerCase();
-    const currentName = (student?.full_name || student?.fullName || student?.name || '').trim().toLowerCase();
-
-    const uId = u.id;
-    const uUsername = (u.username || u.nickname || '').trim().toLowerCase();
-    const uEmail = (u.email || '').trim().toLowerCase();
-    const uName = (u.full_name || u.name || '').trim().toLowerCase();
-
-    // Check if u is the current user (by ID, username, email, or full name)
-    const isSelf = (currentId && uId && String(currentId) === String(uId)) ||
-      (currentUsername && uUsername && currentUsername === uUsername) ||
-      (currentEmail && uEmail && currentEmail === uEmail) ||
-      (currentName && uName && currentName === uName) ||
-      (student?.studentId && u.student_id && String(student.studentId) === String(u.student_id));
-
-    const query = inviteSearch.trim().toLowerCase();
-    if (!query) return !isSelf;
-    return !isSelf && (
-      uName.includes(query) ||
-      uUsername.includes(query) ||
-      uEmail.includes(query) ||
-      (u.school && u.school.toLowerCase().includes(query))
-    );
-  });
-
   return createPortal(
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-0 sm:p-4 md:p-6 bg-slate-950/85 backdrop-blur-xl animate-fade-in font-kantumruy overflow-y-auto">
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in font-kantumruy">
       
-      {/* Main Container: Full-screen on mobile, frosted card on desktop */}
-      <div className="bg-[#0b1120]/95 border-0 sm:border border-slate-700/60 rounded-none sm:rounded-3xl w-full max-w-4xl h-[100dvh] sm:h-auto sm:max-h-[92vh] flex flex-col shadow-[0_25px_80px_rgba(0,0,0,0.85)] overflow-hidden text-slate-100 relative my-auto">
+      {/* ARENA CONTAINER BOX */}
+      <div className={`relative w-full max-w-4xl max-h-[96vh] rounded-3xl overflow-hidden border flex flex-col shadow-2xl transition-all duration-300 ${currentTheme.boxBg} ${currentTheme.boxBorder}`}>
         
-        {/* Subtle Dynamic Ambient Glows */}
-        <div className={`absolute -top-32 -left-32 w-80 h-80 rounded-full blur-[100px] pointer-events-none transition-colors duration-500 ${currentTheme.glowBg}`} />
-        <div className="absolute -top-32 -right-32 w-80 h-80 bg-purple-600/15 rounded-full blur-[100px] pointer-events-none" />
-
-        {/* Header */}
-        <header className="px-3 sm:px-5 md:px-7 py-2.5 sm:py-3.5 bg-[#080d1a]/85 backdrop-blur-md border-b border-slate-800 flex items-center justify-between flex-shrink-0 gap-2 sm:gap-3 relative z-10 transition-colors duration-300">
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
-            <div className={`w-8 h-8 sm:w-10 sm:h-10 rounded-xl sm:rounded-2xl flex items-center justify-center flex-shrink-0 shadow-sm transition-all duration-300 ${currentTheme.headerIconBox}`}>
-              <Swords className="w-4 h-4 sm:w-5 sm:h-5" />
+        {/* TOP STATUS HEADER */}
+        <header className="px-4 sm:px-6 py-3.5 sm:py-4 border-b border-slate-800 flex items-center justify-between gap-3 bg-[#080f1e]/90 backdrop-blur-md relative z-20">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center border flex-shrink-0 shadow-sm transition-colors duration-300 ${currentTheme.badgeClass}`}>
+              <Swords className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
-            <div className="min-w-0 flex-1">
+
+            <div className="min-w-0">
               <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                 <span className={`text-[10px] sm:text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 transition-colors duration-300 ${currentTheme.accentText}`}>
                   <span className="hidden sm:inline">1v1 Arena • First to 6 Correct</span>

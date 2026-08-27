@@ -151,7 +151,13 @@ export default function PlaygroundArenaView() {
               <div className="hacker-button-container">
                 <button
                   type="button"
-                  onClick={() => setDuelGame(filteredGames[0] || playgroundGamesData[0])}
+                  onClick={() => setDuelGame({
+                    id: 'arena-1v1-master',
+                    titleKm: 'សង្វៀនប្រកួត 1v1 Arena',
+                    titleEn: '1v1 Live Academic Duel',
+                    stream: selectedStream === 'all' ? (student?.stream || 'science') : selectedStream,
+                    subject: 'សង្វៀនប្រកួត'
+                  })}
                   className="hacker-button"
                   data-text={lang === 'km' ? '⚔️ បង្កើតបន្ទប់ប្រកួត 1v1 (START 1V1 DUEL)' : '⚔️ START 1V1 DUEL'}
                 >
@@ -325,7 +331,13 @@ export default function PlaygroundArenaView() {
             <div className="p-2.5 sm:p-5 pt-0">
               <button
                 type="button"
-                onClick={() => setDuelGame(filteredGames[0] || playgroundGamesData[0])}
+                onClick={() => setDuelGame({
+                  id: 'arena-1v1-master',
+                  titleKm: 'សង្វៀនប្រកួត 1v1 Arena',
+                  titleEn: '1v1 Live Academic Duel',
+                  stream: selectedStream === 'all' ? (student?.stream || 'science') : selectedStream,
+                  subject: 'សង្វៀនប្រកួត'
+                })}
                 className="w-full py-2 sm:py-2.5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-rose-600 to-red-600 hover:from-rose-500 hover:to-red-500 text-white font-black text-[10.5px] sm:text-xs flex items-center justify-center gap-1 sm:gap-2 transition-colors cursor-pointer shadow-xs active:scale-95"
               >
                 <Swords className="w-3 h-3 sm:w-3.5 sm:h-3.5" />

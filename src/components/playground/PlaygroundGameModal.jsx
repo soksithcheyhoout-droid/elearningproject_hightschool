@@ -41,25 +41,22 @@ export default function PlaygroundGameModal({ game, onClose }) {
   const autoNextTimerRef = useRef(null);
   const countdownIntervalRef = useRef(null);
 
-  // Prevent background scroll & fetch additional questions if needed
+  // Prevent background scroll & fetch fresh live questions from 70k bank
   useEffect(() => {
     document.body.style.overflow = 'hidden';
     let isSubscribed = true;
 
-    // Only fetch live master pool if game has no predefined questions
-    if (!game?.questions || game.questions.length === 0) {
-      fetchLiveExamQuestions({
-        stream: game?.stream || student?.stream || 'science',
-        subjectKey: game?.subjectKey || '',
-        grade: student?.grade || game?.grade || '12',
-        limit: 12,
-        random: true
-      }).then((livePool) => {
-        if (isSubscribed && Array.isArray(livePool) && livePool.length > 0) {
-          setQuestions(livePool);
-        }
-      });
-    }
+    fetchLiveExamQuestions({
+      stream: game?.stream || student?.stream || 'science',
+      subjectKey: game?.subjectKey || '',
+      grade: student?.grade || game?.grade || '12',
+      limit: 12,
+      random: true
+    }).then((livePool) => {
+      if (isSubscribed && Array.isArray(livePool) && livePool.length > 0) {
+        setQuestions(livePool);
+      }
+    });
 
     return () => {
       isSubscribed = false;

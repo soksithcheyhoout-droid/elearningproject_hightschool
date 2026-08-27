@@ -21,7 +21,7 @@ import {
 } from 'lucide-react';
 import { useAuth, computeLevelData } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
-import { getRandomizedGameQuestions } from '../../utils/gamePoolManager';
+import { getRandomizedGameQuestions, fetchLiveExamQuestions } from '../../utils/gamePoolManager';
 
 export default function BossBattleGameModal({ game, onClose }) {
   const { student, addXP } = useAuth();
@@ -30,7 +30,7 @@ export default function BossBattleGameModal({ game, onClose }) {
   const [soundEnabled, setSoundEnabled] = useState(true);
 
   // Dynamic Randomized Question Pool
-  const [questions, setQuestions] = useState(() => getRandomizedGameQuestions(game, 6, student?.grade, game?.stream || student?.stream));
+  const [questions, setQuestions] = useState(() => getRandomizedGameQuestions(game, 8, student?.grade, game?.stream || student?.stream));
 
   // Boss metadata
   const bossNames = {
@@ -73,10 +73,8 @@ export default function BossBattleGameModal({ game, onClose }) {
   const [secondsLeft, setSecondsLeft] = useState(game.timeLimitSeconds || 75);
   const [isGameOver, setIsGameOver] = useState(false);
   const [battleOutcome, setBattleOutcome] = useState(null);
-
-  // Animations & Combat Effects
-  const [playerAnim, setPlayerAnim] = useState('');
-  const [bossAnim, setBossAnim] = useState('');
+  const [bossAction, setBossAction] = useState('idle'); // 'idle' | 'attack' | 'hit'
+  const [playerAction, setPlayerAction] = useState('idle'); // 'idle' | 'attack' | 'hit'
   const [screenFlash, setScreenFlash] = useState(false);
   const [floatingText, setFloatingText] = useState(null);
 
@@ -90,10 +88,25 @@ export default function BossBattleGameModal({ game, onClose }) {
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
+    let isSubscribed = true;
+
+    fetchLiveExamQuestions({
+      stream: game?.stream || student?.stream || 'science',
+      subjectKey: game?.subjectKey || '',
+      grade: student?.grade || game?.grade || '12',
+      limit: 12,
+      random: true
+    }).then((livePool) => {
+      if (isSubscribed && Array.isArray(livePool) && livePool.length > 0) {
+        setQuestions(livePool);
+      }
+    });
+
     return () => {
+      isSubscribed = false;
       document.body.style.overflow = '';
     };
-  }, []);
+  }, [game, student]);
 
   // Timer countdown
   useEffect(() => {

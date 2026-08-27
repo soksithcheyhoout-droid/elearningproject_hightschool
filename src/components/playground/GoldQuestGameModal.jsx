@@ -19,7 +19,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
-import { getRandomizedGameQuestions } from '../../utils/gamePoolManager';
+import { getRandomizedGameQuestions, fetchLiveExamQuestions } from '../../utils/gamePoolManager';
 
 const CHEST_REWARDS = [
   { type: 'gold_small', title: '+50 កាក់មាស', xp: 50, icon: '🪙', color: 'from-amber-500 to-yellow-400' },
@@ -34,8 +34,8 @@ export default function GoldQuestGameModal({ game, onClose }) {
   const { student, addXP } = useAuth();
   const [soundEnabled, setSoundEnabled] = useState(true);
 
-  // Dynamic Randomized Question Pool — use game.stream to match the topic, NOT student.stream
-  const [questions, setQuestions] = useState(() => getRandomizedGameQuestions(game, 6, student?.grade, game?.stream || student?.stream));
+  // Dynamic Randomized Question Pool
+  const [questions, setQuestions] = useState(() => getRandomizedGameQuestions(game, 8, student?.grade, game?.stream || student?.stream));
   const [currentQIndex, setCurrentQIndex] = useState(0);
   const [gameState, setGameState] = useState('question'); // 'question' | 'chest_pick' | 'game_over'
   const [selectedOption, setSelectedOption] = useState(null);
@@ -50,10 +50,25 @@ export default function GoldQuestGameModal({ game, onClose }) {
 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
+    let isSubscribed = true;
+
+    fetchLiveExamQuestions({
+      stream: game?.stream || student?.stream || 'science',
+      subjectKey: game?.subjectKey || '',
+      grade: student?.grade || game?.grade || '12',
+      limit: 10,
+      random: true
+    }).then((livePool) => {
+      if (isSubscribed && Array.isArray(livePool) && livePool.length > 0) {
+        setQuestions(livePool);
+      }
+    });
+
     return () => {
+      isSubscribed = false;
       document.body.style.overflow = '';
     };
-  }, []);
+  }, [game, student]);
 
   const handleSelectOption = (idx) => {
     if (isAnswerSubmitted) return;
