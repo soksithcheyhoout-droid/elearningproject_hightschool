@@ -360,16 +360,16 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 w-full">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-5 w-full">
             {scienceSubjects.map((sub) => {
               const Icon = iconMap[sub.icon] || BookOpen;
               return (
                 <div
                   key={sub.id}
                   onClick={() => onSelectSubject(sub)}
-                  className="group cursor-pointer flex flex-col justify-between p-3 sm:p-5 bg-white border border-slate-200/90 hover:border-[#005baa] hover:shadow-xl transition-all duration-300 rounded-2xl sm:rounded-3xl relative overflow-hidden active:scale-[0.98] w-full min-w-0"
+                  className="group cursor-pointer flex flex-col justify-between p-2.5 sm:p-5 bg-white border border-slate-200/90 hover:border-[#005baa] hover:shadow-xl transition-all duration-300 rounded-xl sm:rounded-3xl relative overflow-hidden active:scale-[0.98] w-full min-w-0"
                 >
-                  <div className="relative z-10 space-y-2 sm:space-y-3">
+                  <div className="relative z-10 space-y-1.5 sm:space-y-3">
                     
                     {/* Header Row */}
                     <div className="flex items-start justify-between gap-1.5">
@@ -380,29 +380,29 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
                         <Icon className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: sub.color }} />
                       </div>
 
-                      <span className="text-[8.5px] sm:text-[9.5px] font-black uppercase tracking-wider px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-blue-50 text-[#005baa] border border-blue-200 font-mono">
+                      <span className="text-[7px] sm:text-[9.5px] font-black uppercase tracking-wider px-1.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-blue-50 text-[#005baa] border border-blue-200 font-mono">
                         {lang === 'km' ? 'វិទ្យាសាស្ត្រ' : 'Science'}
                       </span>
                     </div>
 
                     {/* Subject Title & Teacher */}
                     <div className="space-y-0.5 sm:space-y-1">
-                      <h4 className="font-black text-sm sm:text-base text-[#002b5b] group-hover:text-[#005baa] transition-colors leading-tight line-clamp-1">
+                      <h4 className="font-black text-xs sm:text-base text-[#002b5b] group-hover:text-[#005baa] transition-colors leading-tight line-clamp-2 sm:line-clamp-1">
                         {lang === 'km' ? sub.nameKm : sub.nameEn}
                       </h4>
-                      <p className="text-[9.5px] sm:text-xs text-[#005baa] font-bold flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3 text-emerald-600 flex-shrink-0" />
+                      <p className="text-[8px] sm:text-xs text-[#005baa] font-bold flex items-center gap-1">
+                        <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-emerald-600 flex-shrink-0" />
                         <span className="truncate">{lang === 'km' ? 'កម្មវិធីជាតិ MoTDAR' : 'National MoTDAR Standard'}</span>
                       </p>
                     </div>
 
                     {/* Description */}
-                    <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed font-medium">
+                    <p className="text-[10px] sm:text-xs text-slate-600 line-clamp-2 leading-relaxed font-medium hidden sm:block">
                       {lang === 'km' ? sub.descriptionKm : sub.descriptionEn}
                     </p>
 
                     {/* Chapter & Lesson Counters */}
-                    <div className="grid grid-cols-3 gap-1 sm:gap-2 pt-0.5 sm:pt-1 text-slate-600 w-full">
+                    <div className="grid grid-cols-3 gap-0.5 sm:gap-2 pt-0.5 sm:pt-1 text-slate-600 w-full">
                       <div className="bg-slate-50 p-1 sm:p-2 rounded-lg sm:rounded-2xl border border-slate-200/80 text-center overflow-hidden">
                         <span className="text-slate-400 block text-[8.5px] sm:text-[9.5px] font-bold">{lang === 'km' ? 'ជំពូក' : 'Chapters'}</span>
                         <span className="font-black text-xs sm:text-sm text-[#002b5b] font-cinzel">{sub.totalChapters}</span>
@@ -422,7 +422,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
                   {/* Bottom Progress & Button */}
                   <div className="pt-2.5 sm:pt-4 border-t border-slate-100 mt-2.5 sm:mt-4 space-y-1.5 sm:space-y-3">
                     <div className="space-y-1">
-                      <div className="flex justify-between text-[9px] sm:text-xs text-slate-500 font-bold">
+                      <div className="flex justify-between text-[8px] sm:text-xs text-slate-500 font-bold">
                         <span>{lang === 'km' ? 'វឌ្ឍនភាព' : 'Progress'}</span>
                         <span className="font-black text-[#002b5b] font-cinzel">{sub.progress}%</span>
                       </div>
@@ -435,12 +435,12 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
                     </div>
 
                     <div className="flex items-center justify-between pt-0.5 sm:pt-1">
-                      <span className="text-[10.5px] sm:text-xs font-black text-[#005baa] group-hover:translate-x-1 transition-transform flex items-center gap-0.5 sm:gap-1">
+                      <span className="text-[9px] sm:text-xs font-black text-[#005baa] group-hover:translate-x-1 transition-transform flex items-center gap-0.5 sm:gap-1">
                         <span>{t('continueLesson') || (lang === 'km' ? 'ចូលរៀន' : 'Study Lesson')}</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                       </span>
-                      <span className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-blue-50 flex items-center justify-center text-[#005baa] group-hover:bg-[#005baa] group-hover:text-white transition-colors shadow-2xs">
-                        <PlayCircle className="w-4 h-4" />
+                      <span className="w-6 h-6 sm:w-8 sm:h-8 rounded-lg sm:rounded-xl bg-blue-50 flex items-center justify-center text-[#005baa] group-hover:bg-[#005baa] group-hover:text-white transition-colors shadow-2xs">
+                        <PlayCircle className="w-3.5 h-3.5 sm:w-4 sm:h-4" />
                       </span>
                     </div>
                   </div>
@@ -471,16 +471,16 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 w-full">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-5 w-full">
             {socialSubjects.map((sub) => {
               const Icon = iconMap[sub.icon] || BookOpen;
               return (
                 <div
                   key={sub.id}
                   onClick={() => onSelectSubject(sub)}
-                  className="group cursor-pointer flex flex-col justify-between p-3 sm:p-5 bg-white border border-slate-200/90 hover:border-amber-500 hover:shadow-xl transition-all duration-300 rounded-2xl sm:rounded-3xl relative overflow-hidden active:scale-[0.98] w-full min-w-0"
+                  className="group cursor-pointer flex flex-col justify-between p-2.5 sm:p-5 bg-white border border-slate-200/90 hover:border-amber-500 hover:shadow-xl transition-all duration-300 rounded-xl sm:rounded-3xl relative overflow-hidden active:scale-[0.98] w-full min-w-0"
                 >
-                  <div className="relative z-10 space-y-2 sm:space-y-3">
+                  <div className="relative z-10 space-y-1.5 sm:space-y-3">
                     
                     {/* Header Row */}
                     <div className="flex items-start justify-between gap-1.5">
@@ -491,29 +491,29 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
                         <Icon className="w-5 h-5 sm:w-6 sm:h-6" style={{ color: sub.color }} />
                       </div>
 
-                      <span className="text-[8.5px] sm:text-[9.5px] font-black uppercase tracking-wider px-2 py-0.5 sm:px-3 sm:py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-mono">
+                      <span className="text-[7px] sm:text-[9.5px] font-black uppercase tracking-wider px-1.5 py-0.5 sm:px-3 sm:py-1 rounded-full bg-amber-50 text-amber-800 border border-amber-200 font-mono">
                         {lang === 'km' ? 'សង្គម' : 'Social'}
                       </span>
                     </div>
 
                     {/* Subject Title & Teacher */}
                     <div className="space-y-0.5 sm:space-y-1">
-                      <h4 className="font-black text-sm sm:text-base text-[#002b5b] group-hover:text-[#ca8a04] transition-colors leading-tight line-clamp-1">
+                      <h4 className="font-black text-xs sm:text-base text-[#002b5b] group-hover:text-[#ca8a04] transition-colors leading-tight line-clamp-2 sm:line-clamp-1">
                         {lang === 'km' ? sub.nameKm : sub.nameEn}
                       </h4>
-                      <p className="text-[9.5px] sm:text-xs text-[#ca8a04] font-bold flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3 text-amber-600 flex-shrink-0" />
+                      <p className="text-[8px] sm:text-xs text-[#ca8a04] font-bold flex items-center gap-1">
+                        <CheckCircle2 className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-600 flex-shrink-0" />
                         <span className="truncate">{lang === 'km' ? 'កម្មវិធីជាតិ MoTDAR' : 'National MoTDAR Standard'}</span>
                       </p>
                     </div>
 
                     {/* Description */}
-                    <p className="text-xs text-slate-600 line-clamp-2 leading-relaxed font-medium">
+                    <p className="text-[10px] sm:text-xs text-slate-600 line-clamp-2 leading-relaxed font-medium hidden sm:block">
                       {lang === 'km' ? sub.descriptionKm : sub.descriptionEn}
                     </p>
 
                     {/* Chapter & Lesson Counters */}
-                    <div className="grid grid-cols-3 gap-1 sm:gap-2 pt-0.5 sm:pt-1 text-slate-600 w-full">
+                    <div className="grid grid-cols-3 gap-0.5 sm:gap-2 pt-0.5 sm:pt-1 text-slate-600 w-full">
                       <div className="bg-slate-50 p-1 sm:p-2 rounded-lg sm:rounded-2xl border border-slate-200/80 text-center overflow-hidden">
                         <span className="text-slate-400 block text-[8.5px] sm:text-[9.5px] font-bold">{lang === 'km' ? 'ជំពូក' : 'Chapters'}</span>
                         <span className="font-black text-xs sm:text-sm text-[#002b5b] font-cinzel">{sub.totalChapters}</span>
@@ -546,7 +546,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
                     </div>
 
                     <div className="flex items-center justify-between pt-0.5 sm:pt-1">
-                      <span className="text-[10px] sm:text-xs font-black text-[#ca8a04] group-hover:translate-x-1 transition-transform flex items-center gap-0.5 sm:gap-1">
+                      <span className="text-[9px] sm:text-xs font-black text-[#ca8a04] group-hover:translate-x-1 transition-transform flex items-center gap-0.5 sm:gap-1">
                         <span>{t('continueLesson') || (lang === 'km' ? 'ចូលរៀន' : 'Study Lesson')}</span>
                         <ChevronRight className="w-3.5 h-3.5" />
                       </span>
