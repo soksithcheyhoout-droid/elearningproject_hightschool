@@ -70,18 +70,97 @@ function shuffle(array) {
   return arr;
 }
 
+const SEMANTIC_BANKS = {
+  strait: [
+    'ច្រកសមុទ្រម៉ាឡាកា (Strait of Malacca)',
+    'ច្រកសមុទ្រស៊ុនដា (Sunda Strait)',
+    'ច្រកសមុទ្រប៊េរីង (Bering Strait)',
+    'ច្រកសមុទ្រហ័រមូស (Strait of Hormuz)',
+    'ច្រកសមុទ្រជីប្រាល់តា (Strait of Gibraltar)',
+    'ច្រកសមុទ្របូស្វ័រ (Bosphorus Strait)',
+    'ច្រកសមុទ្រដាវីស (Davis Strait)',
+    'ច្រកសមុទ្រតៃវ៉ាន់ (Taiwan Strait)',
+    'ច្រកសមុទ្រកូរ៉េ (Korea Strait)',
+    'ច្រកសមុទ្របាបអិលម៉ង់ដេប (Bab-el-Mandeb)',
+    'ច្រកសមុទ្រម៉ាហ្សេឡង់ (Strait of Magellan)',
+    'ច្រកសមុទ្រលំពិក (Lombok Strait)'
+  ],
+  river: [
+    'ទន្លេមេគង្គ (Mekong River)',
+    'ទន្លេសាប (Tonle Sap River)',
+    'ទន្លេបាសាក់ (Bassac River)',
+    'ទន្លេសេកុង (Sekong River)',
+    'ទន្លេសេសាន (Sesan River)',
+    'ទន្លេស្រែពក (Srepok River)',
+    'ទន្លេយ៉ាងសេ (Yangtze River)',
+    'ទន្លេហួងហូ (Yellow River)',
+    'ទន្លេនីល (Nile River)',
+    'ទន្លេអាម៉ាហ្សូន (Amazon River)',
+    'ទន្លេគង្គា (Ganges River)'
+  ],
+  island: ['កោះរ៉ុង', 'កោះស្តេច', 'កោះពស់', 'កោះត្រល់', 'កោះស៊ូម៉ាត្រា', 'កោះជ្វា', 'កោះប័រណេអូ', 'កោះហុកកៃដូ'],
+  mountain: ['ភ្នំឱរ៉ាល់ (កម្ពស់ ១៨១៣ម)', 'ជួរភ្នំដងរែក', 'ជួរភ្នំក្រវាញ', 'ភ្នំគូលែន', 'ភ្នំបូកគោ', 'ភ្នំអេវឺរ៉េស (Mount Everest)', 'ភ្នំហ្វូជី (Mount Fuji)'],
+  province: ['ខេត្តសៀមរាប', 'ខេត្តបាត់ដំបង', 'ខេត្តកំពង់ចាម', 'ខេត្តកណ្តាល', 'ខេត្តព្រះសីហនុ', 'ខេត្តកំពត', 'ខេត្តរតនគិរី', 'ខេត្តស្ទឹងត្រែង'],
+  country: ['ប្រទេសកម្ពុជា', 'ប្រទេសថៃ', 'ប្រទេសវៀតណាម', 'ប្រទេសឡាវ', 'ប្រទេសសិង្ហបុរី', 'ប្រទេសឥណ្ឌូណេស៊ី', 'ប្រទេសម៉ាឡេស៊ី', 'ប្រទេសជប៉ុន'],
+  king: ['ព្រះបាទជ័យវរ្ម័នទី៧', 'ព្រះបាទសូរ្យវរ្ម័នទី២', 'ព្រះបាទជ័យវរ្ម័នទី២', 'ព្រះបាទឥន្ទ្រវរ្ម័នទី១', 'ព្រះបាទយសោវរ្ម័នទី១', 'ព្រះបាទរាជេន្ទ្រវរ្ម័ន', 'ព្រះបាទឧទ័យទិត្យវរ្ម័នទី២', 'ព្រះបាទអង្គឌួង'],
+  literature_theme: [
+    'តម្លៃសីលធម៌ និងការតស៊ូព្យាយាម',
+    'តម្លៃវប្បធម៌ និងប្រពៃណីទំនៀមទម្លាប់',
+    'តម្លៃគ្រួសារ សេចក្តីស្រឡាញ់ និងភក្តីភាព',
+    'តម្លៃសាមគ្គីភាព និងសច្ចធម៌ក្នុងសង្គម',
+    'តម្លៃនៃការអប់រំ និងចំណេះដឹងពិតប្រាកដ',
+    'តម្លៃយុត្តិធម៌ និងសមភាពសង្គម'
+  ],
+  author: ['ញ៉ុក ថែម', 'នូ ហាច', 'រីម គីន', 'ឌឹក គាម', 'ភិក្ខុសោម', 'ព្រះបាទអង្គឌួង', 'ក្រមង៉ុយ', 'សន្ធរវោហារម៉ុក']
+};
+
+function detectSemanticCategory(question, options) {
+  const combinedText = [
+    question?.q || '',
+    ...(Array.isArray(options) ? options : [])
+  ].join(' ').toLowerCase();
+
+  if (combinedText.includes('ច្រកសមុទ្រ')) return 'strait';
+  if (combinedText.includes('ទន្លេ') || combinedText.includes('ស្ទឹង')) return 'river';
+  if (combinedText.includes('កោះ')) return 'island';
+  if (combinedText.includes('ភ្នំ')) return 'mountain';
+  if (combinedText.includes('ខេត្ត')) return 'province';
+  if (combinedText.includes('ប្រទេស')) return 'country';
+  if (combinedText.includes('ព្រះបាទ') || combinedText.includes('រជ្ជកាល')) return 'king';
+  if (combinedText.includes('តម្លៃ') || combinedText.includes('កុលាបប៉ៃលិន') || combinedText.includes('ទុំទាវ')) return 'literature_theme';
+  if (combinedText.includes('និពន្ធ') || combinedText.includes('ញ៉ុក ថែម')) return 'author';
+
+  return null;
+}
+
+function generateSecretAcademicHint(q) {
+  if (q.explanation && typeof q.explanation === 'string' && q.explanation.trim()) {
+    const clean = q.explanation.replace(/<[^>]+>/g, '').trim();
+    if (clean.length <= 120) return `💡 ព័ត៌មានជំនួយ៖ ${clean}`;
+    return `💡 ព័ត៌មានជំនួយ៖ ${clean.substring(0, 110)}...`;
+  }
+
+  const qText = (q.q || '').toLowerCase();
+  const sub = (q.subject || q.subjectKey || '').toLowerCase();
+
+  if (qText.includes('ម៉ាឡាកា') || qText.includes('ច្រកសមុទ្រ')) return '💡 ព័ត៌មានជំនួយ៖ ផ្លូវទឹកយុទ្ធសាស្ត្រអន្តរជាតិតភ្ជាប់មហាសមុទ្រឥណ្ឌា និងសមុទ្រចិនខាងត្បូង';
+  if (qText.includes('kmno4') || qText.includes('អុកស៊ីតកម្ម')) return '💡 ព័ត៌មានជំនួយ៖ K = +1, O = -2 (4 អាតូម = -8), ផលបូកចំនួនអុកស៊ីតកម្មស្មើ 0';
+  if (qText.includes('កុលាបប៉ៃលិន') || qText.includes('ចៅចិត្រ')) return '💡 ព័ត៌មានជំនួយ៖ ឆ្លុះបញ្ចាំងពីតម្លៃសីលធម៌ គុណធម៌ និងការតស៊ូព្យាយាមរបស់យុវជន';
+  if (qText.includes('អង្គរវត្ត') || qText.includes('សូរ្យវរ្ម័ន')) return '💡 ព័ត៌មានជំនួយ៖ កសាងឡើងក្នុងសតវត្សរ៍ទី១២ ឧទ្ទិសថ្វាយព្រះវិស្ណុ';
+  if (sub.includes('math') || sub.includes('គណិត')) return '💡 ព័ត៌មានជំនួយ៖ ពិនិត្យរូបមន្តគណិតវិទ្យា សម្រួលកន្សោម និងគណនាឱ្យបានត្រឹមត្រូវ';
+  if (sub.includes('physic') || sub.includes('រូប')) return '💡 ព័ត៌មានជំនួយ៖ ប្រើរូបមន្តរូបវិទ្យា និងផ្ទៀងផ្ទាត់ខ្នាតអន្តរជាតិ (SI Units)';
+  if (sub.includes('chem') || sub.includes('គីមី')) return '💡 ព័ត៌មានជំនួយ៖ ផ្ទៀងផ្ទាត់សមីការគីមី បន្ទុកអគ្គិសនី និងច្បាប់រក្សាម៉ាស';
+  if (sub.includes('geo') || sub.includes('ភូមិ')) return '💡 ព័ត៌មានជំនួយ៖ ពិចារណាលើទីតាំងភូមិសាស្ត្រ ធនធានធម្មជាតិ និងអាកាសធាតុ';
+  if (sub.includes('hist') || sub.includes('ប្រវត្តិ')) return '💡 ព័ត៌មានជំនួយ៖ ព្រឹត្តិការណ៍ប្រវត្តិសាស្ត្រផ្សារភ្ជាប់នឹងសម័យកាល និងបុព្វបុរសខ្មែរ';
+  if (sub.includes('khmer') || sub.includes('អក្សរ')) return '💡 ព័ត៌មានជំនួយ៖ ពិចារណាលើតម្លៃអប់រំ និងសិល្បៈតែងនិពន្ធក្នុងអក្សរសិល្ប៍ជាតិ';
+
+  return '💡 ព័ត៌មានជំនួយ៖ សូមគិតឱ្យបានល្អិតល្អន់ និងផ្ទៀងផ្ទាត់មុននឹងជ្រើសរើសចម្លើយ';
+}
+
 // Expand questions to 8 choices by borrowing plausible distractors from the full bank pool
 function expandTo8Options(question, allQuestionsPool = []) {
   if (!question || !Array.isArray(question.options) || question.options.length === 0) {
     return question;
-  }
-
-  if (question.options.length >= 8) {
-    let hint = question.hint || '';
-    if (!hint && question.explanation) {
-      hint = question.explanation.length > 80 ? question.explanation.substring(0, 80) + '...' : question.explanation;
-    }
-    return { ...question, hint };
   }
 
   const safeAnswerIndex = typeof question.answer === 'number' && question.answer >= 0 && question.answer < question.options.length
@@ -91,45 +170,48 @@ function expandTo8Options(question, allQuestionsPool = []) {
   const correctAnswer = question.options[safeAnswerIndex];
   const originalWrongs = question.options.filter((_, idx) => idx !== safeAnswerIndex);
 
+  if (question.options.length >= 8) {
+    const hint = question.hint || generateSecretAcademicHint(question);
+    return { ...question, hint };
+  }
+
   const existingSet = new Set(question.options.map(o => typeof o === 'string' ? o.trim().toLowerCase() : String(o)));
   if (typeof correctAnswer === 'string') existingSet.add(correctAnswer.trim().toLowerCase());
 
   const needed = 8 - question.options.length;
   const extraDistractors = [];
 
-  // 1. Gather same-subject distractors from full pool
-  const sub = (question.subjectKey || question.subject || '').toLowerCase();
-  const sameSubQuestions = allQuestionsPool.filter(q => (q.subjectKey || q.subject || '').toLowerCase() === sub);
-  const shuffledSameSub = shuffle(sameSubQuestions);
+  const avgLen = question.options.reduce((acc, opt) => acc + (typeof opt === 'string' ? opt.length : 4), 0) / question.options.length;
 
-  for (const q of shuffledSameSub) {
-    if (extraDistractors.length >= needed) break;
-    if (Array.isArray(q.options)) {
-      for (let i = 0; i < q.options.length; i++) {
-        if (i !== q.answer && typeof q.options[i] === 'string' && q.options[i].trim()) {
-          const opt = q.options[i].trim();
-          const key = opt.toLowerCase();
-          if (!existingSet.has(key)) {
-            existingSet.add(key);
-            extraDistractors.push(opt);
-            if (extraDistractors.length >= needed) break;
-          }
-        }
+  // 1. Try Semantic Category Bank (e.g. Strait, River, King, Theme, etc.)
+  const semanticCat = detectSemanticCategory(question, question.options);
+  if (semanticCat && Array.isArray(SEMANTIC_BANKS[semanticCat])) {
+    const candidates = shuffle(SEMANTIC_BANKS[semanticCat]);
+    for (const cand of candidates) {
+      if (extraDistractors.length >= needed) break;
+      const key = cand.trim().toLowerCase();
+      if (!existingSet.has(key)) {
+        existingSet.add(key);
+        extraDistractors.push(cand.trim());
       }
     }
   }
 
-  // 2. Gather from general pool
+  // 2. Gather same-subject length-consistent distractors from full pool
   if (extraDistractors.length < needed) {
-    const shuffledGeneral = shuffle(allQuestionsPool);
-    for (const q of shuffledGeneral) {
+    const sub = (question.subjectKey || question.subject || '').toLowerCase();
+    const sameSubQuestions = allQuestionsPool.filter(q => (q.subjectKey || q.subject || '').toLowerCase() === sub);
+    const shuffledSameSub = shuffle(sameSubQuestions);
+
+    for (const q of shuffledSameSub) {
       if (extraDistractors.length >= needed) break;
       if (Array.isArray(q.options)) {
         for (let i = 0; i < q.options.length; i++) {
           if (i !== q.answer && typeof q.options[i] === 'string' && q.options[i].trim()) {
             const opt = q.options[i].trim();
             const key = opt.toLowerCase();
-            if (!existingSet.has(key)) {
+            const isLengthConsistent = Math.abs(opt.length - avgLen) <= Math.max(8, avgLen * 0.75);
+            if (!existingSet.has(key) && isLengthConsistent) {
               existingSet.add(key);
               extraDistractors.push(opt);
               if (extraDistractors.length >= needed) break;
@@ -140,14 +222,39 @@ function expandTo8Options(question, allQuestionsPool = []) {
     }
   }
 
-  // 3. Fallback fillers
-  const fallbackFillers = ['ជម្រើសមិនត្រឹមត្រូវ', 'គ្មានចម្លើយត្រឹមត្រូវ', 'គ្រប់ចម្លើយទាំងអស់សុទ្ធតែត្រឹមត្រូវ', 'ចម្លើយខាងលើមិនត្រឹមត្រូវ'];
-  for (const filler of fallbackFillers) {
-    if (extraDistractors.length >= needed) break;
+  // 3. Gather from general pool with length filter
+  if (extraDistractors.length < needed) {
+    const shuffledGeneral = shuffle(allQuestionsPool);
+    for (const q of shuffledGeneral) {
+      if (extraDistractors.length >= needed) break;
+      if (Array.isArray(q.options)) {
+        for (let i = 0; i < q.options.length; i++) {
+          if (i !== q.answer && typeof q.options[i] === 'string' && q.options[i].trim()) {
+            const opt = q.options[i].trim();
+            const key = opt.toLowerCase();
+            const isLengthConsistent = Math.abs(opt.length - avgLen) <= Math.max(12, avgLen * 0.9);
+            if (!existingSet.has(key) && isLengthConsistent) {
+              existingSet.add(key);
+              extraDistractors.push(opt);
+              if (extraDistractors.length >= needed) break;
+            }
+          }
+        }
+      }
+    }
+  }
+
+  // 4. Fillers if needed
+  while (extraDistractors.length < needed) {
+    const filler = avgLen > 20
+      ? `ជម្រើសវិភាគបន្ថែមទី ${extraDistractors.length + 1}`
+      : `ជម្រើសទី ${question.options.length + extraDistractors.length + 1}`;
     const key = filler.toLowerCase();
     if (!existingSet.has(key)) {
       existingSet.add(key);
       extraDistractors.push(filler);
+    } else {
+      extraDistractors.push(`ជម្រើសផ្សេង ${extraDistractors.length + 5}`);
     }
   }
 
@@ -155,20 +262,13 @@ function expandTo8Options(question, allQuestionsPool = []) {
   const shuffled8 = shuffle(all8Options);
   const newAnswerIndex = shuffled8.findIndex(o => o === correctAnswer);
 
-  let hint = question.hint || '';
-  if (!hint) {
-    if (question.explanation) {
-      hint = question.explanation.length > 80 ? question.explanation.substring(0, 80) + '...' : question.explanation;
-    } else if (question.subject) {
-      hint = `ព័ត៌មានជំនួយ៖ សំណួរនេះស្ថិតក្នុងមុខវិជ្ជា ${question.subject}`;
-    }
-  }
+  const secretHint = generateSecretAcademicHint(question);
 
   return {
     ...question,
     options: shuffled8,
     answer: newAnswerIndex !== -1 ? newAnswerIndex : 0,
-    hint: hint || 'សូមគិតឱ្យបានល្អិតល្អន់មុននឹងជ្រើសរើសចម្លើយ'
+    hint: secretHint
   };
 }
 
