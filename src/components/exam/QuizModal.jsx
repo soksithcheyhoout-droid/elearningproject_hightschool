@@ -15,6 +15,7 @@ import {
 import confetti from 'canvas-confetti';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
+import AcademicTextRenderer from '../common/AcademicTextRenderer';
 
 export default function QuizModal({ quiz, onClose }) {
   const { t, lang } = useLanguage();
@@ -159,9 +160,9 @@ export default function QuizModal({ quiz, onClose }) {
                 <span className="font-cinzel">100 ពិន្ទុ</span>
               </div>
 
-              <h3 className="text-sm sm:text-base font-semibold text-slate-900 leading-relaxed">
-                {lang === 'km' ? currentQ.questionKm : currentQ.questionEn}
-              </h3>
+              <div className="text-sm sm:text-base font-bold text-slate-900 leading-relaxed">
+                <AcademicTextRenderer content={lang === 'km' ? currentQ.questionKm : currentQ.questionEn} baseTextSize="text-sm sm:text-base" />
+              </div>
 
               {/* Options */}
               <div className="space-y-2.5 pt-2">
@@ -171,19 +172,19 @@ export default function QuizModal({ quiz, onClose }) {
                     <button
                       key={optIdx}
                       onClick={() => handleSelectOption(optIdx)}
-                      className={`w-full text-left p-3 rounded-xl border text-xs sm:text-sm transition-all flex items-center justify-between shadow-sm ${
+                      className={`w-full text-left p-3.5 sm:p-4 rounded-2xl border text-xs sm:text-sm transition-all flex items-center justify-between shadow-xs cursor-pointer active:scale-[0.99] ${
                         isSelected
-                          ? 'bg-amber-50 border-amber-400 text-amber-900 font-bold'
-                          : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300'
+                          ? 'bg-amber-50 border-amber-400 text-amber-950 font-bold ring-2 ring-amber-400/30'
+                          : 'bg-white border-slate-200 text-slate-700 hover:border-slate-300 hover:bg-slate-50'
                       }`}
                     >
                       <div className="flex items-center gap-3">
-                        <span className={`w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold ${
-                          isSelected ? 'bg-amber-500 text-white' : 'bg-slate-100 text-slate-600'
+                        <span className={`w-7 h-7 rounded-xl flex items-center justify-center text-xs font-black font-cinzel flex-shrink-0 ${
+                          isSelected ? 'bg-amber-500 text-white shadow-xs' : 'bg-slate-100 text-slate-600'
                         }`}>
                           {String.fromCharCode(65 + optIdx)}
                         </span>
-                        <span>{opt}</span>
+                        <span className="leading-snug">{opt}</span>
                       </div>
                     </button>
                   );
@@ -196,24 +197,24 @@ export default function QuizModal({ quiz, onClose }) {
               <button
                 onClick={() => setCurrentIdx(prev => Math.max(0, prev - 1))}
                 disabled={currentIdx === 0}
-                className="btn-secondary text-xs py-2 px-4 disabled:opacity-40"
+                className="btn-secondary text-xs sm:text-sm py-2 px-4 disabled:opacity-40"
               >
-                <ArrowLeft className="w-3.5 h-3.5" />
+                <ArrowLeft className="w-4 h-4" />
                 <span>{t('prevQuestion')}</span>
               </button>
 
               {currentIdx < quiz.questions.length - 1 ? (
                 <button
                   onClick={() => setCurrentIdx(prev => prev + 1)}
-                  className="btn-gold text-xs py-2 px-5 font-bold"
+                  className="btn-gold text-xs sm:text-sm py-2.5 px-6 font-bold cursor-pointer"
                 >
                   <span>{t('nextQuestion')}</span>
-                  <ArrowRight className="w-3.5 h-3.5" />
+                  <ArrowRight className="w-4 h-4" />
                 </button>
               ) : (
                 <button
                   onClick={handleSubmit}
-                  className="btn-gold text-xs py-2.5 px-6 font-bold shadow-md"
+                  className="btn-gold text-xs sm:text-sm py-2.5 px-7 font-black shadow-md cursor-pointer"
                 >
                   <Award className="w-4 h-4" />
                   <span>{t('submitQuiz')}</span>
@@ -258,13 +259,13 @@ export default function QuizModal({ quiz, onClose }) {
                 const userAns = selectedAnswers[idx];
                 const isCorrectAns = userAns === q.correctIndex;
                 return (
-                  <div key={idx} className={`p-4 rounded-xl border text-xs space-y-1.5 shadow-sm ${
+                  <div key={idx} className={`p-4 rounded-xl border text-xs space-y-2 shadow-xs ${
                     isCorrectAns ? 'bg-emerald-50 border-emerald-200 text-emerald-900' : 'bg-rose-50 border-rose-200 text-rose-900'
                   }`}>
                     <div className="flex items-start justify-between gap-2">
-                      <p className="font-semibold text-slate-900">
-                        {idx + 1}. {lang === 'km' ? q.questionKm : q.questionEn}
-                      </p>
+                      <div className="font-bold text-slate-900 text-xs sm:text-sm">
+                        {idx + 1}. <AcademicTextRenderer content={lang === 'km' ? q.questionKm : q.questionEn} baseTextSize="text-xs sm:text-sm" />
+                      </div>
                       {isCorrectAns ? (
                         <CheckCircle2 className="w-4 h-4 text-emerald-600 flex-shrink-0" />
                       ) : (
@@ -272,13 +273,13 @@ export default function QuizModal({ quiz, onClose }) {
                       )}
                     </div>
 
-                    <p className="text-[11px] text-slate-600">
+                    <p className="text-[11px] sm:text-xs text-slate-600 bg-white/70 p-2 rounded-lg border border-slate-200/60">
                       ចម្លើយរបស់អ្នក៖ <span className="font-bold text-slate-900">{userAns !== undefined ? q.options[userAns] : 'មិនបានឆ្លើយ'}</span> | ចម្លើយត្រឹមត្រូវ៖ <span className="font-bold text-emerald-700">{q.options[q.correctIndex]}</span>
                     </p>
 
-                    <p className="text-[11px] text-slate-700 pt-1 border-t border-slate-200">
-                      {lang === 'km' ? q.explanationKm : q.explanationEn}
-                    </p>
+                    <div className="text-[11px] sm:text-xs text-slate-700 pt-1 border-t border-slate-200">
+                      <AcademicTextRenderer content={lang === 'km' ? q.explanationKm : q.explanationEn} baseTextSize="text-[11.5px] sm:text-xs" />
+                    </div>
                   </div>
                 );
               })}

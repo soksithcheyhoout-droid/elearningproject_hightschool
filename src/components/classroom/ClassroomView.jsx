@@ -12,13 +12,15 @@ import {
   Sparkles, 
   ArrowLeft,
   ChevronRight,
-  ShieldCheck,
-  Video,
+  ShieldCheck, 
+  Video, 
   ExternalLink,
   GraduationCap
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
+import { curriculumData } from '../../data/curriculumData';
+import AcademicTextRenderer from '../common/AcademicTextRenderer';
 
 // Reliable fallback educational video streams (High quality, 100% playable HTML5 video)
 const RELIABLE_VIDEO_SOURCES = [
@@ -27,11 +29,12 @@ const RELIABLE_VIDEO_SOURCES = [
   "https://commondatastorage.googleapis.com/gtv-videos-bucket/sample/ForBiggerBlazes.mp4"
 ];
 
-export default function ClassroomView({ subject, onBack, onOpenAITutor }) {
+export default function ClassroomView({ subject: initialSubject, onBack, onOpenAITutor }) {
   const { t, lang } = useLanguage();
   const { student, markLessonComplete } = useAuth();
 
-  const defaultChapter = subject.chapters && subject.chapters[0];
+  const currentSubject = initialSubject || curriculumData[0] || {};
+  const defaultChapter = currentSubject?.chapters && currentSubject.chapters[0];
   const defaultLesson = defaultChapter && defaultChapter.lessons && defaultChapter.lessons[0];
 
   const [activeLesson, setActiveLesson] = useState(defaultLesson || null);
@@ -42,6 +45,19 @@ export default function ClassroomView({ subject, onBack, onOpenAITutor }) {
   const [isMuted, setIsMuted] = useState(false);
   const [playbackRate, setPlaybackRate] = useState(1);
   const videoRef = useRef(null);
+
+  // Synchronize active lesson whenever subject changes
+  useEffect(() => {
+    if (currentSubject && Array.isArray(currentSubject.chapters) && currentSubject.chapters.length > 0) {
+      const firstChap = currentSubject.chapters[0];
+      if (firstChap && Array.isArray(firstChap.lessons) && firstChap.lessons.length > 0) {
+        const belongsToSubject = currentSubject.chapters.some(c => c.lessons?.some(l => l.id === activeLesson?.id));
+        if (!belongsToSubject) {
+          setActiveLesson(firstChap.lessons[0]);
+        }
+      }
+    }
+  }, [currentSubject]);
 
   useEffect(() => {
     // Reset video state when activeLesson changes
@@ -179,7 +195,7 @@ export default function ClassroomView({ subject, onBack, onOpenAITutor }) {
             <video
               ref={videoRef}
               src={fallbackVideo}
-              poster={activeLesson?.videoPoster || subject.bannerImg}
+              poster={activeLesson?.videoPoster || currentSubject.bannerImg}
               onTimeUpdate={handleTimeUpdate}
               onLoadedMetadata={handleLoadedMetadata}
               onEnded={() => setIsPlaying(false)}
@@ -198,7 +214,7 @@ export default function ClassroomView({ subject, onBack, onOpenAITutor }) {
                 <div className="flex items-center justify-between text-white">
                   <div className="flex items-center gap-2">
                     <span className="bg-[#005baa] text-white text-[11px] font-black px-2.5 py-0.5 rounded-lg shadow-sm">
-                      {lang === 'km' ? subject.nameKm : subject.nameEn}
+                      {lang === 'km' ? currentSubject.nameKm : currentSubject.nameEn}
                     </span>
                     <span className="text-xs sm:text-sm text-white truncate max-w-xs font-bold">
                       {activeLesson ? (lang === 'km' ? activeLesson.titleKm : activeLesson.titleEn) : ''}
@@ -324,7 +340,7 @@ export default function ClassroomView({ subject, onBack, onOpenAITutor }) {
                   {activeLesson ? (lang === 'km' ? activeLesson.titleKm : activeLesson.titleEn) : ''}
                 </h2>
                 <p className="text-xs text-slate-600 mt-1 font-medium">
-                  {lang === 'km' ? 'បង្រៀនដោយ៖' : 'Taught by:'} <span className="text-[#005baa] font-bold">{subject.teacher}</span> ({subject.teacherRole})
+                  {lang === 'km' ? 'បង្រៀនដោយ៖' : 'Taught by:'} <span className="text-[#005baa] font-bold">{currentSubject.teacher || 'សាស្ត្រាចារ្យជាតិ'}</span> ({currentSubject.teacherRole || 'MoEYS'})
                 </p>
               </div>
 
@@ -341,7 +357,7 @@ export default function ClassroomView({ subject, onBack, onOpenAITutor }) {
               </button>
             </div>
 
-            {/* FULL CLEAN LESSON SUMMARY NOTES (No tabs, no Q&A discussion) */}
+            {/* FULL CLEAN LESSON SUMMARY NOTES (No raw asterisks, clean academic formatting) */}
             <div className="border-t border-slate-100 pt-4 space-y-4">
               <div className="flex items-center gap-2 text-xs font-black text-[#003366]">
                 <FileText className="w-4 h-4 text-[#005baa]" />
@@ -349,18 +365,17 @@ export default function ClassroomView({ subject, onBack, onOpenAITutor }) {
               </div>
 
               <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 text-xs sm:text-sm text-slate-800 leading-relaxed space-y-3 shadow-inner font-medium">
-                <div className="whitespace-pre-line">
-                  {activeLesson?.notes || (lang === 'km' ? 'គ្មានកំណត់ចំណាំសម្រាប់មេរៀននេះនៅឡើយទេ។' : 'No summary notes available for this lesson yet.')}
-                </div>
+                <AcademicTextRenderer content={activeLesson?.notes} baseTextSize="text-xs sm:text-sm" />
 
                 {activeLesson?.keyFormulas && activeLesson.keyFormulas.length > 0 && (
                   <div className="mt-4 pt-3 border-t border-slate-200">
-                    <p className="font-black text-[#003366] text-xs mb-2">
-                      ✨ {lang === 'km' ? 'រូបមន្តគន្លឹះត្រូវចាំ (Essential Formulas):' : 'Key Formulas to Remember:'}
+                    <p className="font-black text-[#003366] text-xs mb-2 flex items-center gap-1.5">
+                      <Sparkles className="w-3.5 h-3.5 text-amber-500" />
+                      <span>{lang === 'km' ? 'រូបមន្តគន្លឹះត្រូវចាំ (Essential Formulas):' : 'Key Formulas to Remember:'}</span>
                     </p>
                     <div className="space-y-2">
                       {activeLesson.keyFormulas.map((formula, idx) => (
-                        <div key={idx} className="bg-white p-2.5 rounded-xl border border-slate-300 text-[#003366] font-mono text-xs shadow-2xs font-bold">
+                        <div key={idx} className="bg-slate-900 text-cyan-300 p-2.5 sm:p-3 rounded-xl border border-slate-700 font-mono text-xs shadow-2xs font-bold overflow-x-auto [scrollbar-width:none]">
                           <code>{formula}</code>
                         </div>
                       ))}
@@ -385,12 +400,12 @@ export default function ClassroomView({ subject, onBack, onOpenAITutor }) {
                 </h3>
               </div>
               <span className="text-xs font-bold text-slate-500">
-                {subject.totalLessons || 20} {lang === 'km' ? 'មេរៀន' : 'lessons'}
+                {currentSubject.totalLessons || 20} {lang === 'km' ? 'មេរៀន' : 'lessons'}
               </span>
             </div>
 
             <div className="space-y-4 max-h-[600px] overflow-y-auto pr-1">
-              {subject.chapters && subject.chapters.map((chapter) => (
+              {currentSubject.chapters && currentSubject.chapters.map((chapter) => (
                 <div key={chapter.id} className="space-y-2">
                   <h4 className="text-xs font-black text-slate-800 px-2 py-1 bg-slate-50 rounded-lg">
                     {lang === 'km' ? chapter.titleKm : chapter.titleEn}

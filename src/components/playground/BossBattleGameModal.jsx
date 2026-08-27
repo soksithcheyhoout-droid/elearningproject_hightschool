@@ -22,6 +22,7 @@ import {
 import { useAuth, computeLevelData } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
 import { getRandomizedGameQuestions, fetchLiveExamQuestions } from '../../utils/gamePoolManager';
+import AcademicTextRenderer from '../common/AcademicTextRenderer';
 
 export default function BossBattleGameModal({ game, onClose }) {
   const { student, addXP } = useAuth();
@@ -466,10 +467,10 @@ export default function BossBattleGameModal({ game, onClose }) {
             <span className="text-amber-400 font-cinzel">COMBAT SCORE: {score}</span>
           </div>
 
-          <div className="bg-slate-950/80 rounded-2xl p-4 border border-cyan-500/30 shadow-inner">
-            <h4 className="text-sm sm:text-base font-bold text-white leading-relaxed">
-              {currentQ.q}
-            </h4>
+          <div className="bg-slate-950/80 rounded-2xl p-4 sm:p-5 border border-cyan-500/30 shadow-inner">
+            <div className="text-sm sm:text-base font-extrabold text-white leading-relaxed">
+              <AcademicTextRenderer content={currentQ.q} baseTextSize="text-sm sm:text-base" />
+            </div>
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
@@ -499,21 +500,21 @@ export default function BossBattleGameModal({ game, onClose }) {
                   type="button"
                   disabled={isAnswerSubmitted || isGameOver}
                   onClick={() => handleSelectOption(idx)}
-                  className={`p-3.5 rounded-xl border-2 text-left text-xs sm:text-sm font-semibold transition-all flex items-start gap-3 cursor-pointer ${btnStyle}`}
+                  className={`p-3.5 sm:p-4 rounded-xl sm:rounded-2xl border-2 text-left text-xs sm:text-sm font-semibold transition-all flex items-center gap-3 cursor-pointer min-h-[46px] ${btnStyle}`}
                 >
-                  <span className="w-6 h-6 rounded-lg bg-white/10 flex items-center justify-center text-xs font-bold font-cinzel flex-shrink-0">
+                  <span className="w-7 h-7 rounded-lg bg-white/10 flex items-center justify-center text-xs font-black font-cinzel flex-shrink-0">
                     {String.fromCharCode(65 + idx)}
                   </span>
-                  <span className="leading-snug">{option}</span>
+                  <span className="leading-snug flex-1">{option}</span>
                 </button>
               );
             })}
           </div>
 
           {isAnswerSubmitted && currentQ.explanation && (
-            <div className="bg-amber-400/10 border border-amber-400/30 rounded-xl p-3 text-xs text-amber-200 leading-relaxed animate-fade-in">
-              <span className="font-bold text-amber-300">💡 គន្លឹះដោះស្រាយ៖ </span>
-              {currentQ.explanation}
+            <div className="bg-amber-400/10 border border-amber-400/30 rounded-xl p-3 sm:p-4 text-xs text-amber-200 leading-relaxed animate-fade-in space-y-1">
+              <span className="font-bold text-amber-300 block">💡 គន្លឹះដោះស្រាយ៖ </span>
+              <AcademicTextRenderer content={currentQ.explanation} baseTextSize="text-xs" />
             </div>
           )}
 

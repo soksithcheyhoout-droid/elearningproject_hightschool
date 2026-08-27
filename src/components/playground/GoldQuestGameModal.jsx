@@ -20,6 +20,7 @@ import {
 import { useAuth } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
 import { getRandomizedGameQuestions, fetchLiveExamQuestions } from '../../utils/gamePoolManager';
+import AcademicTextRenderer from '../common/AcademicTextRenderer';
 
 const CHEST_REWARDS = [
   { type: 'gold_small', title: '+50 កាក់មាស', xp: 50, icon: '🪙', color: 'from-amber-500 to-yellow-400' },
@@ -208,9 +209,9 @@ export default function GoldQuestGameModal({ game, onClose }) {
               </div>
 
               <div className="bg-white rounded-3xl p-6 sm:p-8 shadow-xl text-center border-b-4 border-slate-300">
-                <h3 className="text-lg sm:text-xl font-black text-[#002b5b] leading-relaxed">
-                  {currentQ.q}
-                </h3>
+                <div className="text-lg sm:text-xl font-black text-[#002b5b] leading-relaxed">
+                  <AcademicTextRenderer content={currentQ.q} baseTextSize="text-lg sm:text-xl" />
+                </div>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">

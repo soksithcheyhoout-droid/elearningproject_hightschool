@@ -268,10 +268,10 @@ export default function Science2048GameModal({ onClose }) {
                   >
                     {cellVal > 0 && (
                       <>
-                        <span className="font-cinzel text-base sm:text-lg font-black tracking-tight">
+                        <span className="font-cinzel text-base sm:text-xl font-black tracking-tight">
                           {element?.symbol || cellVal}
                         </span>
-                        <span className="text-[8px] sm:text-[9px] font-bold line-clamp-1 opacity-90">
+                        <span className="text-[10px] sm:text-xs font-bold line-clamp-1 opacity-95">
                           {element?.name || cellVal}
                         </span>
                       </>

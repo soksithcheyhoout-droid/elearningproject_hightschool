@@ -19,9 +19,10 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
+import { getRandomizedGameQuestions } from '../../utils/gamePoolManager';
 
 export default function SpaceShooterGameModal({ game, onClose }) {
-  const { addXP } = useAuth();
+  const { addXP, student } = useAuth();
   const canvasRef = useRef(null);
   const [soundEnabled, setSoundEnabled] = useState(true);
 
@@ -33,11 +34,16 @@ export default function SpaceShooterGameModal({ game, onClose }) {
   const [isWon, setIsWon] = useState(false);
   const [floatingFeedback, setFloatingFeedback] = useState(null);
 
-  const questions = game?.questions || [
-    { q: 'គណនា lim (x → 2) (x² - 4)/(x - 2) = ?', options: ['0', '2', '4', '8'], answer: 2, explanation: 'x+2 => 4' }
-  ];
+  const [questions, setQuestions] = useState(() => 
+    getRandomizedGameQuestions(game, 15, student?.grade || '12', game?.stream || student?.stream || 'science')
+  );
 
-  const currentQ = questions[currentQIndex % questions.length];
+  const currentQ = questions[currentQIndex % questions.length] || {
+    q: 'គណនា lim (x → 2) (x² - 4)/(x - 2) = ?',
+    options: ['0', '2', '4', '8'],
+    answer: 2,
+    explanation: 'x+2 => 4'
+  };
 
   // Professional Game State Reference
   const stateRef = useRef({
@@ -422,6 +428,8 @@ export default function SpaceShooterGameModal({ game, onClose }) {
   };
 
   const handleRestart = () => {
+    const fresh = getRandomizedGameQuestions(game, 15, student?.grade || '12', game?.stream || student?.stream || 'science');
+    setQuestions(fresh);
     setCurrentQIndex(0);
     setScore(0);
     setCombo(0);

@@ -15,9 +15,10 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
+import { getRandomizedGameQuestions } from '../../utils/gamePoolManager';
 
 export default function FlappyAcademicJetModal({ game, onClose }) {
-  const { addXP } = useAuth();
+  const { addXP, student } = useAuth();
   const canvasRef = useRef(null);
   const [soundEnabled, setSoundEnabled] = useState(true);
 
@@ -28,12 +29,16 @@ export default function FlappyAcademicJetModal({ game, onClose }) {
   const [gameStarted, setGameStarted] = useState(false);
   const [feedback, setFeedback] = useState(null);
 
-  const questions = game?.questions || [
-    { q: 'គណនា lim (x → 2) (x² - 4)/(x - 2) = ?', options: ['0', '2', '4', '8'], answer: 2, explanation: '4' },
-    { q: 'ម៉ូឌុលនៃ z = 3 + 4i គឺ៖', options: ['5', '7', '25', '1'], answer: 0, explanation: '5' }
-  ];
+  const [questions, setQuestions] = useState(() => 
+    getRandomizedGameQuestions(game, 15, student?.grade || '12', game?.stream || student?.stream || 'science')
+  );
 
-  const currentQ = questions[currentQIndex % questions.length];
+  const currentQ = questions[currentQIndex % questions.length] || {
+    q: 'គណនា lim (x → 2) (x² - 4)/(x - 2) = ?',
+    options: ['0', '2', '4', '8'],
+    answer: 2,
+    explanation: '4'
+  };
 
   const stateRef = useRef({
     bird: { x: 100, y: 180, vy: 0, gravity: 0.36, jump: -6.5, radius: 16 },
@@ -279,6 +284,8 @@ export default function FlappyAcademicJetModal({ game, onClose }) {
   };
 
   const handleRestart = () => {
+    const fresh = getRandomizedGameQuestions(game, 15, student?.grade || '12', game?.stream || student?.stream || 'science');
+    setQuestions(fresh);
     stateRef.current.bird.y = 180;
     stateRef.current.bird.vy = 0;
     setCurrentQIndex(0);

@@ -20,6 +20,7 @@ import { useAuth } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
 import { getRandomizedGameQuestions, fetchLiveExamQuestions } from '../../utils/gamePoolManager';
 import VictoryRewardCelebration from './VictoryRewardCelebration';
+import AcademicTextRenderer from '../common/AcademicTextRenderer';
 
 export default function KahootSpeedArenaModal({ game, onClose }) {
   const { addXP, student } = useAuth();
@@ -258,9 +259,9 @@ export default function KahootSpeedArenaModal({ game, onClose }) {
 
             {/* Main Question Display Card */}
             <div className="bg-white rounded-3xl p-6 sm:p-10 text-center shadow-2xl border-b-4 border-slate-300 my-auto">
-              <h2 className="text-lg sm:text-2xl font-black text-[#1e1b4b] leading-relaxed">
-                {currentQ.q}
-              </h2>
+              <div className="text-lg sm:text-2xl font-black text-[#1e1b4b] leading-relaxed">
+                <AcademicTextRenderer content={currentQ.q} baseTextSize="text-lg sm:text-2xl" />
+              </div>
             </div>
 
             {/* 4 Iconic Kahoot-style Answer Tiles */}

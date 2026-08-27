@@ -14,27 +14,25 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
-
-const SNAKE_QUESTIONS = [
-  { q: 'គណនា 25 + 37 = ?', correct: '62', wrongs: ['52', '64', '72'] },
-  { q: 'គណនា lim (x → 3) (x² - 9)/(x - 3) = ?', correct: '6', wrongs: ['3', '0', '9'] },
-  { q: 'ម៉ូឌុលនៃ 3 + 4i = ?', correct: '5', wrongs: ['7', '25', '1'] },
-  { q: 'ចំនួនបន្សំ C(4, 2) = ?', correct: '6', wrongs: ['12', '8', '4'] },
-  { q: 'pH នៃទឹកសុទ្ធអព្យាក្រឹត្យ = ?', correct: '7', wrongs: ['0', '14', '1'] }
-];
+import { getRandomSnakeQuestions } from '../../utils/gamePoolManager';
 
 export default function SnakeMathModal({ onClose }) {
   const { addXP } = useAuth();
   const canvasRef = useRef(null);
   const [soundEnabled, setSoundEnabled] = useState(true);
 
+  const [questions, setQuestions] = useState(() => getRandomSnakeQuestions(20));
   const [qIndex, setQIndex] = useState(0);
   const [score, setScore] = useState(0);
   const [isGameOver, setIsGameOver] = useState(false);
   const [isWon, setIsWon] = useState(false);
   const [feedback, setFeedback] = useState(null);
 
-  const currentQ = SNAKE_QUESTIONS[qIndex % SNAKE_QUESTIONS.length];
+  const currentQ = questions[qIndex % questions.length] || {
+    q: 'គណនា 25 + 37 = ?',
+    correct: '62',
+    wrongs: ['52', '64', '72']
+  };
 
   const stateRef = useRef({
     gridSize: 18,
@@ -234,6 +232,7 @@ export default function SnakeMathModal({ onClose }) {
   };
 
   const handleRestart = () => {
+    setQuestions(getRandomSnakeQuestions(20));
     stateRef.current.snake = [
       { x: 8, y: 8 },
       { x: 7, y: 8 },
@@ -261,7 +260,7 @@ export default function SnakeMathModal({ onClose }) {
               <Activity className="w-4 h-4" />
             </span>
             <div>
-              <span className="text-[10px] font-black text-teal-400 uppercase tracking-widest block font-cinzel">
+              <span className="text-xs font-black text-teal-400 uppercase tracking-widest block font-cinzel">
                 ★ RETRO SNAKE MATH & FORMULA ★
               </span>
               <h3 className="text-xs sm:text-sm font-black text-white">
@@ -289,12 +288,12 @@ export default function SnakeMathModal({ onClose }) {
         </div>
 
         {/* Question Banner */}
-        <div className="bg-gradient-to-r from-teal-950 via-slate-900 to-teal-950 px-4 py-2.5 border-b border-teal-500/20 flex items-center justify-between gap-2 text-xs">
+        <div className="bg-gradient-to-r from-teal-950 via-slate-900 to-teal-950 px-4 py-2.5 border-b border-teal-500/20 flex items-center justify-between gap-2 text-xs sm:text-sm">
           <div>
-            <span className="text-[10px] font-black text-teal-400 font-cinzel">TARGET {qIndex + 1}/{SNAKE_QUESTIONS.length}៖ </span>
-            <span className="font-extrabold text-white">{currentQ.q}</span>
+            <span className="text-xs font-black text-teal-400 font-cinzel">TARGET {qIndex + 1}/{questions.length}៖ </span>
+            <span className="font-extrabold text-white text-xs sm:text-sm">{currentQ.q}</span>
           </div>
-          <span className="font-cinzel text-amber-300 font-black">SCORE: {score}</span>
+          <span className="font-cinzel text-amber-300 font-black text-xs sm:text-sm flex-shrink-0">SCORE: {score}</span>
         </div>
 
         {/* Canvas Stage */}

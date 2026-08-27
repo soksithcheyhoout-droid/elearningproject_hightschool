@@ -29,6 +29,7 @@ import { quizData } from '../../data/quizData';
 import { useLanguage } from '../../context/LanguageContext';
 import api from '../../services/api';
 import QuizModal from './QuizModal';
+import AcademicTextRenderer from '../common/AcademicTextRenderer';
 
 const MASTER_SUBJECT_DEFINITIONS = [
   { key: 'math', stream: 'science', nameKm: 'គណិតវិទ្យា', nameEn: 'Mathematics' },
@@ -701,16 +702,31 @@ export default function BacIIHubView() {
 
             <div className="space-y-4 overflow-y-auto pr-1 text-xs sm:text-sm leading-relaxed flex-1">
               {activeSolutionModal.exercises && activeSolutionModal.exercises.map((ex, idx) => (
-                <div key={idx} className="space-y-2.5 sm:space-y-3 bg-slate-50/70 p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200">
-                  <div className="font-bold text-[#003366] text-xs sm:text-sm border-b border-slate-200 pb-2">
-                    {ex.titleKm}
+                <div key={idx} className="space-y-3 bg-slate-50/80 p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs">
+                  <div className="font-black text-[#003366] text-xs sm:text-base border-b border-slate-200 pb-2.5 flex items-center justify-between gap-2">
+                    <span>{ex.titleKm}</span>
+                    <span className="text-[10px] sm:text-xs font-bold text-slate-400 font-cinzel">EXERCISE #{idx + 1}</span>
                   </div>
-                  <div className="text-slate-800 whitespace-pre-line break-words bg-white p-3 sm:p-3.5 rounded-xl border border-slate-200 text-xs shadow-xs leading-relaxed">
-                    <span className="font-bold text-[#003366] block mb-1">ប្រធានលំហាត់ / សំណួរ៖</span>
-                    {ex.problemText}
+                  
+                  {/* Problem Question */}
+                  <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-xs space-y-1.5">
+                    <span className="font-black text-xs sm:text-sm text-[#003366] flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-[#005baa]" />
+                      ប្រធានលំហាត់ / សំណួរ៖
+                    </span>
+                    <AcademicTextRenderer content={ex.problemText} baseTextSize="text-xs sm:text-sm" />
                   </div>
-                  <div className="text-slate-800 whitespace-pre-line break-words leading-relaxed font-mono text-[11px] sm:text-xs bg-[#f0f9ff] p-3 sm:p-4 rounded-xl border border-[#bae6fd]">
-                    {ex.solutionText}
+
+                  {/* Solution Key */}
+                  <div className="bg-[#f0f9ff] p-3.5 sm:p-4 rounded-xl border border-[#bae6fd] shadow-xs space-y-2">
+                    <div className="flex items-center justify-between border-b border-sky-200/80 pb-1.5">
+                      <span className="font-black text-xs sm:text-sm text-[#003366] flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-[#005baa]" />
+                        ដំណោះស្រាយផ្លូវការ និងគន្លឹះគណនា៖
+                      </span>
+                      <span className="text-[10px] font-bold text-sky-600 bg-sky-100 px-2 py-0.5 rounded-full">MoEYS Official</span>
+                    </div>
+                    <AcademicTextRenderer content={ex.solutionText} baseTextSize="text-xs sm:text-sm" />
                   </div>
                 </div>
               ))}

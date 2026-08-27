@@ -16,18 +16,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
-
-// Pairs generator based on stream / subject
-const defaultPairs = [
-  { id: 1, textA: 'T = 2π √(m/k)', textB: 'ខួបប៉ោលរ៉ឺស័រ', tag: 'រូបវិទ្យា' },
-  { id: 2, textA: 'z = a + bi', textB: 'ចំនួនកុំផ្លិច', tag: 'គណិតវិទ្យា' },
-  { id: 3, textA: '៩ វិច្ឆិកា ១៩៥៣', textB: 'បុណ្យឯករាជ្យជាតិ', tag: 'ប្រវត្តិវិទ្យា' },
-  { id: 4, textA: 'ភិក្ខុសោម (១៩១៥)', textB: 'រឿងទុំទាវ', tag: 'អក្សរសាស្ត្រ' },
-  { id: 5, textA: 'pH = -log[H₃O⁺]', textB: 'គណនា pH អាស៊ីត', tag: 'គីមីវិទ្យា' },
-  { id: 6, textA: 'AUG (មេធ្យូនីន)', textB: 'កូដុងផ្តើមលើ ARNm', tag: 'ជីវវិទ្យា' },
-  { id: 7, textA: 'កំពង់ផែស្វយ័ត', textB: 'ក្រុងព្រះសីហនុ', tag: 'ភូមិវិទ្យា' },
-  { id: 8, textA: 'UDHR (១០ ធ្នូ ១៩៤៨)', textB: 'សិទ្ធិមនុស្សជាសកល', tag: 'សីលធម៌' }
-];
+import { getRandomMemoryPairs } from '../../utils/gamePoolManager';
 
 export default function MemoryMatchGameModal({ onClose }) {
   const { addXP } = useAuth();
@@ -44,8 +33,9 @@ export default function MemoryMatchGameModal({ onClose }) {
 
   // Initialize deck
   const initializeGame = () => {
+    const pairs = getRandomMemoryPairs(8);
     const deck = [];
-    defaultPairs.forEach((pair) => {
+    pairs.forEach((pair) => {
       deck.push({
         uid: `${pair.id}-A`,
         pairId: pair.id,

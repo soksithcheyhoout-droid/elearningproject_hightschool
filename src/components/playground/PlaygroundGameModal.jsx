@@ -21,6 +21,7 @@ import { useAuth, computeLevelData } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
 import { getRandomizedGameQuestions, fetchLiveExamQuestions } from '../../utils/gamePoolManager';
 import VictoryRewardCelebration from './VictoryRewardCelebration';
+import AcademicTextRenderer from '../common/AcademicTextRenderer';
 
 export default function PlaygroundGameModal({ game, onClose }) {
   const { addXP, student } = useAuth();
@@ -245,9 +246,9 @@ export default function PlaygroundGameModal({ game, onClose }) {
 
             {/* Question Text */}
             <div className="bg-[#131d31] rounded-2xl p-5 border border-slate-700 shadow-inner">
-              <h4 className="font-black text-base sm:text-lg text-white leading-relaxed text-center sm:text-left">
-                {currentQ.q}
-              </h4>
+              <div className="font-extrabold text-base sm:text-lg text-white leading-relaxed text-center sm:text-left">
+                <AcademicTextRenderer content={currentQ.q} baseTextSize="text-base sm:text-lg" />
+              </div>
             </div>
 
             {/* 4 Interactive 3D Tactile Option Tiles */}
@@ -288,9 +289,9 @@ export default function PlaygroundGameModal({ game, onClose }) {
             {/* Explanation & 3s Auto-Next Timer Bar */}
             {isAnswerSubmitted && (
               <div className="bg-[#131d31] rounded-2xl p-4 border border-slate-700 flex flex-col sm:flex-row items-center justify-between gap-3 animate-fade-in">
-                <div className="text-xs text-slate-300">
-                  <strong className="font-bold text-amber-300">💡 គន្លឹះដោះស្រាយ៖ </strong>
-                  <span>{currentQ.explanation}</span>
+                <div className="text-xs text-slate-300 space-y-1">
+                  <strong className="font-bold text-amber-300 block">💡 គន្លឹះដោះស្រាយ៖ </strong>
+                  <AcademicTextRenderer content={currentQ.explanation} baseTextSize="text-xs" />
                 </div>
 
                 <div className="flex items-center gap-3 flex-shrink-0">

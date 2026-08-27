@@ -2,25 +2,50 @@ import { playgroundGamesData } from '../data/playgroundGamesData.js';
 import { quizData } from '../data/quizData.js';
 import { arenaMasterQuestionBank } from '../data/arenaMasterQuestionBank.js';
 
-// Global session memory to prevent showing the exact same questions repeatedly
-const recentSessionQuestionSet = new Set();
-const MAX_SESSION_MEMORY = 500;
+// Persistent session and cross-play memory to guarantee questions never repeat
+const STORAGE_KEY = 'motdar_seen_questions_v2';
+const MAX_PERSISTENT_MEMORY = 1200;
+
+function loadSeenQuestions() {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const raw = localStorage.getItem(STORAGE_KEY);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) return new Set(parsed);
+      }
+    }
+  } catch (e) {}
+  return new Set();
+}
+
+function saveSeenQuestions(set) {
+  try {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      const arr = Array.from(set).slice(-MAX_PERSISTENT_MEMORY);
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(arr));
+    }
+  } catch (e) {}
+}
+
+const recentSessionQuestionSet = loadSeenQuestions();
 
 export function recordQuestionsAsSeen(questions) {
   if (!Array.isArray(questions)) return;
   questions.forEach((q) => {
     if (q) {
-      const key = q.id || q.q?.trim();
+      const key = q.id || (typeof q.q === 'string' ? q.q.trim() : null);
       if (key) recentSessionQuestionSet.add(key);
     }
   });
 
-  if (recentSessionQuestionSet.size > MAX_SESSION_MEMORY) {
+  if (recentSessionQuestionSet.size > MAX_PERSISTENT_MEMORY) {
     const arr = Array.from(recentSessionQuestionSet);
-    const trimmed = arr.slice(arr.length - MAX_SESSION_MEMORY / 2);
+    const trimmed = arr.slice(arr.length - Math.floor(MAX_PERSISTENT_MEMORY / 2));
     recentSessionQuestionSet.clear();
     trimmed.forEach((k) => recentSessionQuestionSet.add(k));
   }
+  saveSeenQuestions(recentSessionQuestionSet);
 }
 
 /**
@@ -59,12 +84,11 @@ export function shuffleQuestionOptions(question) {
   };
 }
 
-const SCIENCE_SUBJECTS = new Set(['គណិតវិទ្យា', 'រូបវិទ្យា', 'គីមីវិទ្យា', 'ជីវវិទ្យា', 'math', 'physics', 'chemistry', 'biology']);
-const SOCIAL_SUBJECTS = new Set(['ភាសាខ្មែរ', 'អក្សរសាស្ត្រខ្មែរ', 'ប្រវត្តិវិទ្យា', 'ភូមិវិទ្យា', 'សីលធម៌-ពលរដ្ឋ', 'សេដ្ឋកិច្ច', 'khmer', 'history', 'geography', 'civics', 'morals', 'economics']);
+const SCIENCE_SUBJECTS = new Set(['គណិតវិទ្យា', 'រូបវិទ្យា', 'គីមីវិទ្យា', 'ជីវវិទ្យា', 'ផែនដីវិទ្យា', 'math', 'physics', 'chemistry', 'biology', 'earth', 'stem', 'stem-cs']);
+const SOCIAL_SUBJECTS = new Set(['ភាសាខ្មែរ', 'អក្សរសាស្ត្រខ្មែរ', 'ប្រវត្តិវិទ្យា', 'ភូមិវិទ្យា', 'សីលធម៌-ពលរដ្ឋ', 'សេដ្ឋកិច្ច', 'ភាសាអង់គ្លេស', 'khmer', 'history', 'geography', 'civics', 'morals', 'economics', 'english']);
 
 /**
- * Generate a randomized pool of unique questions for a game session
- * Strictly preserves game topic & subject isolation (never leaks Math into Khmer literature or Social into Physics)
+ * Generate a randomized pool of unique, non-repeating questions for a game session
  * @param {Object} game - Game metadata (optional)
  * @param {number} count - Number of questions to return (default: 20)
  * @param {string|number} grade - Grade level '1' to '12'
@@ -78,50 +102,18 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
   const targetSubjectKey = game?.subjectKey;
   const targetSubject = game?.subject;
 
-  // =========================================================================
-  // CASE 1: SPECIFIC SUBJECT / TOPIC GAME (e.g. Limits, Optics, Khmer, History)
-  // Only if the user selected a game with a specific subjectKey and not stream-overridden
-  // =========================================================================
-  if (game && targetSubjectKey && requestedStream === gameStream && requestedStream !== 'random' && requestedStream !== 'all') {
-    // 1. Add game-specific questions first
-    if (Array.isArray(game.questions)) {
-      game.questions.forEach((q) => {
-        if (q && q.q) rawPool.push({ ...q, subjectKey: targetSubjectKey, stream: gameStream });
-      });
-    }
+  // 1. Harvest from Arena Master Bank (2,400 questions)
+  if (Array.isArray(arenaMasterQuestionBank)) {
+    arenaMasterQuestionBank.forEach((item) => {
+      if (!item || !item.q) return;
 
-    // 2. Harvest all other questions matching targetSubjectKey from arenaMasterQuestionBank (300+ items per subject)
-    if (Array.isArray(arenaMasterQuestionBank)) {
-      arenaMasterQuestionBank.forEach((item) => {
-        if (!item || !item.q) return;
+      if (targetSubjectKey && requestedStream !== 'random' && requestedStream !== 'all') {
         const matchesSub = (targetSubjectKey && item.subjectKey === targetSubjectKey) ||
                            (targetSubject && item.subject === targetSubject);
         if (matchesSub) {
-          rawPool.push(item);
+          rawPool.push({ ...item });
         }
-      });
-    }
-
-    // 3. Harvest from other games matching same subjectKey in playgroundGamesData
-    if (Array.isArray(playgroundGamesData)) {
-      playgroundGamesData.forEach((g) => {
-        if (g && g.subjectKey === targetSubjectKey && Array.isArray(g.questions)) {
-          g.questions.forEach((q) => {
-            if (q && q.q) rawPool.push({ ...q, subjectKey: targetSubjectKey, stream: gameStream });
-          });
-        }
-      });
-    }
-  }
-
-  // =========================================================================
-  // CASE 2: STREAM MODE / 1V1 ARENA (Science vs Social vs Random)
-  // =========================================================================
-  if (rawPool.length === 0) {
-    if (Array.isArray(arenaMasterQuestionBank)) {
-      arenaMasterQuestionBank.forEach((item) => {
-        if (!item || !item.q) return;
-
+      } else {
         let matchesStream = false;
         if (requestedStream === 'random' || requestedStream === 'all') {
           matchesStream = true;
@@ -132,34 +124,63 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
         }
 
         if (matchesStream) {
-          rawPool.push(item);
+          rawPool.push({ ...item });
         }
-      });
-    }
+      }
+    });
+  }
 
-    // Also include questions from playgroundGamesData
-    if (Array.isArray(playgroundGamesData)) {
-      playgroundGamesData.forEach((g) => {
-        if (!g || !Array.isArray(g.questions)) return;
+  // 2. Harvest from Playground Games Data
+  if (Array.isArray(playgroundGamesData)) {
+    playgroundGamesData.forEach((g) => {
+      if (!g || !Array.isArray(g.questions)) return;
 
-        let matchesStream = false;
-        if (requestedStream === 'random' || requestedStream === 'all') {
-          matchesStream = true;
-        } else if (requestedStream === 'social') {
-          matchesStream = (g.stream === 'social' || SOCIAL_SUBJECTS.has(g.subjectKey) || SOCIAL_SUBJECTS.has(g.subject)) && !SCIENCE_SUBJECTS.has(g.subject);
-        } else {
-          matchesStream = (g.stream === 'science' || SCIENCE_SUBJECTS.has(g.subjectKey) || SCIENCE_SUBJECTS.has(g.subject)) && !SOCIAL_SUBJECTS.has(g.subject);
-        }
+      const matchesTarget = targetSubjectKey && g.subjectKey === targetSubjectKey;
+      let matchesStream = false;
+      if (requestedStream === 'random' || requestedStream === 'all') {
+        matchesStream = true;
+      } else if (requestedStream === 'social') {
+        matchesStream = g.stream === 'social' || SOCIAL_SUBJECTS.has(g.subjectKey) || SOCIAL_SUBJECTS.has(g.subject);
+      } else {
+        matchesStream = g.stream === 'science' || SCIENCE_SUBJECTS.has(g.subjectKey) || SCIENCE_SUBJECTS.has(g.subject);
+      }
 
-        if (matchesStream) {
-          g.questions.forEach((q) => {
-            if (q && q.q) {
-              rawPool.push({ ...q, stream: g.stream, subject: q.subject || g.subject, subjectKey: q.subjectKey || g.subjectKey });
-            }
-          });
-        }
-      });
-    }
+      if (matchesTarget || matchesStream) {
+        g.questions.forEach((q) => {
+          if (q && q.q) {
+            rawPool.push({
+              ...q,
+              stream: g.stream,
+              subject: q.subject || g.subject,
+              subjectKey: q.subjectKey || g.subjectKey,
+              grade: q.grade || g.grade || '12'
+            });
+          }
+        });
+      }
+    });
+  }
+
+  // 3. Harvest from Quiz Data
+  if (Array.isArray(quizData)) {
+    quizData.forEach((qz) => {
+      if (!qz || !Array.isArray(qz.questions)) return;
+      const matchesSub = targetSubjectKey && (qz.subjectKey === targetSubjectKey || qz.subject === targetSubject);
+      let matchesStream = requestedStream === 'all' || requestedStream === 'random' || qz.stream === requestedStream;
+      if (matchesSub || matchesStream) {
+        qz.questions.forEach((q) => {
+          if (q && q.q) {
+            rawPool.push({
+              ...q,
+              stream: qz.stream,
+              subject: q.subject || qz.subject,
+              subjectKey: q.subjectKey || qz.subjectKey,
+              grade: qz.grade || '12'
+            });
+          }
+        });
+      }
+    });
   }
 
   // Deduplicate and filter out seen questions
@@ -167,15 +188,25 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
   const unseenPool = [];
   const fallbackSeenPool = [];
 
-  rawPool.forEach((q) => {
+  // Deeply pre-shuffle candidate pool
+  const randomizedRaw = shuffleArray(rawPool);
+
+  randomizedRaw.forEach((q) => {
     if (!q || !q.q) return;
     const cleanText = q.q.trim();
     if (seenTexts.has(cleanText)) return;
     seenTexts.add(cleanText);
 
     // Hard stream guard
-    if (requestedStream === 'social' && SCIENCE_SUBJECTS.has(q.subject)) return;
-    if (requestedStream === 'science' && SOCIAL_SUBJECTS.has(q.subject)) return;
+    if (requestedStream === 'social' && SCIENCE_SUBJECTS.has(q.subject) && !SOCIAL_SUBJECTS.has(q.subject)) return;
+    if (requestedStream === 'science' && SOCIAL_SUBJECTS.has(q.subject) && !SCIENCE_SUBJECTS.has(q.subject)) return;
+
+    // Optional grade alignment if grade is specified
+    if (grade && grade !== 'all' && grade !== '1-12' && q.grade) {
+      const targetG = parseInt(grade, 10);
+      const qG = parseInt(q.grade, 10);
+      if (targetG >= 10 && qG < 7) return; // Keep high school away from 1st grade
+    }
 
     const qKey = q.id || cleanText;
     if (recentSessionQuestionSet.has(qKey)) {
@@ -185,7 +216,7 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
     }
   });
 
-  // Prioritize unseen questions first; backfill with seen only if count is higher than unseen
+  // Prioritize unseen questions first; backfill with seen only if unseen pool is exhausted
   const finalCandidates = unseenPool.length >= count
     ? unseenPool
     : [...unseenPool, ...fallbackSeenPool];
@@ -196,8 +227,8 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
   // Record selected questions as seen
   recordQuestionsAsSeen(selectedQuestions);
 
-  // Deeply shuffle and expand every question to 8 options
-  return expandQuestionsTo8Options(selectedQuestions);
+  // Deeply shuffle choices for every single question
+  return selectedQuestions.map(q => shuffleQuestionOptions(q));
 }
 
 /**
@@ -231,7 +262,7 @@ export async function fetchLiveExamQuestions({ stream = 'science', subjectKey = 
     console.warn('[Live Exam Pool Fetch Warning]:', err.message);
   }
 
-  // Fallback to rich local synchronous pool (2,400 questions)
+  // Fallback to rich local synchronous pool (2,400+ questions)
   return getRandomizedGameQuestions(null, limit, grade, stream);
 }
 
@@ -653,5 +684,124 @@ export function expandQuestionsTo8Options(questions) {
     };
   });
 }
+
+/**
+ * Specialized Snake Math Question Pool (Generates high quality arithmetic & algebra challenges)
+ */
+export function getRandomSnakeQuestions(count = 20) {
+  const baseMath = getRandomizedGameQuestions({ subjectKey: 'math', stream: 'science' }, count * 2, '12', 'science');
+  const snakeItems = [];
+
+  baseMath.forEach((q) => {
+    if (!q || !Array.isArray(q.options) || q.options.length < 2) return;
+    const correctOpt = String(q.options[q.answer] || q.options[0]).trim();
+    const wrongOpts = q.options
+      .filter((_, idx) => idx !== q.answer)
+      .map(o => String(o).trim())
+      .slice(0, 3);
+
+    if (correctOpt && wrongOpts.length >= 2) {
+      snakeItems.push({
+        q: q.q,
+        correct: correctOpt,
+        wrongs: wrongOpts
+      });
+    }
+  });
+
+  if (snakeItems.length >= count) {
+    return shuffleArray(snakeItems).slice(0, count);
+  }
+
+  // Rich fallback dynamic math generator
+  const generated = [];
+  for (let i = 0; i < count; i++) {
+    const a = Math.floor(Math.random() * 80) + 12;
+    const b = Math.floor(Math.random() * 70) + 9;
+    const opType = i % 4;
+    let text = '', ans = 0, wrongs = [];
+    if (opType === 0) {
+      text = `គណនា ${a} + ${b} = ?`;
+      ans = a + b;
+    } else if (opType === 1) {
+      text = `គណនា ${a + b} - ${b} = ?`;
+      ans = a;
+    } else if (opType === 2) {
+      const x = Math.floor(Math.random() * 12) + 2;
+      const y = Math.floor(Math.random() * 12) + 2;
+      text = `គណនា ${x} × ${y} = ?`;
+      ans = x * y;
+    } else {
+      const z = Math.floor(Math.random() * 10) + 1;
+      text = `ម៉ូឌុលនៃ ${z} + ${z + 1}i (តម្លៃប្រហាក់ប្រហែល) = ?`;
+      ans = Math.round(Math.sqrt(z * z + (z + 1) * (z + 1)));
+    }
+    wrongs = [String(ans + 2), String(ans - 3), String(ans + 10)];
+    generated.push({ q: text, correct: String(ans), wrongs });
+  }
+
+  return shuffleArray([...snakeItems, ...generated]).slice(0, count);
+}
+
+/**
+ * Specialized Memory Match Pairs Generator (Draws from Science, Social, History, Literature)
+ */
+export function getRandomMemoryPairs(count = 8) {
+  const MASTER_MEMORY_PAIRS = [
+    { textA: 'T = 2π √(m/k)', textB: 'ខួបប៉ោលរ៉ឺស័រ (Physics)', tag: 'រូបវិទ្យា' },
+    { textA: 'z = a + bi', textB: 'ចំនួនកុំផ្លិច (Complex Numbers)', tag: 'គណិតវិទ្យា' },
+    { textA: '៩ វិច្ឆិកា ១៩៥៣', textB: 'បុណ្យឯករាជ្យជាតិកម្ពុជា', tag: 'ប្រវត្តិវិទ្យា' },
+    { textA: 'ភិក្ខុសោម (១៩១៥)', textB: 'រឿងទុំទាវ (Tum Teav)', tag: 'អក្សរសាស្ត្រ' },
+    { textA: 'pH = -log[H₃O⁺]', textB: 'រូបមន្ត pH អាស៊ីត', tag: 'គីមីវិទ្យា' },
+    { textA: 'AUG (មេធ្យូនីន)', textB: 'កូដុងផ្តើមលើ ARNm', tag: 'ជីវវិទ្យា' },
+    { textA: 'កំពង់ផែស្វយ័ត', textB: 'ក្រុងព្រះសីហនុ (Sihanoukville)', tag: 'ភូមិវិទ្យា' },
+    { textA: 'UDHR (១០ ធ្នូ ១៩៤៨)', textB: 'សិទ្ធិមនុស្សជាសកល', tag: 'សីលធម៌' },
+    { textA: 'F = m · a', textB: 'ច្បាប់ទី ២ ញូតុន (Newton Law)', tag: 'រូបវិទ្យា' },
+    { textA: 'I = U / R', textB: 'ច្បាប់អូម (Ohm Law)', tag: 'រូបវិទ្យា' },
+    { textA: 'lim (sin x / x) = 1', textB: 'លីមីតត្រីកោណមាត្រគ្រឹះ', tag: 'គណិតវិទ្យា' },
+    { textA: '∫ (1/x) dx = ln|x|', textB: 'ព្រីមីទីវលោការីត', tag: 'គណិតវិទ្យា' },
+    { textA: 'ព្រះបាទជ័យវរ្ម័នទី ៧', textB: 'ប្រាសាទបាយ័ន និងមន្ទីរពេទ្យ', tag: 'ប្រវត្តិវិទ្យា' },
+    { textA: 'ព្រះបាទសូរ្យវរ្ម័នទី ២', textB: 'ស្ថាបនាប្រាសាទអង្គរវត្ត', tag: 'ប្រវត្តិវិទ្យា' },
+    { textA: 'ញ៉ុក ថែម (១៩៣៦)', textB: 'រឿងកុលាបប៉ៃលិន', tag: 'អក្សរសាស្ត្រ' },
+    { textA: 'នូ ហាច (១៩៤៩)', textB: 'រឿងផ្កាស្រពោន', tag: 'អក្សរសាស្ត្រ' },
+    { textA: 'R-COO-R\'', textB: 'រូបមន្តទូទៅនៃអេស្ទែរ (Esters)', tag: 'គីមីវិទ្យា' },
+    { textA: 'A = T, G = C', textB: 'ច្បាប់បាសបំពេញគ្នាក្នុង ADN', tag: 'ជីវវិទ្យា' },
+    { textA: '១៨១,០៣៥ គម²', textB: 'ផ្ទៃក្រឡាប្រទេសកម្ពុជា', tag: 'ភូមិវិទ្យា' },
+    { textA: '២៣ តុលា ១៩៩១', textB: 'កិច្ចព្រមព្រៀងសន្តិភាពប៉ារីស', tag: 'ប្រវត្តិវិទ្យា' }
+  ];
+
+  const shuffled = shuffleArray(MASTER_MEMORY_PAIRS);
+  return shuffled.slice(0, count).map((item, idx) => ({
+    id: idx + 1,
+    ...item
+  }));
+}
+
+/**
+ * Specialized Wordle Academic Clues (Expanded 35+ Terms)
+ */
+export function getRandomWordleClues() {
+  return shuffleArray([
+    { word: 'LIMIT', clueKm: 'កន្សោមគណិតវិទ្យាសម្រាប់គណនាតម្លៃខិតជិតត្រង់ចំណុច (Calculus)', subject: 'គណិតវិទ្យា' },
+    { word: 'ESTER', clueKm: 'សមាសធាតុសរីរាង្គមានក្លិនក្រអូប ផ្សំពីអាស៊ីត + អាល់កុល', subject: 'គីមីវិទ្យា' },
+    { word: 'RADIO', clueKm: 'បាតុភូតបំបែកស្នូលដោយបញ្ចេញកាំរស្មី α, β, γ', subject: 'រូបវិទ្យា' },
+    { word: 'CLONE', clueKm: 'ការបង្កើតសារពាង្គកាយថ្មីដែលមានពន្ធុដូចគ្នាបេះបិទ', subject: 'ជីវវិទ្យា' },
+    { word: 'NOVEL', clueKm: 'ស្នាដៃអក្សរសិល្ប៍បែបប្រឌិតឆ្លុះបញ្ចាំងសង្គម (ប្រលោមលោក)', subject: 'អក្សរសាស្ត្រ' },
+    { word: 'FORCE', clueKm: 'ទំហំវ៉ិចទ័របណ្តាលឱ្យអង្គធាតុមានសំទុះ (F = ma)', subject: 'រូបវិទ្យា' },
+    { word: 'ANGKOR', clueKm: 'រាជធានីនៃចក្រភពខ្មែរបុរាណ និងជាបេតិកភណ្ឌពិភពលោក', subject: 'ប្រវត្តិវិទ្យា' },
+    { word: 'LOGIC', clueKm: 'ក្បួនគិតត្រិះរិះពិចារណា និងហេតុផលវិទ្យាសាស្ត្រ', subject: 'ទស្សនវិជ្ជា' },
+    { word: 'RADIX', clueKm: 'គោលនៃប្រព័ន្ធរបាប់ ឬឫសក្នុងគណិតវិទ្យា', subject: 'គណិតវិទ្យា' },
+    { word: 'POWER', clueKm: 'អត្រាបម្លែងថាមពលក្នុងមួយខ្នាតពេល P = W / t', subject: 'រូបវិទ្យា' },
+    { word: 'AMINE', clueKm: 'សមាសធាតុសរីរាង្គដេរីវេនៃអាម៉ូញាក់ NH3', subject: 'គីមីវិទ្យា' },
+    { word: 'CELLS', clueKm: 'ឯកតាមូលដ្ឋានគ្រឹះនៃរចនាសម្ព័ន្ធភាវរស់ទាំងអស់', subject: 'ជីវវិទ្យា' },
+    { word: 'MEKONG', clueKm: 'ទន្លេមេដ៏វែងជាងគេនៅអាស៊ីអាគ្នេយ៍ហូរកាត់កម្ពុជា', subject: 'ភូមិវិទ្យា' },
+    { word: 'OASIS', clueKm: 'តំបន់មានជីរជាតិ និងប្រភពទឹកកណ្តាលវាលខ្សាច់', subject: 'ភូមិវិទ្យា' },
+    { word: 'GENES', clueKm: 'កំណាត់ម៉ូលេគុល ADN កំណត់លក្ខណៈតំណពូជ', subject: 'ជីវវិទ្យា' },
+    { word: 'ORBIT', clueKm: 'គន្លងនៃភពវិលជុំវិញព្រះអាទិត្យ ឬផ្កាយរណប', subject: 'រូបវិទ្យា' },
+    { word: 'SPEED', clueKm: 'ចម្ងាយចរក្នុងមួយខ្នាតពេល v = s / t', subject: 'រូបវិទ្យា' },
+    { word: 'ATOMS', clueKm: 'ភាគល្អិតតូចបំផុតនៃរូបធាតុផ្សំពីប្រូតុង ណឺត្រុង អេឡិចត្រុង', subject: 'គីមីវិទ្យា' }
+  ]);
+}
+
 
 

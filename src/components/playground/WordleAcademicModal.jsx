@@ -15,16 +15,7 @@ import {
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
-
-const ACADEMIC_WORDS = [
-  { word: 'LIMIT', clueKm: 'កន្សោមគណិតវិទ្យាសម្រាប់គណនាតម្លៃខិតជិតត្រង់ចំណុច (Calculus)', subject: 'គណិតវិទ្យា' },
-  { word: 'ESTER', clueKm: 'សមាសធាតុសរីរាង្គមានក្លិនក្រអូប ផ្សំពីអាស៊ីត + អាល់កុល', subject: 'គីមីវិទ្យា' },
-  { word: 'RADIO', clueKm: 'បាតុភូតបំបែកស្នូលដោយបញ្ចេញកាំរស្មី α, β, γ', subject: 'រូបវិទ្យា' },
-  { word: 'CLONE', clueKm: 'ការបង្កើតសារពាង្គកាយថ្មីដែលមានពន្ធុដូចគ្នាបេះបិទ', subject: 'ជីវវិទ្យា' },
-  { word: 'NOVEL', clueKm: 'ស្នាដៃអក្សរសិល្ប៍បែបប្រឌិតឆ្លុះបញ្ចាំងសង្គម (ប្រលោមលោក)', subject: 'អក្សរសាស្ត្រ' },
-  { word: 'FORCE', clueKm: 'ទំហំវ៉ិចទ័របណ្តាលឱ្យអង្គធាតុមានសំទុះ (F = ma)', subject: 'រូបវិទ្យា' },
-  { word: 'ANGKOR', clueKm: 'រាជធានីនៃចក្រភពខ្មែរបុរាណ និងជាបេតិកភណ្ឌពិភពលោក', subject: 'ប្រវត្តិវិទ្យា' }
-];
+import { getRandomWordleClues } from '../../utils/gamePoolManager';
 
 const KEYBOARD_ROWS = [
   ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
@@ -36,7 +27,11 @@ export default function WordleAcademicModal({ onClose }) {
   const { addXP } = useAuth();
   const [soundEnabled, setSoundEnabled] = useState(true);
 
-  const [wordItem, setWordItem] = useState(ACADEMIC_WORDS[0]);
+  const [wordPool, setWordPool] = useState(() => getRandomWordleClues());
+  const [wordItem, setWordItem] = useState(() => {
+    const list = getRandomWordleClues();
+    return list[0];
+  });
   const [guesses, setGuesses] = useState([]);
   const [currentGuess, setCurrentGuess] = useState('');
   const [isGameOver, setIsGameOver] = useState(false);
@@ -47,7 +42,9 @@ export default function WordleAcademicModal({ onClose }) {
   const wordLen = targetWord.length;
 
   const initializeGame = () => {
-    const randomItem = ACADEMIC_WORDS[Math.floor(Math.random() * ACADEMIC_WORDS.length)];
+    const freshList = getRandomWordleClues();
+    setWordPool(freshList);
+    const randomItem = freshList[Math.floor(Math.random() * freshList.length)];
     setWordItem(randomItem);
     setGuesses([]);
     setCurrentGuess('');
