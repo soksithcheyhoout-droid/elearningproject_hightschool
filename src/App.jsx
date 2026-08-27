@@ -317,7 +317,7 @@ function MainApp() {
   }
 
   return (
-    <div className={`${activeTab === 'chat' ? 'h-[100dvh] overflow-hidden' : 'min-h-screen'} bg-[#f4f7fb] flex flex-col font-kantumruy relative selection:bg-blue-500 selection:text-white`}>
+    <div className={`${activeTab === 'chat' ? 'h-[100dvh] overflow-hidden' : 'min-h-screen'} bg-[#f4f7fb] flex flex-col font-kantumruy relative selection:bg-blue-500 selection:text-white overflow-x-clip w-full max-w-[100vw]`}>
       
       {/* 🎓 Subtle Ambient Lighting Orbs */}
       <div className="fixed inset-0 pointer-events-none select-none z-0 overflow-hidden">
@@ -345,7 +345,7 @@ function MainApp() {
       />
 
       {/* Main Content Body */}
-      <div className={`flex-1 flex w-full ${activeTab === 'chat' ? 'min-h-0 overflow-hidden' : ''}`}>
+      <div className={`flex-1 flex w-full overflow-x-clip ${activeTab === 'chat' ? 'min-h-0 overflow-hidden' : ''}`}>
         
         {/* Left Navigation Sidebar */}
         <Sidebar
@@ -359,7 +359,7 @@ function MainApp() {
           
           {/* HOME TAB */}
           {activeTab === 'home' && (
-            <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-6 space-y-6 sm:space-y-8 animate-fadeIn">
+            <div className="max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-6 space-y-4 sm:space-y-8 animate-fadeIn overflow-x-hidden">
               <HeroSection
                 onStartLearning={handleStartLearning}
                 onExploreBacII={handleExploreBacII}
@@ -376,7 +376,7 @@ function MainApp() {
 
           {/* NATIONAL CURRICULUM COURSES TAB */}
           {activeTab === 'courses' && (
-            <div className="max-w-7xl mx-auto px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-8 space-y-6 animate-fadeIn">
+            <div className="max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-8 space-y-6 animate-fadeIn overflow-x-hidden">
               <SubjectGrid onSelectSubject={handleSelectSubject} showHeroBanner={true} />
             </div>
           )}

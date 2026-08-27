@@ -65,7 +65,7 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
     <div className="space-y-4 font-kantumruy">
       
       {/* Main Official MoTDAR Hero Banner */}
-      <div className="bg-[#001a38] rounded-2xl sm:rounded-3xl p-4 sm:p-7 lg:p-10 text-white shadow-xl border border-white/15 relative overflow-hidden">
+      <div className="bg-[#001a38] rounded-2xl sm:rounded-3xl p-3 sm:p-7 lg:p-10 text-white shadow-xl border border-white/15 relative overflow-hidden w-full">
         
         {/* Real Education Academic Campus Background Image with Luxury Overlay */}
         <div className="absolute inset-0 z-0 pointer-events-none select-none">
@@ -84,7 +84,7 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
         <div className="absolute bottom-0 left-1/3 w-64 sm:w-80 h-64 sm:h-80 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* Subtle Watermark Logo in Banner Background */}
-        <div className="absolute -right-10 sm:right-[12%] md:right-[16%] top-1/2 -translate-y-1/2 w-48 sm:w-80 h-48 sm:h-80 md:w-96 md:h-96 pointer-events-none select-none opacity-15 sm:opacity-20 mix-blend-screen z-0">
+        <div className="absolute -right-10 sm:right-[12%] md:right-[16%] top-1/2 -translate-y-1/2 w-32 sm:w-80 h-32 sm:h-80 md:w-96 md:h-96 pointer-events-none select-none opacity-10 sm:opacity-20 mix-blend-screen z-0">
           <img
             src="/assets/moeys-crest-transparent.png"
             alt="Ministry Logo Background"
@@ -92,7 +92,7 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
           />
         </div>
 
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center">
+        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-8 items-center w-full min-w-0">
           
           {/* Left Column: Heading, Subtitle & Primary Actions */}
           <div className="lg:col-span-7 space-y-4 sm:space-y-5 min-w-0">
@@ -183,11 +183,11 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
 
           {/* Right Column: Royal Navy Glass Countdown & Stream Hub Card */}
           <div className="lg:col-span-5">
-            <div className="bg-white/10 backdrop-blur-xl text-white rounded-2xl sm:rounded-3xl p-3 sm:p-6 shadow-2xl border border-white/20 space-y-2.5 sm:space-y-4">
+            <div className="bg-white/10 backdrop-blur-xl text-white rounded-2xl sm:rounded-3xl p-2.5 sm:p-6 shadow-2xl border border-white/20 space-y-2 sm:space-y-4 w-full overflow-hidden">
               
               {/* Card Header with August 10-11 Exam Date */}
-              <div className="flex items-center justify-between border-b border-white/15 pb-2.5 sm:pb-3">
-                <div className="flex items-center gap-1.5 sm:gap-2 font-extrabold text-xs sm:text-[13px] text-amber-300">
+              <div className="flex items-center justify-between border-b border-white/15 pb-2 sm:pb-3 gap-2 min-w-0">
+                <div className="flex items-center gap-1.5 sm:gap-2 font-extrabold text-[10px] sm:text-[13px] text-amber-300 min-w-0">
                   <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
                   <span className="truncate">{lang === 'km' ? 'រាប់ថយក្រោយការប្រឡងបាក់ឌុប' : 'BacII Exam Countdown'}</span>
                 </div>
@@ -197,9 +197,9 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
               </div>
 
               {/* 4 Clean Countdown Boxes */}
-              <div className="grid grid-cols-4 gap-1 sm:gap-2">
-                <div className="bg-white/10 border border-white/15 rounded-xl sm:rounded-2xl p-2 sm:p-2.5 text-center shadow-2xs">
-                  <div className="font-black text-lg sm:text-2xl text-amber-300 font-cinzel leading-none">
+              <div className="grid grid-cols-4 gap-0.5 sm:gap-2 w-full">
+                <div className="bg-white/10 border border-white/15 rounded-lg sm:rounded-2xl p-1.5 sm:p-2.5 text-center shadow-2xs">
+                  <div className="font-black text-base sm:text-2xl text-amber-300 font-cinzel leading-none">
                     {timeLeft.days}
                   </div>
                   <div className="text-[8.5px] sm:text-[10px] text-blue-200 font-bold mt-1 uppercase tracking-wider">
@@ -207,8 +207,8 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
                   </div>
                 </div>
 
-                <div className="bg-white/10 border border-white/15 rounded-xl sm:rounded-2xl p-2 sm:p-2.5 text-center shadow-2xs">
-                  <div className="font-black text-lg sm:text-2xl text-amber-300 font-cinzel leading-none">
+                <div className="bg-white/10 border border-white/15 rounded-lg sm:rounded-2xl p-1.5 sm:p-2.5 text-center shadow-2xs">
+                  <div className="font-black text-base sm:text-2xl text-amber-300 font-cinzel leading-none">
                     {timeLeft.hours}
                   </div>
                   <div className="text-[8.5px] sm:text-[10px] text-blue-200 font-bold mt-1 uppercase tracking-wider">
@@ -216,8 +216,8 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
                   </div>
                 </div>
 
-                <div className="bg-white/10 border border-white/15 rounded-xl sm:rounded-2xl p-2 sm:p-2.5 text-center shadow-2xs">
-                  <div className="font-black text-lg sm:text-2xl text-amber-300 font-cinzel leading-none">
+                <div className="bg-white/10 border border-white/15 rounded-lg sm:rounded-2xl p-1.5 sm:p-2.5 text-center shadow-2xs">
+                  <div className="font-black text-base sm:text-2xl text-amber-300 font-cinzel leading-none">
                     {timeLeft.minutes}
                   </div>
                   <div className="text-[8.5px] sm:text-[10px] text-blue-200 font-bold mt-1 uppercase tracking-wider">
@@ -225,8 +225,8 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
                   </div>
                 </div>
 
-                <div className="bg-white/10 border border-white/15 rounded-xl sm:rounded-2xl p-2 sm:p-2.5 text-center shadow-2xs">
-                  <div className="font-black text-lg sm:text-2xl text-sky-400 font-cinzel leading-none">
+                <div className="bg-white/10 border border-white/15 rounded-lg sm:rounded-2xl p-1.5 sm:p-2.5 text-center shadow-2xs">
+                  <div className="font-black text-base sm:text-2xl text-sky-400 font-cinzel leading-none">
                     {timeLeft.seconds}
                   </div>
                   <div className="text-[8.5px] sm:text-[10px] text-blue-200 font-bold mt-1 uppercase tracking-wider">
@@ -305,8 +305,8 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
               </div>
 
               {/* Bottom Quick Action */}
-              <div className="pt-2 border-t border-white/15 flex items-center justify-between text-[10px] sm:text-xs">
-                <span className="text-blue-200 font-bold text-[11px] flex items-center gap-1.5">
+              <div className="pt-2 border-t border-white/15 flex items-center justify-between text-[9px] sm:text-xs gap-2 min-w-0">
+                <span className="text-blue-200 font-bold text-[9px] sm:text-[11px] flex items-center gap-1 min-w-0 truncate">
                   <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
                   <span>{lang === 'km' ? 'កំពុងរៀន៖ ១,៤២០ នាក់' : 'Active Students: 1,420'}</span>
                 </span>

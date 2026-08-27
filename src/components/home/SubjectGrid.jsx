@@ -360,14 +360,14 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 w-full">
             {scienceSubjects.map((sub) => {
               const Icon = iconMap[sub.icon] || BookOpen;
               return (
                 <div
                   key={sub.id}
                   onClick={() => onSelectSubject(sub)}
-                  className="group cursor-pointer flex flex-col justify-between p-3.5 sm:p-5 bg-white border border-slate-200/90 hover:border-[#005baa] hover:shadow-xl transition-all duration-300 rounded-2xl sm:rounded-3xl relative overflow-hidden active:scale-[0.98]"
+                  className="group cursor-pointer flex flex-col justify-between p-3 sm:p-5 bg-white border border-slate-200/90 hover:border-[#005baa] hover:shadow-xl transition-all duration-300 rounded-2xl sm:rounded-3xl relative overflow-hidden active:scale-[0.98] w-full min-w-0"
                 >
                   <div className="relative z-10 space-y-2 sm:space-y-3">
                     
@@ -402,16 +402,16 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
                     </p>
 
                     {/* Chapter & Lesson Counters */}
-                    <div className="grid grid-cols-3 gap-1.5 sm:gap-2 pt-0.5 sm:pt-1 text-slate-600">
-                      <div className="bg-slate-50 p-1.5 sm:p-2 rounded-xl sm:rounded-2xl border border-slate-200/80 text-center">
+                    <div className="grid grid-cols-3 gap-1 sm:gap-2 pt-0.5 sm:pt-1 text-slate-600 w-full">
+                      <div className="bg-slate-50 p-1 sm:p-2 rounded-lg sm:rounded-2xl border border-slate-200/80 text-center overflow-hidden">
                         <span className="text-slate-400 block text-[8.5px] sm:text-[9.5px] font-bold">{lang === 'km' ? 'ជំពូក' : 'Chapters'}</span>
                         <span className="font-black text-xs sm:text-sm text-[#002b5b] font-cinzel">{sub.totalChapters}</span>
                       </div>
-                      <div className="bg-slate-50 p-1.5 sm:p-2 rounded-xl sm:rounded-2xl border border-slate-200/80 text-center">
+                      <div className="bg-slate-50 p-1 sm:p-2 rounded-lg sm:rounded-2xl border border-slate-200/80 text-center overflow-hidden">
                         <span className="text-slate-400 block text-[8.5px] sm:text-[9.5px] font-bold">{lang === 'km' ? 'មេរៀន' : 'Lessons'}</span>
                         <span className="font-black text-xs sm:text-sm text-[#002b5b] font-cinzel">{sub.totalLessons}</span>
                       </div>
-                      <div className="bg-slate-50 p-1.5 sm:p-2 rounded-xl sm:rounded-2xl border border-slate-200/80 text-center">
+                      <div className="bg-slate-50 p-1 sm:p-2 rounded-lg sm:rounded-2xl border border-slate-200/80 text-center overflow-hidden">
                         <span className="text-slate-400 block text-[8.5px] sm:text-[9.5px] font-bold">{lang === 'km' ? 'លំហាត់' : 'Quizzes'}</span>
                         <span className="font-black text-xs sm:text-sm text-amber-700 font-cinzel">{sub.quizzesCount}</span>
                       </div>
@@ -471,14 +471,14 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
             </span>
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-5 w-full">
             {socialSubjects.map((sub) => {
               const Icon = iconMap[sub.icon] || BookOpen;
               return (
                 <div
                   key={sub.id}
                   onClick={() => onSelectSubject(sub)}
-                  className="group cursor-pointer flex flex-col justify-between p-3.5 sm:p-5 bg-white border border-slate-200/90 hover:border-amber-500 hover:shadow-xl transition-all duration-300 rounded-2xl sm:rounded-3xl relative overflow-hidden active:scale-[0.98]"
+                  className="group cursor-pointer flex flex-col justify-between p-3 sm:p-5 bg-white border border-slate-200/90 hover:border-amber-500 hover:shadow-xl transition-all duration-300 rounded-2xl sm:rounded-3xl relative overflow-hidden active:scale-[0.98] w-full min-w-0"
                 >
                   <div className="relative z-10 space-y-2 sm:space-y-3">
                     
@@ -513,16 +513,16 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
                     </p>
 
                     {/* Chapter & Lesson Counters */}
-                    <div className="grid grid-cols-3 gap-1.5 sm:gap-2 pt-0.5 sm:pt-1 text-slate-600">
-                      <div className="bg-slate-50 p-1.5 sm:p-2 rounded-xl sm:rounded-2xl border border-slate-200/80 text-center">
+                    <div className="grid grid-cols-3 gap-1 sm:gap-2 pt-0.5 sm:pt-1 text-slate-600 w-full">
+                      <div className="bg-slate-50 p-1 sm:p-2 rounded-lg sm:rounded-2xl border border-slate-200/80 text-center overflow-hidden">
                         <span className="text-slate-400 block text-[8.5px] sm:text-[9.5px] font-bold">{lang === 'km' ? 'ជំពូក' : 'Chapters'}</span>
                         <span className="font-black text-xs sm:text-sm text-[#002b5b] font-cinzel">{sub.totalChapters}</span>
                       </div>
-                      <div className="bg-slate-50 p-1.5 sm:p-2 rounded-xl sm:rounded-2xl border border-slate-200/80 text-center">
+                      <div className="bg-slate-50 p-1 sm:p-2 rounded-lg sm:rounded-2xl border border-slate-200/80 text-center overflow-hidden">
                         <span className="text-slate-400 block text-[8.5px] sm:text-[9.5px] font-bold">{lang === 'km' ? 'មេរៀន' : 'Lessons'}</span>
                         <span className="font-black text-xs sm:text-sm text-[#002b5b] font-cinzel">{sub.totalLessons}</span>
                       </div>
-                      <div className="bg-slate-50 p-1.5 sm:p-2 rounded-xl sm:rounded-2xl border border-slate-200/80 text-center">
+                      <div className="bg-slate-50 p-1 sm:p-2 rounded-lg sm:rounded-2xl border border-slate-200/80 text-center overflow-hidden">
                         <span className="text-slate-400 block text-[8.5px] sm:text-[9.5px] font-bold">{lang === 'km' ? 'លំហាត់' : 'Quizzes'}</span>
                         <span className="font-black text-xs sm:text-sm text-amber-700 font-cinzel">{sub.quizzesCount}</span>
                       </div>
