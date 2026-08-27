@@ -1250,7 +1250,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   };
 
   return createPortal(
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-2 sm:p-4 bg-black/85 backdrop-blur-md animate-fade-in font-kantumruy">
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-2 sm:p-4 bg-black/90 backdrop-blur-lg animate-fade-in font-kantumruy overflow-y-auto">
       
       {/* ARENA CONTAINER BOX */}
       <div className={`relative w-full max-w-4xl max-h-[96vh] rounded-3xl overflow-hidden border flex flex-col shadow-2xl transition-all duration-300 ${currentTheme.boxBg} ${currentTheme.boxBorder}`}>
