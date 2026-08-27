@@ -11,8 +11,10 @@ const bankPath20k = path.join(__dirname, '..', 'data', 'master_question_bank_200
 const bankPath12k = path.join(__dirname, '..', 'data', 'master_question_bank_12000.json');
 
 let masterQuestionBank = null;
+let distractorIndexBySubject = {};
+let allDistractorsList = [];
 
-// Load 70,000 question bank into memory on demand
+// Load 70,000 question bank into memory on demand and build O(1) fast lookup caches
 function getMasterBank() {
   if (!masterQuestionBank) {
     try {
@@ -30,12 +32,39 @@ function getMasterBank() {
       if (raw) {
         const parsed = JSON.parse(raw);
         if (Array.isArray(parsed)) {
-          const science = parsed.filter(q => q.stream === 'science');
-          const social = parsed.filter(q => q.stream === 'social');
+          const science = [];
+          const social = [];
           const bySubject = {};
-          parsed.forEach(q => {
-            bySubject[q.subjectKey || q.subject] = (bySubject[q.subjectKey || q.subject] || 0) + 1;
-          });
+          const distMap = {};
+          const allDist = [];
+
+          for (let i = 0; i < parsed.length; i++) {
+            const q = parsed[i];
+            if (!q) continue;
+
+            if (q.stream === 'social') {
+              social.push(q);
+            } else {
+              science.push(q);
+            }
+
+            const sub = q.subjectKey || q.subject || 'general';
+            bySubject[sub] = (bySubject[sub] || 0) + 1;
+
+            if (!distMap[sub]) distMap[sub] = [];
+            if (Array.isArray(q.options)) {
+              for (let oi = 0; oi < q.options.length; oi++) {
+                if (oi !== q.answer && typeof q.options[oi] === 'string' && q.options[oi].trim().length >= 2) {
+                  const optText = q.options[oi].trim();
+                  distMap[sub].push(optText);
+                  allDist.push(optText);
+                }
+              }
+            }
+          }
+
+          distractorIndexBySubject = distMap;
+          allDistractorsList = allDist;
 
           masterQuestionBank = {
             totalCount: parsed.length,
@@ -51,7 +80,7 @@ function getMasterBank() {
         } else {
           masterQuestionBank = parsed;
         }
-        console.log(`📚 Master Question Bank loaded into memory: ${masterQuestionBank.totalCount.toLocaleString()} questions (35,000 Science + 35,000 Social)`);
+        console.log(`📚 Master Question Bank loaded: ${masterQuestionBank.totalCount.toLocaleString()} questions (O(1) fast index built)`);
       }
     } catch (e) {
       console.error('Failed to load master question bank:', e);
@@ -60,8 +89,8 @@ function getMasterBank() {
   return masterQuestionBank;
 }
 
-// Fisher-Yates array shuffler
-function shuffle(array) {
+// Fast lightweight array shuffler
+function fastShuffle(array) {
   const arr = [...array];
   for (let i = arr.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1));
@@ -77,13 +106,7 @@ const SEMANTIC_BANKS = {
     'ច្រកសមុទ្រប៊េរីង (Bering Strait)',
     'ច្រកសមុទ្រហ័រមូស (Strait of Hormuz)',
     'ច្រកសមុទ្រជីប្រាល់តា (Strait of Gibraltar)',
-    'ច្រកសមុទ្របូស្វ័រ (Bosphorus Strait)',
-    'ច្រកសមុទ្រដាវីស (Davis Strait)',
-    'ច្រកសមុទ្រតៃវ៉ាន់ (Taiwan Strait)',
-    'ច្រកសមុទ្រកូរ៉េ (Korea Strait)',
-    'ច្រកសមុទ្របាបអិលម៉ង់ដេប (Bab-el-Mandeb)',
-    'ច្រកសមុទ្រម៉ាហ្សេឡង់ (Strait of Magellan)',
-    'ច្រកសមុទ្រលំពិក (Lombok Strait)'
+    'ច្រកសមុទ្របូស្វ័រ (Bosphorus Strait)'
   ],
   river: [
     'ទន្លេមេគង្គ (Mekong River)',
@@ -91,27 +114,13 @@ const SEMANTIC_BANKS = {
     'ទន្លេបាសាក់ (Bassac River)',
     'ទន្លេសេកុង (Sekong River)',
     'ទន្លេសេសាន (Sesan River)',
-    'ទន្លេស្រែពក (Srepok River)',
-    'ទន្លេយ៉ាងសេ (Yangtze River)',
-    'ទន្លេហួងហូ (Yellow River)',
-    'ទន្លេនីល (Nile River)',
-    'ទន្លេអាម៉ាហ្សូន (Amazon River)',
-    'ទន្លេគង្គា (Ganges River)'
+    'ទន្លេស្រែពក (Srepok River)'
   ],
-  island: ['កោះរ៉ុង', 'កោះស្តេច', 'កោះពស់', 'កោះត្រល់', 'កោះស៊ូម៉ាត្រា', 'កោះជ្វា', 'កោះប័រណេអូ', 'កោះហុកកៃដូ'],
-  mountain: ['ភ្នំឱរ៉ាល់ (កម្ពស់ ១៨១៣ម)', 'ជួរភ្នំដងរែក', 'ជួរភ្នំក្រវាញ', 'ភ្នំគូលែន', 'ភ្នំបូកគោ', 'ភ្នំអេវឺរ៉េស (Mount Everest)', 'ភ្នំហ្វូជី (Mount Fuji)'],
-  province: ['ខេត្តសៀមរាប', 'ខេត្តបាត់ដំបង', 'ខេត្តកំពង់ចាម', 'ខេត្តកណ្តាល', 'ខេត្តព្រះសីហនុ', 'ខេត្តកំពត', 'ខេត្តរតនគិរី', 'ខេត្តស្ទឹងត្រែង'],
-  country: ['ប្រទេសកម្ពុជា', 'ប្រទេសថៃ', 'ប្រទេសវៀតណាម', 'ប្រទេសឡាវ', 'ប្រទេសសិង្ហបុរី', 'ប្រទេសឥណ្ឌូណេស៊ី', 'ប្រទេសម៉ាឡេស៊ី', 'ប្រទេសជប៉ុន'],
-  king: ['ព្រះបាទជ័យវរ្ម័នទី៧', 'ព្រះបាទសូរ្យវរ្ម័នទី២', 'ព្រះបាទជ័យវរ្ម័នទី២', 'ព្រះបាទឥន្ទ្រវរ្ម័នទី១', 'ព្រះបាទយសោវរ្ម័នទី១', 'ព្រះបាទរាជេន្ទ្រវរ្ម័ន', 'ព្រះបាទឧទ័យទិត្យវរ្ម័នទី២', 'ព្រះបាទអង្គឌួង'],
-  literature_theme: [
-    'តម្លៃសីលធម៌ និងការតស៊ូព្យាយាម',
-    'តម្លៃវប្បធម៌ និងប្រពៃណីទំនៀមទម្លាប់',
-    'តម្លៃគ្រួសារ សេចក្តីស្រឡាញ់ និងភក្តីភាព',
-    'តម្លៃសាមគ្គីភាព និងសច្ចធម៌ក្នុងសង្គម',
-    'តម្លៃនៃការអប់រំ និងចំណេះដឹងពិតប្រាកដ',
-    'តម្លៃយុត្តិធម៌ និងសមភាពសង្គម'
-  ],
-  author: ['ញ៉ុក ថែម', 'នូ ហាច', 'រីម គីន', 'ឌឹក គាម', 'ភិក្ខុសោម', 'ព្រះបាទអង្គឌួង', 'ក្រមង៉ុយ', 'សន្ធរវោហារម៉ុក']
+  island: ['កោះរ៉ុង', 'កោះស្តេច', 'កោះពស់', 'កោះត្រល់', 'កោះស៊ូម៉ាត្រា', 'កោះជ្វា', 'កោះប័រណេអូ'],
+  mountain: ['ភ្នំឱរ៉ាល់ (កម្ពស់ ១៨១៣ម)', 'ជួរភ្នំដងរែក', 'ជួរភ្នំក្រវាញ', 'ភ្នំគូលែន', 'ភ្នំបូកគោ'],
+  province: ['ខេត្តសៀមរាប', 'ខេត្តបាត់ដំបង', 'ខេត្តកំពង់ចាម', 'ខេត្តកណ្តាល', 'ខេត្តព្រះសីហនុ', 'ខេត្តកំពត'],
+  country: ['ប្រទេសកម្ពុជា', 'ប្រទេសថៃ', 'ប្រទេសវៀតណាម', 'ប្រទេសឡាវ', 'ប្រទេសសិង្ហបុរី', 'ប្រទេសឥណ្ឌូណេស៊ី'],
+  king: ['ព្រះបាទជ័យវរ្ម័នទី៧', 'ព្រះបាទសូរ្យវរ្ម័នទី២', 'ព្រះបាទជ័យវរ្ម័នទី២', 'ព្រះបាទឥន្ទ្រវរ្ម័នទី១', 'ព្រះបាទយសោវរ្ម័នទី១']
 };
 
 function detectSemanticCategory(question, options) {
@@ -127,8 +136,6 @@ function detectSemanticCategory(question, options) {
   if (combinedText.includes('ខេត្ត')) return 'province';
   if (combinedText.includes('ប្រទេស')) return 'country';
   if (combinedText.includes('ព្រះបាទ') || combinedText.includes('រជ្ជកាល')) return 'king';
-  if (combinedText.includes('តម្លៃ') || combinedText.includes('កុលាបប៉ៃលិន') || combinedText.includes('ទុំទាវ')) return 'literature_theme';
-  if (combinedText.includes('និពន្ធ') || combinedText.includes('ញ៉ុក ថែម')) return 'author';
 
   return null;
 }
@@ -140,13 +147,7 @@ function generateSecretAcademicHint(q) {
     return `💡 ព័ត៌មានជំនួយ៖ ${clean.substring(0, 110)}...`;
   }
 
-  const qText = (q.q || '').toLowerCase();
   const sub = (q.subject || q.subjectKey || '').toLowerCase();
-
-  if (qText.includes('ម៉ាឡាកា') || qText.includes('ច្រកសមុទ្រ')) return '💡 ព័ត៌មានជំនួយ៖ ផ្លូវទឹកយុទ្ធសាស្ត្រអន្តរជាតិតភ្ជាប់មហាសមុទ្រឥណ្ឌា និងសមុទ្រចិនខាងត្បូង';
-  if (qText.includes('kmno4') || qText.includes('អុកស៊ីតកម្ម')) return '💡 ព័ត៌មានជំនួយ៖ K = +1, O = -2 (4 អាតូម = -8), ផលបូកចំនួនអុកស៊ីតកម្មស្មើ 0';
-  if (qText.includes('កុលាបប៉ៃលិន') || qText.includes('ចៅចិត្រ')) return '💡 ព័ត៌មានជំនួយ៖ ឆ្លុះបញ្ចាំងពីតម្លៃសីលធម៌ គុណធម៌ និងការតស៊ូព្យាយាមរបស់យុវជន';
-  if (qText.includes('អង្គរវត្ត') || qText.includes('សូរ្យវរ្ម័ន')) return '💡 ព័ត៌មានជំនួយ៖ កសាងឡើងក្នុងសតវត្សរ៍ទី១២ ឧទ្ទិសថ្វាយព្រះវិស្ណុ';
   if (sub.includes('math') || sub.includes('គណិត')) return '💡 ព័ត៌មានជំនួយ៖ ពិនិត្យរូបមន្តគណិតវិទ្យា សម្រួលកន្សោម និងគណនាឱ្យបានត្រឹមត្រូវ';
   if (sub.includes('physic') || sub.includes('រូប')) return '💡 ព័ត៌មានជំនួយ៖ ប្រើរូបមន្តរូបវិទ្យា និងផ្ទៀងផ្ទាត់ខ្នាតអន្តរជាតិ (SI Units)';
   if (sub.includes('chem') || sub.includes('គីមី')) return '💡 ព័ត៌មានជំនួយ៖ ផ្ទៀងផ្ទាត់សមីការគីមី បន្ទុកអគ្គិសនី និងច្បាប់រក្សាម៉ាស';
@@ -157,8 +158,8 @@ function generateSecretAcademicHint(q) {
   return '💡 ព័ត៌មានជំនួយ៖ សូមគិតឱ្យបានល្អិតល្អន់ និងផ្ទៀងផ្ទាត់មុននឹងជ្រើសរើសចម្លើយ';
 }
 
-// Expand questions to 8 choices by borrowing plausible distractors from the full bank pool
-function expandTo8Options(question, allQuestionsPool = []) {
+// Ultra-fast O(1) expansion of options to 8 choices
+function fastExpandTo8Options(question) {
   if (!question || !Array.isArray(question.options) || question.options.length === 0) {
     return question;
   }
@@ -175,20 +176,16 @@ function expandTo8Options(question, allQuestionsPool = []) {
     return { ...question, hint };
   }
 
-  const existingSet = new Set(question.options.map(o => typeof o === 'string' ? o.trim().toLowerCase() : String(o)));
-  if (typeof correctAnswer === 'string') existingSet.add(correctAnswer.trim().toLowerCase());
-
+  const existingSet = new Set(question.options.map(o => String(o).trim().toLowerCase()));
   const needed = 8 - question.options.length;
   const extraDistractors = [];
 
-  const avgLen = question.options.reduce((acc, opt) => acc + (typeof opt === 'string' ? opt.length : 4), 0) / question.options.length;
-
-  // 1. Try Semantic Category Bank (e.g. Strait, River, King, Theme, etc.)
+  // 1. Check semantic category bank
   const semanticCat = detectSemanticCategory(question, question.options);
   if (semanticCat && Array.isArray(SEMANTIC_BANKS[semanticCat])) {
-    const candidates = shuffle(SEMANTIC_BANKS[semanticCat]);
-    for (const cand of candidates) {
-      if (extraDistractors.length >= needed) break;
+    const list = SEMANTIC_BANKS[semanticCat];
+    for (let i = 0; i < list.length && extraDistractors.length < needed; i++) {
+      const cand = list[Math.floor(Math.random() * list.length)];
       const key = cand.trim().toLowerCase();
       if (!existingSet.has(key)) {
         existingSet.add(key);
@@ -197,78 +194,45 @@ function expandTo8Options(question, allQuestionsPool = []) {
     }
   }
 
-  // 2. Gather same-subject length-consistent distractors from full pool
-  if (extraDistractors.length < needed) {
-    const sub = (question.subjectKey || question.subject || '').toLowerCase();
-    const sameSubQuestions = allQuestionsPool.filter(q => (q.subjectKey || q.subject || '').toLowerCase() === sub);
-    const shuffledSameSub = shuffle(sameSubQuestions);
+  // 2. Fetch from pre-indexed subject distractor pool (O(1) instant lookup)
+  const sub = question.subjectKey || question.subject || 'general';
+  const subDistractors = distractorIndexBySubject[sub] || allDistractorsList;
 
-    for (const q of shuffledSameSub) {
-      if (extraDistractors.length >= needed) break;
-      if (Array.isArray(q.options)) {
-        for (let i = 0; i < q.options.length; i++) {
-          if (i !== q.answer && typeof q.options[i] === 'string' && q.options[i].trim()) {
-            const opt = q.options[i].trim();
-            const key = opt.toLowerCase();
-            const isLengthConsistent = Math.abs(opt.length - avgLen) <= Math.max(8, avgLen * 0.75);
-            if (!existingSet.has(key) && isLengthConsistent) {
-              existingSet.add(key);
-              extraDistractors.push(opt);
-              if (extraDistractors.length >= needed) break;
-            }
-          }
+  if (Array.isArray(subDistractors) && subDistractors.length > 0) {
+    let attempts = 0;
+    while (extraDistractors.length < needed && attempts < 30) {
+      attempts++;
+      const randOpt = subDistractors[Math.floor(Math.random() * subDistractors.length)];
+      if (randOpt) {
+        const key = randOpt.trim().toLowerCase();
+        if (!existingSet.has(key)) {
+          existingSet.add(key);
+          extraDistractors.push(randOpt.trim());
         }
       }
     }
   }
 
-  // 3. Gather from general pool with length filter
-  if (extraDistractors.length < needed) {
-    const shuffledGeneral = shuffle(allQuestionsPool);
-    for (const q of shuffledGeneral) {
-      if (extraDistractors.length >= needed) break;
-      if (Array.isArray(q.options)) {
-        for (let i = 0; i < q.options.length; i++) {
-          if (i !== q.answer && typeof q.options[i] === 'string' && q.options[i].trim()) {
-            const opt = q.options[i].trim();
-            const key = opt.toLowerCase();
-            const isLengthConsistent = Math.abs(opt.length - avgLen) <= Math.max(12, avgLen * 0.9);
-            if (!existingSet.has(key) && isLengthConsistent) {
-              existingSet.add(key);
-              extraDistractors.push(opt);
-              if (extraDistractors.length >= needed) break;
-            }
-          }
-        }
-      }
-    }
-  }
-
-  // 4. Fillers if needed
+  // 3. Fallback fillers if needed
   while (extraDistractors.length < needed) {
-    const filler = avgLen > 20
-      ? `ជម្រើសវិភាគបន្ថែមទី ${extraDistractors.length + 1}`
-      : `ជម្រើសទី ${question.options.length + extraDistractors.length + 1}`;
-    const key = filler.toLowerCase();
-    if (!existingSet.has(key)) {
-      existingSet.add(key);
+    const filler = `ជម្រើសបន្ថែមទី ${extraDistractors.length + 1}`;
+    if (!existingSet.has(filler.toLowerCase())) {
+      existingSet.add(filler.toLowerCase());
       extraDistractors.push(filler);
     } else {
-      extraDistractors.push(`ជម្រើសផ្សេង ${extraDistractors.length + 5}`);
+      extraDistractors.push(`ជម្រើសវិភាគ ${extraDistractors.length + 3}`);
     }
   }
 
   const all8Options = [correctAnswer, ...originalWrongs, ...extraDistractors.slice(0, needed)];
-  const shuffled8 = shuffle(all8Options);
+  const shuffled8 = fastShuffle(all8Options);
   const newAnswerIndex = shuffled8.findIndex(o => o === correctAnswer);
-
-  const secretHint = generateSecretAcademicHint(question);
 
   return {
     ...question,
     options: shuffled8,
     answer: newAnswerIndex !== -1 ? newAnswerIndex : 0,
-    hint: secretHint
+    hint: generateSecretAcademicHint(question)
   };
 }
 
@@ -292,7 +256,7 @@ export const getQuestionBankStats = (req, res) => {
 };
 
 /**
- * GET /api/questions/master-pool
+ * GET /api/questions/master-pool (Instant O(1) response)
  */
 export const getQuestionsFromPool = (req, res) => {
   const bank = getMasterBank();
@@ -300,8 +264,8 @@ export const getQuestionsFromPool = (req, res) => {
     return res.status(500).json({ error: 'Question bank not available' });
   }
 
-  const { stream, subjectKey, grade, limit = 24, random = 'true', excludeIds = '' } = req.query;
-  let pool = [];
+  const { stream, subjectKey, grade, limit = 24, excludeIds = '' } = req.query;
+  const parsedLimit = Math.min(Math.max(parseInt(limit, 10) || 24, 1), 50);
 
   const excludedSet = new Set(
     typeof excludeIds === 'string' && excludeIds.trim()
@@ -309,80 +273,71 @@ export const getQuestionsFromPool = (req, res) => {
       : []
   );
 
-  const scienceList = bank.science || [];
-  const socialList = bank.social || [];
-
+  let sourcePool = [];
   if (stream === 'social') {
-    pool = [...socialList];
+    sourcePool = bank.social;
   } else if (stream === 'science') {
-    pool = [...scienceList];
-  } else if (stream === 'random' || stream === 'all' || !stream) {
-    const shuffledSci = shuffle(scienceList);
-    const shuffledSoc = shuffle(socialList);
-    const maxLen = Math.max(shuffledSci.length, shuffledSoc.length);
-    const interleaved = [];
-    for (let i = 0; i < maxLen; i++) {
-      if (i < shuffledSci.length) interleaved.push(shuffledSci[i]);
-      if (i < shuffledSoc.length) interleaved.push(shuffledSoc[i]);
-    }
-    pool = interleaved;
+    sourcePool = bank.science;
   } else {
-    pool = [...scienceList, ...socialList];
+    // Balanced mixed pool
+    sourcePool = [...bank.social, ...bank.science];
   }
 
   // Filter by subjectKey if provided
   if (subjectKey && subjectKey !== 'all') {
     const keys = subjectKey.split(',').map(k => k.trim().toLowerCase());
-    pool = pool.filter(q => keys.includes((q.subjectKey || '').toLowerCase()));
-  }
-
-  // Filter out excluded question IDs if any
-  if (excludedSet.size > 0) {
-    const filteredPool = pool.filter(q => !excludedSet.has(q.id) && !excludedSet.has(q.q));
-    if (filteredPool.length >= (parseInt(limit, 10) || 24)) {
-      pool = filteredPool;
-    }
+    sourcePool = sourcePool.filter(q => keys.includes((q.subjectKey || '').toLowerCase()));
   }
 
   // Filter or prioritize by grade
   if (grade && grade !== 'all') {
     const targetGrade = String(grade);
     const targetGradeNum = parseInt(targetGrade, 10) || 12;
+    const gradeFiltered = sourcePool.filter(q => {
+      const qG = parseInt(q.grade, 10) || 12;
+      if (targetGradeNum >= 10) return qG >= 10;
+      if (targetGradeNum >= 7) return qG >= 7 && qG <= 9;
+      return qG <= 6;
+    });
+    if (gradeFiltered.length >= parsedLimit) {
+      sourcePool = gradeFiltered;
+    }
+  }
 
-    const exactMatches = pool.filter(q => String(q.grade) === targetGrade);
-    const reqLimit = parseInt(limit, 10) || 24;
+  // Fast random sampling without full array copy/shuffle
+  const selected = [];
+  const chosenIndices = new Set();
+  const maxAttempts = sourcePool.length * 2;
+  let attempts = 0;
 
-    if (exactMatches.length >= reqLimit) {
-      pool = exactMatches;
-    } else {
-      const tierMatches = pool.filter(q => {
-        const qG = parseInt(q.grade, 10) || 12;
-        if (targetGradeNum >= 10 && targetGradeNum <= 12) return qG >= 10 && qG <= 12;
-        if (targetGradeNum >= 7 && targetGradeNum <= 9) return qG >= 7 && qG <= 9;
-        return qG >= 1 && qG <= 6;
-      });
-
-      if (tierMatches.length >= reqLimit) {
-        pool = tierMatches;
+  while (selected.length < parsedLimit && chosenIndices.size < sourcePool.length && attempts < maxAttempts) {
+    attempts++;
+    const rIdx = Math.floor(Math.random() * sourcePool.length);
+    if (!chosenIndices.has(rIdx)) {
+      chosenIndices.add(rIdx);
+      const q = sourcePool[rIdx];
+      if (q && !excludedSet.has(q.id) && !excludedSet.has(q.q)) {
+        selected.push(q);
       }
     }
   }
 
-  const shouldRandom = random === 'true' || random === true;
-  if (shouldRandom) {
-    pool = shuffle(pool);
+  // Fallback if excludedSet filtered too many
+  if (selected.length < parsedLimit && sourcePool.length > 0) {
+    for (let i = 0; i < sourcePool.length && selected.length < parsedLimit; i++) {
+      const q = sourcePool[i];
+      if (!selected.includes(q)) {
+        selected.push(q);
+      }
+    }
   }
 
-  const parsedLimit = Math.min(Math.max(parseInt(limit, 10) || 24, 1), 200);
-  const selected = pool.slice(0, parsedLimit);
-
-  // Expand to 8 options and deeply shuffle options for each individual question
-  const allBank = [...scienceList, ...socialList];
-  const randomizedQuestions = selected.map(q => expandTo8Options(q, allBank));
+  // Expand to 8 options in O(1) time
+  const randomizedQuestions = selected.map(q => fastExpandTo8Options(q));
 
   res.status(200).json({
     success: true,
-    totalMatching: pool.length,
+    totalMatching: sourcePool.length,
     returnedCount: randomizedQuestions.length,
     stream: stream || 'all',
     questions: randomizedQuestions

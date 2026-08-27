@@ -367,11 +367,6 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
         explanation: '(x-2)(x+2)/(x-2) = x+2 => 4'
       };
     }
-    // Strictly guarantee all 8 options (A through H) on the fly
-    if (q && Array.isArray(q.options) && q.options.length < 8) {
-      const [expanded] = expandQuestionsTo8Options([q]);
-      return expanded || q;
-    }
     return q;
   }, [questions, currentQIndex, selectedStream]);
 
@@ -453,9 +448,13 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     // Prepare next question from 60k pool without repeating solved ones
     let extra = [];
     if (currentQIndex + 1 >= questions.length) {
-      extra = getRandomizedGameQuestions(game, 20, '12', selectedStream).filter(
-        q => !solvedQuestionsSet.has(q?.id || q?.q)
-      );
+      const extraRaw = getRandomizedGameQuestions(
+        isSpecificGameCard && game?.stream === selectedStream ? game : null,
+        20,
+        '12',
+        selectedStream
+      ).filter(q => !solvedQuestionsSet.has(q?.id || q?.q));
+      extra = expandQuestionsTo8Options(extraRaw);
       setQuestions((prev) => [...prev, ...extra]);
     }
 
@@ -742,20 +741,35 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
           startCountdown(room.questions);
         }
 
-        // Synchronize Questions pool for Challenger
+        // Synchronize Questions pool for Challenger without creating unnecessary re-renders
         if (!isHost && Array.isArray(room.questions) && room.questions.length > 0) {
-          setQuestions(room.questions);
+          setQuestions((prev) => {
+            if (prev && prev.length === room.questions.length && prev[0]?.id === room.questions[0]?.id) {
+              return prev;
+            }
+            return room.questions;
+          });
         }
 
-        // Synchronize Scores & Correct Counts
+        // Synchronize Scores & Correct Counts only when values change
         if (isHost) {
-          if (typeof room.challengerScore === 'number') setOpponentScore(room.challengerScore);
+          if (typeof room.challengerScore === 'number') {
+            setOpponentScore((prev) => prev !== room.challengerScore ? room.challengerScore : prev);
+          }
         } else {
-          if (typeof room.hostScore === 'number') setOpponentScore(room.hostScore);
+          if (typeof room.hostScore === 'number') {
+            setOpponentScore((prev) => prev !== room.hostScore ? room.hostScore : prev);
+          }
         }
-        if (typeof room.hostCorrectCount === 'number') setHostCorrectCount(room.hostCorrectCount);
-        if (typeof room.challengerCorrectCount === 'number') setChallengerCorrectCount(room.challengerCorrectCount);
-        if (typeof room.isOvertime === 'boolean') setIsOvertime(room.isOvertime);
+        if (typeof room.hostCorrectCount === 'number') {
+          setHostCorrectCount((prev) => prev !== room.hostCorrectCount ? room.hostCorrectCount : prev);
+        }
+        if (typeof room.challengerCorrectCount === 'number') {
+          setChallengerCorrectCount((prev) => prev !== room.challengerCorrectCount ? room.challengerCorrectCount : prev);
+        }
+        if (typeof room.isOvertime === 'boolean') {
+          setIsOvertime((prev) => prev !== room.isOvertime ? room.isOvertime : prev);
+        }
 
         // Automatic start trigger for Challenger in lobby
         if (!isHost && currentStep === 'lobby' && (room.status === 'countdown' || room.status === 'battle')) {
