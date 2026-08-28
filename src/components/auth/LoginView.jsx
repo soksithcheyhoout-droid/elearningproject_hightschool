@@ -214,8 +214,8 @@ export default function LoginView() {
           setOtpDigits(['', '', '', '', '', '']);
           setSuccessMessage(
             lang === 'km' 
-              ? `លេខកូដសម្ងាត់ OTP ៦ ខ្ទង់ត្រូវបានផ្ញើចូលប្រអប់សំបុត្រ Gmail (${finalTarget}) រួចរាល់ហើយ! សូមពិនិត្យមើល Inbox/Spam។`
-              : `6-Digit OTP code sent to ${finalTarget}! Please check your Gmail inbox.`
+              ? `លេខកូដសម្ងាត់ OTP ៦ ខ្ទង់ត្រូវបានផ្ញើចូលប្រអប់សំបុត្រ Gmail (${finalTarget}) រួចរាល់ហើយ!`
+              : `6-Digit OTP code sent directly to your Gmail inbox (${finalTarget})!`
           );
         }
         setTimeout(() => {
@@ -750,8 +750,8 @@ export default function LoginView() {
           setOtpDigits(['', '', '', '', '', '']);
           setSuccessMessage(
             lang === 'km'
-              ? `លេខកូដសម្ងាត់ OTP ៦ ខ្ទង់ត្រូវបានផ្ញើទៅកាន់ ${finalTarget} រួចរាល់ហើយ! សូមពិនិត្យប្រអប់សំបុត្រ Gmail របស់អ្នក (Inbox/Spam)។`
-              : `6-Digit OTP code sent to ${finalTarget}! Please check your Gmail inbox (or Spam folder).`
+              ? `លេខកូដសម្ងាត់ OTP ៦ ខ្ទង់ត្រូវបានផ្ញើទៅកាន់ ${finalTarget} រួចរាល់ហើយ! សូមពិនិត្យប្រអប់សំបុត្រ Gmail របស់អ្នក។`
+              : `6-Digit OTP code sent directly to your Gmail inbox (${finalTarget})!`
           );
         }
         setTimeout(() => {

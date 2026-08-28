@@ -672,10 +672,24 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
         if (!res || !res.room || res.canceled || res.error || (res.room && (res.room.status === 'host_left' || res.room.hostLeft || !res.room.host))) {
           if (!isHost) {
             setChallengerPlayer(null);
-            setHostWarningNotice('ម្ចាស់បន្ទប់ (Admin) បានបោះបង់ ឬបិទការប្រកួតហើយ!');
-            setTimeout(() => {
-              if (typeof onClose === 'function') onClose();
-            }, 1200);
+            if (currentStep === 'battle' || currentStep === 'countdown') {
+              clearTimeout(autoNextTimerRef.current);
+              clearInterval(countdownIntervalRef.current);
+              setCurrentStep('results');
+              setOpponentLeftNotice('ម្ចាស់បន្ទប់បានចាកចេញពីការប្រកួត (Victory by Forfeit!)');
+              try {
+                confetti({ particleCount: 160, spread: 90, origin: { y: 0.6 } });
+              } catch (e) { }
+              if (soundEnabled) playSound.correct();
+              addXP(game?.xpReward ? game.xpReward + 350 : 500);
+            } else if (currentStep === 'results') {
+              setOpponentLeftNotice('ម្ចាស់បន្ទប់បានចាកចេញពីបន្ទប់ប្រកួតហើយ');
+            } else {
+              setHostWarningNotice('ម្ចាស់បន្ទប់ (Admin) បានបោះបង់ ឬបិទការប្រកួតហើយ!');
+              setTimeout(() => {
+                if (typeof onClose === 'function') onClose();
+              }, 1200);
+            }
             return;
           }
         }
@@ -721,19 +735,29 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
           return;
         }
 
-        // Check if opponent left
-        if ((room.status === 'opponent_left' || room.challengerLeft || (isHost && !room.challenger && currentStep !== 'lobby')) && !hostKickedRef.current) {
+        // Check if challenger left or forfeited
+        const isChallengerDisconnected = isHost && (room.status === 'opponent_left' || room.challengerLeft || (!room.challenger && currentStep !== 'lobby'));
+        if (isChallengerDisconnected && !hostKickedRef.current) {
           setChallengerPlayer(null);
           setIsChallengerReady(false);
           setMyRematchRequested(false);
           setOpponentRematchRequested(false);
+
           if (currentStep === 'battle' || currentStep === 'countdown') {
-            setCurrentStep('lobby');
+            clearTimeout(autoNextTimerRef.current);
+            clearInterval(countdownIntervalRef.current);
+            setCurrentStep('results');
+            setTurnStatus('playing');
+            setTurnResult(null);
+            setOpponentLeftNotice('គូប្រជែងបានចាកចេញពីបន្ទប់ប្រកួតហើយ (Victory by Forfeit!)');
+            try {
+              confetti({ particleCount: 160, spread: 90, origin: { y: 0.6 } });
+            } catch (e) { }
+            if (soundEnabled) playSound.correct();
+            addXP(game?.xpReward ? game.xpReward + 350 : 500);
+          } else if (currentStep === 'results') {
+            setOpponentLeftNotice('គូប្រជែងបានចាកចេញពីបន្ទប់ប្រកួតហើយ');
           }
-          setOpponentLeftNotice('គូប្រជែងបានចាកចេញពីបន្ទប់ប្រកួតហើយ');
-          setTimeout(() => {
-            setOpponentLeftNotice('');
-          }, 3500);
         }
 
         // Rematch launched by both agreeing
@@ -2510,9 +2534,14 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
             {/* Opponent Left Warning Banner */}
             {opponentLeftNotice && (
-              <div className="w-full max-w-md p-3 bg-rose-500/20 border border-rose-500/40 rounded-xl text-rose-300 text-xs font-semibold flex items-center justify-center gap-2 animate-fade-in shadow-md">
-                <LogOut className="w-4 h-4 text-rose-400 flex-shrink-0" />
-                <span>{opponentLeftNotice}</span>
+              <div className="w-full max-w-md p-3.5 bg-rose-500/20 border border-rose-500/40 rounded-2xl text-rose-200 text-xs font-semibold flex items-center justify-center gap-2.5 animate-fade-in shadow-lg shadow-rose-950/40">
+                <div className="p-1 rounded-lg bg-rose-500/30 text-rose-300 flex-shrink-0">
+                  <LogOut className="w-4 h-4" />
+                </div>
+                <div className="text-left flex-1">
+                  <span className="font-bold text-rose-200 block text-xs">{opponentLeftNotice}</span>
+                  <span className="text-[10px] text-rose-300 font-normal">អ្នកអាចអញ្ជើញគូប្រជែងថ្មី ឬត្រឡប់ទៅ Lobby</span>
+                </div>
               </div>
             )}
 
@@ -2545,11 +2574,13 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             </div>
 
             <h3 className="text-xl sm:text-2xl font-black text-white">
-              {myScore > opponentScore || myCorrectCount > opponentCorrectCount
+              {opponentLeftNotice
                 ? 'អ្នកបានទទួលជ័យជម្នះ (Victory)'
-                : myScore === opponentScore && myCorrectCount === opponentCorrectCount
-                  ? 'លទ្ធផលស្មើគ្នា (Draw)'
-                  : 'គូប្រជែងបានទទួលជ័យជម្នះ (Defeat)'}
+                : myScore > opponentScore || myCorrectCount > opponentCorrectCount
+                  ? 'អ្នកបានទទួលជ័យជម្នះ (Victory)'
+                  : myScore === opponentScore && myCorrectCount === opponentCorrectCount
+                    ? 'លទ្ធផលស្មើគ្នា (Draw)'
+                    : 'គូប្រជែងបានទទួលជ័យជម្នះ (Defeat)'}
             </h3>
 
             {/* Score & Correct Count Comparison */}
@@ -2569,54 +2600,83 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
               <div>
                 <span className="text-slate-400 block mb-1">XP ទទួលបាន</span>
                 <span className="text-2xl font-black font-mono text-emerald-400">
-                  +{myCorrectCount >= opponentCorrectCount ? 500 : 150}
+                  +{myCorrectCount >= opponentCorrectCount || opponentLeftNotice ? 500 : 150}
                 </span>
               </div>
             </div>
 
             {/* Rematch & Exit Action Buttons */}
             <div className="flex flex-col sm:flex-row items-center justify-center gap-3 w-full max-w-md">
+              {(!challengerPlayer || opponentLeftNotice) ? (
+                <>
+                  {isHost && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setOpponentLeftNotice('');
+                        setCurrentStep('lobby');
+                        setTab('host');
+                        setShowInviteModal(true);
+                      }}
+                      className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-indigo-600 to-indigo-500 hover:from-indigo-500 hover:to-indigo-400 text-white font-black text-xs shadow-lg shadow-indigo-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98"
+                    >
+                      <UserPlus className="w-4 h-4" />
+                      <span>អញ្ជើញគូប្រជែងថ្មី (Invite Player)</span>
+                    </button>
+                  )}
+                  <button
+                    type="button"
+                    onClick={handleLeaveArenaRoom}
+                    className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <LogOut className="w-3.5 h-3.5 text-slate-400" />
+                    <span>ត្រឡប់ទៅ Lobby</span>
+                  </button>
+                </>
+              ) : (
+                <>
+                  {/* Play Again (Rematch) Button */}
+                  <button
+                    type="button"
+                    disabled={myRematchRequested}
+                    onClick={handleRequestRematch}
+                    className={`w-full sm:w-auto px-6 py-3 rounded-2xl font-black text-xs shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 ${
+                      myRematchRequested
+                        ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 cursor-wait'
+                        : opponentRematchRequested
+                          ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/25 ring-2 ring-emerald-400/50'
+                          : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/25'
+                    }`}
+                  >
+                    {myRematchRequested ? (
+                      <>
+                        <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
+                        <span>កំពុងរង់ចាំគូប្រជែងចុច 'ប្រកួតម្តងទៀត'...</span>
+                      </>
+                    ) : opponentRematchRequested ? (
+                      <>
+                        <Zap className="w-4 h-4 fill-white" />
+                        <span>ទទួលយកការប្រកួតម្តងទៀត (Accept Rematch)</span>
+                      </>
+                    ) : (
+                      <>
+                        <RotateCcw className="w-3.5 h-3.5" />
+                        <span>ប្រកួតម្តងទៀត (Play Again)</span>
+                      </>
+                    )}
+                  </button>
 
-              {/* Play Again (Rematch) Button */}
-              <button
-                type="button"
-                disabled={myRematchRequested}
-                onClick={handleRequestRematch}
-                className={`w-full sm:w-auto px-6 py-3 rounded-2xl font-black text-xs shadow-lg transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 ${
-                  myRematchRequested
-                    ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40 cursor-wait'
-                    : opponentRematchRequested
-                      ? 'bg-emerald-600 hover:bg-emerald-500 text-white shadow-emerald-600/25 ring-2 ring-emerald-400/50'
-                      : 'bg-indigo-600 hover:bg-indigo-500 text-white shadow-indigo-600/25'
-                }`}
-              >
-                {myRematchRequested ? (
-                  <>
-                    <Loader2 className="w-4 h-4 animate-spin text-amber-400" />
-                    <span>កំពុងរង់ចាំគូប្រជែងចុច 'ប្រកួតម្តងទៀត'...</span>
-                  </>
-                ) : opponentRematchRequested ? (
-                  <>
-                    <Zap className="w-4 h-4 fill-white" />
-                    <span>ទទួលយកការប្រកួតម្តងទៀត (Accept Rematch)</span>
-                  </>
-                ) : (
-                  <>
-                    <RotateCcw className="w-3.5 h-3.5" />
-                    <span>ប្រកួតម្តងទៀត (Play Again)</span>
-                  </>
-                )}
-              </button>
-
-              {/* Leave Room Button */}
-              <button
-                type="button"
-                onClick={handleLeaveArenaRoom}
-                className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 transition-colors cursor-pointer flex items-center justify-center gap-1.5"
-              >
-                <LogOut className="w-3.5 h-3.5 text-slate-400" />
-                <span>ចាកចេញទៅ Lobby</span>
-              </button>
+                  {/* Leave Room Button */}
+                  <button
+                    type="button"
+                    onClick={handleLeaveArenaRoom}
+                    className="w-full sm:w-auto px-5 py-3 rounded-2xl bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs border border-slate-700 transition-colors cursor-pointer flex items-center justify-center gap-1.5"
+                  >
+                    <LogOut className="w-3.5 h-3.5 text-slate-400" />
+                    <span>ចាកចេញទៅ Lobby</span>
+                  </button>
+                </>
+              )}
             </div>
 
           </div>
