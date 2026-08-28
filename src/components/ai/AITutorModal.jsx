@@ -210,7 +210,7 @@ export default function AITutorModal({ isOpen, onClose, initialPrompt = '' }) {
                     : 'bg-white text-slate-900 border border-slate-200 rounded-tl-xs shadow-xs font-sans whitespace-pre-wrap'
                 }`}
               >
-                {msg.text}
+                {(msg.text || '').replace(/\*{2,}/g, '').replace(/\*/g, '').replace(/\${1,2}/g, '').replace(/<[^>]*>/g, '').replace(/^#+\s*/gm, '').replace(/^>\s*/gm, '')}
                 <div className={`text-[10px] mt-2.5 flex items-center justify-between gap-2 ${msg.sender === 'user' ? 'text-blue-200' : 'text-slate-400'}`}>
                   {msg.sender === 'ai' && (
                     <button

@@ -20,7 +20,34 @@ export function saveStoredGeminiKey(key) {
   }
 }
 
+function checkRudeContent(text) {
+  if (!text) return false;
+  const t = text.toLowerCase();
+  const rudePatterns = [
+    /\b(fuck|shit|bitch|asshole|dick|pussy|bastard|cunt|slut|whore|stfu|idiot|retard)\b/i,
+    /ចុយ|ក្ដ|ក្ដរ|មីចុយ|អាក្ដ|អាឆ្កែ|អាងាប់|អាឡប់|មីឆ្កែ|មីសំផឹង|ងាប់ទៅ|ចោរម្សៀត|អាភ្លើ|អាល្ងង់/i
+  ];
+  return rudePatterns.some(pattern => pattern.test(t));
+}
+
+function cleanDisplaySymbols(text) {
+  if (!text) return '';
+  return text
+    .replace(/\*{2,}/g, '')
+    .replace(/\*/g, '')
+    .replace(/\${1,2}/g, '')
+    .replace(/<[^>]*>/g, '')
+    .replace(/^#+\s*/gm, '')
+    .replace(/^>\s*/gm, '')
+    .replace(/_{2,}/g, '')
+    .trim();
+}
+
 export async function askMinistryAI(userPrompt, chatHistory = []) {
+  if (checkRudeContent(userPrompt)) {
+    return '⚠️ សូមប្អូនប្រើប្រាស់ពាក្យសម្តីសមរម្យ និងថ្លៃថ្នូរក្នុងការសន្ទនាជាមួយលោកគ្រូ AI អប់រំជាតិណា៎! លោកគ្រូរីករាយនឹងជួយពន្យល់រាល់មេរៀន ចំណេះដឹងទូទៅ និងការដោះស្រាយលំហាត់ជូនប្អូនជានិច្ច។';
+  }
+
   // 1. First Priority: Query Backend API endpoint /api/ai/chat
   try {
     const apiRes = await fetch('/api/ai/chat', {
@@ -31,7 +58,7 @@ export async function askMinistryAI(userPrompt, chatHistory = []) {
     if (apiRes.ok) {
       const data = await apiRes.json();
       if (data && data.reply) {
-        return data.reply;
+        return cleanDisplaySymbols(data.reply);
       }
     }
   } catch (backendErr) {
@@ -43,10 +70,9 @@ export async function askMinistryAI(userPrompt, chatHistory = []) {
   if (activeKey) {
     const systemPrompt = `អ្នកគឺជា «លោកគ្រូ AI អប់រំជាតិ» នៃប្រព័ន្ធអប់រំឌីជីថលកម្ពុជា (MoEYS / MoTDAR)។
 តួនាទីរបស់អ្នក៖
-- ឆ្លើយតបជាភាសាខ្មែរយ៉ាងរលូន សុភាពរាបសារ និងច្បាស់លាស់ជាមួយសិស្សានុសិស្ស។
-- សម្រាប់មុខវិជ្ជាវិទ្យាសាស្ត្រ (គណិត, រូប, គីមី, ជីវវិទ្យា)៖ បង្ហាញរូបមន្ត ជំហានគណនាលម្អិត និងសេចក្តីសន្និដ្ឋានត្រឹមត្រូវ ១០០%។
-- សម្រាប់មុខវិជ្ជាសង្គម (អក្សរសាស្ត្រ, ប្រវត្តិ, ភូមិ, ពលរដ្ឋ)៖ ពន្យល់កាលបរិច្ឆេទ ព្រឹត្តិការណ៍ ចលនាអក្សរសិល្ប៍ និងច្បាប់ឱ្យបានស៊ីជម្រៅ។
-- ប្រើប្រាស់ Markdown (ចំណងជើង, តារាង, បញ្ជី, LaTeX Formulas $$...$$) ដើម្បីឱ្យអានងាយយល់ និងមានរបៀបរៀបរយ។
+- ឆ្លើយតបរាល់សំណួរទាំងអស់ (ភាសាខ្មែរ ឬអង់គ្លេស) យ៉ាងច្បាស់លាស់ ត្រឹមត្រូវ ឆ្លាតវៃ និងទូលំទូលាយ ទាំងសាលារៀននៅកម្ពុជា (ដូចជា AIS - American Intercon School, សាលារដ្ឋ និងឯកជននានា), ចំណេះដឹងទូទៅ, ប្រវត្តិសាស្ត្រ, ភូមិវិទ្យា, វិទ្យាសាស្ត្រ, គណិតវិទ្យា និងលំហាត់គ្រប់កម្រិត។
+- ឆ្លើយតបជាភាសាខ្មែរយ៉ាងរលូន សុភាពរាបសារ និងមានការគោរព។
+- ហាមដាច់ខាតកុំប្រើសញ្ញា raw formatting ដូចជា ** ឬ * ឬ $$ ឬ $ ឬ < > ឬ ### ឡើយ! ចូរសរសេរជាអត្ថបទធម្មតា ប្រើការចុះបន្ទាត់ ប្រើលេខរៀង (១, ២, ៣) ឬត្រេ (-) ធម្មតា។
 - ហាមដាច់ខាតកុំនិយាយ ឬលើកឡើងពីឈ្មោះក្រុមហ៊ុន AI ឬឈ្មោះម៉ូដែលបច្ចេកវិទ្យាណាមួយឡើយ។`;
 
     const formattedContents = [];
@@ -77,7 +103,7 @@ export async function askMinistryAI(userPrompt, chatHistory = []) {
           const data = await res.json();
           const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
           if (reply && reply.trim().length > 10) {
-            return reply.trim();
+            return cleanDisplaySymbols(reply);
           }
         }
       } catch (err) {
@@ -87,7 +113,7 @@ export async function askMinistryAI(userPrompt, chatHistory = []) {
   }
 
   // 3. Fallback: Offline High-School Knowledge Engine
-  return fallbackStudyEngine(userPrompt);
+  return cleanDisplaySymbols(fallbackStudyEngine(userPrompt));
 }
 
 export const askGeminiAI = askMinistryAI;
