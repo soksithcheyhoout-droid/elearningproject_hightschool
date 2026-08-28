@@ -774,7 +774,7 @@ export default function PlaygroundArenaView() {
                         <span>{game.timeLimitSeconds} វិ.</span>
                       </span>
                       <span>•</span>
-                      <span>{game.questions.length} សំណួរ</span>
+                      <span>{game.questions && game.questions.length >= 8 ? game.questions.length : 15} សំណួរ</span>
                     </div>
 
                   </div>

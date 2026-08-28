@@ -92,6 +92,8 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
   const requestedStream = stream || game?.stream || 'science';
   const targetSubjectKey = game?.subjectKey;
   const targetSubject = game?.subject;
+  const gameTitle = game?.titleKm || '';
+  const gameKeywords = gameTitle.replace(/[\(\)«»]/g, ' ').split(/\s+/).filter(w => w.length > 2);
 
   // Determine if targetSubjectKey actually matches the requestedStream
   const isSubjectAlignedWithStream = targetSubjectKey
@@ -103,7 +105,38 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
 
   let rawPool = [];
 
-  // 1. Harvest from Arena Master Bank (6,000+ balanced questions)
+  // 1. Priority #1: Game's OWN specific questions (Tum Teav, Kolab Pailin, Limits, etc.)
+  if (game && Array.isArray(game.questions) && game.questions.length > 0) {
+    game.questions.forEach((q) => {
+      if (q && q.q) {
+        rawPool.push({
+          ...q,
+          stream: game.stream || requestedStream,
+          subject: q.subject || game.subject || effectiveSubject,
+          subjectKey: q.subjectKey || game.subjectKey || effectiveSubjectKey,
+          grade: q.grade || game.grade || '12',
+          isPriorityTopic: true
+        });
+      }
+    });
+  }
+
+  // 2. Priority #2: Match specific topic keywords from Arena Master Bank
+  if (gameKeywords.length > 0 && Array.isArray(arenaMasterQuestionBank)) {
+    arenaMasterQuestionBank.forEach((item) => {
+      if (!item || !item.q) return;
+      const text = item.q + ' ' + (item.explanation || '');
+      const matchesKeyword = gameKeywords.some(kw => text.includes(kw));
+      if (matchesKeyword) {
+        rawPool.push({
+          ...item,
+          isPriorityTopic: true
+        });
+      }
+    });
+  }
+
+  // 3. Priority #3: Harvest aligned subject questions from Arena Master Bank
   if (Array.isArray(arenaMasterQuestionBank)) {
     arenaMasterQuestionBank.forEach((item) => {
       if (!item || !item.q) return;
@@ -131,38 +164,7 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
     });
   }
 
-  // 2. Harvest from Playground Games Data
-  if (Array.isArray(playgroundGamesData)) {
-    playgroundGamesData.forEach((g) => {
-      if (!g || !Array.isArray(g.questions)) return;
-
-      const matchesTarget = effectiveSubjectKey && g.subjectKey === effectiveSubjectKey;
-      let matchesStream = false;
-      if (requestedStream === 'random' || requestedStream === 'all') {
-        matchesStream = true;
-      } else if (requestedStream === 'social') {
-        matchesStream = g.stream === 'social' || SOCIAL_SUBJECTS.has(g.subjectKey) || SOCIAL_SUBJECTS.has(g.subject);
-      } else {
-        matchesStream = g.stream === 'science' || SCIENCE_SUBJECTS.has(g.subjectKey) || SCIENCE_SUBJECTS.has(g.subject);
-      }
-
-      if (matchesTarget || matchesStream) {
-        g.questions.forEach((q) => {
-          if (q && q.q) {
-            rawPool.push({
-              ...q,
-              stream: g.stream,
-              subject: q.subject || g.subject,
-              subjectKey: q.subjectKey || g.subjectKey,
-              grade: q.grade || g.grade || '12'
-            });
-          }
-        });
-      }
-    });
-  }
-
-  // 3. Harvest from Quiz Data
+  // 4. Harvest from Quiz Data
   if (Array.isArray(quizData)) {
     quizData.forEach((qz) => {
       if (!qz || !Array.isArray(qz.questions)) return;
