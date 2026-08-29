@@ -166,7 +166,7 @@ export default function BacIICertificateModal({
             </div>
             <div>
               <h3 className="text-xs sm:text-sm font-black text-white">
-                វិញ្ញាបនបត្របណ្ដោះអាសន្នមធ្យមសិក្សាទុតិយភូមិ (MoEYS Bac II Certificate)
+                វិញ្ញាបនបត្របណ្ដោះអាសន្នមធ្យមសិក្សាទុតិយភូមិ (National Bac II Certificate)
               </h3>
               <p className="text-[10px] text-amber-300 font-bold">
                 លទ្ធផលផ្លូវការ៖ និទ្ទេស {gradeResult?.grade || 'A'} • {totalScore}/{maxPossible} ពិន្ទុ ({percentage}%)
@@ -430,7 +430,7 @@ export default function BacIICertificateModal({
                   <div className="font-mono text-[9px] tracking-tighter text-slate-800">
                     |||||| | |||||||| ||||||||||| | |||||
                   </div>
-                  <span className="text-[7.5px] text-slate-400 font-mono">MOEYS-2026-BACII-VERIFIED</span>
+                  <span className="text-[7.5px] text-slate-400 font-mono">MOTDAR-2026-BACII-VERIFIED</span>
                 </div>
               </div>
 

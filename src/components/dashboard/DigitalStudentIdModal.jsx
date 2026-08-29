@@ -79,7 +79,7 @@ export default function DigitalStudentIdModal({ student, isOpen, onClose }) {
             </div>
             <div>
               <h3 className="font-bold text-sm text-white">ប័ណ្ណសិស្សឌីជីថលជាតិ (National Student Smart ID)</h3>
-              <p className="text-[10px] text-slate-400">ក្រសួងអប់រំ យុវជន និងកីឡា (MoEYS Official Standard)</p>
+              <p className="text-[10px] text-slate-400">ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ និងការស្រាវជ្រាវកម្រិតខ្ពស់ (MoTDAR Official Standard)</p>
             </div>
           </div>
 
@@ -234,7 +234,7 @@ export default function DigitalStudentIdModal({ student, isOpen, onClose }) {
             <div className="relative z-10 pt-2 border-t border-amber-400/30 flex items-center justify-between gap-2">
               <div className="flex items-center gap-1.5 text-[8px] sm:text-[9px] text-slate-300">
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
-                <span>ផ្ទៀងផ្ទាត់ផ្លូវការ MoEYS • 2026 Security Seal</span>
+                <span>ផ្ទៀងផ្ទាត់ផ្លូវការ MoTDAR • 2026 Security Seal</span>
               </div>
 
               {/* Crisp Barcode */}

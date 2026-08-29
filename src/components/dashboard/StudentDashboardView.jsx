@@ -701,10 +701,10 @@ export default function StudentDashboardView({ setActiveTab }) {
             </div>
             <div>
               <h3 className="font-bold text-base text-slate-900">
-                ម៉ាស៊ីនគណនានិទ្ទេសបាក់ឌុបជាតិ (Official MoEYS BacII Simulator)
+                ម៉ាស៊ីនគណនានិទ្ទេសបាក់ឌុបជាតិ (Official BacII Simulator)
               </h3>
               <p className="text-xs text-slate-500">
-                គណនាតាមរូបមន្តមេគុណផ្លូវការរបស់ក្រសួងអប់រំ យុវជន និងកីឡា សម្រាប់ថ្នាក់វិទ្យាសាស្ត្រពិត និងសង្គម
+                គណនាតាមរូបមន្តមេគុណផ្លូវការថ្នាក់ជាតិ សម្រាប់ថ្នាក់វិទ្យាសាស្ត្រពិត និងសង្គម
               </p>
             </div>
           </div>
@@ -833,7 +833,7 @@ export default function StudentDashboardView({ setActiveTab }) {
                 />
                 <div>
                   <div className="text-[9px] font-bold text-amber-300 uppercase tracking-widest leading-none">
-                    MoEYS OFFICIAL FORECAST
+                    MOTDAR OFFICIAL FORECAST
                   </div>
                   <div className="text-xs font-bold text-white mt-0.5">
                     លទ្ធផលព្យាករណ៍បាក់ឌុបជាតិ

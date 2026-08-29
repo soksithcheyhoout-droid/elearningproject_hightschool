@@ -177,10 +177,10 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
                 </div>
                 <div className="min-w-0">
                   <h4 className="text-[11px] sm:text-xs font-black text-amber-300 font-cinzel tracking-wider uppercase truncate">
-                    ក្រសួងអប់រំ យុវជន និងកីឡា
+                    ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ និងការស្រាវជ្រាវកម្រិតខ្ពស់
                   </h4>
                   <p className="text-[9.5px] sm:text-[11px] text-blue-200 font-medium truncate">
-                    MoEYS National E-Learning Platform
+                    MoTDAR National E-Learning Platform
                   </p>
                 </div>
               </div>

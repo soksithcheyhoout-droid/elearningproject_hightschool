@@ -77,7 +77,7 @@ export function initSecurityProtection() {
   if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
     try {
       console.log('%cMoTDAR National E-Learning Platform', 'color: #f59e0b; font-size: 16px; font-weight: bold;');
-      console.log('%cProtected Academic Learning Portal - MoEYS Cambodia', 'color: #94a3b8; font-size: 12px;');
+      console.log('%cProtected Academic Learning Portal - MoTDAR Cambodia', 'color: #94a3b8; font-size: 12px;');
     } catch (e) {}
   }
 }

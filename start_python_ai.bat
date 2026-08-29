@@ -1,7 +1,7 @@
 @echo off
-title MoEYS Python AI & Live Google Search Microservice
+title MoTDAR Python AI & Live Google Search Microservice
 echo =======================================================
-echo   MoEYS MoTDAR Python AI Engine (Zero API Key)
+echo   MoTDAR Python AI Engine (Zero API Key)
 echo   Connected to Live Google & Wikipedia & SymPy Math
 echo =======================================================
 echo Starting microservice on http://127.0.0.1:5001 ...

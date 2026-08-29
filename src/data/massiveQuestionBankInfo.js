@@ -5,7 +5,7 @@ export const MASTER_EXAM_BANK_STATS = {
   totalQuestions: 60000,
   scienceCount: 30000,
   socialCount: 30000,
-  version: '4.0.0-National-MoEYS-60k',
+  version: '4.0.0-National-MoTDAR-60k',
   streams: {
     science: {
       total: 30000,

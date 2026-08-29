@@ -155,7 +155,7 @@ export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor }) {
       <div className="mt-auto pt-3 border-t border-slate-100">
         <div className="bg-gradient-to-br from-blue-50/80 via-slate-50 to-indigo-50/60 rounded-2xl p-3 border border-blue-100/80 space-y-2 text-center shadow-2xs">
           <div className="flex items-center justify-center gap-1.5 text-[#003366] font-extrabold text-[11px]">
-            <img src="/assets/moeys-crest-transparent.png" alt="MoEYS" className="w-4 h-4 object-contain" />
+            <img src="/assets/moeys-crest-transparent.png" alt="MoTDAR" className="w-4 h-4 object-contain" />
             <span>{lang === 'km' ? 'ជំនួយការសិក្សាជាតិ' : 'National Support'}</span>
           </div>
           <div className="text-[10px] text-slate-600 font-semibold space-y-0.5">

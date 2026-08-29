@@ -963,7 +963,7 @@ export default function LoginView() {
 
                 <div className="hidden sm:flex items-center gap-1.5 text-[11px] text-slate-400">
                   <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
-                  <span>MoEYS SSO</span>
+                  <span>MoTDAR SSO</span>
                 </div>
               </div>
 
@@ -990,7 +990,7 @@ export default function LoginView() {
                       <ShieldCheck className="w-6 h-6 text-cyan-400" />
                     </div>
                     <h3 className="font-extrabold text-white text-sm">
-                      {lang === 'km' ? 'ច្រកទ្វារសុវត្ថិភាពសិស្សថ្នាក់ជាតិ' : 'National MoEYS Student Portal'}
+                      {lang === 'km' ? 'ច្រកទ្វារសុវត្ថិភាពសិស្សថ្នាក់ជាតិ' : 'National MoTDAR Student Portal'}
                     </h3>
                     <p className="text-xs text-slate-300 leading-relaxed max-w-sm mx-auto">
                       {lang === 'km' 
@@ -1496,7 +1496,7 @@ export default function LoginView() {
                 <ShieldCheck className="w-3.5 h-3.5 text-emerald-400" />
                 <span>Google OAuth 2.0 API & SSL Encrypted Official Gate</span>
               </span>
-              <span>© {new Date().getFullYear()} MoEYS Cambodia</span>
+              <span>© {new Date().getFullYear()} MoTDAR Cambodia</span>
             </div>
 
           </div>

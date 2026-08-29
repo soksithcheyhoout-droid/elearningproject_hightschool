@@ -265,7 +265,7 @@ function normalizePhoneticsForSpeech(text, isKhmer) {
     result = result
       // 1. National & System Entities
       .replace(/\bMoTDAR\b/gi, 'ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ')
-      .replace(/\bMoEYS\b/gi, 'ក្រសួងអប់រំ យុវជន និងកីឡា')
+      .replace(/\bMoEYS\b/gi, 'ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ')
       .replace(/\bKHQR\b/gi, 'ខេអេច ឃ្យូអរ')
       .replace(/\bQR\s*Code\b/gi, 'កូដ ឃ្យូអរ')
       .replace(/\bQR\b/gi, 'ឃ្យូអរ')

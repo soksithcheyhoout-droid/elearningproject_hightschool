@@ -724,7 +724,7 @@ export default function BacIIHubView() {
                         <Sparkles className="w-3.5 h-3.5 text-[#005baa]" />
                         ដំណោះស្រាយផ្លូវការ និងគន្លឹះគណនា៖
                       </span>
-                      <span className="text-[10px] font-bold text-sky-600 bg-sky-100 px-2 py-0.5 rounded-full">MoEYS Official</span>
+                      <span className="text-[10px] font-bold text-sky-600 bg-sky-100 px-2 py-0.5 rounded-full">Official Curriculum</span>
                     </div>
                     <AcademicTextRenderer content={ex.solutionText} baseTextSize="text-xs sm:text-sm" />
                   </div>

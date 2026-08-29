@@ -340,7 +340,7 @@ export default function ClassroomView({ subject: initialSubject, onBack, onOpenA
                   {activeLesson ? (lang === 'km' ? activeLesson.titleKm : activeLesson.titleEn) : ''}
                 </h2>
                 <p className="text-xs text-slate-600 mt-1 font-medium">
-                  {lang === 'km' ? 'បង្រៀនដោយ៖' : 'Taught by:'} <span className="text-[#005baa] font-bold">{currentSubject.teacher || 'សាស្ត្រាចារ្យជាតិ'}</span> ({currentSubject.teacherRole || 'MoEYS'})
+                  {lang === 'km' ? 'បង្រៀនដោយ៖' : 'Taught by:'} <span className="text-[#005baa] font-bold">{currentSubject.teacher || 'សាស្ត្រាចារ្យជាតិ'}</span> ({currentSubject.teacherRole || 'MoTDAR'})
                 </p>
               </div>
 

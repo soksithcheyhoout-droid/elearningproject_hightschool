@@ -469,7 +469,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
               <div className="w-4 h-4 rounded-full bg-amber-400/20 border border-amber-400/50 flex items-center justify-center flex-shrink-0 p-0.5 shadow-2xs">
                 <img 
                   src="/assets/moeys-crest-transparent.png" 
-                  alt="MoEYS Emblem" 
+                  alt="MoTDAR Emblem" 
                   className="w-full h-full object-contain filter drop-shadow-xs" 
                 />
               </div>
@@ -655,7 +655,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
                         <div className="w-8 h-8 rounded-xl bg-white/15 border border-white/25 flex items-center justify-center p-1 flex-shrink-0 shadow-inner">
                           <img 
                             src="/assets/moeys-crest-transparent.png" 
-                            alt="MoEYS Crest"
+                            alt="MoTDAR Crest"
                             className="w-full h-full object-contain filter drop-shadow-xs" 
                           />
                         </div>

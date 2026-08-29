@@ -1,5 +1,5 @@
 // ==========================================================
-// MOEYS DIGITAL LEARNING PORTAL - CLIENT API SERVICE
+// MOTDAR DIGITAL LEARNING PORTAL - CLIENT API SERVICE
 // Connects to Integrated High-Performance Backend at /api
 // ==========================================================
 

@@ -207,7 +207,7 @@ function getBookCoverDesign(cat = '', title = '') {
     accentColor: '#cbd5e1',
     titleKm: 'សៀវភៅពុម្ពជាតិ',
     titleEn: 'NATIONAL TEXTBOOK',
-    streamKm: 'កម្មវិធីសិក្សាគោល MoEYS',
+    streamKm: 'កម្មវិធីសិក្សាគោល MoTDAR',
     badgeText: 'TEXTBOOK',
     patternType: 'general'
   };
@@ -374,7 +374,7 @@ function OfficialVectorIllustration({ type, accentColor }) {
     <svg viewBox="0 0 160 100" className="w-full h-full opacity-90 filter drop-shadow">
       <rect x="40" y="20" width="80" height="55" rx="6" fill="rgba(255,255,255,0.15)" stroke="#ffffff" strokeWidth="2" />
       <line x1="80" y1="20" x2="80" y2="75" stroke="#ffffff" strokeWidth="2" />
-      <text x="80" y="90" textAnchor="middle" fill="#ffffff" fontSize="10" fontWeight="bold">MoEYS TEXTBOOK</text>
+      <text x="80" y="90" textAnchor="middle" fill="#ffffff" fontSize="10" fontWeight="bold">MOTDAR TEXTBOOK</text>
     </svg>
   );
 }

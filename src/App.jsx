@@ -625,7 +625,7 @@ function MainApp() {
               ឡើងកម្រិតថ្មី!
             </h3>
             <p className="text-xs text-slate-300 mb-5 leading-relaxed">
-              អបអរសាទរ! អ្នកបានឡើងដល់ <strong className="text-amber-400 font-bold">Level {levelUpToast.newLevel}</strong> ក្នុងប្រព័ន្ធ MoEYS E-Learning
+              អបអរសាទរ! អ្នកបានឡើងដល់ <strong className="text-amber-400 font-bold">Level {levelUpToast.newLevel}</strong> ក្នុងប្រព័ន្ធ MoTDAR E-Learning
             </p>
 
             <div className="flex items-center justify-center gap-4 bg-white/5 border border-white/10 rounded-2xl p-3.5 mb-5">

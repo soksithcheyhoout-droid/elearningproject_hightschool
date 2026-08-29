@@ -1764,8 +1764,8 @@ export default function AdminDashboardView({ admin, onLogout, onSwitchToStudentV
                   { name: 'សាស្រ្តាចារ្យបណ្ឌិត សុខ គឹមហួរ', role: 'ប្រធានដេប៉ាតឺម៉ង់គណិតវិទ្យា', icon: '👨‍🏫', subject: 'គណិតវិទ្យា (Math)', students: 1420 },
                   { name: 'សាស្រ្តាចារ្យ ចាន់ សុផល', role: 'គ្រូឧទ្ទេសរូបវិទ្យាថ្នាក់ជាតិ', icon: '👨‍🔬', subject: 'រូបវិទ្យា (Physics)', students: 1180 },
                   { name: 'អ្នកគ្រូ ម៉េង ស្រីពៅ', role: 'សាស្ត្រាចារ្យគីមីវិទ្យាជាន់ខ្ពស់', icon: '👩‍🏫', subject: 'គីមីវិទ្យា (Chemistry)', students: 950 },
-                  { name: 'MoEYS AI Math Tutor', role: 'AI Assistant (Math Solver)', icon: '🤖', subject: 'ជំនួយការគណិតវិទ្យា', students: 4820 },
-                  { name: 'MoEYS AI Science Lab Tutor', role: 'AI Assistant (Physics & Chem)', icon: '⚡', subject: 'ជំនួយការវិទ្យាសាស្ត្រពិត', students: 3900 }
+                  { name: 'MoTDAR AI Math Tutor', role: 'AI Assistant (Math Solver)', icon: '🤖', subject: 'ជំនួយការគណិតវិទ្យា', students: 4820 },
+                  { name: 'MoTDAR AI Science Lab Tutor', role: 'AI Assistant (Physics & Chem)', icon: '⚡', subject: 'ជំនួយការវិទ្យាសាស្ត្រពិត', students: 3900 }
                 ].map((lec, idx) => (
                   <div key={idx} className="p-5 rounded-2xl bg-slate-50 border border-slate-200 space-y-3">
                     <div className="flex items-center gap-3">
