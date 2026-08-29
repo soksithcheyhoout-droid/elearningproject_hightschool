@@ -117,26 +117,16 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
   const speechTimerRef5 = useRef(null);
   const countdownTimerRef = useRef(null);
   const activeAudioElRef = useRef(null);
-  const isClosedRef = useRef(false); // Master kill-switch for audio
-  const allTimerRefs = [speechTimerRef, speechTimerRef2, speechTimerRef3, speechTimerRef4, speechTimerRef5];
+  const isClosedRef = useRef(false); // Master kill-switch ONLY when modal is closed
 
   const currentWordItem = wordsList[currentIndex] || englishDictationWords[0];
 
-  // 🛑 GLOBAL STOP ALL AUDIO FUNCTION (Instant voice cancellation)
-  const stopAllAudio = useCallback(() => {
+  // 🛑 Stop current speech / sound without killing future audio in the modal
+  const stopCurrentSpeech = useCallback(() => {
     try {
-      isClosedRef.current = true; // Prevent any pending callbacks from speaking
-      
-      // Cancel all browser speech immediately
       if (typeof window !== 'undefined' && window.speechSynthesis) {
         window.speechSynthesis.cancel();
-        // Double-cancel after a tick to catch any queued utterances
-        setTimeout(() => {
-          try { window.speechSynthesis.cancel(); } catch(e) {}
-        }, 50);
       }
-      
-      // Stop any HTML5 audio element
       if (activeAudioElRef.current) {
         try {
           activeAudioElRef.current.pause();
@@ -145,54 +135,91 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
         } catch(e) {}
         activeAudioElRef.current = null;
       }
-      
-      // Clear ALL pending timers (every ref in the chain)
-      for (const ref of allTimerRefs) {
-        if (ref.current) {
-          clearTimeout(ref.current);
-          ref.current = null;
-        }
-      }
-      
-      if (countdownTimerRef.current) {
-        clearInterval(countdownTimerRef.current);
-        countdownTimerRef.current = null;
-      }
+      if (speechTimerRef.current) { clearTimeout(speechTimerRef.current); speechTimerRef.current = null; }
+      if (speechTimerRef2.current) { clearTimeout(speechTimerRef2.current); speechTimerRef2.current = null; }
+      if (speechTimerRef3.current) { clearTimeout(speechTimerRef3.current); speechTimerRef3.current = null; }
+      if (speechTimerRef4.current) { clearTimeout(speechTimerRef4.current); speechTimerRef4.current = null; }
+      if (speechTimerRef5.current) { clearTimeout(speechTimerRef5.current); speechTimerRef5.current = null; }
       setIsSpeaking(false);
-      setSpeakPhase(0);
     } catch (e) {
-      console.warn('Audio stop notice:', e);
+      console.warn('stopCurrentSpeech notice:', e);
     }
   }, []);
 
-  // Ensure speech is completely terminated when modal closes or unmounts
+  // 🛑 MASTER KILL-SWITCH: Kill all audio and timers when closing modal
+  const killAllAudio = useCallback(() => {
+    isClosedRef.current = true;
+    stopCurrentSpeech();
+    if (countdownTimerRef.current) {
+      clearInterval(countdownTimerRef.current);
+      countdownTimerRef.current = null;
+    }
+    setSpeakPhase(0);
+    setIsSpeaking(false);
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.cancel();
+    }
+  }, [stopCurrentSpeech]);
+
+  // Ensure audio state matches modal visibility
   useEffect(() => {
     if (isOpen) {
-      isClosedRef.current = false; // Re-enable audio when modal opens
+      isClosedRef.current = false; // Enable audio when modal is opened
     } else {
-      stopAllAudio();
+      killAllAudio(); // Kill audio when modal is closed
     }
     return () => {
-      stopAllAudio();
+      killAllAudio();
     };
-  }, [isOpen, stopAllAudio]);
+  }, [isOpen, killAllAudio]);
 
   // Sanitize text to only contain clean English-pronounceable characters
   const sanitizeForSpeech = (text) => {
     if (!text) return '';
-    // Remove anything that isn't letters, spaces, dots, commas, hyphens, or apostrophes
     return text.replace(/[^a-zA-Z\s.,\-']/g, '').trim();
   };
+
+  // HTML5 Audio Fallback (via standard TTS service) if SpeechSynthesis is unavailable or silent
+  const playAudioFallback = useCallback((cleanText, rate = 0.75, onDone) => {
+    if (isClosedRef.current) {
+      if (onDone) onDone();
+      return;
+    }
+    try {
+      const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q=${encodeURIComponent(cleanText)}`;
+      const audio = new Audio(audioUrl);
+      activeAudioElRef.current = audio;
+      audio.playbackRate = Math.max(0.6, Math.min(1.0, rate));
+      setIsSpeaking(true);
+
+      let ended = false;
+      const finish = () => {
+        if (ended) return;
+        ended = true;
+        setIsSpeaking(false);
+        activeAudioElRef.current = null;
+        if (!isClosedRef.current && onDone) onDone();
+      };
+
+      audio.onended = finish;
+      audio.onerror = () => {
+        finish();
+      };
+
+      const playPromise = audio.play();
+      if (playPromise !== undefined) {
+        playPromise.catch(() => finish());
+      }
+    } catch(e) {
+      setIsSpeaking(false);
+      if (onDone) onDone();
+    }
+  }, []);
 
   // Calm & Slow Educational Voice Pronunciation (Speech Rate: 0.75x slow & crystal clear)
   const speakWordSlowly = useCallback((text, customRate = 0.75, onComplete) => {
     // 🛑 KILL-SWITCH: If modal is closed, do NOT speak anything
-    if (isClosedRef.current) {
-      if (onComplete) onComplete();
-      return;
-    }
-
-    if (typeof window === 'undefined') {
+    if (isClosedRef.current || typeof window === 'undefined') {
       if (onComplete) onComplete();
       return;
     }
@@ -203,72 +230,84 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
       return;
     }
 
-    try {
-      if (window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-      }
-      if (activeAudioElRef.current) {
-        activeAudioElRef.current.pause();
-        activeAudioElRef.current.currentTime = 0;
-        activeAudioElRef.current = null;
-      }
+    stopCurrentSpeech();
 
-      if (window.speechSynthesis) {
+    let completed = false;
+    const safeComplete = () => {
+      if (completed) return;
+      completed = true;
+      setIsSpeaking(false);
+      if (!isClosedRef.current && onComplete) onComplete();
+    };
+
+    if (window.speechSynthesis) {
+      try {
+        window.speechSynthesis.cancel();
+        if (window.speechSynthesis.paused) {
+          window.speechSynthesis.resume();
+        }
+
         const utterance = new SpeechSynthesisUtterance(cleanText);
         utterance.lang = 'en-US';
-        utterance.rate = customRate; // Slow 0.75x for clear comprehension
+        utterance.rate = customRate;
         utterance.pitch = 1.0;
         utterance.volume = 1.0;
 
-        // Choose best natural English voice available (prioritize high-quality voices)
-        const voices = window.speechSynthesis.getVoices();
+        const voices = window.speechSynthesis.getVoices() || [];
         const preferredVoice = 
-          // Priority 1: Google US English (best quality on Chrome)
-          voices.find(v => v.name === 'Google US English' && v.lang === 'en-US') ||
-          // Priority 2: Microsoft natural voices (Windows 11)
-          voices.find(v => v.lang === 'en-US' && v.name.includes('Natural') && (v.name.includes('Jenny') || v.name.includes('Guy') || v.name.includes('Aria'))) ||
-          // Priority 3: Microsoft standard voices (Windows 10/11)
-          voices.find(v => v.lang === 'en-US' && (v.name.includes('David') || v.name.includes('Zira') || v.name.includes('Mark'))) ||
-          // Priority 4: macOS Samantha or other Apple voices
-          voices.find(v => v.lang === 'en-US' && (v.name.includes('Samantha') || v.name.includes('Alex'))) ||
-          // Priority 5: Google UK English
-          voices.find(v => v.name === 'Google UK English Female' || v.name === 'Google UK English Male') ||
-          // Priority 6: Any US English voice
-          voices.find(v => v.lang === 'en-US') ||
-          // Priority 7: Any English voice
+          voices.find(v => v.lang === 'en-US' && (v.name.includes('Google') || v.name.includes('Natural'))) ||
+          voices.find(v => v.lang === 'en-US' && (v.name.includes('Samantha') || v.name.includes('Jenny') || v.name.includes('David') || v.name.includes('Zira') || v.name.includes('Aria') || v.name.includes('Guy'))) ||
+          voices.find(v => v.lang && v.lang.startsWith('en-US')) ||
           voices.find(v => v.lang && v.lang.startsWith('en'));
 
         if (preferredVoice) utterance.voice = preferredVoice;
 
         setIsSpeaking(true);
 
+        utterance.onstart = () => {
+          setIsSpeaking(true);
+        };
+
         utterance.onend = () => {
-          setIsSpeaking(false);
-          // Check kill-switch before calling onComplete (which chains next speech)
-          if (!isClosedRef.current && onComplete) onComplete();
+          safeComplete();
         };
 
-        utterance.onerror = () => {
-          setIsSpeaking(false);
-          if (!isClosedRef.current && onComplete) onComplete();
+        utterance.onerror = (err) => {
+          console.warn('SpeechSynthesis error, using fallback audio:', err);
+          playAudioFallback(cleanText, customRate, safeComplete);
         };
 
-        window.speechSynthesis.speak(utterance);
-      } else {
-        if (onComplete) onComplete();
+        // Safety timeout to avoid getting stuck if SpeechSynthesis hangs
+        const maxDuration = Math.max(3000, cleanText.length * 350);
+        speechTimerRef.current = setTimeout(() => {
+          if (!completed) {
+            safeComplete();
+          }
+        }, maxDuration);
+
+        // Small delay to ensure cancel() was processed
+        setTimeout(() => {
+          if (isClosedRef.current) return;
+          try {
+            window.speechSynthesis.speak(utterance);
+          } catch(e) {
+            playAudioFallback(cleanText, customRate, safeComplete);
+          }
+        }, 40);
+
+        return;
+      } catch (e) {
+        console.warn('SpeechSynthesis exception:', e);
       }
-    } catch (e) {
-      setIsSpeaking(false);
-      if (onComplete) onComplete();
     }
-  }, []);
+
+    // Direct fallback if SpeechSynthesis is not supported
+    playAudioFallback(cleanText, customRate, safeComplete);
+  }, [stopCurrentSpeech, playAudioFallback]);
 
   // 3-Time Clear Repetition Routine (Earth... Earth... Earth... GO!)
   const startThreeTimeRoutine = useCallback((targetWord) => {
-    // Clear ALL previous timers
-    for (const ref of allTimerRefs) {
-      if (ref.current) { clearTimeout(ref.current); ref.current = null; }
-    }
+    stopCurrentSpeech();
     if (!targetWord || isClosedRef.current) return;
 
     const cleanWord = sanitizeForSpeech(targetWord);
@@ -276,20 +315,17 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
 
     setSpeakPhase(1); // 1st time (0.78x speed)
     speakWordSlowly(cleanWord, 0.78, () => {
-      if (isClosedRef.current) return; // Check before every chained step
-      // Pause 1.2s before 2nd time
+      if (isClosedRef.current) return;
       speechTimerRef2.current = setTimeout(() => {
         if (isClosedRef.current) return;
         setSpeakPhase(2); // 2nd time (0.74x speed)
         speakWordSlowly(cleanWord, 0.74, () => {
           if (isClosedRef.current) return;
-          // Pause 1.2s before 3rd time
           speechTimerRef3.current = setTimeout(() => {
             if (isClosedRef.current) return;
             setSpeakPhase(3); // 3rd time (0.70x deliberate slow phonetics)
             speakWordSlowly(cleanWord, 0.70, () => {
               if (isClosedRef.current) return;
-              // Pause 0.5s and announce Go!
               speechTimerRef4.current = setTimeout(() => {
                 if (isClosedRef.current) return;
                 setSpeakPhase(4); // GO!
@@ -304,11 +340,12 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
         });
       }, 1200);
     });
-  }, [speakWordSlowly, soundEffects]);
+  }, [speakWordSlowly, stopCurrentSpeech, soundEffects]);
 
   // Start Session
   const startGameSession = async () => {
-    stopAllAudio();
+    isClosedRef.current = false;
+    stopCurrentSpeech();
 
     let sessionWords = [];
     const topicPrompt = selectedDifficulty === 'low'
@@ -354,8 +391,10 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
 
     if (sessionWords[0]) {
       setTimeout(() => {
-        startThreeTimeRoutine(sessionWords[0].word);
-      }, 400);
+        if (!isClosedRef.current) {
+          startThreeTimeRoutine(sessionWords[0].word);
+        }
+      }, 500);
     }
   };
 
@@ -454,7 +493,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
   };
 
   const proceedToNextWord = () => {
-    stopAllAudio();
+    stopCurrentSpeech();
     setCurrentInput('');
     setShowHint(false);
     setShowSentence(false);
@@ -477,7 +516,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
   };
 
   const finishGame = () => {
-    stopAllAudio();
+    stopCurrentSpeech();
     if (soundEffects) playSound.victory();
     setGameState('game_over');
   };
@@ -523,7 +562,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
       } else if (e.key === 'Backspace') {
         setCurrentInput(prev => prev.slice(0, -1));
       } else if (e.key === 'Escape') {
-        stopAllAudio();
+        killAllAudio();
         if (onClose) onClose();
       } else if (/^[a-zA-Z]$/.test(e.key)) {
         if (currentInput.length < 24) {
@@ -534,17 +573,10 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
 
     window.addEventListener('keydown', handlePhysicalKeyDown);
     return () => window.removeEventListener('keydown', handlePhysicalKeyDown);
-  }, [gameState, currentInput, currentWordItem, streak, lives, maxStreak, stopAllAudio, onClose]);
+  }, [gameState, currentInput, currentWordItem, streak, lives, maxStreak, killAllAudio, onClose]);
 
   const handleCloseModal = () => {
-    isClosedRef.current = true; // Set kill-switch FIRST before anything else
-    stopAllAudio();
-    // Triple-cancel speech synthesis to handle edge cases
-    if (window.speechSynthesis) {
-      window.speechSynthesis.cancel();
-      setTimeout(() => { try { window.speechSynthesis.cancel(); } catch(e) {} }, 100);
-      setTimeout(() => { try { window.speechSynthesis.cancel(); } catch(e) {} }, 300);
-    }
+    killAllAudio();
     setGameState('lobby');
     if (onClose) onClose();
   };
