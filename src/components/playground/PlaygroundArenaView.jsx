@@ -609,7 +609,7 @@ export default function PlaygroundArenaView() {
               <div className="space-y-1">
                 <div className="flex flex-wrap items-center gap-2">
                   <span className="px-2 py-0.5 rounded-full bg-cyan-400/20 text-cyan-300 font-mono text-[10px] font-black tracking-wider uppercase border border-cyan-400/30">
-                    GEMINI AI 3X VOICE
+                    SMART AUDIO 3X VOICE
                   </span>
                   <span className="px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 font-mono text-[10px] font-black border border-emerald-400/30">
                     LOW • MEDIUM • HARD
@@ -623,8 +623,8 @@ export default function PlaygroundArenaView() {
                 </h4>
                 <p className="text-xs text-blue-100/80 max-w-xl line-clamp-2">
                   {lang === 'km' 
-                    ? 'AI បញ្ចេញសំឡេងពាក្យអង់គ្លេស ៣ ដងយឺតៗច្បាស់ៗ (Earth... 3x Go!) តាមកម្រិត Low, Medium, Hard ដោយមានជំនួយពី Gemini AI!' 
-                    : 'Listen to slow, clear English voice pronunciations 3 times in sequence (Low, Medium, Hard difficulties) powered by Gemini AI!'}
+                    ? 'ប្រព័ន្ធបញ្ចេញសំឡេងពាក្យអង់គ្លេស ៣ ដងយឺតៗច្បាស់ៗ (Earth... 3x Go!) តាមកម្រិត Low, Medium, Hard តាមស្តង់ដារជាតិ MoTDAR!' 
+                    : 'Listen to slow, clear English voice pronunciations 3 times in sequence (Low, Medium, Hard difficulties) with smart dictation!'}
                 </p>
               </div>
             </div>

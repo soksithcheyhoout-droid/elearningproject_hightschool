@@ -24,10 +24,9 @@ import {
   Heart,
   Crown,
   Bot,
-  Wand2,
-  RefreshCw,
   Gauge,
-  BookOpen
+  BookOpen,
+  Check
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
@@ -47,7 +46,8 @@ const DIFFICULTY_LEVELS = [
     nameKm: 'កម្រិតទាប (ដំបូង)',
     descKm: 'ពាក្យខ្លីៗ ៤-៦ អក្សរ ងាយស្រួលស្តាប់ (Earth, Water, Space...)',
     badgeColor: 'from-emerald-500 to-teal-500',
-    borderColor: 'border-emerald-400',
+    borderColor: 'border-emerald-500/60',
+    activeGlow: 'shadow-[0_0_25px_rgba(16,185,129,0.35)] bg-emerald-950/40 border-emerald-400',
     textColor: 'text-emerald-300',
     xpReward: 300
   },
@@ -57,7 +57,8 @@ const DIFFICULTY_LEVELS = [
     nameKm: 'កម្រិតមធ្យម (ទូទៅ)',
     descKm: 'ពាក្យវិទ្យាសាស្ត្រ ៦-៩ អក្សរ (Gravity, Climate, Oxygen...)',
     badgeColor: 'from-amber-500 to-orange-500',
-    borderColor: 'border-amber-400',
+    borderColor: 'border-amber-500/60',
+    activeGlow: 'shadow-[0_0_25px_rgba(245,158,11,0.35)] bg-amber-950/40 border-amber-400',
     textColor: 'text-amber-300',
     xpReward: 450
   },
@@ -67,18 +68,11 @@ const DIFFICULTY_LEVELS = [
     nameKm: 'កម្រិតខ្ពស់ (បាក់ឌុប)',
     descKm: 'ពាក្យស៊ីជម្រៅ ៨-១៤ អក្សរ (Photosynthesis, Biodiversity...)',
     badgeColor: 'from-rose-500 to-red-600',
-    borderColor: 'border-rose-400',
+    borderColor: 'border-rose-500/60',
+    activeGlow: 'shadow-[0_0_25px_rgba(244,63,94,0.35)] bg-rose-950/40 border-rose-400',
     textColor: 'text-rose-300',
     xpReward: 600
   }
-];
-
-const AI_TOPIC_PRESETS = [
-  { id: 'earth', labelKm: '🌍 Earth & Nature (ធម្មជាតិ)', prompt: 'Earth, nature, weather, seasons, water, and geography' },
-  { id: 'science', labelKm: '🔬 Science & Biology (វិទ្យាសាស្ត្រ)', prompt: 'Science, biology, cells, energy, planets, and laboratory' },
-  { id: 'tech', labelKm: '⚡ Physics & Tech (បច្ចេកវិទ្យា)', prompt: 'Physics, computer, technology, internet, electricity, and engineering' },
-  { id: 'bacii', labelKm: '🎓 BacII Academic (ប្រឡងបាក់ឌុប)', prompt: 'Grade 12 Cambodian national English exam vocabulary and essay words' },
-  { id: 'daily', labelKm: '🍎 Everyday English (សន្ទនា)', prompt: 'Everyday communication, school, food, travel, and health' }
 ];
 
 export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
@@ -89,8 +83,6 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
   const [gameMode, setGameMode] = useState('mission'); // 'mission' | 'speed' | 'endless'
   const [soundEffects, setSoundEffects] = useState(true);
   const [autoThreeTimes, setAutoThreeTimes] = useState(true);
-  const [customAiTopic, setCustomAiTopic] = useState('');
-  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
 
   // Game Progress State
   const [gameState, setGameState] = useState('lobby'); // 'lobby' | 'playing' | 'game_over'
@@ -124,7 +116,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
 
   const currentWordItem = wordsList[currentIndex] || englishDictationWords[0];
 
-  // 🛑 GLOBAL STOP ALL AUDIO FUNCTION (Instant voice cancel on close or transition)
+  // 🛑 GLOBAL STOP ALL AUDIO FUNCTION (Instant voice cancellation)
   const stopAllAudio = useCallback(() => {
     try {
       if (typeof window !== 'undefined' && window.speechSynthesis) {
@@ -168,7 +160,6 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
     }
 
     try {
-      // 1. Stop any prior speech
       if (window.speechSynthesis) {
         window.speechSynthesis.cancel();
       }
@@ -207,7 +198,6 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
 
         window.speechSynthesis.speak(utterance);
       } else {
-        // Fallback to online dictionary audio stream if speechSynthesis is missing
         const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q=${encodeURIComponent(text)}`;
         const audio = new Audio(audioUrl);
         activeAudioElRef.current = audio;
@@ -264,25 +254,25 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
     });
   }, [speakWordSlowly, soundEffects]);
 
-  // Start Session with Gemini AI or Local Bank
-  const startGameSession = async (useAi = true, selectedTopic = '') => {
+  // Start Session
+  const startGameSession = async () => {
     stopAllAudio();
-    setIsGeneratingAi(true);
 
     let sessionWords = [];
-    const topicPrompt = selectedTopic || customAiTopic || 'Earth, Science, Nature, and High School Academic Vocabulary';
+    const topicPrompt = selectedDifficulty === 'low'
+      ? 'Earth, Space, Nature, Everyday high school vocabulary'
+      : selectedDifficulty === 'hard'
+        ? 'Grade 12 BacII National English Exam Academic Science and Literature'
+        : 'Science, Biology, Physics, and High School Academic Vocabulary';
 
     try {
-      if (useAi) {
-        sessionWords = await generateEnglishDictationWithAI(topicPrompt, gameMode === 'mission' ? 10 : 20, selectedDifficulty);
-      }
+      sessionWords = await generateEnglishDictationWithAI(topicPrompt, gameMode === 'mission' ? 10 : 20, selectedDifficulty);
     } catch (e) {
       console.warn('AI generator fallback:', e);
     }
 
     if (!sessionWords || sessionWords.length === 0) {
       sessionWords = getEnglishDictationSession(gameMode === 'mission' ? 10 : 25, 'all');
-      // Filter by difficulty length if fallback
       if (selectedDifficulty === 'low') {
         sessionWords = sessionWords.filter(w => w.word.length <= 6);
       } else if (selectedDifficulty === 'hard') {
@@ -293,7 +283,6 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
       }
     }
 
-    setIsGeneratingAi(false);
     setWordsList(sessionWords);
     setCurrentIndex(0);
     setCurrentInput('');
@@ -506,31 +495,30 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
     <div className="fixed inset-0 z-[99999] flex items-center justify-center p-2 sm:p-4 bg-slate-950/90 backdrop-blur-xl animate-fadeIn font-kantumruy select-none overflow-y-auto">
       
       {/* Modal Container */}
-      <div className="relative w-full max-w-4xl bg-gradient-to-b from-[#081528] via-[#050f1d] to-[#020710] rounded-3xl border-2 border-cyan-400/40 shadow-[0_20px_80px_rgba(6,182,212,0.25)] overflow-hidden flex flex-col my-auto max-h-[96vh]">
+      <div className="relative w-full max-w-4xl bg-[#050f1d] rounded-3xl border-2 border-cyan-500/40 shadow-[0_25px_90px_rgba(6,182,212,0.25)] overflow-hidden flex flex-col my-auto max-h-[96vh]">
         
-        {/* Ambient Glows */}
-        <div className="absolute top-0 right-1/4 w-72 h-72 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
-        <div className="absolute bottom-0 left-1/4 w-72 h-72 bg-amber-500/10 rounded-full blur-3xl pointer-events-none" />
+        {/* Ambient Grid Background */}
+        <div className="absolute inset-0 bg-[radial-gradient(#005baa_1px,transparent_1px)] [background-size:24px_24px] opacity-15 pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
 
         {/* 🌟 TOP HEADER BAR */}
-        <div className="relative z-10 bg-[#001730]/90 backdrop-blur-md border-b border-white/10 px-4 sm:px-6 py-3 flex items-center justify-between flex-shrink-0">
+        <div className="relative z-10 bg-[#001730]/95 backdrop-blur-md border-b border-cyan-500/20 px-4 sm:px-6 py-3.5 flex items-center justify-between flex-shrink-0">
           
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 text-white flex items-center justify-center shadow-lg shadow-cyan-500/30">
+            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-cyan-500/30 border border-cyan-300/40">
               <Headphones className="w-5 h-5 animate-pulse" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-extrabold text-sm sm:text-base text-white font-cinzel tracking-wider">
+                <h3 className="font-black text-sm sm:text-base text-white font-cinzel tracking-wider">
                   ENGLISH PRACTICE: LISTEN AND SPELL
                 </h3>
-                <span className="px-2 py-0.5 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400/40 text-[9.5px] font-black text-cyan-300 uppercase flex items-center gap-1">
-                  <Bot className="w-3 h-3 text-cyan-400" />
-                  <span>GEMINI AI VOICE 3X</span>
+                <span className="px-2.5 py-0.5 rounded-full bg-cyan-400/20 border border-cyan-400/40 text-[9.5px] font-black text-cyan-300 uppercase tracking-wide">
+                  SMART AUDIO 3X
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 hidden sm:block">
-                អនុវត្តស្តាប់ AI បញ្ចេញសំឡេង ៣ ដងយឺតៗ & សរសេរអក្ខរាវិរុទ្ធអង់គ្លេសត្រឹមត្រូវ
+                អនុវត្តស្តាប់ការបញ្ចេញសំឡេង ៣ ដងយឺតៗ & សរសេរអក្ខរាវិរុទ្ធអង់គ្លេសដណ្តើម XP
               </p>
             </div>
           </div>
@@ -566,29 +554,30 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
           {/* 1. LOBBY / CONFIGURATION SCREEN */}
           {/* ========================================================= */}
           {gameState === 'lobby' && (
-            <div className="space-y-6 animate-fadeIn py-2 max-w-2xl mx-auto w-full text-center">
+            <div className="space-y-6 animate-fadeIn py-2 max-w-3xl mx-auto w-full text-center">
               
-              <div className="space-y-2">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 text-xs font-bold font-cinzel">
+              {/* Header Title */}
+              <div className="space-y-1.5">
+                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 text-xs font-bold font-cinzel tracking-wider">
                   <Sparkles className="w-3.5 h-3.5" />
-                  <span>NATIONAL ENGLISH LISTENING & SPELLING</span>
+                  <span>NATIONAL ENGLISH LISTENING & SPELLING ARENA</span>
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">
                   ការអនុវត្តភាសាអង់គ្លេស៖ ស្តាប់ & សរសេរអក្ខរាវិរុទ្ធ
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto leading-relaxed">
-                  លោកគ្រូ AI បញ្ចេញសំឡេងពាក្យអង់គ្លេស <strong>៣ ដងយឺតៗច្បាស់ៗ (ដូចជា Earth... Earth... Earth... GO!)</strong> ដើម្បីឱ្យប្អូនស្តាប់ទាន់ រួចវាយអក្សរចូលឱ្យបានត្រឹមត្រូវ!
+                <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
+                  ប្រព័ន្ធបញ្ចេញសំឡេងពាក្យអង់គ្លេស <strong>៣ ដងយឺតៗច្បាស់ៗ (ដូចជា Earth... Earth... Earth... GO!)</strong> ដើម្បីឱ្យប្អូនស្តាប់ទាន់ រួចវាយអក្សរចូលឱ្យបានត្រឹមត្រូវ!
                 </p>
               </div>
 
-              {/* 🌟 OPTION CHOICE 1: DIFFICULTY SELECTION (LOW, MEDIUM, HARD) */}
+              {/* 🌟 1. DIFFICULTY SELECTION CARDS (LOW, MEDIUM, HARD) */}
               <div className="space-y-2 text-left">
                 <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
                   <span>ជ្រើសរើសកម្រិតលំបាក (Choose Difficulty Level):</span>
-                  <span className="text-cyan-400 text-[11px] font-normal">Gemini AI បង្កើតពាក្យតាមកម្រិត</span>
+                  <span className="text-cyan-400 text-[11px] font-mono">3 NATIONAL TIERS</span>
                 </label>
                 
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                   {DIFFICULTY_LEVELS.map((level) => {
                     const isSelected = selectedDifficulty === level.id;
                     return (
@@ -596,25 +585,27 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                         key={level.id}
                         type="button"
                         onClick={() => setSelectedDifficulty(level.id)}
-                        className={`p-3.5 rounded-2xl border-2 text-left transition-all cursor-pointer relative overflow-hidden ${
+                        className={`p-4 rounded-2xl border-2 text-left transition-all duration-200 cursor-pointer relative overflow-hidden flex flex-col justify-between ${
                           isSelected
-                            ? `${level.borderColor} bg-slate-900 shadow-lg shadow-cyan-950/60 scale-102`
-                            : 'bg-white/5 border-white/10 hover:border-white/20 text-slate-400'
+                            ? `${level.activeGlow} scale-102`
+                            : 'bg-slate-900/60 border-white/10 hover:border-white/20 text-slate-400'
                         }`}
                       >
-                        <div className="flex items-center justify-between mb-1.5">
-                          <span className={`font-black text-xs sm:text-sm ${isSelected ? level.textColor : 'text-white'}`}>
-                            {level.nameKm}
-                          </span>
-                          <span className="text-[10px] font-mono font-bold text-amber-400">
-                            +{level.xpReward} XP
-                          </span>
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <span className={`font-black text-sm sm:text-base ${isSelected ? level.textColor : 'text-white'}`}>
+                              {level.nameKm}
+                            </span>
+                            <span className="px-2 py-0.5 rounded-md bg-amber-400/15 border border-amber-400/30 text-[10px] font-mono font-black text-amber-300">
+                              +{level.xpReward} XP
+                            </span>
+                          </div>
+                          <p className="text-[11.5px] text-slate-300 leading-snug">
+                            {level.descKm}
+                          </p>
                         </div>
-                        <p className="text-[11px] text-slate-300 leading-snug">
-                          {level.descKm}
-                        </p>
                         {isSelected && (
-                          <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${level.badgeColor}`} />
+                          <div className={`absolute bottom-0 left-0 right-0 h-1.5 bg-gradient-to-r ${level.badgeColor}`} />
                         )}
                       </button>
                     );
@@ -622,64 +613,9 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                 </div>
               </div>
 
-              {/* 🌟 OPTION CHOICE 2: AI TOPIC SELECTION / CUSTOM PROMPT */}
-              <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-950/60 via-[#071d3a] to-cyan-950/60 border border-cyan-400/40 text-left space-y-3 shadow-lg shadow-cyan-950/40">
-                <div className="flex items-center justify-between">
-                  <div className="flex items-center gap-2 text-cyan-300 font-bold text-xs">
-                    <Wand2 className="w-4 h-4 text-cyan-400" />
-                    <span>ប្រធានបទពាក្យដោយ Gemini AI (Topic Generator):</span>
-                  </div>
-                  <span className="px-2 py-0.5 rounded-md bg-cyan-400/20 text-cyan-200 text-[10px] font-mono font-bold">
-                    AI LIVE
-                  </span>
-                </div>
-
-                {/* Custom Input */}
-                <div className="flex items-center gap-2">
-                  <input
-                    type="text"
-                    value={customAiTopic}
-                    onChange={(e) => setCustomAiTopic(e.target.value)}
-                    placeholder="វាយប្រធានបទដែលចង់រៀន (ឧទាហរណ៍៖ Space, Earth, Biology, BacII Exam, Technology...)"
-                    className="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-white/15 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-cyan-400"
-                  />
-                  <button
-                    type="button"
-                    onClick={() => startGameSession(true, customAiTopic)}
-                    disabled={isGeneratingAi}
-                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer shadow-md disabled:opacity-50"
-                  >
-                    {isGeneratingAi ? (
-                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
-                    ) : (
-                      <Wand2 className="w-3.5 h-3.5" />
-                    )}
-                    <span>{isGeneratingAi ? 'AI កំពុងបង្កើត...' : 'AI បង្កើត & លេង'}</span>
-                  </button>
-                </div>
-
-                {/* Quick Presets */}
-                <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                  <span className="text-[11px] text-slate-400 font-medium">ប្រធានបទគំរូ៖</span>
-                  {AI_TOPIC_PRESETS.map((preset) => (
-                    <button
-                      key={preset.id}
-                      type="button"
-                      onClick={() => {
-                        setCustomAiTopic(preset.prompt);
-                        startGameSession(true, preset.prompt);
-                      }}
-                      className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-cyan-500/20 border border-white/10 hover:border-cyan-400/40 text-[11px] text-slate-300 hover:text-cyan-200 transition-colors cursor-pointer"
-                    >
-                      {preset.labelKm}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* Game Mode Selector */}
+              {/* 🌟 2. GAME MODE SELECTION */}
               <div className="space-y-2 text-left">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
+                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider block">
                   ទម្រង់ប្រកួត (Game Mode):
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
@@ -688,8 +624,8 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                     onClick={() => setGameMode('mission')}
                     className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
                       gameMode === 'mission'
-                        ? 'bg-cyan-950/60 border-cyan-400 shadow-lg shadow-cyan-500/20 text-white'
-                        : 'bg-white/5 border-white/10 text-slate-400 hover:border-white/30 hover:text-white'
+                        ? 'bg-cyan-950/70 border-cyan-400 shadow-lg shadow-cyan-500/20 text-white'
+                        : 'bg-slate-900/60 border-white/10 text-slate-400 hover:border-white/20 hover:text-white'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
@@ -704,8 +640,8 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                     onClick={() => setGameMode('speed')}
                     className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
                       gameMode === 'speed'
-                        ? 'bg-cyan-950/60 border-cyan-400 shadow-lg shadow-cyan-500/20 text-white'
-                        : 'bg-white/5 border-white/10 text-slate-400 hover:border-white/30 hover:text-white'
+                        ? 'bg-cyan-950/70 border-cyan-400 shadow-lg shadow-cyan-500/20 text-white'
+                        : 'bg-slate-900/60 border-white/10 text-slate-400 hover:border-white/20 hover:text-white'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
@@ -720,8 +656,8 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                     onClick={() => setGameMode('endless')}
                     className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
                       gameMode === 'endless'
-                        ? 'bg-cyan-950/60 border-cyan-400 shadow-lg shadow-cyan-500/20 text-white'
-                        : 'bg-white/5 border-white/10 text-slate-400 hover:border-white/30 hover:text-white'
+                        ? 'bg-cyan-950/70 border-cyan-400 shadow-lg shadow-cyan-500/20 text-white'
+                        : 'bg-slate-900/60 border-white/10 text-slate-400 hover:border-white/20 hover:text-white'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
@@ -733,15 +669,15 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                 </div>
               </div>
 
-              {/* Auto 3 Times Switch */}
-              <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between text-left">
+              {/* 🌟 3. AUTO 3-TIME VOICE TOGGLE */}
+              <div className="p-3.5 rounded-2xl bg-slate-900/60 border border-white/10 flex items-center justify-between text-left">
                 <div className="space-y-0.5">
                   <div className="text-xs font-bold text-white flex items-center gap-1.5">
                     <Volume2 className="w-4 h-4 text-cyan-400" />
                     <span>បញ្ចេញសំឡេងស្វ័យប្រវត្តិ ៣ ដងយឺតៗ (Auto 3x Routine)</span>
                   </div>
                   <p className="text-[11px] text-slate-400">
-                    AI និយាយពាក្យ ៣ ដងយឺតៗច្បាស់ៗ (Earth... Earth... Earth... GO!)
+                    ប្រព័ន្ធនិយាយពាក្យ ៣ ដងយឺតៗច្បាស់ៗ (Earth... Earth... Earth... GO!)
                   </p>
                 </div>
                 <button
@@ -757,17 +693,43 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                 </button>
               </div>
 
-              {/* Start Button */}
-              <button
-                type="button"
-                onClick={() => startGameSession(true)}
-                disabled={isGeneratingAi}
-                className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-blue-500 text-white font-black text-sm sm:text-base flex items-center justify-center gap-3 shadow-xl shadow-cyan-500/25 active:scale-98 transition-all cursor-pointer border border-cyan-300/40"
-              >
-                <Play className="w-5 h-5 fill-white" />
-                <span>ចាប់ផ្តើមអនុវត្តស្តាប់ & សរសេរ (START LISTEN & SPELL)</span>
-                <Sparkles className="w-4 h-4 text-amber-300" />
-              </button>
+              {/* 🌟 4. HACKER / CYBER ARENA START BUTTON */}
+              <div className="hacker-button-container w-full pt-1">
+                <button
+                  type="button"
+                  onClick={startGameSession}
+                  className="hacker-button w-full justify-center cursor-pointer"
+                  data-text="🎧 ចាប់ផ្តើមអនុវត្ត (START LISTEN & SPELL)"
+                >
+                  <Headphones className="w-5 h-5 fill-current relative z-10 text-cyan-300 animate-pulse" />
+                  <span className="relative z-10 font-black text-sm sm:text-base tracking-wide">
+                    ចាប់ផ្តើមអនុវត្ត (START LISTEN & SPELL)
+                  </span>
+                  
+                  <div className="neon-frame" />
+                  <div className="circuit-traces">
+                    <div className="circuit-trace" />
+                    <div className="circuit-trace" />
+                    <div className="circuit-trace" />
+                    <div className="circuit-trace" />
+                    <div className="circuit-trace" />
+                  </div>
+                  <div className="code-fragments">
+                    <span className="code-fragment">0xEN</span>
+                    <span className="code-fragment">SPELL</span>
+                    <span className="code-fragment">AUDIO</span>
+                    <span className="code-fragment">3X</span>
+                    <span className="code-fragment">100%</span>
+                  </div>
+                  <div className="interference" />
+                  <div className="scan-bars">
+                    <div className="scan-bar" />
+                    <div className="scan-bar" />
+                    <div className="scan-bar" />
+                  </div>
+                  <div className="text-glow" />
+                </button>
+              </div>
 
             </div>
           )}
@@ -848,9 +810,9 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                         : 'bg-cyan-500 text-slate-950'
                     }`}>
                       <Volume2 className="w-3.5 h-3.5" />
-                      {speakPhase === 1 && '🗣️ AI Saying: 1st Time (ស្តាប់លើកទី ១)'}
-                      {speakPhase === 2 && '🗣️ AI Saying: 2nd Time (ស្តាប់លើកទី ២)'}
-                      {speakPhase === 3 && '🗣️ AI Saying: 3rd Time (ស្តាប់លើកទី ៣ - យឺតៗ)'}
+                      {speakPhase === 1 && '🗣️ លើកទី ១ (1st Time)'}
+                      {speakPhase === 2 && '🗣️ លើកទី ២ (2nd Time)'}
+                      {speakPhase === 3 && '🗣️ លើកទី ៣ យឺតៗ (3rd Time)'}
                       {speakPhase === 4 && '🚀 GO! TYPE THE WORD NOW! (វាយពាក្យ!)'}
                     </span>
                   </div>
@@ -890,7 +852,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                   ))}
                 </div>
 
-                {/* Audio Helper Actions (Repeat 3x, Slow 0.65x, Phonics, Sentence, AI Coach) */}
+                {/* Audio Helper Actions (Repeat 3x, Slow 0.60x, Phonics, Sentence, AI Coach) */}
                 <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
                   
                   <button
@@ -937,7 +899,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                     <span>លឺឧទាហរណ៍ (Sentence)</span>
                   </button>
 
-                  {/* 🤖 Live AI Smart Coach Button */}
+                  {/* Smart Coach Hint Button */}
                   <button
                     type="button"
                     onClick={handleAskAiCoach}
@@ -945,7 +907,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                     className="px-3 py-1.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-400/40 text-indigo-300 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
                   >
                     <Bot className="w-3.5 h-3.5 text-indigo-400" />
-                    <span>{isAskingAiCoach ? 'AI កំពុងគិត...' : '🤖 សួរ AI ឱ្យជួយពន្យល់'}</span>
+                    <span>{isAskingAiCoach ? 'កំពុងគិត...' : '🤖 ជំនួយពន្យល់ (Smart Hint)'}</span>
                   </button>
 
                 </div>
@@ -956,14 +918,14 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                     <div className="flex items-center justify-between text-indigo-300 font-bold">
                       <span className="flex items-center gap-1.5">
                         <Bot className="w-4 h-4 text-indigo-400" />
-                        <span>លោកគ្រូ AI Smart Coach ៖</span>
+                        <span>លោកគ្រូ AI (Smart Coach) ៖</span>
                       </span>
                       <button
                         type="button"
                         onClick={() => speakWordSlowly(aiCoachHint, 0.85)}
                         className="text-[11px] text-cyan-300 hover:underline cursor-pointer"
                       >
-                        🔊 ស្តាប់ AI
+                        🔊 ស្តាប់សំឡេង
                       </button>
                     </div>
                     <p className="text-slate-200 leading-relaxed">
@@ -1215,7 +1177,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
               <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={() => startGameSession(true)}
+                  onClick={startGameSession}
                   className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg"
                 >
                   <RotateCcw className="w-4 h-4" />
