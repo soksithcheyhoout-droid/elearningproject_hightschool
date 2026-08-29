@@ -26,12 +26,12 @@ import {
   Bot,
   Wand2,
   RefreshCw,
-  Send,
-  MessageSquare
+  Gauge,
+  BookOpen
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
-import { englishDictationWords, englishDictationCategories, getEnglishDictationSession } from '../../data/englishDictationData';
+import { englishDictationWords, getEnglishDictationSession } from '../../data/englishDictationData';
 import { generateEnglishDictationWithAI, getAIAssistedSpellingHint } from '../../services/geminiService';
 
 const VIRTUAL_KEYBOARD = [
@@ -40,20 +40,52 @@ const VIRTUAL_KEYBOARD = [
   ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACK']
 ];
 
+const DIFFICULTY_LEVELS = [
+  {
+    id: 'low',
+    nameEn: 'Low (Beginner)',
+    nameKm: 'កម្រិតទាប (ដំបូង)',
+    descKm: 'ពាក្យខ្លីៗ ៤-៦ អក្សរ ងាយស្រួលស្តាប់ (Earth, Water, Space...)',
+    badgeColor: 'from-emerald-500 to-teal-500',
+    borderColor: 'border-emerald-400',
+    textColor: 'text-emerald-300',
+    xpReward: 300
+  },
+  {
+    id: 'medium',
+    nameEn: 'Medium (Standard)',
+    nameKm: 'កម្រិតមធ្យម (ទូទៅ)',
+    descKm: 'ពាក្យវិទ្យាសាស្ត្រ ៦-៩ អក្សរ (Gravity, Climate, Oxygen...)',
+    badgeColor: 'from-amber-500 to-orange-500',
+    borderColor: 'border-amber-400',
+    textColor: 'text-amber-300',
+    xpReward: 450
+  },
+  {
+    id: 'hard',
+    nameEn: 'Hard (BacII Advanced)',
+    nameKm: 'កម្រិតខ្ពស់ (បាក់ឌុប)',
+    descKm: 'ពាក្យស៊ីជម្រៅ ៨-១៤ អក្សរ (Photosynthesis, Biodiversity...)',
+    badgeColor: 'from-rose-500 to-red-600',
+    borderColor: 'border-rose-400',
+    textColor: 'text-rose-300',
+    xpReward: 600
+  }
+];
+
 const AI_TOPIC_PRESETS = [
-  { id: 'earth', labelKm: '🌍 ភពផែនដី & លំហ (Earth & Space)', prompt: 'Earth, astronomy, solar system, atmosphere, and geology' },
-  { id: 'science', labelKm: '🔬 វិទ្យាសាស្ត្រ & ជីវវិទ្យា (Science & Bio)', prompt: 'Biology, chemistry, photosynthesis, cells, and genetics' },
-  { id: 'tech', labelKm: '⚡ រូបវិទ្យា & IT (Physics & Tech)', prompt: 'Physics, mechanics, electricity, computer science, and innovation' },
-  { id: 'bacii', labelKm: '🎓 ត្រៀមប្រឡងបាក់ឌុប (BacII Academic)', prompt: 'Grade 12 Cambodian national English curriculum, academic vocabulary, and essay comprehension' },
-  { id: 'culture', labelKm: '🏛️ ប្រវត្តិសាស្ត្រ & វប្បធម៌ (Culture & History)', prompt: 'Cambodian culture, Angkor civilization, world history, and society' },
-  { id: 'daily', labelKm: '🍎 ការសន្ទនាប្រចាំថ្ងៃ (Daily English)', prompt: 'Everyday high-frequency English, school life, travel, and communication' }
+  { id: 'earth', labelKm: '🌍 Earth & Nature (ធម្មជាតិ)', prompt: 'Earth, nature, weather, seasons, water, and geography' },
+  { id: 'science', labelKm: '🔬 Science & Biology (វិទ្យាសាស្ត្រ)', prompt: 'Science, biology, cells, energy, planets, and laboratory' },
+  { id: 'tech', labelKm: '⚡ Physics & Tech (បច្ចេកវិទ្យា)', prompt: 'Physics, computer, technology, internet, electricity, and engineering' },
+  { id: 'bacii', labelKm: '🎓 BacII Academic (ប្រឡងបាក់ឌុប)', prompt: 'Grade 12 Cambodian national English exam vocabulary and essay words' },
+  { id: 'daily', labelKm: '🍎 Everyday English (សន្ទនា)', prompt: 'Everyday communication, school, food, travel, and health' }
 ];
 
 export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
   const { addXP } = useAuth();
 
-  // Settings & Category
-  const [category, setCategory] = useState('all');
+  // Difficulty & Settings
+  const [selectedDifficulty, setSelectedDifficulty] = useState('medium'); // 'low' | 'medium' | 'hard'
   const [gameMode, setGameMode] = useState('mission'); // 'mission' | 'speed' | 'endless'
   const [soundEffects, setSoundEffects] = useState(true);
   const [autoThreeTimes, setAutoThreeTimes] = useState(true);
@@ -61,13 +93,12 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
   const [isGeneratingAi, setIsGeneratingAi] = useState(false);
 
   // Game Progress State
-  const [gameState, setGameState] = useState('lobby'); // 'lobby' | 'playing' | 'round_result' | 'game_over'
+  const [gameState, setGameState] = useState('lobby'); // 'lobby' | 'playing' | 'game_over'
   const [wordsList, setWordsList] = useState([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [currentInput, setCurrentInput] = useState('');
-  const [repeatsLeft, setRepeatsLeft] = useState(3);
   const [isSpeaking, setIsSpeaking] = useState(false);
-  const [speakPhase, setSpeakPhase] = useState(0); // 0 = idle, 1 = 1st time, 2 = 2nd time, 3 = 3rd time, 4 = go
+  const [speakPhase, setSpeakPhase] = useState(0); // 0 = idle, 1 = 1st, 2 = 2nd, 3 = 3rd, 4 = go
   const [isWrongShake, setIsWrongShake] = useState(false);
   const [isCorrectGlow, setIsCorrectGlow] = useState(false);
   const [showHint, setShowHint] = useState(false);
@@ -86,102 +117,183 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
   const [resultsHistory, setResultsHistory] = useState([]);
   const [timeLeft, setTimeLeft] = useState(60);
 
-  // Audio Speech Synthesizer Ref
+  // Audio & Timers Refs
   const speechTimerRef = useRef(null);
   const countdownTimerRef = useRef(null);
+  const activeAudioElRef = useRef(null);
 
   const currentWordItem = wordsList[currentIndex] || englishDictationWords[0];
 
-  // Helper to pronounce words with Web Speech API
-  const speakWord = useCallback((text, rate = 1.0, onComplete) => {
-    if (typeof window === 'undefined' || !window.speechSynthesis) {
+  // 🛑 GLOBAL STOP ALL AUDIO FUNCTION (Instant voice cancel on close or transition)
+  const stopAllAudio = useCallback(() => {
+    try {
+      if (typeof window !== 'undefined' && window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+      if (activeAudioElRef.current) {
+        activeAudioElRef.current.pause();
+        activeAudioElRef.current.currentTime = 0;
+        activeAudioElRef.current = null;
+      }
+      if (speechTimerRef.current) {
+        clearTimeout(speechTimerRef.current);
+        speechTimerRef.current = null;
+      }
+      if (countdownTimerRef.current) {
+        clearInterval(countdownTimerRef.current);
+        countdownTimerRef.current = null;
+      }
+      setIsSpeaking(false);
+      setSpeakPhase(0);
+    } catch (e) {
+      console.warn('Audio stop notice:', e);
+    }
+  }, []);
+
+  // Ensure speech is completely terminated when modal closes or unmounts
+  useEffect(() => {
+    if (!isOpen) {
+      stopAllAudio();
+    }
+    return () => {
+      stopAllAudio();
+    };
+  }, [isOpen, stopAllAudio]);
+
+  // Calm & Slow Educational Voice Pronunciation (Speech Rate: 0.75x slow & crystal clear)
+  const speakWordSlowly = useCallback((text, customRate = 0.75, onComplete) => {
+    if (typeof window === 'undefined') {
       if (onComplete) onComplete();
       return;
     }
 
     try {
-      window.speechSynthesis.cancel(); // Stop prior speech
-      const utterance = new SpeechSynthesisUtterance(text);
-      utterance.lang = 'en-US';
-      utterance.rate = rate; // 1.0 normal, 0.75 slow
-      utterance.pitch = 1.0;
+      // 1. Stop any prior speech
+      if (window.speechSynthesis) {
+        window.speechSynthesis.cancel();
+      }
+      if (activeAudioElRef.current) {
+        activeAudioElRef.current.pause();
+        activeAudioElRef.current.currentTime = 0;
+        activeAudioElRef.current = null;
+      }
 
-      // Select top quality English Voice
-      const voices = window.speechSynthesis.getVoices();
-      const preferred = voices.find(v => (v.lang === 'en-US' || v.lang === 'en-GB') && (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha') || v.name.includes('Jenny') || v.name.includes('Guy') || v.name.includes('David') || v.name.includes('Zira')))
-        || voices.find(v => v.lang.startsWith('en'));
-      
-      if (preferred) utterance.voice = preferred;
+      if (window.speechSynthesis) {
+        const utterance = new SpeechSynthesisUtterance(text);
+        utterance.lang = 'en-US';
+        utterance.rate = customRate; // Slow 0.75x for clear comprehension
+        utterance.pitch = 1.0;
 
-      setIsSpeaking(true);
-      utterance.onend = () => {
-        setIsSpeaking(false);
-        if (onComplete) onComplete();
-      };
-      utterance.onerror = () => {
-        setIsSpeaking(false);
-        if (onComplete) onComplete();
-      };
+        // Choose best natural English voice available
+        const voices = window.speechSynthesis.getVoices();
+        const preferredVoice = voices.find(v => 
+          (v.lang === 'en-US' || v.lang === 'en-GB') && 
+          (v.name.includes('Google') || v.name.includes('Natural') || v.name.includes('Samantha') || v.name.includes('Jenny') || v.name.includes('David') || v.name.includes('Zira') || v.name.includes('Guy'))
+        ) || voices.find(v => v.lang && v.lang.startsWith('en'));
 
-      window.speechSynthesis.speak(utterance);
+        if (preferredVoice) utterance.voice = preferredVoice;
+
+        setIsSpeaking(true);
+
+        utterance.onend = () => {
+          setIsSpeaking(false);
+          if (onComplete) onComplete();
+        };
+
+        utterance.onerror = () => {
+          setIsSpeaking(false);
+          if (onComplete) onComplete();
+        };
+
+        window.speechSynthesis.speak(utterance);
+      } else {
+        // Fallback to online dictionary audio stream if speechSynthesis is missing
+        const audioUrl = `https://translate.google.com/translate_tts?ie=UTF-8&client=tw-ob&tl=en&q=${encodeURIComponent(text)}`;
+        const audio = new Audio(audioUrl);
+        activeAudioElRef.current = audio;
+        audio.playbackRate = customRate;
+        setIsSpeaking(true);
+        audio.onended = () => {
+          setIsSpeaking(false);
+          activeAudioElRef.current = null;
+          if (onComplete) onComplete();
+        };
+        audio.onerror = () => {
+          setIsSpeaking(false);
+          activeAudioElRef.current = null;
+          if (onComplete) onComplete();
+        };
+        audio.play().catch(() => {
+          setIsSpeaking(false);
+          if (onComplete) onComplete();
+        });
+      }
     } catch (e) {
       setIsSpeaking(false);
       if (onComplete) onComplete();
     }
   }, []);
 
-  // AI 3-Time Voice Routine ("ai will said for user type like ai said earth and said 3 time after go")
-  const startAiThreeTimeRoutine = useCallback((targetWord) => {
+  // 3-Time Clear Repetition Routine (Earth... Earth... Earth... GO!)
+  const startThreeTimeRoutine = useCallback((targetWord) => {
     if (speechTimerRef.current) clearTimeout(speechTimerRef.current);
     if (!targetWord) return;
 
-    setSpeakPhase(1); // 1st time
-    speakWord(targetWord, 1.0, () => {
-      // Pause 0.9s before 2nd time
+    setSpeakPhase(1); // 1st time (0.78x speed)
+    speakWordSlowly(targetWord, 0.78, () => {
+      // Pause 1s before 2nd time
       speechTimerRef.current = setTimeout(() => {
-        setSpeakPhase(2); // 2nd time
-        speakWord(targetWord, 0.9, () => {
-          // Pause 0.9s before 3rd time
+        setSpeakPhase(2); // 2nd time (0.74x speed)
+        speakWordSlowly(targetWord, 0.74, () => {
+          // Pause 1s before 3rd time
           speechTimerRef.current = setTimeout(() => {
-            setSpeakPhase(3); // 3rd time
-            speakWord(targetWord, 0.8, () => {
+            setSpeakPhase(3); // 3rd time (0.70x deliberate slow phonetics)
+            speakWordSlowly(targetWord, 0.70, () => {
               // Pause 0.4s and announce Go!
               speechTimerRef.current = setTimeout(() => {
                 setSpeakPhase(4); // GO!
                 if (soundEffects) playSound.duelStart();
                 speechTimerRef.current = setTimeout(() => {
-                  setSpeakPhase(0); // Idle, ready for typing
+                  setSpeakPhase(0); // Ready for user typing
                 }, 1200);
-              }, 350);
+              }, 400);
             });
-          }, 850);
+          }, 1000);
         });
-      }, 850);
+      }, 1000);
     });
-  }, [speakWord, soundEffects]);
+  }, [speakWordSlowly, soundEffects]);
 
-  // Start / Init Game Session (Local or AI Generated)
-  const startGameSession = async (useLiveAi = false, selectedTopic = '') => {
+  // Start Session with Gemini AI or Local Bank
+  const startGameSession = async (useAi = true, selectedTopic = '') => {
+    stopAllAudio();
+    setIsGeneratingAi(true);
+
     let sessionWords = [];
+    const topicPrompt = selectedTopic || customAiTopic || 'Earth, Science, Nature, and High School Academic Vocabulary';
 
-    if (useLiveAi) {
-      setIsGeneratingAi(true);
-      try {
-        const topicPrompt = selectedTopic || customAiTopic || 'Earth, Science, Nature, and Academic English';
-        sessionWords = await generateEnglishDictationWithAI(topicPrompt, gameMode === 'mission' ? 10 : 20, 'medium');
-      } catch (e) {
-        sessionWords = getEnglishDictationSession(10);
-      } finally {
-        setIsGeneratingAi(false);
+    try {
+      if (useAi) {
+        sessionWords = await generateEnglishDictationWithAI(topicPrompt, gameMode === 'mission' ? 10 : 20, selectedDifficulty);
       }
-    } else {
-      sessionWords = getEnglishDictationSession(gameMode === 'mission' ? 10 : 25, category);
+    } catch (e) {
+      console.warn('AI generator fallback:', e);
     }
 
     if (!sessionWords || sessionWords.length === 0) {
-      sessionWords = getEnglishDictationSession(10);
+      sessionWords = getEnglishDictationSession(gameMode === 'mission' ? 10 : 25, 'all');
+      // Filter by difficulty length if fallback
+      if (selectedDifficulty === 'low') {
+        sessionWords = sessionWords.filter(w => w.word.length <= 6);
+      } else if (selectedDifficulty === 'hard') {
+        sessionWords = sessionWords.filter(w => w.word.length >= 8);
+      }
+      if (sessionWords.length < 5) {
+        sessionWords = getEnglishDictationSession(10);
+      }
     }
 
+    setIsGeneratingAi(false);
     setWordsList(sessionWords);
     setCurrentIndex(0);
     setCurrentInput('');
@@ -194,21 +306,19 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
     setShowHint(false);
     setShowSentence(false);
     setAiCoachHint('');
-    setRepeatsLeft(3);
     setTimeLeft(60);
     setGameState('playing');
 
     if (soundEffects) playSound.duelStart();
 
-    // Trigger AI 3-times routine for first word
     if (sessionWords[0]) {
       setTimeout(() => {
-        startAiThreeTimeRoutine(sessionWords[0].word);
+        startThreeTimeRoutine(sessionWords[0].word);
       }, 400);
     }
   };
 
-  // Speed Mode Timer
+  // Speed Timer
   useEffect(() => {
     if (gameState === 'playing' && gameMode === 'speed') {
       countdownTimerRef.current = setInterval(() => {
@@ -226,7 +336,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
     }
   }, [gameState, gameMode]);
 
-  // Handle User Input Submission
+  // Answer Submission & Check
   const handleCheckAnswer = () => {
     if (!currentWordItem || gameState !== 'playing') return;
 
@@ -236,12 +346,12 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
     const isCorrect = cleanInput.toLowerCase() === currentWordItem.word.toLowerCase();
 
     if (isCorrect) {
-      // 🌟 CORRECT SPELLING!
       if (soundEffects) playSound.correct();
       setIsCorrectGlow(true);
 
       const streakBonus = streak >= 3 ? 1.5 : streak >= 5 ? 2.0 : 1.0;
-      const roundXp = Math.round(40 * streakBonus);
+      const basePoints = selectedDifficulty === 'hard' ? 60 : selectedDifficulty === 'low' ? 30 : 45;
+      const roundXp = Math.round(basePoints * streakBonus);
       const newStreak = streak + 1;
       setStreak(newStreak);
       setMaxStreak(Math.max(maxStreak, newStreak));
@@ -249,7 +359,6 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
       setTotalXpEarned(prev => prev + roundXp);
       addXP(roundXp);
 
-      // Record to history
       setResultsHistory(prev => [
         ...prev,
         {
@@ -262,14 +371,12 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
         }
       ]);
 
-      // Move to next word after short celebration
       setTimeout(() => {
         setIsCorrectGlow(false);
         proceedToNextWord();
       }, 900);
 
     } else {
-      // ❌ WRONG SPELLING
       if (soundEffects) playSound.wrong();
       setIsWrongShake(true);
       setStreak(0);
@@ -286,7 +393,6 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
         }
       }
 
-      // Record to history
       setResultsHistory(prev => [
         ...prev,
         {
@@ -307,11 +413,11 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
   };
 
   const proceedToNextWord = () => {
+    stopAllAudio();
     setCurrentInput('');
     setShowHint(false);
     setShowSentence(false);
     setAiCoachHint('');
-    setRepeatsLeft(3);
 
     const nextIndex = currentIndex + 1;
     if (nextIndex >= wordsList.length) {
@@ -321,22 +427,21 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
       const nextWord = wordsList[nextIndex];
       if (nextWord) {
         if (autoThreeTimes) {
-          startAiThreeTimeRoutine(nextWord.word);
+          startThreeTimeRoutine(nextWord.word);
         } else {
-          speakWord(nextWord.word);
+          speakWordSlowly(nextWord.word);
         }
       }
     }
   };
 
   const finishGame = () => {
+    stopAllAudio();
     if (soundEffects) playSound.victory();
     setGameState('game_over');
-    if (speechTimerRef.current) clearTimeout(speechTimerRef.current);
-    if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
   };
 
-  // Ask AI Live Coach for Etymology / Spelling Mnemonic Hint
+  // Live AI Coach Advice in Khmer
   const handleAskAiCoach = async () => {
     if (!currentWordItem || isAskingAiCoach) return;
     setIsAskingAiCoach(true);
@@ -344,13 +449,13 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
       const hint = await getAIAssistedSpellingHint(currentWordItem.word, currentWordItem.meaningKm);
       setAiCoachHint(hint);
     } catch (e) {
-      setAiCoachHint(`ពាក្យ «${currentWordItem.word}» ប្រែថា «${currentWordItem.meaningKm}»។ ព្យាយាមស្តាប់សំឡេង AI ម្តងទៀតណា៎!`);
+      setAiCoachHint(`ពាក្យ «${currentWordItem.word}» មានន័យថា «${currentWordItem.meaningKm}»។ ចងចាំអក្សរដំបូង ${currentWordItem.word[0]} និងព្យាង្គបន្តបន្ទាប់ណា៎!`);
     } finally {
       setIsAskingAiCoach(false);
     }
   };
 
-  // Keyboard Handler for Typing
+  // Keyboard Handler
   const handleVirtualKeyPress = (key) => {
     if (gameState !== 'playing') return;
 
@@ -367,7 +472,6 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
     }
   };
 
-  // Physical Keyboard listener
   useEffect(() => {
     const handlePhysicalKeyDown = (e) => {
       if (gameState !== 'playing') return;
@@ -378,6 +482,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
       } else if (e.key === 'Backspace') {
         setCurrentInput(prev => prev.slice(0, -1));
       } else if (e.key === 'Escape') {
+        stopAllAudio();
         if (onClose) onClose();
       } else if (/^[a-zA-Z]$/.test(e.key)) {
         if (currentInput.length < 24) {
@@ -388,18 +493,12 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
 
     window.addEventListener('keydown', handlePhysicalKeyDown);
     return () => window.removeEventListener('keydown', handlePhysicalKeyDown);
-  }, [gameState, currentInput, currentWordItem, streak, lives, maxStreak]);
+  }, [gameState, currentInput, currentWordItem, streak, lives, maxStreak, stopAllAudio, onClose]);
 
-  // Clean up timers on unmount
-  useEffect(() => {
-    return () => {
-      if (speechTimerRef.current) clearTimeout(speechTimerRef.current);
-      if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
-      if (typeof window !== 'undefined' && window.speechSynthesis) {
-        window.speechSynthesis.cancel();
-      }
-    };
-  }, []);
+  const handleCloseModal = () => {
+    stopAllAudio();
+    if (onClose) onClose();
+  };
 
   if (!isOpen) return null;
 
@@ -423,15 +522,15 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
             <div>
               <div className="flex items-center gap-2">
                 <h3 className="font-extrabold text-sm sm:text-base text-white font-cinzel tracking-wider">
-                  AI ENGLISH AUDIO SPELL ARENA
+                  ENGLISH PRACTICE: LISTEN AND SPELL
                 </h3>
                 <span className="px-2 py-0.5 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400/40 text-[9.5px] font-black text-cyan-300 uppercase flex items-center gap-1">
                   <Bot className="w-3 h-3 text-cyan-400" />
-                  <span>AI 3X SPEECH ENGINE</span>
+                  <span>GEMINI AI VOICE 3X</span>
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 hidden sm:block">
-                AI បញ្ចេញសំឡេង ៣ ដង (Earth... Earth... Earth... GO!) & វាយពាក្យអង់គ្លេសដណ្តើម XP
+                អនុវត្តស្តាប់ AI បញ្ចេញសំឡេង ៣ ដងយឺតៗ & សរសេរអក្ខរាវិរុទ្ធអង់គ្លេសត្រឹមត្រូវ
               </p>
             </div>
           </div>
@@ -447,15 +546,12 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
               {soundEffects ? <Volume2 className="w-4 h-4 text-cyan-400" /> : <VolumeX className="w-4 h-4 text-slate-500" />}
             </button>
 
-            {/* Close Button */}
+            {/* Close Button with Guaranteed Audio Stop */}
             <button
               type="button"
-              onClick={() => {
-                if (typeof window !== 'undefined' && window.speechSynthesis) window.speechSynthesis.cancel();
-                onClose();
-              }}
+              onClick={handleCloseModal}
               className="p-2 rounded-xl bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 border border-white/10 hover:border-rose-500/40 transition-colors cursor-pointer"
-              title="Close Modal"
+              title="Close Modal & Stop Voice"
             >
               <X className="w-5 h-5" />
             </button>
@@ -474,26 +570,67 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
               
               <div className="space-y-2">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 text-xs font-bold font-cinzel">
-                  <Bot className="w-3.5 h-3.5 text-cyan-400" />
-                  <span>GEMINI & LIVE AI AUDIO DICTATION</span>
+                  <Sparkles className="w-3.5 h-3.5" />
+                  <span>NATIONAL ENGLISH LISTENING & SPELLING</span>
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">
-                  ហ្គេមស្តាប់សំឡេង AI & វាយពាក្យអង់គ្លេស
+                  ការអនុវត្តភាសាអង់គ្លេស៖ ស្តាប់ & សរសេរអក្ខរាវិរុទ្ធ
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto leading-relaxed">
-                  លោកគ្រូ AI នឹងបញ្ចេញសំឡេងពាក្យអង់គ្លេស <strong>៣ ដងជាប់គ្នា (ដូចជា Earth... Earth... Earth... GO!)</strong> ដើម្បីឱ្យប្អូនៗស្តាប់យ៉ាងច្បាស់ រួចវាយអក្សរចូលឱ្យបានត្រឹមត្រូវ!
+                  លោកគ្រូ AI បញ្ចេញសំឡេងពាក្យអង់គ្លេស <strong>៣ ដងយឺតៗច្បាស់ៗ (ដូចជា Earth... Earth... Earth... GO!)</strong> ដើម្បីឱ្យប្អូនស្តាប់ទាន់ រួចវាយអក្សរចូលឱ្យបានត្រឹមត្រូវ!
                 </p>
               </div>
 
-              {/* 🌟 LIVE AI CUSTOM TOPIC GENERATOR BOX */}
+              {/* 🌟 OPTION CHOICE 1: DIFFICULTY SELECTION (LOW, MEDIUM, HARD) */}
+              <div className="space-y-2 text-left">
+                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
+                  <span>ជ្រើសរើសកម្រិតលំបាក (Choose Difficulty Level):</span>
+                  <span className="text-cyan-400 text-[11px] font-normal">Gemini AI បង្កើតពាក្យតាមកម្រិត</span>
+                </label>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
+                  {DIFFICULTY_LEVELS.map((level) => {
+                    const isSelected = selectedDifficulty === level.id;
+                    return (
+                      <button
+                        key={level.id}
+                        type="button"
+                        onClick={() => setSelectedDifficulty(level.id)}
+                        className={`p-3.5 rounded-2xl border-2 text-left transition-all cursor-pointer relative overflow-hidden ${
+                          isSelected
+                            ? `${level.borderColor} bg-slate-900 shadow-lg shadow-cyan-950/60 scale-102`
+                            : 'bg-white/5 border-white/10 hover:border-white/20 text-slate-400'
+                        }`}
+                      >
+                        <div className="flex items-center justify-between mb-1.5">
+                          <span className={`font-black text-xs sm:text-sm ${isSelected ? level.textColor : 'text-white'}`}>
+                            {level.nameKm}
+                          </span>
+                          <span className="text-[10px] font-mono font-bold text-amber-400">
+                            +{level.xpReward} XP
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-300 leading-snug">
+                          {level.descKm}
+                        </p>
+                        {isSelected && (
+                          <div className={`absolute bottom-0 left-0 right-0 h-1 bg-gradient-to-r ${level.badgeColor}`} />
+                        )}
+                      </button>
+                    );
+                  })}
+                </div>
+              </div>
+
+              {/* 🌟 OPTION CHOICE 2: AI TOPIC SELECTION / CUSTOM PROMPT */}
               <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-950/60 via-[#071d3a] to-cyan-950/60 border border-cyan-400/40 text-left space-y-3 shadow-lg shadow-cyan-950/40">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2 text-cyan-300 font-bold text-xs">
-                    <Wand2 className="w-4 h-4 text-cyan-400 animate-spin" style={{ animationDuration: '6s' }} />
-                    <span>បង្កើតពាក្យតាមប្រធានបទ AI ភ្លាមៗ (Live AI Topic Generator):</span>
+                    <Wand2 className="w-4 h-4 text-cyan-400" />
+                    <span>ប្រធានបទពាក្យដោយ Gemini AI (Topic Generator):</span>
                   </div>
                   <span className="px-2 py-0.5 rounded-md bg-cyan-400/20 text-cyan-200 text-[10px] font-mono font-bold">
-                    GEMINI POWERED
+                    AI LIVE
                   </span>
                 </div>
 
@@ -503,7 +640,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                     type="text"
                     value={customAiTopic}
                     onChange={(e) => setCustomAiTopic(e.target.value)}
-                    placeholder="វាយប្រធានបទដែលចង់រៀន (ឧទាហរណ៍៖ Space, Biology, BacII Exam, AI, Animals...)"
+                    placeholder="វាយប្រធានបទដែលចង់រៀន (ឧទាហរណ៍៖ Space, Earth, Biology, BacII Exam, Technology...)"
                     className="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-white/15 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-cyan-400"
                   />
                   <button
@@ -521,9 +658,9 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                   </button>
                 </div>
 
-                {/* Quick AI Presets */}
+                {/* Quick Presets */}
                 <div className="flex flex-wrap items-center gap-1.5 pt-1">
-                  <span className="text-[11px] text-slate-400 font-medium">ប្រធានបទល្បីៗ៖</span>
+                  <span className="text-[11px] text-slate-400 font-medium">ប្រធានបទគំរូ៖</span>
                   {AI_TOPIC_PRESETS.map((preset) => (
                     <button
                       key={preset.id}
@@ -543,7 +680,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
               {/* Game Mode Selector */}
               <div className="space-y-2 text-left">
                 <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
-                  ជ្រើសរើសទម្រង់ប្រកួត (Game Mode):
+                  ទម្រង់ប្រកួត (Game Mode):
                 </label>
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5">
                   <button
@@ -556,10 +693,10 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-bold text-xs">🎯 Mission Mode</span>
+                      <span className="font-bold text-xs">🎯 10-Word Mission</span>
                       <span className="text-[10px] text-amber-400 font-cinzel font-black">+400 XP</span>
                     </div>
-                    <p className="text-[11px] text-slate-300">១០ ពាក្យផ្លូវការថ្នាក់ជាតិ</p>
+                    <p className="text-[11px] text-slate-300">១០ ពាក្យស្តង់ដារថ្នាក់ជាតិ</p>
                   </button>
 
                   <button
@@ -601,10 +738,10 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                 <div className="space-y-0.5">
                   <div className="text-xs font-bold text-white flex items-center gap-1.5">
                     <Volume2 className="w-4 h-4 text-cyan-400" />
-                    <span>បញ្ចេញសំឡេងស្វ័យប្រវត្តិ ៣ ដង (Auto 3x Speak Routine)</span>
+                    <span>បញ្ចេញសំឡេងស្វ័យប្រវត្តិ ៣ ដងយឺតៗ (Auto 3x Routine)</span>
                   </div>
                   <p className="text-[11px] text-slate-400">
-                    AI និយាយពាក្យ ៣ ដងដោយស្វ័យប្រវត្តិរៀងរាល់ពាក្យថ្មី (Earth... Earth... Earth... GO!)
+                    AI និយាយពាក្យ ៣ ដងយឺតៗច្បាស់ៗ (Earth... Earth... Earth... GO!)
                   </p>
                 </div>
                 <button
@@ -623,12 +760,12 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
               {/* Start Button */}
               <button
                 type="button"
-                onClick={() => startGameSession(false)}
+                onClick={() => startGameSession(true)}
                 disabled={isGeneratingAi}
                 className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-blue-500 text-white font-black text-sm sm:text-base flex items-center justify-center gap-3 shadow-xl shadow-cyan-500/25 active:scale-98 transition-all cursor-pointer border border-cyan-300/40"
               >
                 <Play className="w-5 h-5 fill-white" />
-                <span>ចាប់ផ្តើមប្រកួតស្តាប់ & វាយពាក្យ (START DICTATION)</span>
+                <span>ចាប់ផ្តើមអនុវត្តស្តាប់ & សរសេរ (START LISTEN & SPELL)</span>
                 <Sparkles className="w-4 h-4 text-amber-300" />
               </button>
 
@@ -648,6 +785,17 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                   <span className="px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 font-mono font-black border border-cyan-400/30">
                     WORD {currentIndex + 1} / {wordsList.length}
                   </span>
+                  
+                  <span className={`px-2 py-0.5 rounded-md text-[10.5px] font-black uppercase border ${
+                    selectedDifficulty === 'hard'
+                      ? 'bg-rose-500/20 text-rose-300 border-rose-400/30'
+                      : selectedDifficulty === 'low'
+                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'
+                        : 'bg-amber-500/20 text-amber-300 border-amber-400/30'
+                  }`}>
+                    {selectedDifficulty.toUpperCase()}
+                  </span>
+
                   {gameMode === 'speed' && (
                     <span className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 font-mono font-black flex items-center gap-1 border border-amber-400/30">
                       <Clock className="w-3.5 h-3.5" />
@@ -688,7 +836,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
 
               </div>
 
-              {/* CENTER STAGE: AI VOICE SOUNDWAVE & SPEAKING CONTROLS */}
+              {/* CENTER STAGE: AI VOICE SOUNDWAVE & SLOW REPETITION CONTROLS */}
               <div className="p-6 rounded-3xl bg-gradient-to-b from-[#071933]/90 via-[#0a1f3d]/80 to-[#040e1e]/90 border border-cyan-500/30 text-center space-y-4 shadow-xl relative overflow-hidden">
                 
                 {/* 3-Time Speak Phase Banner Alert */}
@@ -702,7 +850,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                       <Volume2 className="w-3.5 h-3.5" />
                       {speakPhase === 1 && '🗣️ AI Saying: 1st Time (ស្តាប់លើកទី ១)'}
                       {speakPhase === 2 && '🗣️ AI Saying: 2nd Time (ស្តាប់លើកទី ២)'}
-                      {speakPhase === 3 && '🗣️ AI Saying: 3rd Time (ស្តាប់លើកទី ៣)'}
+                      {speakPhase === 3 && '🗣️ AI Saying: 3rd Time (ស្តាប់លើកទី ៣ - យឺតៗ)'}
                       {speakPhase === 4 && '🚀 GO! TYPE THE WORD NOW! (វាយពាក្យ!)'}
                     </span>
                   </div>
@@ -715,14 +863,14 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                   
                   <button
                     type="button"
-                    onClick={() => speakWord(currentWordItem.word)}
+                    onClick={() => speakWordSlowly(currentWordItem.word, 0.75)}
                     disabled={isSpeaking}
                     className="w-full h-full rounded-full bg-gradient-to-tr from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-blue-500 text-white flex flex-col items-center justify-center shadow-xl shadow-cyan-500/30 active:scale-95 transition-all cursor-pointer border-2 border-cyan-300"
-                    title="Click to Listen Again"
+                    title="Click to Listen Slowly Again"
                   >
                     <Volume2 className={`w-8 h-8 ${isSpeaking ? 'animate-bounce text-amber-300' : 'text-white'}`} />
                     <span className="text-[9px] font-black uppercase tracking-wider mt-1 text-cyan-100">
-                      {isSpeaking ? 'SPEAKING...' : 'LISTEN'}
+                      {isSpeaking ? 'SPEAKING...' : 'LISTEN 0.75X'}
                     </span>
                   </button>
                 </div>
@@ -742,12 +890,12 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                   ))}
                 </div>
 
-                {/* Audio Helper Actions (Repeat 3x, Slow, Phonics, Sentence, AI Coach) */}
+                {/* Audio Helper Actions (Repeat 3x, Slow 0.65x, Phonics, Sentence, AI Coach) */}
                 <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
                   
                   <button
                     type="button"
-                    onClick={() => startAiThreeTimeRoutine(currentWordItem.word)}
+                    onClick={() => startThreeTimeRoutine(currentWordItem.word)}
                     disabled={isSpeaking}
                     className="px-3 py-1.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-400/40 text-cyan-300 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
                   >
@@ -757,19 +905,18 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
 
                   <button
                     type="button"
-                    onClick={() => speakWord(currentWordItem.word, 0.65)}
+                    onClick={() => speakWordSlowly(currentWordItem.word, 0.60)}
                     disabled={isSpeaking}
                     className="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/40 text-amber-300 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
                   >
-                    <span>🐢 សំឡេងយឺត (Slow 0.7x)</span>
+                    <span>🐢 សំឡេងយឺតបំផុត (Slow 0.6x)</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => {
-                      // Spell letter by letter
                       const letters = currentWordItem.word.split('').join(' . ');
-                      speakWord(letters, 0.85);
+                      speakWordSlowly(letters, 0.75);
                     }}
                     disabled={isSpeaking}
                     className="px-3 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-400/40 text-purple-300 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
@@ -781,7 +928,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                     type="button"
                     onClick={() => {
                       setShowSentence(true);
-                      speakWord(currentWordItem.exampleEn);
+                      speakWordSlowly(currentWordItem.exampleEn, 0.75);
                     }}
                     disabled={isSpeaking}
                     className="px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/40 text-emerald-300 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
@@ -813,7 +960,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                       </span>
                       <button
                         type="button"
-                        onClick={() => speakWord(aiCoachHint, 1.0)}
+                        onClick={() => speakWordSlowly(aiCoachHint, 0.85)}
                         className="text-[11px] text-cyan-300 hover:underline cursor-pointer"
                       >
                         🔊 ស្តាប់ AI
@@ -984,10 +1131,10 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
 
               <div className="space-y-1.5">
                 <h2 className="text-2xl sm:text-3xl font-black text-white font-moul">
-                  អបអរសាទរ! បញ្ចប់ការប្រកួត
+                  អបអរសាទរ! បញ្ចប់ការអនុវត្ត
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-300 font-medium">
-                  អ្នកបានបញ្ចប់ការស្តាប់ & វាយពាក្យអង់គ្លេសប្រកបដោយជោគជ័យ!
+                  អ្នកបានបញ្ចប់ការស្តាប់ & សរសេរអក្ខរាវិរុទ្ធអង់គ្លេសប្រកបដោយជោគជ័យ!
                 </p>
               </div>
 
@@ -1018,7 +1165,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
               {/* Word List Review Table with Clickable Audio Play */}
               <div className="space-y-2 text-left">
                 <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
-                  <span>បញ្ជីវាក្យសព្ទដែលបានប្រកួត (Word Review):</span>
+                  <span>បញ្ជីវាក្យសព្ទដែលបានអនុវត្ត (Word Review):</span>
                   <span className="text-[11px] text-cyan-400 font-normal">ចុច 🔊 ដើម្បីស្តាប់ការបញ្ចេញសំឡេងម្តងទៀត</span>
                 </h4>
 
@@ -1035,7 +1182,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                       <div className="flex items-center gap-3 min-w-0">
                         <button
                           type="button"
-                          onClick={() => speakWord(item.word)}
+                          onClick={() => speakWordSlowly(item.word, 0.75)}
                           className="w-8 h-8 rounded-lg bg-white/10 hover:bg-white/20 text-white flex items-center justify-center flex-shrink-0 cursor-pointer"
                           title="Play Audio"
                         >
@@ -1068,11 +1215,11 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
               <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={() => startGameSession(false)}
+                  onClick={() => startGameSession(true)}
                   className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg"
                 >
                   <RotateCcw className="w-4 h-4" />
-                  <span>លេងម្តងទៀត (Play Again)</span>
+                  <span>អនុវត្តម្តងទៀត (Practice Again)</span>
                 </button>
 
                 <button

@@ -212,7 +212,17 @@ function fallbackStudyEngine(prompt) {
  */
 export async function generateEnglishDictationWithAI(topic = 'Earth & Science', count = 10, difficulty = 'medium') {
   const activeKey = getStoredGeminiKey() || AI_API_KEY;
-  const prompt = `Generate a JSON array of ${count} unique English vocabulary words suitable for Cambodian high school students (Grades 10-12) related to the topic "${topic}" with difficulty "${difficulty}".
+  
+  const diffDesc = difficulty === 'low'
+    ? 'Low / Beginner (4-6 letter simple foundation words, e.g. Earth, Space, Water, Plant, Light, River, Solar, Star)'
+    : difficulty === 'hard'
+      ? 'Hard / Advanced BacII (8-14 letter advanced academic & scientific vocabulary, e.g. Photosynthesis, Biodiversity, Acceleration, Equilibrium, Precipitation, Transformation)'
+      : 'Medium / Intermediate (6-9 letter standard high-school vocabulary, e.g. Gravity, Climate, Oxygen, Ecosystem, Atmosphere, Radiation, Energy)';
+
+  const prompt = `You are the National English Teacher AI for Cambodian High School Students.
+Generate a JSON array of ${count} unique English vocabulary words for topic: "${topic}".
+Target Difficulty: ${diffDesc}.
+
 Each item in the JSON array must follow this exact JSON schema:
 [
   {
@@ -226,7 +236,7 @@ Each item in the JSON array must follow this exact JSON schema:
     "clue": "Our home planet, third from the Sun."
   }
 ]
-Output ONLY valid JSON inside \`\`\`json \`\`\` code block without any conversational filler.`;
+Output ONLY valid JSON inside \`\`\`json \`\`\` code block without any markdown or conversational text.`;
 
   if (activeKey) {
     for (const model of AI_MODELS) {

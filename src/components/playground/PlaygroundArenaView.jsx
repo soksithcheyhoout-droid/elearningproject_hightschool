@@ -207,7 +207,7 @@ export default function PlaygroundArenaView() {
                 className="px-5 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-blue-500 text-white font-black text-xs sm:text-sm border border-cyan-300/40 flex items-center gap-2 cursor-pointer shadow-lg shadow-cyan-500/25 active:scale-95 transition-all"
               >
                 <Headphones className="w-4 h-4 text-amber-300 animate-pulse" />
-                <span>{lang === 'km' ? '🎙️ ស្តាប់ AI វាយពាក្យអង់គ្លេស' : '🎙️ AI English Audio Spell'}</span>
+                <span>{lang === 'km' ? '🎧 English Practice: Listen & Spell' : '🎧 English Practice: Listen & Spell'}</span>
               </button>
             </div>
 
@@ -599,7 +599,7 @@ export default function PlaygroundArenaView() {
             </div>
           </div>
 
-          {/* 7. AI English Audio Spelling Bee */}
+          {/* 7. English Practice: Listen and Spell */}
           <div className="col-span-2 lg:col-span-3 bg-gradient-to-r from-[#031b38] via-[#052b57] to-[#01142a] rounded-2xl sm:rounded-3xl border-2 border-cyan-400/50 hover:border-cyan-300 shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 gap-4 text-white overflow-hidden relative group">
             <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-400/10 rounded-full blur-2xl pointer-events-none" />
             <div className="flex items-center gap-4 relative z-10">
@@ -607,21 +607,24 @@ export default function PlaygroundArenaView() {
                 <Headphones className="w-7 h-7 sm:w-8 sm:h-8 animate-pulse" />
               </div>
               <div className="space-y-1">
-                <div className="flex items-center gap-2">
+                <div className="flex flex-wrap items-center gap-2">
                   <span className="px-2 py-0.5 rounded-full bg-cyan-400/20 text-cyan-300 font-mono text-[10px] font-black tracking-wider uppercase border border-cyan-400/30">
-                    AI VOICE 3X DICTATION
+                    GEMINI AI 3X VOICE
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 font-mono text-[10px] font-black border border-emerald-400/30">
+                    LOW • MEDIUM • HARD
                   </span>
                   <span className="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 font-mono text-[10px] font-black border border-amber-400/30">
-                    +400 XP
+                    +600 XP
                   </span>
                 </div>
                 <h4 className="text-base sm:text-xl font-black text-white group-hover:text-cyan-300 transition-colors">
-                  {lang === 'km' ? 'ហ្គេមស្តាប់ AI និយាយ ៣ ដង & វាយពាក្យអង់គ្លេស (AI English Spell)' : 'AI English Audio Dictation & Spelling Bee'}
+                  {lang === 'km' ? 'English Practice: Listen and Spell (ស្តាប់ & សរសេរអក្ខរាវិរុទ្ធ)' : 'English Practice: Listen and Spell'}
                 </h4>
                 <p className="text-xs text-blue-100/80 max-w-xl line-clamp-2">
                   {lang === 'km' 
-                    ? 'AI និយាយបញ្ចេញសំឡេងពាក្យអង់គ្លេស ៣ ដង (ដូចជា Earth... 3x Go!) ដើម្បីស្តាប់ឱ្យច្បាស់ រួចវាយអក្ខរាវិរុទ្ធឱ្យបានត្រឹមត្រូវ!' 
-                    : 'AI pronounces English words 3 times clearly in sequence (e.g. Earth... 3x Go!) for listening comprehension and typing precision!'}
+                    ? 'AI បញ្ចេញសំឡេងពាក្យអង់គ្លេស ៣ ដងយឺតៗច្បាស់ៗ (Earth... 3x Go!) តាមកម្រិត Low, Medium, Hard ដោយមានជំនួយពី Gemini AI!' 
+                    : 'Listen to slow, clear English voice pronunciations 3 times in sequence (Low, Medium, Hard difficulties) powered by Gemini AI!'}
                 </p>
               </div>
             </div>
@@ -633,7 +636,7 @@ export default function PlaygroundArenaView() {
                 className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 hover:from-cyan-300 hover:to-teal-300 text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xl shadow-cyan-500/25 active:scale-95"
               >
                 <Play className="w-4 h-4 fill-slate-950" />
-                <span>{lang === 'km' ? 'ចូលលេងស្តាប់ AI (Start 3x Spell)' : 'Start AI Audio Spell'}</span>
+                <span>{lang === 'km' ? 'ចូលអនុវត្តស្តាប់ (Start Practice)' : 'Start Practice'}</span>
               </button>
             </div>
           </div>
@@ -656,8 +659,8 @@ export default function PlaygroundArenaView() {
           </span>
         </div>
 
-        {/* 3 Main Stream Tabs */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 text-xs font-bold">
+        {/* 4 Main Stream & English Practice Tabs */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-2.5 text-xs font-bold">
           <button
             type="button"
             onClick={() => setSelectedStream('all')}
@@ -695,6 +698,15 @@ export default function PlaygroundArenaView() {
           >
             <Landmark className="w-4 h-4 text-amber-200" />
             <span>ថ្នាក់វិទ្យាសាស្ត្រសង្គម ({socialCount})</span>
+          </button>
+
+          <button
+            type="button"
+            onClick={() => setShowEnglishSpellGame(true)}
+            className="p-3 rounded-2xl border transition-all flex items-center justify-center gap-2 cursor-pointer bg-gradient-to-r from-cyan-900/40 via-blue-900/40 to-indigo-900/40 hover:from-cyan-600 hover:to-blue-600 text-cyan-900 hover:text-white border-cyan-400/60 shadow-xs"
+          >
+            <Headphones className="w-4 h-4 text-cyan-500 hover:text-white animate-pulse" />
+            <span className="truncate">English Practice (Low/Med/Hard)</span>
           </button>
         </div>
 
