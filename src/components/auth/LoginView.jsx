@@ -97,6 +97,9 @@ export default function LoginView() {
   const [googleClientId, setGoogleClientId] = useState(() => {
     return localStorage.getItem('khmer_google_client_id') || import.meta.env.VITE_GOOGLE_CLIENT_ID || '';
   });
+  const [geminiApiKey, setGeminiApiKey] = useState(() => {
+    return localStorage.getItem('motdar_ai_key') || import.meta.env.VITE_AI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY || '';
+  });
 
   // Register Form Fields
   const [regFullNameKm, setRegFullNameKm] = useState('');
@@ -1539,11 +1542,30 @@ export default function LoginView() {
               />
             </div>
 
+            <div className="space-y-1.5">
+              <label className="text-[11px] font-bold text-slate-300 flex items-center justify-between">
+                <span>Google Gemini AI API Key (`AIzaSy...`):</span>
+                <span className="text-cyan-400 text-[10px]">Active</span>
+              </label>
+              <input
+                type="password"
+                value={geminiApiKey}
+                onChange={(e) => setGeminiApiKey(e.target.value)}
+                placeholder="e.g. AIzaSy..."
+                className="w-full bg-[#050f1c] border border-white/15 rounded-xl px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-cyan-400 font-mono"
+              />
+            </div>
+
             <div className="flex items-center gap-2 pt-2">
               <button
                 type="button"
                 onClick={() => {
                   localStorage.setItem('khmer_google_client_id', googleClientId.trim());
+                  if (geminiApiKey.trim()) {
+                    localStorage.setItem('motdar_ai_key', geminiApiKey.trim());
+                  } else {
+                    localStorage.removeItem('motdar_ai_key');
+                  }
                   setShowGoogleConfigModal(false);
                 }}
                 className="flex-1 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs cursor-pointer transition-all"
@@ -1554,7 +1576,9 @@ export default function LoginView() {
                 type="button"
                 onClick={() => {
                   setGoogleClientId('');
+                  setGeminiApiKey('');
                   localStorage.removeItem('khmer_google_client_id');
+                  localStorage.removeItem('motdar_ai_key');
                 }}
                 className="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 font-bold text-xs cursor-pointer transition-all"
               >
