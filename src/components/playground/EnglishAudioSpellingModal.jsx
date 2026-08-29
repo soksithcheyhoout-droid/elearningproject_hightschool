@@ -39,47 +39,10 @@ const VIRTUAL_KEYBOARD = [
   ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACK']
 ];
 
-const DIFFICULTY_LEVELS = [
-  {
-    id: 'low',
-    nameEn: 'Low (Beginner)',
-    nameKm: 'កម្រិតទាប (ដំបូង)',
-    descKm: 'ពាក្យខ្លីៗ ៤-៦ អក្សរ ងាយស្រួលស្តាប់ (Earth, Water, Space...)',
-    badgeColor: 'from-emerald-500 to-teal-500',
-    borderColor: 'border-emerald-500/60',
-    activeGlow: 'shadow-[0_0_25px_rgba(16,185,129,0.35)] bg-emerald-950/40 border-emerald-400',
-    textColor: 'text-emerald-300',
-    xpReward: 300
-  },
-  {
-    id: 'medium',
-    nameEn: 'Medium (Standard)',
-    nameKm: 'កម្រិតមធ្យម (ទូទៅ)',
-    descKm: 'ពាក្យវិទ្យាសាស្ត្រ ៦-៩ អក្សរ (Gravity, Climate, Oxygen...)',
-    badgeColor: 'from-amber-500 to-orange-500',
-    borderColor: 'border-amber-500/60',
-    activeGlow: 'shadow-[0_0_25px_rgba(245,158,11,0.35)] bg-amber-950/40 border-amber-400',
-    textColor: 'text-amber-300',
-    xpReward: 450
-  },
-  {
-    id: 'hard',
-    nameEn: 'Hard (BacII Advanced)',
-    nameKm: 'កម្រិតខ្ពស់ (បាក់ឌុប)',
-    descKm: 'ពាក្យស៊ីជម្រៅ ៨-១៤ អក្សរ (Photosynthesis, Biodiversity...)',
-    badgeColor: 'from-rose-500 to-red-600',
-    borderColor: 'border-rose-500/60',
-    activeGlow: 'shadow-[0_0_25px_rgba(244,63,94,0.35)] bg-rose-950/40 border-rose-400',
-    textColor: 'text-rose-300',
-    xpReward: 600
-  }
-];
-
 export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
   const { addXP } = useAuth();
 
-  // Difficulty & Settings
-  const [selectedDifficulty, setSelectedDifficulty] = useState('medium'); // 'low' | 'medium' | 'hard'
+  // Mode & Audio Settings
   const [gameMode, setGameMode] = useState('mission'); // 'mission' | 'speed' | 'endless'
   const [soundEffects, setSoundEffects] = useState(true);
   const [autoThreeTimes, setAutoThreeTimes] = useState(true);
@@ -348,29 +311,18 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
     stopCurrentSpeech();
 
     let sessionWords = [];
-    const topicPrompt = selectedDifficulty === 'low'
-      ? 'Earth, Space, Nature, Everyday high school vocabulary'
-      : selectedDifficulty === 'hard'
-        ? 'Grade 12 BacII National English Exam Academic Science and Literature'
-        : 'Science, Biology, Physics, and High School Academic Vocabulary';
-
     try {
-      sessionWords = await generateEnglishDictationWithAI(topicPrompt, gameMode === 'mission' ? 10 : 20, selectedDifficulty);
+      sessionWords = await generateEnglishDictationWithAI('High School Academic English', gameMode === 'mission' ? 10 : 20);
     } catch (e) {
       console.warn('AI generator fallback:', e);
     }
 
     if (!sessionWords || sessionWords.length === 0) {
       sessionWords = getEnglishDictationSession(gameMode === 'mission' ? 10 : 25, 'all');
-      if (selectedDifficulty === 'low') {
-        sessionWords = sessionWords.filter(w => w.word.length <= 6);
-      } else if (selectedDifficulty === 'hard') {
-        sessionWords = sessionWords.filter(w => w.word.length >= 8);
-      }
-      if (sessionWords.length < 5) {
-        sessionWords = getEnglishDictationSession(10);
-      }
     }
+
+    // Auto-random balanced shuffle across all grade levels
+    sessionWords = [...sessionWords].sort(() => Math.random() - 0.5);
 
     setWordsList(sessionWords);
     setCurrentIndex(0);
@@ -429,8 +381,9 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
       if (soundEffects) playSound.correct();
       setIsCorrectGlow(true);
 
+      const wordLen = currentWordItem.word.length;
+      const basePoints = wordLen >= 9 ? 60 : wordLen <= 5 ? 30 : 45;
       const streakBonus = streak >= 3 ? 1.5 : streak >= 5 ? 2.0 : 1.0;
-      const basePoints = selectedDifficulty === 'hard' ? 60 : selectedDifficulty === 'low' ? 30 : 45;
       const roundXp = Math.round(basePoints * streakBonus);
       const newStreak = streak + 1;
       setStreak(newStreak);
@@ -662,46 +615,34 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                 </p>
               </div>
 
-              {/* 🌟 1. DIFFICULTY SELECTION CARDS (LOW, MEDIUM, HARD) */}
-              <div className="space-y-2 text-left">
-                <label className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
-                  <span>ជ្រើសរើសកម្រិតលំបាក (Choose Difficulty Level):</span>
-                  <span className="text-cyan-400 text-[11px] font-mono">3 NATIONAL TIERS</span>
-                </label>
-                
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                  {DIFFICULTY_LEVELS.map((level) => {
-                    const isSelected = selectedDifficulty === level.id;
-                    return (
-                      <button
-                        key={level.id}
-                        type="button"
-                        onClick={() => setSelectedDifficulty(level.id)}
-                        className={`p-4 rounded-2xl border-2 text-left transition-all duration-200 cursor-pointer relative overflow-hidden flex flex-col justify-between ${
-                          isSelected
-                            ? `${level.activeGlow} scale-102`
-                            : 'bg-slate-900/60 border-white/10 hover:border-white/20 text-slate-400'
-                        }`}
-                      >
-                        <div>
-                          <div className="flex items-center justify-between mb-2">
-                            <span className={`font-black text-sm sm:text-base ${isSelected ? level.textColor : 'text-white'}`}>
-                              {level.nameKm}
-                            </span>
-                            <span className="px-2 py-0.5 rounded-md bg-amber-400/15 border border-amber-400/30 text-[10px] font-mono font-black text-amber-300">
-                              +{level.xpReward} XP
-                            </span>
-                          </div>
-                          <p className="text-[11.5px] text-slate-300 leading-snug">
-                            {level.descKm}
-                          </p>
-                        </div>
-                        {isSelected && (
-                          <div className={`absolute bottom-0 left-0 right-0 h-1.5 bg-gradient-to-r ${level.badgeColor}`} />
-                        )}
-                      </button>
-                    );
-                  })}
+              {/* 🌟 1. AUTO-RANDOM ADAPTIVE VOCABULARY HIGHLIGHT */}
+              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#031b38]/90 via-[#052b57]/80 to-[#01142a]/90 border border-cyan-400/40 text-left space-y-3 shadow-lg relative overflow-hidden">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2">
+                    <span className="p-1.5 rounded-xl bg-cyan-400/20 text-cyan-300 border border-cyan-400/30">
+                      <Sparkles className="w-4 h-4" />
+                    </span>
+                    <span className="font-black text-sm sm:text-base text-white">
+                      🎲 ប្រព័ន្ធចម្រុះពាក្យស្វ័យប្រវត្តិ (Auto-Random Adaptive Vocab)
+                    </span>
+                  </div>
+                  <span className="px-2.5 py-0.5 rounded-full bg-cyan-400/20 border border-cyan-400/40 text-[10px] font-mono font-black text-cyan-300">
+                    ALL LEVELS AUTO
+                  </span>
+                </div>
+                <p className="text-xs text-slate-300 leading-relaxed">
+                  ប្រព័ន្ធនឹងចម្រុះពាក្យគ្រប់កម្រិត (ពីងាយស្រួល ៤-៥ អក្សរ ដល់កម្រិតបាក់ឌុប ១២+ អក្សរ) ដោយស្វ័យប្រវត្តិ។ ប្អូនគ្រាន់តែចុចចាប់ផ្តើម ហើយស្តាប់សំឡេងអាន ៣ ដងយឺតៗ!
+                </p>
+                <div className="grid grid-cols-3 gap-2 pt-1 text-center font-mono">
+                  <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold">
+                    🟢 Easy (4-5 letters) <span className="block text-[10px] text-emerald-400 font-normal">+300 XP</span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] font-bold">
+                    🟡 Med (6-8 letters) <span className="block text-[10px] text-amber-400 font-normal">+450 XP</span>
+                  </div>
+                  <div className="p-2 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-[11px] font-bold">
+                    🔴 Hard (9+ letters) <span className="block text-[10px] text-rose-400 font-normal">+600 XP</span>
+                  </div>
                 </div>
               </div>
 
@@ -840,14 +781,19 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                     WORD {currentIndex + 1} / {wordsList.length}
                   </span>
                   
-                  <span className={`px-2 py-0.5 rounded-md text-[10.5px] font-black uppercase border ${
-                    selectedDifficulty === 'hard'
+                  {/* Dynamic Word Length Badge */}
+                  <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider border ${
+                    currentWordItem.word.length >= 9
                       ? 'bg-rose-500/20 text-rose-300 border-rose-400/30'
-                      : selectedDifficulty === 'low'
+                      : currentWordItem.word.length <= 5
                         ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'
                         : 'bg-amber-500/20 text-amber-300 border-amber-400/30'
                   }`}>
-                    {selectedDifficulty.toUpperCase()}
+                    {currentWordItem.word.length >= 9 
+                      ? 'HARD • ៩-១៤ អក្សរ' 
+                      : currentWordItem.word.length <= 5 
+                        ? 'EASY • ៤-៥ អក្សរ' 
+                        : 'MEDIUM • ៦-៨ អក្សរ'}
                   </span>
 
                   {gameMode === 'speed' && (

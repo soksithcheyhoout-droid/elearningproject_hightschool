@@ -208,28 +208,23 @@ function fallbackStudyEngine(prompt) {
 
 /**
  * Live AI English Dictation & Vocabulary Challenge Generator
- * Generates custom academic English words with phonetics, Khmer translations, and example sentences in real-time!
+ * Automatically generates a balanced, auto-randomized mix of academic English words (4-12 letters)
+ * with phonetics, Khmer translations, and example sentences in real-time!
  */
-export async function generateEnglishDictationWithAI(topic = 'Earth & Science', count = 10, difficulty = 'medium') {
+export async function generateEnglishDictationWithAI(topic = 'High School Academic English', count = 10) {
   const activeKey = getStoredGeminiKey() || AI_API_KEY;
-  
-  const diffDesc = difficulty === 'low'
-    ? 'Low / Beginner (4-6 letter simple foundation words, e.g. Earth, Space, Water, Plant, Light, River, Solar, Star)'
-    : difficulty === 'hard'
-      ? 'Hard / Advanced BacII (8-14 letter advanced academic & scientific vocabulary, e.g. Photosynthesis, Biodiversity, Acceleration, Equilibrium, Precipitation, Transformation)'
-      : 'Medium / Intermediate (6-9 letter standard high-school vocabulary, e.g. Gravity, Climate, Oxygen, Ecosystem, Atmosphere, Radiation, Energy)';
 
   const prompt = `You are the National English Teacher AI for Cambodian High School Students.
-Generate a JSON array of ${count} unique English vocabulary words for topic: "${topic}".
-Target Difficulty: ${diffDesc}.
+Generate a JSON array of ${count} unique, diverse English vocabulary words for topic: "${topic}".
+Automatically mix a balanced variety of beginner (4-5 letters), intermediate (6-8 letters), and advanced academic words (9-12 letters).
 
 CRITICAL RULES:
 - ONLY use common, well-known, clearly pronounceable English words that exist in standard dictionaries.
 - Do NOT use abbreviations, acronyms, slang, brand names, or made-up words.
 - Every word MUST be a single English word (no spaces, no hyphens, no special characters).
 - Choose words that a text-to-speech engine can easily pronounce clearly.
-- Words like: Earth, Water, Climate, Gravity, Oxygen, Biology, Science, Energy, Temperature, Electricity are GOOD examples.
-- Do NOT include words with unusual spellings or rare scientific jargon that sounds unnatural when spoken aloud.
+- Words like: Earth, Water, Space, Climate, Gravity, Oxygen, Biology, Science, Energy, Temperature, Planet, Nature, Atmosphere, Ecosystem are GREAT examples.
+- Do NOT include words with unusual spellings or rare jargon that sounds unnatural when spoken aloud.
 
 Each item in the JSON array must follow this exact JSON schema:
 [

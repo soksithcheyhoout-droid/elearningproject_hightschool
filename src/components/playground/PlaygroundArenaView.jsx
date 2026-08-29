@@ -640,7 +640,7 @@ export default function PlaygroundArenaView() {
                     SMART AUDIO 3X VOICE
                   </span>
                   <span className="px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 font-mono text-[10px] font-black border border-emerald-400/30">
-                    LOW • MEDIUM • HARD
+                    🎲 AUTO RANDOM VOCAB
                   </span>
                   <span className="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 font-mono text-[10px] font-black border border-amber-400/30">
                     +600 XP
@@ -651,8 +651,8 @@ export default function PlaygroundArenaView() {
                 </h4>
                 <p className="text-xs text-blue-100/80 max-w-xl line-clamp-2">
                   {lang === 'km' 
-                    ? 'ប្រព័ន្ធបញ្ចេញសំឡេងពាក្យអង់គ្លេស ៣ ដងយឺតៗច្បាស់ៗ (Earth... 3x Go!) តាមកម្រិត Low, Medium, Hard តាមស្តង់ដារជាតិ MoTDAR!' 
-                    : 'Listen to slow, clear English voice pronunciations 3 times in sequence (Low, Medium, Hard difficulties) with smart dictation!'}
+                    ? 'ប្រព័ន្ធបញ្ចេញសំឡេងពាក្យអង់គ្លេស ៣ ដងយឺតៗច្បាស់ៗ (Earth... 3x Go!) ចម្រុះកម្រិតស្វ័យប្រវត្តិ តាមស្តង់ដារជាតិ MoTDAR!' 
+                    : 'Listen to slow, clear English voice pronunciations 3 times in sequence with auto-randomized adaptive vocabulary!'}
                 </p>
               </div>
             </div>
@@ -734,7 +734,7 @@ export default function PlaygroundArenaView() {
             className="p-3 rounded-2xl border transition-all flex items-center justify-center gap-2 cursor-pointer bg-gradient-to-r from-cyan-900/40 via-blue-900/40 to-indigo-900/40 hover:from-cyan-600 hover:to-blue-600 text-cyan-900 hover:text-white border-cyan-400/60 shadow-xs"
           >
             <Headphones className="w-4 h-4 text-cyan-500 hover:text-white animate-pulse" />
-            <span className="truncate">English Practice (Low/Med/Hard)</span>
+            <span className="truncate">English Practice: Listen & Spell</span>
           </button>
         </div>
 
