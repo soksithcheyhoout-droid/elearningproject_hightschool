@@ -201,14 +201,42 @@ export default function PlaygroundArenaView() {
                 <span>{lang === 'km' ? 'លេង Blooket Gold Quest' : 'Play Gold Quest'}</span>
               </button>
 
-              <button
-                type="button"
-                onClick={() => setShowEnglishSpellGame(true)}
-                className="px-5 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-blue-500 text-white font-black text-xs sm:text-sm border border-cyan-300/40 flex items-center gap-2 cursor-pointer shadow-lg shadow-cyan-500/25 active:scale-95 transition-all"
-              >
-                <Headphones className="w-4 h-4 text-amber-300 animate-pulse" />
-                <span>{lang === 'km' ? '🎧 English Practice: Listen & Spell' : '🎧 English Practice: Listen & Spell'}</span>
-              </button>
+              <div className="hacker-button-container">
+                <button
+                  type="button"
+                  onClick={() => setShowEnglishSpellGame(true)}
+                  className="hacker-button"
+                  data-text={lang === 'km' ? '🎧 ENGLISH PRACTICE (LISTEN & SPELL)' : '🎧 ENGLISH PRACTICE (LISTEN & SPELL)'}
+                >
+                  <Headphones className="w-4 h-4 fill-current relative z-10 text-cyan-300 animate-pulse" />
+                  <span className="relative z-10 font-bold">
+                    {lang === 'km' ? 'English Practice: Listen & Spell' : 'English Practice: Listen & Spell'}
+                  </span>
+                  
+                  <div className="neon-frame" />
+                  <div className="circuit-traces">
+                    <div className="circuit-trace" />
+                    <div className="circuit-trace" />
+                    <div className="circuit-trace" />
+                    <div className="circuit-trace" />
+                    <div className="circuit-trace" />
+                  </div>
+                  <div className="code-fragments">
+                    <span className="code-fragment">0xEN</span>
+                    <span className="code-fragment">3X</span>
+                    <span className="code-fragment">AUDIO</span>
+                    <span className="code-fragment">SPELL</span>
+                    <span className="code-fragment">100%</span>
+                  </div>
+                  <div className="interference" />
+                  <div className="scan-bars">
+                    <div className="scan-bar" />
+                    <div className="scan-bar" />
+                    <div className="scan-bar" />
+                  </div>
+                  <div className="text-glow" />
+                </button>
+              </div>
             </div>
 
           </div>
