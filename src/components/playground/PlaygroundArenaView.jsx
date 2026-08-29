@@ -43,6 +43,8 @@ import WordleAcademicModal from './WordleAcademicModal';
 import GoldQuestGameModal from './GoldQuestGameModal';
 import KahootSpeedArenaModal from './KahootSpeedArenaModal';
 import DuelMultiplayerModal from './DuelMultiplayerModal';
+import EnglishAudioSpellingModal from './EnglishAudioSpellingModal';
+import { Headphones } from 'lucide-react';
 
 export default function PlaygroundArenaView() {
   const { student } = useAuth();
@@ -63,6 +65,7 @@ export default function PlaygroundArenaView() {
   const [showMemoryMatch, setShowMemoryMatch] = useState(false);
   const [show2048Game, setShow2048Game] = useState(false);
   const [showWordleGame, setShowWordleGame] = useState(false);
+  const [showEnglishSpellGame, setShowEnglishSpellGame] = useState(false);
 
   // Auto-open multiplayer duel if invited via ?room=... link
   useEffect(() => {
@@ -197,6 +200,15 @@ export default function PlaygroundArenaView() {
                 <Coins className="w-4 h-4 text-amber-400" />
                 <span>{lang === 'km' ? 'លេង Blooket Gold Quest' : 'Play Gold Quest'}</span>
               </button>
+
+              <button
+                type="button"
+                onClick={() => setShowEnglishSpellGame(true)}
+                className="px-5 py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-blue-500 text-white font-black text-xs sm:text-sm border border-cyan-300/40 flex items-center gap-2 cursor-pointer shadow-lg shadow-cyan-500/25 active:scale-95 transition-all"
+              >
+                <Headphones className="w-4 h-4 text-amber-300 animate-pulse" />
+                <span>{lang === 'km' ? '🎙️ ស្តាប់ AI វាយពាក្យអង់គ្លេស' : '🎙️ AI English Audio Spell'}</span>
+              </button>
             </div>
 
           </div>
@@ -283,11 +295,11 @@ export default function PlaygroundArenaView() {
           <div className="flex items-center gap-2">
             <Gamepad2 className="w-5 h-5 text-[#005baa]" />
             <h3 className="text-base sm:text-lg font-black text-[#003366]">
-              {lang === 'km' ? 'ម៉ាស៊ីនហ្គេម Arcade & 1v1 Multiplayer ទាំង ៦' : '6 Core Educational Game Engines'}
+              {lang === 'km' ? 'ម៉ាស៊ីនហ្គេម Arcade & 1v1 Multiplayer ទាំង ៧' : '7 Core Educational Game Engines'}
             </h3>
           </div>
           <span className="text-xs font-bold text-slate-500 hidden sm:block">
-            1v1 vs Bot / Friends + Blooket + Kahoot + RPG + 2048 + Wordle
+            1v1 vs Bot / Friends + AI Audio Spell + Blooket + Kahoot + RPG + 2048 + Wordle
           </span>
         </div>
 
@@ -587,6 +599,45 @@ export default function PlaygroundArenaView() {
             </div>
           </div>
 
+          {/* 7. AI English Audio Spelling Bee */}
+          <div className="col-span-2 lg:col-span-3 bg-gradient-to-r from-[#031b38] via-[#052b57] to-[#01142a] rounded-2xl sm:rounded-3xl border-2 border-cyan-400/50 hover:border-cyan-300 shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 gap-4 text-white overflow-hidden relative group">
+            <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-400/10 rounded-full blur-2xl pointer-events-none" />
+            <div className="flex items-center gap-4 relative z-10">
+              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 text-white flex items-center justify-center flex-shrink-0 shadow-lg shadow-cyan-500/30 border border-cyan-300/40">
+                <Headphones className="w-7 h-7 sm:w-8 sm:h-8 animate-pulse" />
+              </div>
+              <div className="space-y-1">
+                <div className="flex items-center gap-2">
+                  <span className="px-2 py-0.5 rounded-full bg-cyan-400/20 text-cyan-300 font-mono text-[10px] font-black tracking-wider uppercase border border-cyan-400/30">
+                    AI VOICE 3X DICTATION
+                  </span>
+                  <span className="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 font-mono text-[10px] font-black border border-amber-400/30">
+                    +400 XP
+                  </span>
+                </div>
+                <h4 className="text-base sm:text-xl font-black text-white group-hover:text-cyan-300 transition-colors">
+                  {lang === 'km' ? 'ហ្គេមស្តាប់ AI និយាយ ៣ ដង & វាយពាក្យអង់គ្លេស (AI English Spell)' : 'AI English Audio Dictation & Spelling Bee'}
+                </h4>
+                <p className="text-xs text-blue-100/80 max-w-xl line-clamp-2">
+                  {lang === 'km' 
+                    ? 'AI និយាយបញ្ចេញសំឡេងពាក្យអង់គ្លេស ៣ ដង (ដូចជា Earth... 3x Go!) ដើម្បីស្តាប់ឱ្យច្បាស់ រួចវាយអក្ខរាវិរុទ្ធឱ្យបានត្រឹមត្រូវ!' 
+                    : 'AI pronounces English words 3 times clearly in sequence (e.g. Earth... 3x Go!) for listening comprehension and typing precision!'}
+                </p>
+              </div>
+            </div>
+
+            <div className="flex-shrink-0 w-full sm:w-auto relative z-10">
+              <button
+                type="button"
+                onClick={() => setShowEnglishSpellGame(true)}
+                className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 hover:from-cyan-300 hover:to-teal-300 text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xl shadow-cyan-500/25 active:scale-95"
+              >
+                <Play className="w-4 h-4 fill-slate-950" />
+                <span>{lang === 'km' ? 'ចូលលេងស្តាប់ AI (Start 3x Spell)' : 'Start AI Audio Spell'}</span>
+              </button>
+            </div>
+          </div>
+
         </div>
       </div>
 
@@ -881,6 +932,14 @@ export default function PlaygroundArenaView() {
       {showWordleGame && (
         <WordleAcademicModal
           onClose={() => setShowWordleGame(false)}
+        />
+      )}
+
+      {/* English AI Audio Dictation / Spelling Bee Modal */}
+      {showEnglishSpellGame && (
+        <EnglishAudioSpellingModal
+          isOpen={showEnglishSpellGame}
+          onClose={() => setShowEnglishSpellGame(false)}
         />
       )}
 
