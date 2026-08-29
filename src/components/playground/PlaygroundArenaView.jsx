@@ -206,7 +206,7 @@ export default function PlaygroundArenaView() {
                   type="button"
                   onClick={() => setShowEnglishSpellGame(true)}
                   className="hacker-button"
-                  data-text={lang === 'km' ? '🎧 ENGLISH PRACTICE (LISTEN & SPELL)' : '🎧 ENGLISH PRACTICE (LISTEN & SPELL)'}
+                  data-text={lang === 'km' ? 'ENGLISH PRACTICE (LISTEN & SPELL)' : 'ENGLISH PRACTICE (LISTEN & SPELL)'}
                 >
                   <Headphones className="w-4 h-4 fill-current relative z-10 text-cyan-300 animate-pulse" />
                   <span className="relative z-10 font-bold">
@@ -640,7 +640,7 @@ export default function PlaygroundArenaView() {
                     SMART AUDIO 3X VOICE
                   </span>
                   <span className="px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 font-mono text-[10px] font-black border border-emerald-400/30">
-                    🎲 AUTO RANDOM VOCAB
+                    AUTO RANDOM VOCAB
                   </span>
                   <span className="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 font-mono text-[10px] font-black border border-amber-400/30">
                     +600 XP

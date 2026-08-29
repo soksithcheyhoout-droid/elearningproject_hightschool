@@ -23,10 +23,13 @@ import {
   Lightbulb,
   Heart,
   Crown,
-  Bot,
   Gauge,
   BookOpen,
-  Check
+  Check,
+  Target,
+  Delete,
+  ShieldCheck,
+  Radio
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
@@ -540,30 +543,30 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
     <div className="fixed inset-0 z-[99999] flex items-center justify-center p-2 sm:p-4 bg-slate-950/90 backdrop-blur-xl animate-fadeIn font-kantumruy select-none overflow-y-auto">
       
       {/* Modal Container */}
-      <div className="relative w-full max-w-4xl bg-[#050f1d] rounded-3xl border-2 border-cyan-500/40 shadow-[0_25px_90px_rgba(6,182,212,0.25)] overflow-hidden flex flex-col my-auto max-h-[96vh]">
+      <div className="relative w-full max-w-4xl bg-[#030a16] rounded-3xl border border-cyan-500/30 shadow-[0_25px_90px_rgba(6,182,212,0.2)] overflow-hidden flex flex-col my-auto max-h-[96vh]">
         
-        {/* Ambient Grid Background */}
-        <div className="absolute inset-0 bg-[radial-gradient(#005baa_1px,transparent_1px)] [background-size:24px_24px] opacity-15 pointer-events-none" />
-        <div className="absolute top-0 right-1/4 w-80 h-80 bg-cyan-500/10 rounded-full blur-3xl pointer-events-none" />
+        {/* Subtle Ambient Grid Background */}
+        <div className="absolute inset-0 bg-[radial-gradient(#0284c7_1px,transparent_1px)] [background-size:24px_24px] opacity-10 pointer-events-none" />
+        <div className="absolute top-0 right-1/4 w-80 h-80 bg-cyan-500/5 rounded-full blur-3xl pointer-events-none" />
 
         {/* 🌟 TOP HEADER BAR */}
-        <div className="relative z-10 bg-[#001730]/95 backdrop-blur-md border-b border-cyan-500/20 px-4 sm:px-6 py-3.5 flex items-center justify-between flex-shrink-0">
+        <div className="relative z-10 bg-[#061224]/95 backdrop-blur-md border-b border-cyan-500/20 px-4 sm:px-6 py-3.5 flex items-center justify-between flex-shrink-0">
           
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-indigo-600 text-white flex items-center justify-center shadow-lg shadow-cyan-500/30 border border-cyan-300/40">
-              <Headphones className="w-5 h-5 animate-pulse" />
+            <div className="w-10 h-10 rounded-xl bg-gradient-to-tr from-cyan-600 via-blue-600 to-indigo-700 text-white flex items-center justify-center shadow-md shadow-cyan-500/20 border border-cyan-400/30">
+              <Headphones className="w-5 h-5 text-cyan-200" />
             </div>
             <div>
               <div className="flex items-center gap-2">
-                <h3 className="font-black text-sm sm:text-base text-white font-cinzel tracking-wider">
-                  ENGLISH PRACTICE: LISTEN AND SPELL
+                <h3 className="font-black text-xs sm:text-sm text-white font-cinzel tracking-wider uppercase">
+                  English Practice: Listen & Spell
                 </h3>
-                <span className="px-2.5 py-0.5 rounded-full bg-cyan-400/20 border border-cyan-400/40 text-[9.5px] font-black text-cyan-300 uppercase tracking-wide">
-                  SMART AUDIO 3X
+                <span className="px-2 py-0.5 rounded-md bg-cyan-500/15 border border-cyan-400/30 text-[9px] font-black text-cyan-300 uppercase tracking-wide font-mono">
+                  Smart Audio 3x
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 hidden sm:block">
-                អនុវត្តស្តាប់ការបញ្ចេញសំឡេង ៣ ដងយឺតៗ & សរសេរអក្ខរាវិរុទ្ធអង់គ្លេសដណ្តើម XP
+                អនុវត្តស្តាប់ការបញ្ចេញសំឡេង ៣ ដងយឺតៗ និងសរសេរអក្ខរាវិរុទ្ធអង់គ្លេស
               </p>
             </div>
           </div>
@@ -573,18 +576,18 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
             <button
               type="button"
               onClick={() => setSoundEffects(!soundEffects)}
-              className="p-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/10 transition-colors cursor-pointer"
+              className="p-2 rounded-xl bg-slate-900/80 hover:bg-slate-800 text-slate-400 hover:text-white border border-white/10 transition-colors cursor-pointer"
               title={soundEffects ? 'Mute Sound Effects' : 'Enable Sound'}
             >
               {soundEffects ? <Volume2 className="w-4 h-4 text-cyan-400" /> : <VolumeX className="w-4 h-4 text-slate-500" />}
             </button>
 
-            {/* Close Button with Guaranteed Audio Stop */}
+            {/* Close Button */}
             <button
               type="button"
               onClick={handleCloseModal}
-              className="p-2 rounded-xl bg-white/5 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 border border-white/10 hover:border-rose-500/40 transition-colors cursor-pointer"
-              title="Close Modal & Stop Voice"
+              className="p-2 rounded-xl bg-slate-900/80 hover:bg-rose-950/50 text-slate-400 hover:text-rose-300 border border-white/10 hover:border-rose-500/30 transition-colors cursor-pointer"
+              title="Close Modal"
             >
               <X className="w-5 h-5" />
             </button>
@@ -603,45 +606,45 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
               
               {/* Header Title */}
               <div className="space-y-1.5">
-                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 text-xs font-bold font-cinzel tracking-wider">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>NATIONAL ENGLISH LISTENING & SPELLING ARENA</span>
+                <div className="inline-flex items-center gap-2 px-3.5 py-1 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 text-xs font-bold font-cinzel tracking-wider uppercase">
+                  <Radio className="w-3.5 h-3.5" />
+                  <span>National English Listening Studio</span>
                 </div>
-                <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">
+                <h2 className="text-xl sm:text-2xl font-black text-white leading-tight">
                   ការអនុវត្តភាសាអង់គ្លេស៖ ស្តាប់ & សរសេរអក្ខរាវិរុទ្ធ
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-300 max-w-xl mx-auto leading-relaxed">
-                  ប្រព័ន្ធបញ្ចេញសំឡេងពាក្យអង់គ្លេស <strong>៣ ដងយឺតៗច្បាស់ៗ (ដូចជា Earth... Earth... Earth... GO!)</strong> ដើម្បីឱ្យប្អូនស្តាប់ទាន់ រួចវាយអក្សរចូលឱ្យបានត្រឹមត្រូវ!
+                  ប្រព័ន្ធបញ្ចេញសំឡេងពាក្យអង់គ្លេស <strong>៣ ដងយឺតៗច្បាស់ៗ (0.75x)</strong> ជួយពង្រឹងការស្តាប់ ការបញ្ចេញសំឡេង និងការសរសេរអក្ខរាវិរុទ្ធបានត្រឹមត្រូវ។
                 </p>
               </div>
 
               {/* 🌟 1. AUTO-RANDOM ADAPTIVE VOCABULARY HIGHLIGHT */}
-              <div className="p-4 sm:p-5 rounded-2xl bg-gradient-to-r from-[#031b38]/90 via-[#052b57]/80 to-[#01142a]/90 border border-cyan-400/40 text-left space-y-3 shadow-lg relative overflow-hidden">
+              <div className="p-4 sm:p-5 rounded-2xl bg-slate-900/70 border border-cyan-500/20 text-left space-y-3 shadow-sm relative overflow-hidden">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
-                    <span className="p-1.5 rounded-xl bg-cyan-400/20 text-cyan-300 border border-cyan-400/30">
+                    <span className="p-1.5 rounded-lg bg-cyan-400/15 text-cyan-300 border border-cyan-400/20">
                       <Sparkles className="w-4 h-4" />
                     </span>
-                    <span className="font-black text-sm sm:text-base text-white">
-                      🎲 ប្រព័ន្ធចម្រុះពាក្យស្វ័យប្រវត្តិ (Auto-Random Adaptive Vocab)
+                    <span className="font-bold text-xs sm:text-sm text-white">
+                      ប្រព័ន្ធចម្រុះពាក្យស្វ័យប្រវត្តិ (Auto-Random Adaptive Vocab)
                     </span>
                   </div>
-                  <span className="px-2.5 py-0.5 rounded-full bg-cyan-400/20 border border-cyan-400/40 text-[10px] font-mono font-black text-cyan-300">
-                    ALL LEVELS AUTO
+                  <span className="px-2 py-0.5 rounded bg-cyan-500/15 text-[10px] font-mono font-bold text-cyan-300 uppercase">
+                    All Levels
                   </span>
                 </div>
                 <p className="text-xs text-slate-300 leading-relaxed">
-                  ប្រព័ន្ធនឹងចម្រុះពាក្យគ្រប់កម្រិត (ពីងាយស្រួល ៤-៥ អក្សរ ដល់កម្រិតបាក់ឌុប ១២+ អក្សរ) ដោយស្វ័យប្រវត្តិ។ ប្អូនគ្រាន់តែចុចចាប់ផ្តើម ហើយស្តាប់សំឡេងអាន ៣ ដងយឺតៗ!
+                  ប្រព័ន្ធនឹងចម្រុះពាក្យគ្រប់កម្រិត (ពីងាយស្រួល ៤-៥ អក្សរ ដល់កម្រិតបាក់ឌុប ១២+ អក្សរ) ដោយស្វ័យប្រវត្តិ។ ចុចចាប់ផ្តើម ហើយស្តាប់សំឡេងអាន ៣ ដងយឺតៗ!
                 </p>
                 <div className="grid grid-cols-3 gap-2 pt-1 text-center font-mono">
-                  <div className="p-2 rounded-xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold">
-                    🟢 Easy (4-5 letters) <span className="block text-[10px] text-emerald-400 font-normal">+300 XP</span>
+                  <div className="p-2.5 rounded-xl bg-slate-950/70 border border-emerald-500/30 text-emerald-300 text-[11px] font-bold">
+                    Easy (4-5 letters) <span className="block text-[10px] text-emerald-400/80 font-normal mt-0.5">+300 XP</span>
                   </div>
-                  <div className="p-2 rounded-xl bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[11px] font-bold">
-                    🟡 Med (6-8 letters) <span className="block text-[10px] text-amber-400 font-normal">+450 XP</span>
+                  <div className="p-2.5 rounded-xl bg-slate-950/70 border border-amber-500/30 text-amber-300 text-[11px] font-bold">
+                    Medium (6-8 letters) <span className="block text-[10px] text-amber-400/80 font-normal mt-0.5">+450 XP</span>
                   </div>
-                  <div className="p-2 rounded-xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-[11px] font-bold">
-                    🔴 Hard (9+ letters) <span className="block text-[10px] text-rose-400 font-normal">+600 XP</span>
+                  <div className="p-2.5 rounded-xl bg-slate-950/70 border border-rose-500/30 text-rose-300 text-[11px] font-bold">
+                    Advanced (9+ letters) <span className="block text-[10px] text-rose-400/80 font-normal mt-0.5">+600 XP</span>
                   </div>
                 </div>
               </div>
@@ -657,12 +660,15 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                     onClick={() => setGameMode('mission')}
                     className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
                       gameMode === 'mission'
-                        ? 'bg-cyan-950/70 border-cyan-400 shadow-lg shadow-cyan-500/20 text-white'
+                        ? 'bg-cyan-950/50 border-cyan-400 shadow-md text-white'
                         : 'bg-slate-900/60 border-white/10 text-slate-400 hover:border-white/20 hover:text-white'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-bold text-xs">🎯 10-Word Mission</span>
+                      <span className="font-bold text-xs flex items-center gap-1.5">
+                        <Target className="w-3.5 h-3.5 text-cyan-400" />
+                        <span>10-Word Mission</span>
+                      </span>
                       <span className="text-[10px] text-amber-400 font-cinzel font-black">+400 XP</span>
                     </div>
                     <p className="text-[11px] text-slate-300">១០ ពាក្យស្តង់ដារថ្នាក់ជាតិ</p>
@@ -673,12 +679,15 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                     onClick={() => setGameMode('speed')}
                     className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
                       gameMode === 'speed'
-                        ? 'bg-cyan-950/70 border-cyan-400 shadow-lg shadow-cyan-500/20 text-white'
+                        ? 'bg-cyan-950/50 border-cyan-400 shadow-md text-white'
                         : 'bg-slate-900/60 border-white/10 text-slate-400 hover:border-white/20 hover:text-white'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-bold text-xs">⚡ Speed Blitz</span>
+                      <span className="font-bold text-xs flex items-center gap-1.5">
+                        <Clock className="w-3.5 h-3.5 text-amber-400" />
+                        <span>60s Speed Run</span>
+                      </span>
                       <span className="text-[10px] text-cyan-400 font-cinzel font-black">60 SEC</span>
                     </div>
                     <p className="text-[11px] text-slate-300">ប្រណាំងល្បឿន ៦០ វិនាទី</p>
@@ -689,12 +698,15 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                     onClick={() => setGameMode('endless')}
                     className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer ${
                       gameMode === 'endless'
-                        ? 'bg-cyan-950/70 border-cyan-400 shadow-lg shadow-cyan-500/20 text-white'
+                        ? 'bg-cyan-950/50 border-cyan-400 shadow-md text-white'
                         : 'bg-slate-900/60 border-white/10 text-slate-400 hover:border-white/20 hover:text-white'
                     }`}
                   >
                     <div className="flex items-center justify-between mb-1">
-                      <span className="font-bold text-xs">♾️ Endless Mastery</span>
+                      <span className="font-bold text-xs flex items-center gap-1.5">
+                        <ShieldCheck className="w-3.5 h-3.5 text-rose-400" />
+                        <span>Survival Mastery</span>
+                      </span>
                       <span className="text-[10px] text-rose-400 font-cinzel font-black">3 LIVES</span>
                     </div>
                     <p className="text-[11px] text-slate-300">លេងរហូតដល់ខុស ៣ ដង</p>
@@ -717,7 +729,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                   type="button"
                   onClick={() => setAutoThreeTimes(!autoThreeTimes)}
                   className={`w-12 h-6 rounded-full p-1 transition-colors cursor-pointer relative ${
-                    autoThreeTimes ? 'bg-cyan-500' : 'bg-slate-700'
+                    autoThreeTimes ? 'bg-cyan-600' : 'bg-slate-700'
                   }`}
                 >
                   <div className={`w-4 h-4 rounded-full bg-white transition-transform ${
@@ -732,11 +744,11 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                   type="button"
                   onClick={startGameSession}
                   className="hacker-button w-full justify-center cursor-pointer"
-                  data-text="🎧 ចាប់ផ្តើមអនុវត្ត (START LISTEN & SPELL)"
+                  data-text="START PRACTICE (LISTEN & SPELL)"
                 >
                   <Headphones className="w-5 h-5 fill-current relative z-10 text-cyan-300 animate-pulse" />
-                  <span className="relative z-10 font-black text-sm sm:text-base tracking-wide">
-                    ចាប់ផ្តើមអនុវត្ត (START LISTEN & SPELL)
+                  <span className="relative z-10 font-black text-xs sm:text-sm tracking-widest uppercase">
+                    START PRACTICE (LISTEN & SPELL)
                   </span>
                   
                   <div className="neon-frame" />
@@ -777,37 +789,37 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
               <div className="flex flex-wrap items-center justify-between gap-2 p-3 rounded-2xl bg-slate-900/80 border border-white/10 text-xs">
                 
                 <div className="flex items-center gap-2">
-                  <span className="px-2.5 py-1 rounded-lg bg-cyan-500/20 text-cyan-300 font-mono font-black border border-cyan-400/30">
+                  <span className="px-2.5 py-1 rounded-lg bg-cyan-500/15 text-cyan-300 font-mono font-bold border border-cyan-400/30">
                     WORD {currentIndex + 1} / {wordsList.length}
                   </span>
                   
                   {/* Dynamic Word Length Badge */}
-                  <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-black uppercase tracking-wider border ${
+                  <span className={`px-2.5 py-1 rounded-lg text-[10px] font-mono font-bold uppercase tracking-wider border ${
                     currentWordItem.word.length >= 9
-                      ? 'bg-rose-500/20 text-rose-300 border-rose-400/30'
+                      ? 'bg-rose-500/15 text-rose-300 border-rose-400/30'
                       : currentWordItem.word.length <= 5
-                        ? 'bg-emerald-500/20 text-emerald-300 border-emerald-400/30'
-                        : 'bg-amber-500/20 text-amber-300 border-amber-400/30'
+                        ? 'bg-emerald-500/15 text-emerald-300 border-emerald-400/30'
+                        : 'bg-amber-500/15 text-amber-300 border-amber-400/30'
                   }`}>
                     {currentWordItem.word.length >= 9 
-                      ? 'HARD • ៩-១៤ អក្សរ' 
+                      ? 'ADVANCED (9+ LETTERS)' 
                       : currentWordItem.word.length <= 5 
-                        ? 'EASY • ៤-៥ អក្សរ' 
-                        : 'MEDIUM • ៦-៨ អក្សរ'}
+                        ? 'EASY (4-5 LETTERS)' 
+                        : 'MEDIUM (6-8 LETTERS)'}
                   </span>
 
                   {gameMode === 'speed' && (
-                    <span className="px-2.5 py-1 rounded-lg bg-amber-500/20 text-amber-300 font-mono font-black flex items-center gap-1 border border-amber-400/30">
+                    <span className="px-2.5 py-1 rounded-lg bg-amber-500/15 text-amber-300 font-mono font-bold flex items-center gap-1 border border-amber-400/30">
                       <Clock className="w-3.5 h-3.5" />
                       <span>{timeLeft}s</span>
                     </span>
                   )}
                   {gameMode === 'endless' && (
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 px-2 py-1 rounded-lg bg-slate-950 border border-white/10">
                       {[1, 2, 3].map((h) => (
                         <Heart
                           key={h}
-                          className={`w-4 h-4 ${h <= lives ? 'text-rose-500 fill-rose-500' : 'text-slate-700'}`}
+                          className={`w-3.5 h-3.5 ${h <= lives ? 'text-rose-500 fill-rose-500' : 'text-slate-700'}`}
                         />
                       ))}
                     </div>
@@ -817,7 +829,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                 <div className="flex items-center gap-3">
                   {/* Streak Multiplier */}
                   {streak > 1 && (
-                    <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-gradient-to-r from-amber-500/30 to-orange-500/30 border border-amber-400/40 text-amber-300 font-black text-xs animate-bounce">
+                    <div className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-amber-500/20 border border-amber-400/40 text-amber-300 font-bold text-xs animate-pulse">
                       <Flame className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                       <span>STREAK x{streak}</span>
                     </div>
@@ -825,7 +837,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
 
                   {/* Total Score & XP */}
                   <div className="flex items-center gap-2">
-                    <span className="font-mono text-amber-400 font-black text-xs sm:text-sm">
+                    <span className="font-mono text-amber-400 font-bold text-xs sm:text-sm">
                       {score} PTS
                     </span>
                     <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 font-mono font-bold text-[11px] border border-emerald-400/30">
@@ -836,80 +848,91 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
 
               </div>
 
-              {/* CENTER STAGE: AI VOICE SOUNDWAVE & SLOW REPETITION CONTROLS */}
-              <div className="p-6 rounded-3xl bg-gradient-to-b from-[#071933]/90 via-[#0a1f3d]/80 to-[#040e1e]/90 border border-cyan-500/30 text-center space-y-4 shadow-xl relative overflow-hidden">
+              {/* CENTER STAGE: AUDIO CONSOLE & VISUALIZER */}
+              <div className="p-5 sm:p-6 rounded-3xl bg-slate-900/60 border border-cyan-500/20 text-center space-y-4 shadow-xl relative overflow-hidden">
                 
-                {/* 3-Time Speak Phase Banner Alert */}
-                {speakPhase > 0 && (
-                  <div className="absolute top-3 left-1/2 -translate-x-1/2 z-20">
-                    <span className={`px-4 py-1 rounded-full text-xs font-black uppercase tracking-wider flex items-center gap-1.5 shadow-lg animate-pulse ${
-                      speakPhase === 4 
-                        ? 'bg-emerald-500 text-slate-950 font-cinzel text-sm scale-110' 
-                        : 'bg-cyan-500 text-slate-950'
-                    }`}>
-                      <Volume2 className="w-3.5 h-3.5" />
-                      {speakPhase === 1 && '🗣️ លើកទី ១ (1st Time)'}
-                      {speakPhase === 2 && '🗣️ លើកទី ២ (2nd Time)'}
-                      {speakPhase === 3 && '🗣️ លើកទី ៣ យឺតៗ (3rd Time)'}
-                      {speakPhase === 4 && '🚀 GO! TYPE THE WORD NOW! (វាយពាក្យ!)'}
-                    </span>
-                  </div>
-                )}
+                {/* 3-Step Listening Progress Stepper */}
+                <div className="grid grid-cols-4 gap-1.5 sm:gap-2 max-w-xl mx-auto">
+                  {[
+                    { step: 1, label: '1st Listen (0.78x)' },
+                    { step: 2, label: '2nd Listen (0.74x)' },
+                    { step: 3, label: '3rd Listen (0.70x)' },
+                    { step: 4, label: 'Ready to Spell' }
+                  ].map((s) => {
+                    const isActive = speakPhase === s.step;
+                    const isPassed = speakPhase > s.step || (speakPhase === 0 && s.step === 4);
+                    return (
+                      <div
+                        key={s.step}
+                        className={`py-1.5 px-2 rounded-xl text-[10px] font-mono font-bold border transition-all duration-200 ${
+                          isActive
+                            ? 'bg-cyan-500/20 border-cyan-400 text-cyan-200 shadow-[0_0_15px_rgba(6,182,212,0.3)]'
+                            : isPassed
+                              ? 'bg-emerald-950/40 border-emerald-500/30 text-emerald-300'
+                              : 'bg-slate-950/40 border-white/5 text-slate-500'
+                        }`}
+                      >
+                        <div className="truncate">{s.label}</div>
+                      </div>
+                    );
+                  })}
+                </div>
 
-                {/* Animated Audio Soundwave Waves */}
+                {/* Animated Audio Hub Disc */}
                 <div className="w-24 h-24 sm:w-28 sm:h-28 rounded-full mx-auto relative flex items-center justify-center mt-2">
-                  <div className={`absolute inset-0 rounded-full border-2 border-cyan-400/40 ${isSpeaking ? 'animate-ping opacity-60' : 'opacity-20'}`} />
-                  <div className={`absolute -inset-3 rounded-full border border-blue-400/30 ${isSpeaking ? 'animate-pulse' : 'opacity-10'}`} />
+                  <div className={`absolute inset-0 rounded-full border border-cyan-400/30 ${isSpeaking ? 'animate-ping opacity-50' : 'opacity-15'}`} />
+                  <div className={`absolute -inset-2 rounded-full border border-blue-500/20 ${isSpeaking ? 'animate-pulse' : 'opacity-10'}`} />
                   
                   <button
                     type="button"
                     onClick={() => speakWordSlowly(currentWordItem.word, 0.75)}
                     disabled={isSpeaking}
-                    className="w-full h-full rounded-full bg-gradient-to-tr from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-blue-500 text-white flex flex-col items-center justify-center shadow-xl shadow-cyan-500/30 active:scale-95 transition-all cursor-pointer border-2 border-cyan-300"
-                    title="Click to Listen Slowly Again"
+                    className="w-full h-full rounded-full bg-gradient-to-tr from-cyan-600 via-blue-600 to-indigo-700 hover:from-cyan-500 hover:to-blue-500 text-white flex flex-col items-center justify-center shadow-lg shadow-cyan-500/20 active:scale-95 transition-all cursor-pointer border border-cyan-300/40"
+                    title="Click to Listen Slowly"
                   >
-                    <Volume2 className={`w-8 h-8 ${isSpeaking ? 'animate-bounce text-amber-300' : 'text-white'}`} />
-                    <span className="text-[9px] font-black uppercase tracking-wider mt-1 text-cyan-100">
-                      {isSpeaking ? 'SPEAKING...' : 'LISTEN 0.75X'}
+                    <Volume2 className={`w-7 h-7 sm:w-8 sm:h-8 ${isSpeaking ? 'animate-pulse text-amber-300' : 'text-white'}`} />
+                    <span className="text-[9px] font-mono font-bold uppercase tracking-wider mt-1 text-cyan-100">
+                      {isSpeaking ? 'Speaking...' : '0.75x Audio'}
                     </span>
                   </button>
                 </div>
 
                 {/* Frequency Bar Visualizer */}
-                <div className="flex items-center justify-center gap-1.5 h-6">
-                  {[12, 24, 18, 30, 20, 28, 14, 22, 32, 16, 26, 15].map((h, i) => (
+                <div className="flex items-center justify-center gap-1.5 h-5">
+                  {[10, 20, 16, 26, 18, 24, 12, 19, 28, 14, 22, 15].map((h, i) => (
                     <span
                       key={i}
-                      className={`w-1 rounded-full bg-gradient-to-t from-cyan-500 to-blue-300 transition-all duration-150 ${
-                        isSpeaking ? 'opacity-100' : 'opacity-25'
+                      className={`w-1 rounded-full bg-cyan-400 transition-all duration-150 ${
+                        isSpeaking ? 'opacity-90' : 'opacity-20'
                       }`}
                       style={{
-                        height: isSpeaking ? `${Math.max(6, (h * Math.sin(Date.now() / 150 + i)) % 32)}px` : '6px'
+                        height: isSpeaking ? `${Math.max(5, (h * Math.sin(Date.now() / 150 + i)) % 26)}px` : '4px'
                       }}
                     />
                   ))}
                 </div>
 
-                {/* Audio Helper Actions (Repeat 3x, Slow 0.60x, Phonics, Sentence, AI Coach) */}
-                <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
+                {/* Unified Segmented Audio Tool Strip */}
+                <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 max-w-xl mx-auto pt-1">
                   
                   <button
                     type="button"
                     onClick={() => startThreeTimeRoutine(currentWordItem.word)}
                     disabled={isSpeaking}
-                    className="px-3 py-1.5 rounded-xl bg-cyan-500/15 hover:bg-cyan-500/25 border border-cyan-400/40 text-cyan-300 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                    className="px-3 py-1.5 rounded-xl bg-slate-950/70 hover:bg-slate-800 border border-white/10 text-slate-200 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
                   >
-                    <Volume2 className="w-3.5 h-3.5" />
-                    <span>បញ្ចេញសំឡេង ៣ ដង (Repeat 3x)</span>
+                    <RotateCcw className="w-3.5 h-3.5 text-cyan-400" />
+                    <span>Repeat 3x</span>
                   </button>
 
                   <button
                     type="button"
                     onClick={() => speakWordSlowly(currentWordItem.word, 0.60)}
                     disabled={isSpeaking}
-                    className="px-3 py-1.5 rounded-xl bg-amber-500/15 hover:bg-amber-500/25 border border-amber-400/40 text-amber-300 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                    className="px-3 py-1.5 rounded-xl bg-slate-950/70 hover:bg-slate-800 border border-white/10 text-slate-200 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
                   >
-                    <span>🐢 សំឡេងយឺតបំផុត (Slow 0.6x)</span>
+                    <Gauge className="w-3.5 h-3.5 text-amber-400" />
+                    <span>Slow 0.6x</span>
                   </button>
 
                   <button
@@ -919,9 +942,10 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                       speakWordSlowly(letters, 0.75);
                     }}
                     disabled={isSpeaking}
-                    className="px-3 py-1.5 rounded-xl bg-purple-500/15 hover:bg-purple-500/25 border border-purple-400/40 text-purple-300 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                    className="px-3 py-1.5 rounded-xl bg-slate-950/70 hover:bg-slate-800 border border-white/10 text-slate-200 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
                   >
-                    <span>🔤 អក្ខរាវិរុទ្ធ (Spelling)</span>
+                    <BookOpen className="w-3.5 h-3.5 text-purple-400" />
+                    <span>Phonics</span>
                   </button>
 
                   <button
@@ -931,39 +955,39 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                       speakWordSlowly(currentWordItem.exampleEn, 0.75);
                     }}
                     disabled={isSpeaking}
-                    className="px-3 py-1.5 rounded-xl bg-emerald-500/15 hover:bg-emerald-500/25 border border-emerald-400/40 text-emerald-300 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                    className="px-3 py-1.5 rounded-xl bg-slate-950/70 hover:bg-slate-800 border border-white/10 text-slate-200 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
                   >
-                    <Lightbulb className="w-3.5 h-3.5" />
-                    <span>លឺឧទាហរណ៍ (Sentence)</span>
+                    <Lightbulb className="w-3.5 h-3.5 text-emerald-400" />
+                    <span>Sentence</span>
                   </button>
 
-                  {/* Smart Coach Hint Button */}
                   <button
                     type="button"
                     onClick={handleAskAiCoach}
                     disabled={isAskingAiCoach || isSpeaking}
-                    className="px-3 py-1.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-400/40 text-indigo-300 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                    className="px-3 py-1.5 rounded-xl bg-slate-950/70 hover:bg-slate-800 border border-white/10 text-slate-200 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
                   >
-                    <Bot className="w-3.5 h-3.5 text-indigo-400" />
-                    <span>{isAskingAiCoach ? 'កំពុងគិត...' : '🤖 ជំនួយពន្យល់ (Smart Hint)'}</span>
+                    <HelpCircle className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>{isAskingAiCoach ? 'Loading...' : 'Hint'}</span>
                   </button>
 
                 </div>
 
-                {/* AI Smart Coach Hint Box */}
+                {/* Smart Coach Hint Box */}
                 {aiCoachHint && (
-                  <div className="p-3 rounded-2xl bg-indigo-950/50 border border-indigo-500/40 text-left text-xs space-y-1 animate-fadeIn">
+                  <div className="p-3 rounded-2xl bg-slate-950/80 border border-indigo-500/30 text-left text-xs space-y-1 animate-fadeIn">
                     <div className="flex items-center justify-between text-indigo-300 font-bold">
                       <span className="flex items-center gap-1.5">
-                        <Bot className="w-4 h-4 text-indigo-400" />
-                        <span>លោកគ្រូ AI (Smart Coach) ៖</span>
+                        <HelpCircle className="w-4 h-4 text-indigo-400" />
+                        <span>ពន្យល់តម្រុយ (Smart Hint) ៖</span>
                       </span>
                       <button
                         type="button"
                         onClick={() => speakWordSlowly(aiCoachHint, 0.85)}
-                        className="text-[11px] text-cyan-300 hover:underline cursor-pointer"
+                        className="text-[11px] text-cyan-300 hover:underline cursor-pointer flex items-center gap-1"
                       >
-                        🔊 ស្តាប់សំឡេង
+                        <Volume2 className="w-3 h-3" />
+                        <span>ស្តាប់</span>
                       </button>
                     </div>
                     <p className="text-slate-200 leading-relaxed">
@@ -972,11 +996,11 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                   </div>
                 )}
 
-                {/* Example Sentence Box if clicked */}
+                {/* Example Sentence Box */}
                 {showSentence && (
-                  <div className="p-3 rounded-xl bg-emerald-950/40 border border-emerald-500/30 text-left text-xs space-y-1 animate-fadeIn">
+                  <div className="p-3 rounded-xl bg-slate-950/80 border border-emerald-500/30 text-left text-xs space-y-1 animate-fadeIn">
                     <p className="font-bold text-emerald-200">
-                      📝 {currentWordItem.exampleEn}
+                      Example: {currentWordItem.exampleEn}
                     </p>
                     <p className="text-slate-400 text-[11px]">
                       {currentWordItem.exampleKm}
@@ -984,13 +1008,13 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                   </div>
                 )}
 
-                {/* Clue / Meaning Drawer */}
+                {/* Clue / Word Details Footer */}
                 <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
-                  <div className="flex items-center gap-2">
-                    <span className="px-2 py-0.5 rounded bg-white/10 text-slate-300 font-mono text-[10.5px]">
+                  <div className="flex items-center gap-2 font-mono">
+                    <span className="px-2 py-0.5 rounded bg-white/5 text-slate-300 text-[10.5px]">
                       [{currentWordItem.partOfSpeech.toUpperCase()}]
                     </span>
-                    <span>ប្រវែងពាក្យ៖ {currentWordItem.word.length} អក្សរ</span>
+                    <span>LENGTH: {currentWordItem.word.length} LETTERS</span>
                   </div>
 
                   <button
@@ -999,18 +1023,18 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                     className="text-amber-400 hover:text-amber-300 font-bold flex items-center gap-1 cursor-pointer"
                   >
                     <HelpCircle className="w-3.5 h-3.5" />
-                    <span>{showHint ? 'លាក់តម្រុយ (Hide)' : 'មើលតម្រុយន័យ (Hint)'}</span>
+                    <span>{showHint ? 'Hide Meaning' : 'View Meaning'}</span>
                   </button>
                 </div>
 
                 {/* Revealed Hint */}
                 {showHint && (
-                  <div className="p-2.5 rounded-xl bg-amber-500/10 border border-amber-400/30 text-left text-xs space-y-0.5 animate-fadeIn">
+                  <div className="p-2.5 rounded-xl bg-slate-950/80 border border-amber-400/30 text-left text-xs space-y-0.5 animate-fadeIn">
                     <p className="text-amber-200 font-bold">
-                      💡 អត្ថន័យ៖ <span className="text-white">{currentWordItem.meaningKm}</span>
+                      Meaning: <span className="text-white">{currentWordItem.meaningKm}</span>
                     </p>
                     <p className="text-slate-400 text-[11px]">
-                      {currentWordItem.clue} • អក្សរដំបូង៖ <strong className="text-amber-300">{currentWordItem.word[0]}...</strong>
+                      {currentWordItem.clue} • First Letter: <strong className="text-amber-300 font-mono">{currentWordItem.word[0]}...</strong>
                     </p>
                   </div>
                 )}
@@ -1018,12 +1042,12 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
               </div>
 
               {/* 🌟 USER SPELLING INPUT DISPLAY (BIG LETTER SLOTS) */}
-              <div className={`p-4 rounded-2xl bg-slate-900 border-2 transition-all duration-200 ${
+              <div className={`p-4 rounded-2xl bg-slate-900/90 border-2 transition-all duration-200 ${
                 isCorrectGlow 
-                  ? 'border-emerald-400 bg-emerald-950/40 shadow-xl shadow-emerald-500/20' 
+                  ? 'border-emerald-400 bg-emerald-950/30 shadow-lg shadow-emerald-500/20' 
                   : isWrongShake 
-                    ? 'border-rose-500 bg-rose-950/40 animate-shake' 
-                    : 'border-white/15 focus-within:border-cyan-400'
+                    ? 'border-rose-500 bg-rose-950/30 animate-shake' 
+                    : 'border-white/10 focus-within:border-cyan-400'
               }`}>
                 
                 <div className="flex flex-col items-center gap-3">
@@ -1037,10 +1061,10 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                           key={idx}
                           className={`w-9 h-11 sm:w-11 sm:h-13 rounded-xl border-2 flex items-center justify-center font-mono text-lg sm:text-2xl font-black transition-all ${
                             char
-                              ? 'border-cyan-400 bg-cyan-950/60 text-cyan-200 shadow-md scale-105'
+                              ? 'border-cyan-400 bg-cyan-950/40 text-cyan-200 shadow-sm scale-105'
                               : idx === currentInput.length
                                 ? 'border-amber-400 bg-white/5 text-amber-300 animate-pulse'
-                                : 'border-slate-700 bg-slate-800/50 text-slate-500'
+                                : 'border-slate-800 bg-slate-950/60 text-slate-600'
                           }`}
                         >
                           {char ? char.toUpperCase() : ''}
@@ -1051,16 +1075,16 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
 
                   {/* Phonetics & Feedback Text */}
                   {isCorrectGlow && (
-                    <div className="text-emerald-300 font-black text-sm flex items-center gap-1.5 animate-bounce">
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>ត្រឹមត្រូវណាស់! {currentWordItem.phonetic} • {currentWordItem.meaningKm}</span>
+                    <div className="text-emerald-300 font-bold text-xs sm:text-sm flex items-center gap-1.5 animate-pulse">
+                      <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                      <span>Correct! {currentWordItem.phonetic} • {currentWordItem.meaningKm}</span>
                     </div>
                   )}
 
                   {isWrongShake && (
                     <div className="text-rose-300 font-bold text-xs flex items-center gap-1.5">
-                      <AlertCircle className="w-4 h-4" />
-                      <span>អក្ខរាវិរុទ្ធមិនទាន់ត្រឹមត្រូវទេ! ពាក្យពិត៖ <strong className="text-white underline">{currentWordItem.word}</strong> ({currentWordItem.meaningKm})</span>
+                      <AlertCircle className="w-4 h-4 text-rose-400" />
+                      <span>Not correct. Word was: <strong className="text-white underline font-mono">{currentWordItem.word}</strong> ({currentWordItem.meaningKm})</span>
                     </div>
                   )}
 
@@ -1069,18 +1093,19 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                     <button
                       type="button"
                       onClick={() => setCurrentInput('')}
-                      className="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-bold transition-colors cursor-pointer"
+                      className="px-3 py-2 rounded-xl bg-white/5 hover:bg-white/10 text-slate-400 hover:text-white text-xs font-bold transition-colors cursor-pointer flex items-center gap-1.5"
                     >
-                      លុបទាំងអស់ (Clear)
+                      <RotateCcw className="w-3.5 h-3.5" />
+                      <span>Clear</span>
                     </button>
 
                     <button
                       type="button"
                       onClick={handleCheckAnswer}
                       disabled={!currentInput.trim()}
-                      className="flex-1 sm:flex-initial px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-400 hover:to-teal-500 text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/20 active:scale-95 transition-all cursor-pointer disabled:opacity-40"
+                      className="flex-1 sm:flex-initial px-6 py-2.5 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 hover:from-emerald-500 hover:to-teal-500 text-white font-bold text-xs sm:text-sm flex items-center justify-center gap-2 shadow-md shadow-emerald-500/20 active:scale-95 transition-all cursor-pointer disabled:opacity-40"
                     >
-                      <span>បញ្ជាក់ចម្លើយ (Submit / Enter)</span>
+                      <span>Submit Answer (Enter)</span>
                       <ArrowRight className="w-4 h-4" />
                     </button>
                   </div>
@@ -1089,7 +1114,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
 
               </div>
 
-              {/* 🌟 ON-SCREEN TOUCH VIRTUAL KEYBOARD (FOR MOBILE / TABLET) */}
+              {/* 🌟 ON-SCREEN TOUCH VIRTUAL KEYBOARD */}
               <div className="space-y-1.5 max-w-xl mx-auto w-full pt-1">
                 {VIRTUAL_KEYBOARD.map((row, rIdx) => (
                   <div key={rIdx} className="flex items-center justify-center gap-1 sm:gap-1.5">
@@ -1103,12 +1128,12 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                           className={`rounded-lg sm:rounded-xl font-bold font-mono transition-all active:scale-90 cursor-pointer ${
                             isSpecial
                               ? key === 'ENTER'
-                                ? 'px-3 sm:px-4 py-2 sm:py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] sm:text-xs font-black shadow-md'
-                                : 'px-2.5 sm:px-3.5 py-2 sm:py-2.5 bg-rose-600/80 hover:bg-rose-500 text-white text-[10px] sm:text-xs'
-                              : 'w-7 sm:w-10 h-9 sm:h-11 bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs sm:text-sm border border-white/10 shadow-xs'
+                                ? 'px-3 sm:px-4 py-2 sm:py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] sm:text-xs font-bold shadow-md'
+                                : 'px-2.5 sm:px-3.5 py-2 sm:py-2.5 bg-slate-800 hover:bg-rose-600/80 text-slate-300 hover:text-white text-[10px] sm:text-xs border border-white/10 flex items-center justify-center'
+                              : 'w-7 sm:w-10 h-9 sm:h-11 bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs sm:text-sm border border-white/10 shadow-xs'
                           }`}
                         >
-                          {key === 'BACK' ? '⌫' : key}
+                          {key === 'BACK' ? <Delete className="w-3.5 h-3.5" /> : key}
                         </button>
                       );
                     })}
@@ -1125,36 +1150,36 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
           {gameState === 'game_over' && (
             <div className="space-y-6 animate-fadeIn py-2 max-w-2xl mx-auto w-full text-center">
               
-              <div className="w-20 h-20 rounded-3xl bg-gradient-to-tr from-amber-400 to-yellow-500 text-slate-950 flex items-center justify-center mx-auto shadow-2xl shadow-amber-400/30 animate-bounce">
-                <Trophy className="w-10 h-10" />
+              <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-amber-400 to-yellow-500 text-slate-950 flex items-center justify-center mx-auto shadow-xl shadow-amber-400/20">
+                <Trophy className="w-8 h-8" />
               </div>
 
               <div className="space-y-1.5">
-                <h2 className="text-2xl sm:text-3xl font-black text-white font-moul">
-                  អបអរសាទរ! បញ្ចប់ការអនុវត្ត
+                <h2 className="text-xl sm:text-2xl font-black text-white font-cinzel">
+                  PRACTICE COMPLETED
                 </h2>
                 <p className="text-xs sm:text-sm text-slate-300 font-medium">
-                  អ្នកបានបញ្ចប់ការស្តាប់ & សរសេរអក្ខរាវិរុទ្ធអង់គ្លេសប្រកបដោយជោគជ័យ!
+                  អ្នកបានបញ្ចប់ការស្តាប់ និងសរសេរអក្ខរាវិរុទ្ធអង់គ្លេសប្រកបដោយជោគជ័យ!
                 </p>
               </div>
 
               {/* Score Highlights Bento Grid */}
-              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center">
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5 text-center font-mono">
                 <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10">
-                  <span className="text-[10px] text-slate-400 block font-bold">TOTAL SCORE</span>
-                  <span className="text-lg sm:text-xl font-black text-amber-400 font-mono">{score}</span>
+                  <span className="text-[10px] text-slate-400 block font-bold uppercase">Total Score</span>
+                  <span className="text-lg sm:text-xl font-black text-amber-400">{score}</span>
                 </div>
                 <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10">
-                  <span className="text-[10px] text-slate-400 block font-bold">XP EARNED</span>
-                  <span className="text-lg sm:text-xl font-black text-emerald-400 font-mono">+{totalXpEarned} XP</span>
+                  <span className="text-[10px] text-slate-400 block font-bold uppercase">XP Earned</span>
+                  <span className="text-lg sm:text-xl font-black text-emerald-400">+{totalXpEarned} XP</span>
                 </div>
                 <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10">
-                  <span className="text-[10px] text-slate-400 block font-bold">MAX STREAK</span>
-                  <span className="text-lg sm:text-xl font-black text-orange-400 font-mono">x{maxStreak}</span>
+                  <span className="text-[10px] text-slate-400 block font-bold uppercase">Max Streak</span>
+                  <span className="text-lg sm:text-xl font-black text-orange-400">x{maxStreak}</span>
                 </div>
                 <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10">
-                  <span className="text-[10px] text-slate-400 block font-bold">ACCURACY</span>
-                  <span className="text-lg sm:text-xl font-black text-cyan-400 font-mono">
+                  <span className="text-[10px] text-slate-400 block font-bold uppercase">Accuracy</span>
+                  <span className="text-lg sm:text-xl font-black text-cyan-400">
                     {resultsHistory.length > 0 
                       ? Math.round((resultsHistory.filter(r => r.isCorrect).length / resultsHistory.length) * 100) 
                       : 100}%
@@ -1164,9 +1189,9 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
 
               {/* Word List Review Table with Clickable Audio Play */}
               <div className="space-y-2 text-left">
-                <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between">
-                  <span>បញ្ជីវាក្យសព្ទដែលបានអនុវត្ត (Word Review):</span>
-                  <span className="text-[11px] text-cyan-400 font-normal">ចុច 🔊 ដើម្បីស្តាប់ការបញ្ចេញសំឡេងម្តងទៀត</span>
+                <h4 className="text-xs font-bold text-slate-300 uppercase tracking-wider flex items-center justify-between font-mono">
+                  <span>Vocabulary Review:</span>
+                  <span className="text-[11px] text-cyan-400 font-normal">Click speaker icon to listen again</span>
                 </h4>
 
                 <div className="max-h-60 overflow-y-auto space-y-2 pr-1">
@@ -1189,7 +1214,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                           <Volume2 className="w-4 h-4 text-cyan-300" />
                         </button>
                         <div className="min-w-0">
-                          <div className="font-extrabold text-sm text-white flex items-center gap-2">
+                          <div className="font-bold text-sm text-white flex items-center gap-2">
                             <span>{item.word}</span>
                             <span className="text-[11px] font-mono text-cyan-300 font-normal">{item.phonetic}</span>
                           </div>
@@ -1200,7 +1225,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                       </div>
 
                       <div className="text-right flex-shrink-0">
-                        <span className={`px-2 py-0.5 rounded-full text-[10px] font-black ${
+                        <span className={`px-2 py-0.5 rounded-md text-[10px] font-mono font-bold ${
                           item.isCorrect ? 'bg-emerald-500/20 text-emerald-300' : 'bg-rose-500/20 text-rose-300'
                         }`}>
                           {item.isCorrect ? `+${item.xp} XP` : 'Mistake'}
@@ -1216,10 +1241,10 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                 <button
                   type="button"
                   onClick={startGameSession}
-                  className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg"
+                  className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-600 to-blue-600 hover:from-cyan-500 hover:to-blue-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-md"
                 >
                   <RotateCcw className="w-4 h-4" />
-                  <span>អនុវត្តម្តងទៀត (Practice Again)</span>
+                  <span>Practice Again</span>
                 </button>
 
                 <button
@@ -1227,7 +1252,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                   onClick={() => setGameState('lobby')}
                   className="w-full sm:w-auto py-3 px-5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer border border-white/20"
                 >
-                  <span>ត្រឡប់ទៅមឺនុយ (Menu)</span>
+                  <span>Return to Menu</span>
                 </button>
               </div>
 
