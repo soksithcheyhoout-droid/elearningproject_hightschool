@@ -223,6 +223,14 @@ export async function generateEnglishDictationWithAI(topic = 'Earth & Science', 
 Generate a JSON array of ${count} unique English vocabulary words for topic: "${topic}".
 Target Difficulty: ${diffDesc}.
 
+CRITICAL RULES:
+- ONLY use common, well-known, clearly pronounceable English words that exist in standard dictionaries.
+- Do NOT use abbreviations, acronyms, slang, brand names, or made-up words.
+- Every word MUST be a single English word (no spaces, no hyphens, no special characters).
+- Choose words that a text-to-speech engine can easily pronounce clearly.
+- Words like: Earth, Water, Climate, Gravity, Oxygen, Biology, Science, Energy, Temperature, Electricity are GOOD examples.
+- Do NOT include words with unusual spellings or rare scientific jargon that sounds unnatural when spoken aloud.
+
 Each item in the JSON array must follow this exact JSON schema:
 [
   {
@@ -247,7 +255,7 @@ Output ONLY valid JSON inside \`\`\`json \`\`\` code block without any markdown 
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             contents: [{ role: 'user', parts: [{ text: prompt }] }],
-            generationConfig: { temperature: 0.7, maxOutputTokens: 2048 }
+            generationConfig: { temperature: 0.5, maxOutputTokens: 2048 }
           })
         });
         if (res.ok) {
@@ -257,7 +265,10 @@ Output ONLY valid JSON inside \`\`\`json \`\`\` code block without any markdown 
           const rawJson = (jsonMatch[1] || reply).trim();
           const parsed = JSON.parse(rawJson);
           if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].word) {
-            return parsed.map((item, idx) => ({
+            // Filter: only keep words that are pure English letters (no special chars, no spaces)
+            const validWords = parsed
+              .filter(item => /^[a-zA-Z]{3,}$/.test(item.word.trim()))
+              .map((item, idx) => ({
               id: `ai-dict-${Date.now()}-${idx}`,
               word: item.word.trim(),
               phonetic: item.phonetic || '',
@@ -267,6 +278,7 @@ Output ONLY valid JSON inside \`\`\`json \`\`\` code block without any markdown 
               exampleKm: item.exampleKm || '',
               clue: item.clue || ''
             }));
+            if (validWords.length >= 3) return validWords;
           }
         }
       } catch (e) {
