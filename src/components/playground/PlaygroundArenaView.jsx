@@ -627,48 +627,6 @@ export default function PlaygroundArenaView() {
             </div>
           </div>
 
-          {/* 7. English Practice: Listen and Spell */}
-          <div className="col-span-2 lg:col-span-3 bg-gradient-to-r from-[#031b38] via-[#052b57] to-[#01142a] rounded-2xl sm:rounded-3xl border-2 border-cyan-400/50 hover:border-cyan-300 shadow-lg hover:shadow-2xl transition-all duration-300 flex flex-col sm:flex-row items-center justify-between p-4 sm:p-6 gap-4 text-white overflow-hidden relative group">
-            <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-400/10 rounded-full blur-2xl pointer-events-none" />
-            <div className="flex items-center gap-4 relative z-10">
-              <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-gradient-to-tr from-cyan-500 to-blue-600 text-white flex items-center justify-center flex-shrink-0 shadow-lg shadow-cyan-500/30 border border-cyan-300/40">
-                <Headphones className="w-7 h-7 sm:w-8 sm:h-8 animate-pulse" />
-              </div>
-              <div className="space-y-1">
-                <div className="flex flex-wrap items-center gap-2">
-                  <span className="px-2 py-0.5 rounded-full bg-cyan-400/20 text-cyan-300 font-mono text-[10px] font-black tracking-wider uppercase border border-cyan-400/30">
-                    SMART AUDIO 3X VOICE
-                  </span>
-                  <span className="px-2 py-0.5 rounded-full bg-emerald-400/20 text-emerald-300 font-mono text-[10px] font-black border border-emerald-400/30">
-                    AUTO RANDOM VOCAB
-                  </span>
-                  <span className="px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 font-mono text-[10px] font-black border border-amber-400/30">
-                    +600 XP
-                  </span>
-                </div>
-                <h4 className="text-base sm:text-xl font-black text-white group-hover:text-cyan-300 transition-colors">
-                  {lang === 'km' ? 'English Practice: Listen and Spell (ស្តាប់ & សរសេរអក្ខរាវិរុទ្ធ)' : 'English Practice: Listen and Spell'}
-                </h4>
-                <p className="text-xs text-blue-100/80 max-w-xl line-clamp-2">
-                  {lang === 'km' 
-                    ? 'ប្រព័ន្ធបញ្ចេញសំឡេងពាក្យអង់គ្លេស ៣ ដងយឺតៗច្បាស់ៗ (Earth... 3x Go!) ចម្រុះកម្រិតស្វ័យប្រវត្តិ តាមស្តង់ដារជាតិ MoTDAR!' 
-                    : 'Listen to slow, clear English voice pronunciations 3 times in sequence with auto-randomized adaptive vocabulary!'}
-                </p>
-              </div>
-            </div>
-
-            <div className="flex-shrink-0 w-full sm:w-auto relative z-10">
-              <button
-                type="button"
-                onClick={() => setShowEnglishSpellGame(true)}
-                className="w-full sm:w-auto px-6 py-3 rounded-2xl bg-gradient-to-r from-cyan-400 via-teal-400 to-emerald-400 hover:from-cyan-300 hover:to-teal-300 text-slate-950 font-black text-xs sm:text-sm flex items-center justify-center gap-2 transition-all cursor-pointer shadow-xl shadow-cyan-500/25 active:scale-95"
-              >
-                <Play className="w-4 h-4 fill-slate-950" />
-                <span>{lang === 'km' ? 'ចូលអនុវត្តស្តាប់ (Start Practice)' : 'Start Practice'}</span>
-              </button>
-            </div>
-          </div>
-
         </div>
       </div>
 
