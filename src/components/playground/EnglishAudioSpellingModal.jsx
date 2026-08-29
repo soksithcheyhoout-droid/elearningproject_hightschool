@@ -912,14 +912,13 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                   ))}
                 </div>
 
-                {/* Unified Segmented Audio Tool Strip */}
-                <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2 max-w-xl mx-auto pt-1">
-                  
+                {/* Streamlined Audio Controls (Repeat 3x & Slow 0.6x) */}
+                <div className="flex items-center justify-center gap-2 max-w-xs mx-auto pt-1">
                   <button
                     type="button"
                     onClick={() => startThreeTimeRoutine(currentWordItem.word)}
                     disabled={isSpeaking}
-                    className="px-3 py-1.5 rounded-xl bg-slate-950/70 hover:bg-slate-800 border border-white/10 text-slate-200 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                    className="flex-1 py-2 px-3 rounded-xl bg-slate-950/80 hover:bg-slate-800 border border-cyan-500/30 text-cyan-300 hover:text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-50 shadow-xs active:scale-95"
                   >
                     <RotateCcw className="w-3.5 h-3.5 text-cyan-400" />
                     <span>Repeat 3x</span>
@@ -929,84 +928,12 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                     type="button"
                     onClick={() => speakWordSlowly(currentWordItem.word, 0.60)}
                     disabled={isSpeaking}
-                    className="px-3 py-1.5 rounded-xl bg-slate-950/70 hover:bg-slate-800 border border-white/10 text-slate-200 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                    className="flex-1 py-2 px-3 rounded-xl bg-slate-950/80 hover:bg-slate-800 border border-amber-500/30 text-amber-300 hover:text-white text-xs font-bold flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-50 shadow-xs active:scale-95"
                   >
                     <Gauge className="w-3.5 h-3.5 text-amber-400" />
                     <span>Slow 0.6x</span>
                   </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      const letters = currentWordItem.word.split('').join(' . ');
-                      speakWordSlowly(letters, 0.75);
-                    }}
-                    disabled={isSpeaking}
-                    className="px-3 py-1.5 rounded-xl bg-slate-950/70 hover:bg-slate-800 border border-white/10 text-slate-200 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
-                  >
-                    <BookOpen className="w-3.5 h-3.5 text-purple-400" />
-                    <span>Phonics</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setShowSentence(true);
-                      speakWordSlowly(currentWordItem.exampleEn, 0.75);
-                    }}
-                    disabled={isSpeaking}
-                    className="px-3 py-1.5 rounded-xl bg-slate-950/70 hover:bg-slate-800 border border-white/10 text-slate-200 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
-                  >
-                    <Lightbulb className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>Sentence</span>
-                  </button>
-
-                  <button
-                    type="button"
-                    onClick={handleAskAiCoach}
-                    disabled={isAskingAiCoach || isSpeaking}
-                    className="px-3 py-1.5 rounded-xl bg-slate-950/70 hover:bg-slate-800 border border-white/10 text-slate-200 hover:text-white text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
-                  >
-                    <HelpCircle className="w-3.5 h-3.5 text-indigo-400" />
-                    <span>{isAskingAiCoach ? 'Loading...' : 'Hint'}</span>
-                  </button>
-
                 </div>
-
-                {/* Smart Coach Hint Box */}
-                {aiCoachHint && (
-                  <div className="p-3 rounded-2xl bg-slate-950/80 border border-indigo-500/30 text-left text-xs space-y-1 animate-fadeIn">
-                    <div className="flex items-center justify-between text-indigo-300 font-bold">
-                      <span className="flex items-center gap-1.5">
-                        <HelpCircle className="w-4 h-4 text-indigo-400" />
-                        <span>ពន្យល់តម្រុយ (Smart Hint) ៖</span>
-                      </span>
-                      <button
-                        type="button"
-                        onClick={() => speakWordSlowly(aiCoachHint, 0.85)}
-                        className="text-[11px] text-cyan-300 hover:underline cursor-pointer flex items-center gap-1"
-                      >
-                        <Volume2 className="w-3 h-3" />
-                        <span>ស្តាប់</span>
-                      </button>
-                    </div>
-                    <p className="text-slate-200 leading-relaxed">
-                      {aiCoachHint}
-                    </p>
-                  </div>
-                )}
-
-                {/* Example Sentence Box */}
-                {showSentence && (
-                  <div className="p-3 rounded-xl bg-slate-950/80 border border-emerald-500/30 text-left text-xs space-y-1 animate-fadeIn">
-                    <p className="font-bold text-emerald-200">
-                      Example: {currentWordItem.exampleEn}
-                    </p>
-                    <p className="text-slate-400 text-[11px]">
-                      {currentWordItem.exampleKm}
-                    </p>
-                  </div>
-                )}
 
                 {/* Clue / Word Details Footer */}
                 <div className="pt-2 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
@@ -1041,8 +968,8 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
 
               </div>
 
-              {/* 🌟 USER SPELLING INPUT DISPLAY (BIG LETTER SLOTS) */}
-              <div className={`p-4 rounded-2xl bg-slate-900/90 border-2 transition-all duration-200 ${
+              {/* 🌟 USER SPELLING INPUT DISPLAY (RESPONSIVE LETTER TILES) */}
+              <div className={`p-3.5 sm:p-4 rounded-2xl bg-slate-900/90 border-2 transition-all duration-200 ${
                 isCorrectGlow 
                   ? 'border-emerald-400 bg-emerald-950/30 shadow-lg shadow-emerald-500/20' 
                   : isWrongShake 
@@ -1052,16 +979,23 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                 
                 <div className="flex flex-col items-center gap-3">
                   
-                  {/* Slots display */}
-                  <div className="flex flex-wrap items-center justify-center gap-1.5 sm:gap-2">
+                  {/* Slots display - scales smoothly on mobile screens */}
+                  <div className="flex flex-wrap items-center justify-center gap-1 sm:gap-2 max-w-full">
                     {Array.from({ length: Math.max(currentWordItem.word.length, currentInput.length) }).map((_, idx) => {
                       const char = currentInput[idx] || '';
+                      const totalLen = Math.max(currentWordItem.word.length, currentInput.length);
+                      const sizeClasses = totalLen >= 10 
+                        ? 'w-7 sm:w-9 h-9 sm:h-11 text-sm sm:text-lg' 
+                        : totalLen >= 8 
+                          ? 'w-8 sm:w-10 h-10 sm:h-12 text-base sm:text-xl' 
+                          : 'w-9 sm:w-12 h-11 sm:h-14 text-lg sm:text-2xl';
+
                       return (
                         <div
                           key={idx}
-                          className={`w-9 h-11 sm:w-11 sm:h-13 rounded-xl border-2 flex items-center justify-center font-mono text-lg sm:text-2xl font-black transition-all ${
+                          className={`${sizeClasses} rounded-xl border-2 flex items-center justify-center font-mono font-black transition-all ${
                             char
-                              ? 'border-cyan-400 bg-cyan-950/40 text-cyan-200 shadow-sm scale-105'
+                              ? 'border-cyan-400 bg-cyan-950/50 text-cyan-200 shadow-sm scale-105'
                               : idx === currentInput.length
                                 ? 'border-amber-400 bg-white/5 text-amber-300 animate-pulse'
                                 : 'border-slate-800 bg-slate-950/60 text-slate-600'
@@ -1114,31 +1048,79 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
 
               </div>
 
-              {/* 🌟 ON-SCREEN TOUCH VIRTUAL KEYBOARD */}
-              <div className="space-y-1.5 max-w-xl mx-auto w-full pt-1">
-                {VIRTUAL_KEYBOARD.map((row, rIdx) => (
-                  <div key={rIdx} className="flex items-center justify-center gap-1 sm:gap-1.5">
-                    {row.map((key) => {
-                      const isSpecial = key === 'ENTER' || key === 'BACK';
-                      return (
-                        <button
-                          key={key}
-                          type="button"
-                          onClick={() => handleVirtualKeyPress(key)}
-                          className={`rounded-lg sm:rounded-xl font-bold font-mono transition-all active:scale-90 cursor-pointer ${
-                            isSpecial
-                              ? key === 'ENTER'
-                                ? 'px-3 sm:px-4 py-2 sm:py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white text-[10px] sm:text-xs font-bold shadow-md'
-                                : 'px-2.5 sm:px-3.5 py-2 sm:py-2.5 bg-slate-800 hover:bg-rose-600/80 text-slate-300 hover:text-white text-[10px] sm:text-xs border border-white/10 flex items-center justify-center'
-                              : 'w-7 sm:w-10 h-9 sm:h-11 bg-slate-900 hover:bg-slate-800 text-slate-200 text-xs sm:text-sm border border-white/10 shadow-xs'
-                          }`}
-                        >
-                          {key === 'BACK' ? <Delete className="w-3.5 h-3.5" /> : key}
-                        </button>
-                      );
-                    })}
-                  </div>
-                ))}
+              {/* 🌟 VIRTUAL KEYBOARD (VISIBLE ON MOBILE / TABLET ONLY, HIDDEN ON PC / LAPTOP) */}
+              <div className="block md:hidden w-full max-w-md mx-auto space-y-1 pt-0.5 select-none">
+                {/* Row 1: Q W E R T Y U I O P */}
+                <div className="flex items-center justify-center gap-1 w-full">
+                  {['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'].map((k) => (
+                    <button
+                      key={k}
+                      type="button"
+                      onClick={() => handleVirtualKeyPress(k)}
+                      className="flex-1 h-11 bg-slate-800 active:bg-cyan-600 text-white font-mono font-black text-sm rounded-lg border border-slate-700/80 shadow-md flex items-center justify-center transition-transform active:scale-90"
+                    >
+                      {k}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Row 2: A S D F G H J K L */}
+                <div className="flex items-center justify-center gap-1 w-full px-2">
+                  {['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'].map((k) => (
+                    <button
+                      key={k}
+                      type="button"
+                      onClick={() => handleVirtualKeyPress(k)}
+                      className="flex-1 h-11 bg-slate-800 active:bg-cyan-600 text-white font-mono font-black text-sm rounded-lg border border-slate-700/80 shadow-md flex items-center justify-center transition-transform active:scale-90"
+                    >
+                      {k}
+                    </button>
+                  ))}
+                </div>
+
+                {/* Row 3: ENTER Z X C V B N M BACK */}
+                <div className="flex items-center justify-center gap-1 w-full">
+                  <button
+                    type="button"
+                    onClick={() => handleVirtualKeyPress('ENTER')}
+                    className="flex-[1.4] h-11 bg-emerald-600 active:bg-emerald-500 text-white font-mono font-black text-[11px] rounded-lg shadow-md flex items-center justify-center transition-transform active:scale-90"
+                  >
+                    ENTER
+                  </button>
+                  {['Z', 'X', 'C', 'V', 'B', 'N', 'M'].map((k) => (
+                    <button
+                      key={k}
+                      type="button"
+                      onClick={() => handleVirtualKeyPress(k)}
+                      className="flex-1 h-11 bg-slate-800 active:bg-cyan-600 text-white font-mono font-black text-sm rounded-lg border border-slate-700/80 shadow-md flex items-center justify-center transition-transform active:scale-90"
+                    >
+                      {k}
+                    </button>
+                  ))}
+                  <button
+                    type="button"
+                    onClick={() => handleVirtualKeyPress('BACK')}
+                    className="flex-[1.2] h-11 bg-slate-700 active:bg-rose-600 text-white rounded-lg border border-slate-600 shadow-md flex items-center justify-center transition-transform active:scale-90"
+                    title="Backspace"
+                  >
+                    <Delete className="w-5 h-5 text-white" />
+                  </button>
+                </div>
+              </div>
+
+              {/* 💻 DESKTOP / PC KEYBOARD HINT (VISIBLE ON LAPTOP / PC, HIDDEN ON MOBILE) */}
+              <div className="hidden md:flex items-center justify-center gap-3 py-2.5 px-4 rounded-xl bg-slate-900/60 border border-white/5 text-xs text-slate-400 font-mono">
+                <span className="flex items-center gap-1.5 text-slate-300">
+                  <span className="px-2 py-0.5 rounded bg-slate-800 border border-white/10 text-cyan-300 font-bold">A-Z</span> Type on keyboard
+                </span>
+                <span>•</span>
+                <span className="flex items-center gap-1.5 text-slate-300">
+                  <span className="px-2 py-0.5 rounded bg-slate-800 border border-white/10 text-emerald-300 font-bold">ENTER</span> Submit
+                </span>
+                <span>•</span>
+                <span className="flex items-center gap-1.5 text-slate-300">
+                  <span className="px-2 py-0.5 rounded bg-slate-800 border border-white/10 text-rose-300 font-bold">BACKSPACE</span> Delete
+                </span>
               </div>
 
             </div>
