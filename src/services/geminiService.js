@@ -198,3 +198,100 @@ function fallbackStudyEngine(prompt) {
 • **ដំណោះស្រាយលំហាត់៖** អនុវត្តជំហានដោះស្រាយតាមលំដាប់លំដោយ ដើម្បីកុំឱ្យបាត់ពិន្ទុតាមដំណាក់កាល។
 • **គន្លឹះប្រឡងបាក់ឌុប៖** ពិនិត្យមើលវិញ្ញាសាគំរូឆ្នាំកន្លងទៅ និងអនុវត្តឱ្យបានទៀងទាត់។`;
 }
+
+/**
+ * Live AI English Dictation & Vocabulary Challenge Generator
+ * Generates custom academic English words with phonetics, Khmer translations, and example sentences in real-time!
+ */
+export async function generateEnglishDictationWithAI(topic = 'Earth & Science', count = 10, difficulty = 'medium') {
+  const activeKey = getStoredGeminiKey() || AI_API_KEY;
+  const prompt = `Generate a JSON array of ${count} unique English vocabulary words suitable for Cambodian high school students (Grades 10-12) related to the topic "${topic}" with difficulty "${difficulty}".
+Each item in the JSON array must follow this exact JSON schema:
+[
+  {
+    "id": "ai-word-1",
+    "word": "Earth",
+    "phonetic": "/ɜːrθ/",
+    "partOfSpeech": "noun",
+    "meaningKm": "ភពផែនដី, ផែនដី",
+    "exampleEn": "The Earth orbits around the Sun.",
+    "exampleKm": "ភពផែនដីធ្វើដំណើរជុំវិញព្រះអាទិត្យ។",
+    "clue": "Our home planet, third from the Sun."
+  }
+]
+Output ONLY valid JSON inside \`\`\`json \`\`\` code block without any conversational filler.`;
+
+  if (activeKey) {
+    for (const model of AI_MODELS) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(activeKey)}`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: { temperature: 0.7, maxOutputTokens: 2048 }
+          })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const reply = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+          const jsonMatch = reply.match(/```(?:json)?\s*([\s\S]*?)\s*```/) || [null, reply];
+          const rawJson = (jsonMatch[1] || reply).trim();
+          const parsed = JSON.parse(rawJson);
+          if (Array.isArray(parsed) && parsed.length > 0 && parsed[0].word) {
+            return parsed.map((item, idx) => ({
+              id: `ai-dict-${Date.now()}-${idx}`,
+              word: item.word.trim(),
+              phonetic: item.phonetic || '',
+              partOfSpeech: item.partOfSpeech || 'noun',
+              meaningKm: item.meaningKm || '',
+              exampleEn: item.exampleEn || '',
+              exampleKm: item.exampleKm || '',
+              clue: item.clue || ''
+            }));
+          }
+        }
+      } catch (e) {
+        console.warn(`AI Dictation generator notice with ${model}:`, e.message);
+      }
+    }
+  }
+
+  // Fallback to local high school vocabulary session
+  const { getEnglishDictationSession } = await import('../data/englishDictationData.js');
+  return getEnglishDictationSession(count);
+}
+
+/**
+ * AI Smart Spelling Coach & Etymology / Mnemonic Hint Generator
+ */
+export async function getAIAssistedSpellingHint(word, meaningKm) {
+  const activeKey = getStoredGeminiKey() || AI_API_KEY;
+  const prompt = `Give a short, friendly, and memorable spelling hint / mnemonic and etymology in Khmer for high school students learning how to spell the English word "${word}" (meaning: ${meaningKm}). Keep it under 2 sentences, fun, encouraging, and clear without any markdown symbols.`;
+
+  if (activeKey) {
+    for (const model of AI_MODELS) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(activeKey)}`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: { temperature: 0.7, maxOutputTokens: 256 }
+          })
+        });
+        if (res.ok) {
+          const data = await res.json();
+          const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
+          if (reply && reply.trim().length > 5) {
+            return cleanDisplaySymbols(reply);
+          }
+        }
+      } catch (e) {}
+    }
+  }
+
+  return `ពាក្យ «${word}» មានអត្ថន័យថា «${meaningKm}»។ ចងចាំអក្សរដំបូង ${word[0]} និងព្យាង្គបន្តបន្ទាប់ដើម្បីសរសេរឱ្យបានត្រឹមត្រូវណា៎!`;
+}

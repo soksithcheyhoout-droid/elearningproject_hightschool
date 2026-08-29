@@ -22,16 +22,31 @@ import {
   ChevronRight,
   Lightbulb,
   Heart,
-  Crown
+  Crown,
+  Bot,
+  Wand2,
+  RefreshCw,
+  Send,
+  MessageSquare
 } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
 import { englishDictationWords, englishDictationCategories, getEnglishDictationSession } from '../../data/englishDictationData';
+import { generateEnglishDictationWithAI, getAIAssistedSpellingHint } from '../../services/geminiService';
 
 const VIRTUAL_KEYBOARD = [
   ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'],
   ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'],
   ['ENTER', 'Z', 'X', 'C', 'V', 'B', 'N', 'M', 'BACK']
+];
+
+const AI_TOPIC_PRESETS = [
+  { id: 'earth', labelKm: '🌍 ភពផែនដី & លំហ (Earth & Space)', prompt: 'Earth, astronomy, solar system, atmosphere, and geology' },
+  { id: 'science', labelKm: '🔬 វិទ្យាសាស្ត្រ & ជីវវិទ្យា (Science & Bio)', prompt: 'Biology, chemistry, photosynthesis, cells, and genetics' },
+  { id: 'tech', labelKm: '⚡ រូបវិទ្យា & IT (Physics & Tech)', prompt: 'Physics, mechanics, electricity, computer science, and innovation' },
+  { id: 'bacii', labelKm: '🎓 ត្រៀមប្រឡងបាក់ឌុប (BacII Academic)', prompt: 'Grade 12 Cambodian national English curriculum, academic vocabulary, and essay comprehension' },
+  { id: 'culture', labelKm: '🏛️ ប្រវត្តិសាស្ត្រ & វប្បធម៌ (Culture & History)', prompt: 'Cambodian culture, Angkor civilization, world history, and society' },
+  { id: 'daily', labelKm: '🍎 ការសន្ទនាប្រចាំថ្ងៃ (Daily English)', prompt: 'Everyday high-frequency English, school life, travel, and communication' }
 ];
 
 export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
@@ -42,6 +57,8 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
   const [gameMode, setGameMode] = useState('mission'); // 'mission' | 'speed' | 'endless'
   const [soundEffects, setSoundEffects] = useState(true);
   const [autoThreeTimes, setAutoThreeTimes] = useState(true);
+  const [customAiTopic, setCustomAiTopic] = useState('');
+  const [isGeneratingAi, setIsGeneratingAi] = useState(false);
 
   // Game Progress State
   const [gameState, setGameState] = useState('lobby'); // 'lobby' | 'playing' | 'round_result' | 'game_over'
@@ -56,6 +73,10 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
   const [showHint, setShowHint] = useState(false);
   const [showSentence, setShowSentence] = useState(false);
 
+  // Live AI Smart Coach State
+  const [aiCoachHint, setAiCoachHint] = useState('');
+  const [isAskingAiCoach, setIsAskingAiCoach] = useState(false);
+
   // Stats & Scoring
   const [score, setScore] = useState(0);
   const [streak, setStreak] = useState(0);
@@ -68,7 +89,6 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
   // Audio Speech Synthesizer Ref
   const speechTimerRef = useRef(null);
   const countdownTimerRef = useRef(null);
-  const inputRef = useRef(null);
 
   const currentWordItem = wordsList[currentIndex] || englishDictationWords[0];
 
@@ -117,32 +137,51 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
 
     setSpeakPhase(1); // 1st time
     speakWord(targetWord, 1.0, () => {
-      // Pause 1s before 2nd time
+      // Pause 0.9s before 2nd time
       speechTimerRef.current = setTimeout(() => {
         setSpeakPhase(2); // 2nd time
         speakWord(targetWord, 0.9, () => {
-          // Pause 1s before 3rd time
+          // Pause 0.9s before 3rd time
           speechTimerRef.current = setTimeout(() => {
             setSpeakPhase(3); // 3rd time
             speakWord(targetWord, 0.8, () => {
-              // Pause 0.6s and announce Go!
+              // Pause 0.4s and announce Go!
               speechTimerRef.current = setTimeout(() => {
                 setSpeakPhase(4); // GO!
                 if (soundEffects) playSound.duelStart();
                 speechTimerRef.current = setTimeout(() => {
                   setSpeakPhase(0); // Idle, ready for typing
                 }, 1200);
-              }, 400);
+              }, 350);
             });
-          }, 900);
+          }, 850);
         });
-      }, 900);
+      }, 850);
     });
   }, [speakWord, soundEffects]);
 
-  // Start / Init Game Session
-  const startGameSession = (selectedCat = category, mode = gameMode) => {
-    const sessionWords = getEnglishDictationSession(mode === 'mission' ? 10 : 25, selectedCat);
+  // Start / Init Game Session (Local or AI Generated)
+  const startGameSession = async (useLiveAi = false, selectedTopic = '') => {
+    let sessionWords = [];
+
+    if (useLiveAi) {
+      setIsGeneratingAi(true);
+      try {
+        const topicPrompt = selectedTopic || customAiTopic || 'Earth, Science, Nature, and Academic English';
+        sessionWords = await generateEnglishDictationWithAI(topicPrompt, gameMode === 'mission' ? 10 : 20, 'medium');
+      } catch (e) {
+        sessionWords = getEnglishDictationSession(10);
+      } finally {
+        setIsGeneratingAi(false);
+      }
+    } else {
+      sessionWords = getEnglishDictationSession(gameMode === 'mission' ? 10 : 25, category);
+    }
+
+    if (!sessionWords || sessionWords.length === 0) {
+      sessionWords = getEnglishDictationSession(10);
+    }
+
     setWordsList(sessionWords);
     setCurrentIndex(0);
     setCurrentInput('');
@@ -154,6 +193,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
     setResultsHistory([]);
     setShowHint(false);
     setShowSentence(false);
+    setAiCoachHint('');
     setRepeatsLeft(3);
     setTimeLeft(60);
     setGameState('playing');
@@ -261,7 +301,6 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
 
       setTimeout(() => {
         setIsWrongShake(false);
-        // Allow another attempt or proceed if mission mode exceeded
         proceedToNextWord();
       }, 900);
     }
@@ -271,6 +310,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
     setCurrentInput('');
     setShowHint(false);
     setShowSentence(false);
+    setAiCoachHint('');
     setRepeatsLeft(3);
 
     const nextIndex = currentIndex + 1;
@@ -294,6 +334,20 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
     setGameState('game_over');
     if (speechTimerRef.current) clearTimeout(speechTimerRef.current);
     if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
+  };
+
+  // Ask AI Live Coach for Etymology / Spelling Mnemonic Hint
+  const handleAskAiCoach = async () => {
+    if (!currentWordItem || isAskingAiCoach) return;
+    setIsAskingAiCoach(true);
+    try {
+      const hint = await getAIAssistedSpellingHint(currentWordItem.word, currentWordItem.meaningKm);
+      setAiCoachHint(hint);
+    } catch (e) {
+      setAiCoachHint(`ពាក្យ «${currentWordItem.word}» ប្រែថា «${currentWordItem.meaningKm}»។ ព្យាយាមស្តាប់សំឡេង AI ម្តងទៀតណា៎!`);
+    } finally {
+      setIsAskingAiCoach(false);
+    }
   };
 
   // Keyboard Handler for Typing
@@ -371,12 +425,13 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                 <h3 className="font-extrabold text-sm sm:text-base text-white font-cinzel tracking-wider">
                   AI ENGLISH AUDIO SPELL ARENA
                 </h3>
-                <span className="px-2 py-0.5 rounded-full bg-cyan-400/20 border border-cyan-400/40 text-[9.5px] font-black text-cyan-300 uppercase">
-                  3X DICTATION
+                <span className="px-2 py-0.5 rounded-full bg-gradient-to-r from-cyan-500/20 to-blue-500/20 border border-cyan-400/40 text-[9.5px] font-black text-cyan-300 uppercase flex items-center gap-1">
+                  <Bot className="w-3 h-3 text-cyan-400" />
+                  <span>AI 3X SPEECH ENGINE</span>
                 </span>
               </div>
               <p className="text-[11px] text-slate-400 hidden sm:block">
-                ស្តាប់ AI បញ្ចេញសំឡេង ៣ ដង & វាយពាក្យអង់គ្លេសត្រឹមត្រូវដណ្តើម XP
+                AI បញ្ចេញសំឡេង ៣ ដង (Earth... Earth... Earth... GO!) & វាយពាក្យអង់គ្លេសដណ្តើម XP
               </p>
             </div>
           </div>
@@ -419,8 +474,8 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
               
               <div className="space-y-2">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-500/10 border border-cyan-400/30 text-cyan-300 text-xs font-bold font-cinzel">
-                  <Sparkles className="w-3.5 h-3.5" />
-                  <span>NATIONAL DICTATION CHALLENGE</span>
+                  <Bot className="w-3.5 h-3.5 text-cyan-400" />
+                  <span>GEMINI & LIVE AI AUDIO DICTATION</span>
                 </div>
                 <h2 className="text-2xl sm:text-3xl font-black text-white leading-tight">
                   ហ្គេមស្តាប់សំឡេង AI & វាយពាក្យអង់គ្លេស
@@ -428,6 +483,61 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                 <p className="text-xs sm:text-sm text-slate-300 max-w-lg mx-auto leading-relaxed">
                   លោកគ្រូ AI នឹងបញ្ចេញសំឡេងពាក្យអង់គ្លេស <strong>៣ ដងជាប់គ្នា (ដូចជា Earth... Earth... Earth... GO!)</strong> ដើម្បីឱ្យប្អូនៗស្តាប់យ៉ាងច្បាស់ រួចវាយអក្សរចូលឱ្យបានត្រឹមត្រូវ!
                 </p>
+              </div>
+
+              {/* 🌟 LIVE AI CUSTOM TOPIC GENERATOR BOX */}
+              <div className="p-4 rounded-2xl bg-gradient-to-r from-blue-950/60 via-[#071d3a] to-cyan-950/60 border border-cyan-400/40 text-left space-y-3 shadow-lg shadow-cyan-950/40">
+                <div className="flex items-center justify-between">
+                  <div className="flex items-center gap-2 text-cyan-300 font-bold text-xs">
+                    <Wand2 className="w-4 h-4 text-cyan-400 animate-spin" style={{ animationDuration: '6s' }} />
+                    <span>បង្កើតពាក្យតាមប្រធានបទ AI ភ្លាមៗ (Live AI Topic Generator):</span>
+                  </div>
+                  <span className="px-2 py-0.5 rounded-md bg-cyan-400/20 text-cyan-200 text-[10px] font-mono font-bold">
+                    GEMINI POWERED
+                  </span>
+                </div>
+
+                {/* Custom Input */}
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    value={customAiTopic}
+                    onChange={(e) => setCustomAiTopic(e.target.value)}
+                    placeholder="វាយប្រធានបទដែលចង់រៀន (ឧទាហរណ៍៖ Space, Biology, BacII Exam, AI, Animals...)"
+                    className="flex-1 px-3.5 py-2.5 rounded-xl bg-slate-900/90 border border-white/15 text-white text-xs placeholder:text-slate-500 focus:outline-none focus:border-cyan-400"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => startGameSession(true, customAiTopic)}
+                    disabled={isGeneratingAi}
+                    className="px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white text-xs font-black flex items-center gap-1.5 transition-all cursor-pointer shadow-md disabled:opacity-50"
+                  >
+                    {isGeneratingAi ? (
+                      <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                    ) : (
+                      <Wand2 className="w-3.5 h-3.5" />
+                    )}
+                    <span>{isGeneratingAi ? 'AI កំពុងបង្កើត...' : 'AI បង្កើត & លេង'}</span>
+                  </button>
+                </div>
+
+                {/* Quick AI Presets */}
+                <div className="flex flex-wrap items-center gap-1.5 pt-1">
+                  <span className="text-[11px] text-slate-400 font-medium">ប្រធានបទល្បីៗ៖</span>
+                  {AI_TOPIC_PRESETS.map((preset) => (
+                    <button
+                      key={preset.id}
+                      type="button"
+                      onClick={() => {
+                        setCustomAiTopic(preset.prompt);
+                        startGameSession(true, preset.prompt);
+                      }}
+                      className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-cyan-500/20 border border-white/10 hover:border-cyan-400/40 text-[11px] text-slate-300 hover:text-cyan-200 transition-colors cursor-pointer"
+                    >
+                      {preset.labelKm}
+                    </button>
+                  ))}
+                </div>
               </div>
 
               {/* Game Mode Selector */}
@@ -486,30 +596,6 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                 </div>
               </div>
 
-              {/* Category Selector */}
-              <div className="space-y-2 text-left">
-                <label className="text-xs font-bold text-slate-400 uppercase tracking-wider block">
-                  ជ្រើសរើសប្រធានបទពាក្យ (Vocabulary Topic):
-                </label>
-                <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                  {englishDictationCategories.map((cat) => (
-                    <button
-                      key={cat.id}
-                      type="button"
-                      onClick={() => setCategory(cat.id)}
-                      className={`p-2.5 rounded-xl border text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
-                        category === cat.id
-                          ? 'bg-gradient-to-r from-blue-900/80 to-cyan-900/80 border-cyan-400 text-white shadow-md'
-                          : 'bg-white/5 border-white/10 text-slate-300 hover:border-white/20'
-                      }`}
-                    >
-                      <span className="w-2 h-2 rounded-full" style={{ backgroundColor: cat.color }} />
-                      <span className="truncate">{cat.nameKm}</span>
-                    </button>
-                  ))}
-                </div>
-              </div>
-
               {/* Auto 3 Times Switch */}
               <div className="p-3.5 rounded-2xl bg-white/5 border border-white/10 flex items-center justify-between text-left">
                 <div className="space-y-0.5">
@@ -518,7 +604,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                     <span>បញ្ចេញសំឡេងស្វ័យប្រវត្តិ ៣ ដង (Auto 3x Speak Routine)</span>
                   </div>
                   <p className="text-[11px] text-slate-400">
-                    AI និយាយពាក្យ ៣ ដងដោយស្វ័យប្រវត្តិរៀងរាល់ពាក្យថ្មី
+                    AI និយាយពាក្យ ៣ ដងដោយស្វ័យប្រវត្តិរៀងរាល់ពាក្យថ្មី (Earth... Earth... Earth... GO!)
                   </p>
                 </div>
                 <button
@@ -537,7 +623,8 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
               {/* Start Button */}
               <button
                 type="button"
-                onClick={() => startGameSession(category, gameMode)}
+                onClick={() => startGameSession(false)}
+                disabled={isGeneratingAi}
                 className="w-full py-4 px-6 rounded-2xl bg-gradient-to-r from-cyan-500 via-blue-600 to-indigo-600 hover:from-cyan-400 hover:to-blue-500 text-white font-black text-sm sm:text-base flex items-center justify-center gap-3 shadow-xl shadow-cyan-500/25 active:scale-98 transition-all cursor-pointer border border-cyan-300/40"
               >
                 <Play className="w-5 h-5 fill-white" />
@@ -655,7 +742,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                   ))}
                 </div>
 
-                {/* Audio Helper Actions (Repeat 3x, Slow, Phonics, Sentence) */}
+                {/* Audio Helper Actions (Repeat 3x, Slow, Phonics, Sentence, AI Coach) */}
                 <div className="flex flex-wrap items-center justify-center gap-2 pt-1">
                   
                   <button
@@ -703,7 +790,40 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
                     <span>លឺឧទាហរណ៍ (Sentence)</span>
                   </button>
 
+                  {/* 🤖 Live AI Smart Coach Button */}
+                  <button
+                    type="button"
+                    onClick={handleAskAiCoach}
+                    disabled={isAskingAiCoach || isSpeaking}
+                    className="px-3 py-1.5 rounded-xl bg-indigo-500/20 hover:bg-indigo-500/30 border border-indigo-400/40 text-indigo-300 text-xs font-bold flex items-center gap-1.5 transition-all cursor-pointer disabled:opacity-50"
+                  >
+                    <Bot className="w-3.5 h-3.5 text-indigo-400" />
+                    <span>{isAskingAiCoach ? 'AI កំពុងគិត...' : '🤖 សួរ AI ឱ្យជួយពន្យល់'}</span>
+                  </button>
+
                 </div>
+
+                {/* AI Smart Coach Hint Box */}
+                {aiCoachHint && (
+                  <div className="p-3 rounded-2xl bg-indigo-950/50 border border-indigo-500/40 text-left text-xs space-y-1 animate-fadeIn">
+                    <div className="flex items-center justify-between text-indigo-300 font-bold">
+                      <span className="flex items-center gap-1.5">
+                        <Bot className="w-4 h-4 text-indigo-400" />
+                        <span>លោកគ្រូ AI Smart Coach ៖</span>
+                      </span>
+                      <button
+                        type="button"
+                        onClick={() => speakWord(aiCoachHint, 1.0)}
+                        className="text-[11px] text-cyan-300 hover:underline cursor-pointer"
+                      >
+                        🔊 ស្តាប់ AI
+                      </button>
+                    </div>
+                    <p className="text-slate-200 leading-relaxed">
+                      {aiCoachHint}
+                    </p>
+                  </div>
+                )}
 
                 {/* Example Sentence Box if clicked */}
                 {showSentence && (
@@ -948,7 +1068,7 @@ export default function EnglishAudioSpellingModal({ isOpen, onClose }) {
               <div className="flex flex-col sm:flex-row items-center gap-3 pt-2">
                 <button
                   type="button"
-                  onClick={() => startGameSession(category, gameMode)}
+                  onClick={() => startGameSession(false)}
                   className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-bold text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-lg"
                 >
                   <RotateCcw className="w-4 h-4" />
