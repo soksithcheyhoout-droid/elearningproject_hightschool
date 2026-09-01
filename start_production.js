@@ -40,7 +40,7 @@ let bakongProcess = null;
 const bakongDir = path.join(__dirname, 'Bakong Bypass');
 const bakongScript = path.join(bakongDir, 'server.js');
 try {
-  console.log('🇰🇭 Launching Bakong KHQR Bypass Server on port 3000 with Cambodia Proxy...');
+  console.log('🇰🇭 Launching Bakong KHQR High-Speed SSR Engine on port 3000...');
   bakongProcess = spawn('node', [bakongScript], {
     cwd: bakongDir,
     stdio: 'inherit',

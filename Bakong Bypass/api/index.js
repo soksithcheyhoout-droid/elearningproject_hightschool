@@ -1,70 +1,129 @@
-import { chromium as playwright } from "playwright-core";
-import chromium from "@sparticuz/chromium";
-
 const SITE = "https://api-bakong.nbc.gov.kh/";
-const SITE_KEY = "6Ldjf3YtAAAAAKaxeqLGdxRkNW06Wq5ws6nPnPbG";
 
-let browser = null;
-let page = null;
+/**
+ * Unflattens Nuxt 3 devalue payload format
+ */
+function unflattenNuxtPayload(rawArray) {
+  if (!Array.isArray(rawArray) || rawArray.length === 0) return null;
 
-async function getBrowser() {
-  if (browser && browser.isConnected()) return browser;
-  browser = await playwright.launch({
-    args: chromium.args,
-    executablePath: await chromium.executablePath(),
-    headless: chromium.headless,
-  });
-  page = await browser.newPage();
-  await page.goto(SITE, { waitUntil: "domcontentloaded", timeout: 30000 });
-  await page.waitForTimeout(2000);
-  await getToken().catch(() => {});
-  return browser;
+  const cache = new Map();
+
+  function resolve(idx) {
+    if (typeof idx !== "number" || idx < 0 || idx >= rawArray.length) {
+      return idx;
+    }
+    if (cache.has(idx)) {
+      return cache.get(idx);
+    }
+
+    const item = rawArray[idx];
+    if (item === null || typeof item !== "object") {
+      return item;
+    }
+
+    if (Array.isArray(item)) {
+      if (item.length === 2 && typeof item[0] === "string" && typeof item[1] === "number") {
+        const type = item[0];
+        if (["ShallowReactive", "Reactive", "Ref", "Set"].includes(type)) {
+          return resolve(item[1]);
+        }
+      }
+      const resolvedArray = [];
+      cache.set(idx, resolvedArray);
+      for (const el of item) {
+        resolvedArray.push(typeof el === "number" ? resolve(el) : el);
+      }
+      return resolvedArray;
+    }
+
+    const resolvedObj = {};
+    cache.set(idx, resolvedObj);
+    for (const [key, valIdx] of Object.entries(item)) {
+      resolvedObj[key] = typeof valIdx === "number" ? resolve(valIdx) : valIdx;
+    }
+    return resolvedObj;
+  }
+
+  return resolve(1);
 }
 
-async function getToken() {
-  return page.evaluate(
-    (key) =>
-      new Promise((resolve, reject) => {
-        if (!window.grecaptcha) return reject(new Error("grecaptcha not loaded"));
-        grecaptcha.ready(() => {
-          grecaptcha.execute(key, { action: "submit" }).then(resolve, reject);
-        });
-      }),
-    SITE_KEY
+/**
+ * Queries NBC Bakong Open API v2.0.3 using direct SSR verification
+ */
+async function queryBakongByMd5(md5) {
+  const cookieVal = encodeURIComponent(
+    JSON.stringify({
+      type: "MD5",
+      value: md5,
+      amount: "",
+      ccy: "USD",
+    })
   );
-}
 
-async function postFromPage(md5, token) {
-  return page.evaluate(
-    async ({ md5, token }) => {
-      const r = await fetch("/local/v1/check_transaction_by_md5", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ md5, recaptchaToken: token }),
-      });
-      const text = await r.text();
-      let parsed = null;
-      try { parsed = JSON.parse(text); } catch { parsed = null; }
-      return { httpStatus: r.status, raw: text, parsed };
+  const response = await fetch(SITE, {
+    method: "GET",
+    headers: {
+      "Cookie": `tx_search=${cookieVal}`,
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "Cache-Control": "no-cache",
     },
-    { md5, token }
-  );
-}
+    signal: AbortSignal.timeout(8000),
+  });
 
-async function checkMd5(md5, attempt = 0) {
-  let token;
-  try {
-    token = await getToken();
-  } catch {
-    await page.waitForFunction(() => window.grecaptcha !== undefined, null, { timeout: 15000 });
-    token = await getToken();
+  if (!response.ok) {
+    return {
+      status: "PENDING",
+      responseCode: 1,
+      errorCode: 18,
+      message: `NBC gateway HTTP status ${response.status}`,
+      data: null,
+    };
   }
-  const result = await postFromPage(md5, token);
-  if (result.parsed && result.parsed.errorCode === 18 && attempt < 2) {
-    await new Promise((r) => setTimeout(r, 1500));
-    return checkMd5(md5, attempt + 1);
+
+  const html = await response.text();
+  const match = html.match(/<script type="application\/json" data-nuxt-data="nuxt-app"[^>]*>([\s\S]*?)<\/script>/);
+  if (!match) {
+    return {
+      status: "PENDING",
+      responseCode: 1,
+      errorCode: 18,
+      message: "Unable to parse NBC response payload",
+      data: null,
+    };
   }
-  return result;
+
+  const rawArray = JSON.parse(match[1]);
+  const parsed = unflattenNuxtPayload(rawArray);
+  const txLookup = parsed?.data?.["tx-lookup"];
+
+  if (txLookup?.txResult) {
+    return {
+      status: "SUCCESS",
+      responseCode: 0,
+      errorCode: 0,
+      responseMessage: "Transaction confirmed successfully",
+      data: txLookup.txResult,
+    };
+  }
+
+  if (txLookup?.txError?.errorCode === 1) {
+    return {
+      status: "PENDING",
+      responseCode: 1,
+      errorCode: 1,
+      responseMessage: "Transaction not found (waiting for payment)",
+      data: null,
+    };
+  }
+
+  return {
+    status: "PENDING",
+    responseCode: 1,
+    errorCode: txLookup?.txError?.errorCode || 18,
+    responseMessage: "Waiting for transaction confirmation",
+    data: null,
+  };
 }
 
 function json(res, status, obj) {
@@ -94,6 +153,7 @@ export default async function handler(req, res) {
     return json(res, 200, {
       service: "bakong-md5-api",
       platform: "vercel",
+      engine: "direct-ssr-v2",
       usage: "GET /api/bakong/unofficial/md5=<32-char-md5>",
     });
   }
@@ -103,20 +163,18 @@ export default async function handler(req, res) {
     return json(res, 404, { error: "Not found", expected: "/api/bakong/unofficial/md5=<md5>" });
   }
 
+  const md5 = m[1];
   try {
-    await getBrowser();
-    const result = await checkMd5(m[1]);
-    const httpStatus = typeof result.httpStatus === "number" ? result.httpStatus : 200;
-    const raw = typeof result.raw === "string" ? result.raw : "null";
-    res.writeHead(httpStatus, {
-      "Content-Type": "application/json; charset=utf-8",
-      "Access-Control-Allow-Origin": "*",
-      "Access-Control-Allow-Methods": "GET, OPTIONS",
-      "Access-Control-Allow-Headers": "Content-Type",
-    });
-    res.end(raw);
+    const result = await queryBakongByMd5(md5);
+    json(res, 200, result);
   } catch (err) {
-    console.error("Check error:", err.message);
-    json(res, 500, { error: err.message });
+    console.warn("⚠️ [Bakong Bypass Vercel Check Notice]:", err.message);
+    json(res, 200, {
+      status: "PENDING",
+      responseCode: 1,
+      errorCode: 18,
+      message: err.message,
+      data: null,
+    });
   }
 }

@@ -182,6 +182,110 @@ export const generateBakongKhqr = (req, res) => {
 };
 
 /**
+ * Unflattens Nuxt 3 devalue payload format
+ */
+function unflattenNuxtPayload(rawArray) {
+  if (!Array.isArray(rawArray) || rawArray.length === 0) return null;
+  const cache = new Map();
+
+  function resolve(idx) {
+    if (typeof idx !== 'number' || idx < 0 || idx >= rawArray.length) return idx;
+    if (cache.has(idx)) return cache.get(idx);
+
+    const item = rawArray[idx];
+    if (item === null || typeof item !== 'object') return item;
+
+    if (Array.isArray(item)) {
+      if (item.length === 2 && typeof item[0] === 'string' && typeof item[1] === 'number') {
+        if (['ShallowReactive', 'Reactive', 'Ref', 'Set'].includes(item[0])) {
+          return resolve(item[1]);
+        }
+      }
+      const arr = [];
+      cache.set(idx, arr);
+      for (const el of item) arr.push(typeof el === 'number' ? resolve(el) : el);
+      return arr;
+    }
+
+    const obj = {};
+    cache.set(idx, obj);
+    for (const [k, v] of Object.entries(item)) {
+      obj[k] = typeof v === 'number' ? resolve(v) : v;
+    }
+    return obj;
+  }
+
+  return resolve(1);
+}
+
+/**
+ * Direct check against NBC Bakong Open API v2.0.3 SSR endpoint
+ */
+async function queryBakongDirect(md5) {
+  const cookieVal = encodeURIComponent(
+    JSON.stringify({
+      type: 'MD5',
+      value: md5,
+      amount: '',
+      ccy: 'USD',
+    })
+  );
+
+  const response = await fetch('https://api-bakong.nbc.gov.kh/', {
+    method: 'GET',
+    headers: {
+      'Cookie': `tx_search=${cookieVal}`,
+      'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36',
+      'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8',
+      'Cache-Control': 'no-cache',
+    },
+    signal: AbortSignal.timeout(8000),
+  });
+
+  if (!response.ok) {
+    return { status: 'PENDING', responseCode: 1, errorCode: 18, message: `NBC HTTP status ${response.status}`, data: null };
+  }
+
+  const html = await response.text();
+  const match = html.match(/<script type="application\/json" data-nuxt-data="nuxt-app"[^>]*>([\s\S]*?)<\/script>/);
+  if (!match) {
+    return { status: 'PENDING', responseCode: 1, errorCode: 18, message: 'Nuxt payload not found', data: null };
+  }
+
+  const rawArray = JSON.parse(match[1]);
+  const parsed = unflattenNuxtPayload(rawArray);
+  const txLookup = parsed?.data?.['tx-lookup'];
+
+  if (txLookup?.txResult) {
+    return {
+      status: 'SUCCESS',
+      responseCode: 0,
+      errorCode: 0,
+      responseMessage: 'Transaction confirmed successfully',
+      data: txLookup.txResult,
+    };
+  }
+
+  if (txLookup?.txError?.errorCode === 1) {
+    return {
+      status: 'PENDING',
+      responseCode: 1,
+      errorCode: 1,
+      responseMessage: 'Transaction not found (waiting for payment)',
+      data: null,
+    };
+  }
+
+  return {
+    status: 'PENDING',
+    responseCode: 1,
+    errorCode: txLookup?.txError?.errorCode || 18,
+    responseMessage: 'Waiting for transaction confirmation',
+    data: null,
+  };
+}
+
+/**
  * Proxy check transaction status from local Bakong Bypass server, Vercel cloud bypass, or direct NBC Open API
  * GET /api/bakong/check/:md5
  */
@@ -230,14 +334,22 @@ export const checkBakongStatus = async (req, res) => {
   try {
     const fetchRes = await fetch(targetUrl, { 
       headers: { 'Accept': 'application/json' },
-      signal: AbortSignal.timeout(15000) 
+      signal: AbortSignal.timeout(6000) 
     });
     if (fetchRes.ok) {
       const data = await fetchRes.json();
       return res.json(data);
     }
   } catch (err) {
-    // Return standard pending response if bypass server is unreachable
+    // If bypass server is unreachable or slow, seamlessly fallback to direct check below
+  }
+
+  // 3. Fallback: Ultra-fast direct NBC Open API SSR check
+  try {
+    const directResult = await queryBakongDirect(md5);
+    return res.json(directResult);
+  } catch (err) {
+    console.warn('⚠️ [Bakong Direct Check Notice]:', err.message);
   }
 
   return res.json({ status: 'PENDING', message: 'Waiting for payment confirmation...' });

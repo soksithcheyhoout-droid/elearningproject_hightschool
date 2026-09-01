@@ -1,150 +1,133 @@
 import http from "node:http";
-import fs from "node:fs";
-import { chromium } from "playwright-core";
 
 const PORT = process.env.PORT || 3000;
 const SITE = "https://api-bakong.nbc.gov.kh/";
-const SITE_KEY = "6Ldjf3YtAAAAAKaxeqLGdxRkNW06Wq5ws6nPnPbG";
 
-const KH_PROXIES = [
-  "socks5://203.189.153.170:1080",
-  "socks5://220.158.234.84:1080",
-  "socks5://220.158.232.118:1080",
-  "socks5://110.235.240.223:1080",
-  "socks5://185.175.229.218:1080",
-  "socks5://124.248.191.83:1080",
-  "socks5://110.235.247.206:1080",
-  "socks5://202.62.55.95:1080",
-  "socks5://110.235.240.135:1080",
-  "socks5://185.175.229.58:1080",
-];
+/**
+ * Unflattens Nuxt 3 devalue payload format
+ */
+function unflattenNuxtPayload(rawArray) {
+  if (!Array.isArray(rawArray) || rawArray.length === 0) return null;
 
-let browser = null;
-let page = null;
-let ready = false;
+  const cache = new Map();
 
-function resolveExecutablePath() {
-  if (process.env.CHROMIUM_PATH) return process.env.CHROMIUM_PATH;
-  const termuxPaths = [
-    "/data/data/com.termux/files/usr/bin/chromium-browser",
-    "/data/data/com.termux/files/usr/bin/chromium",
-  ];
-  for (const p of termuxPaths) {
-    if (fs.existsSync(p)) return p;
+  function resolve(idx) {
+    if (typeof idx !== "number" || idx < 0 || idx >= rawArray.length) {
+      return idx;
+    }
+    if (cache.has(idx)) {
+      return cache.get(idx);
+    }
+
+    const item = rawArray[idx];
+    if (item === null || typeof item !== "object") {
+      return item;
+    }
+
+    if (Array.isArray(item)) {
+      if (item.length === 2 && typeof item[0] === "string" && typeof item[1] === "number") {
+        const type = item[0];
+        if (["ShallowReactive", "Reactive", "Ref", "Set"].includes(type)) {
+          return resolve(item[1]);
+        }
+      }
+      const resolvedArray = [];
+      cache.set(idx, resolvedArray);
+      for (const el of item) {
+        resolvedArray.push(typeof el === "number" ? resolve(el) : el);
+      }
+      return resolvedArray;
+    }
+
+    const resolvedObj = {};
+    cache.set(idx, resolvedObj);
+    for (const [key, valIdx] of Object.entries(item)) {
+      resolvedObj[key] = typeof valIdx === "number" ? resolve(valIdx) : valIdx;
+    }
+    return resolvedObj;
   }
-  return null;
+
+  return resolve(1);
 }
 
-import chromiumPkg from "@sparticuz/chromium";
-
-async function buildLaunchOptions(useProxy = false) {
-  const opts = { headless: true, args: ["--no-sandbox", "--disable-gpu", "--disable-dev-shm-usage", "--no-zygote"] };
-
-  if (process.env.CHROMIUM_PATH) {
-    opts.executablePath = process.env.CHROMIUM_PATH;
-  } else if (process.platform === 'linux') {
-    try {
-      opts.executablePath = await chromiumPkg.executablePath();
-    } catch (e) {
-      opts.executablePath = "/usr/bin/chromium";
-    }
-  } else {
-    opts.channel = "chrome";
-  }
-
-  const proxyUrl = process.env.PROXY_URL;
-  if (proxyUrl) {
-    opts.proxy = { server: proxyUrl };
-    console.log(`🇰🇭 [Bakong Proxy] Using Custom Proxy: ${proxyUrl}`);
-  } else if (useProxy && KH_PROXIES.length > 0) {
-    const idx = Math.floor(Math.random() * KH_PROXIES.length);
-    opts.proxy = { server: KH_PROXIES[idx] };
-    console.log(`🇰🇭 [Bakong Proxy] Using SOCKS5 Proxy Fallback: ${opts.proxy.server}`);
-  }
-
-  return opts;
-}
-
-async function init(attempt = 0) {
-  const useProxy = attempt > 0;
-  console.log(`🚀 Launching Bakong Bypass Browser (attempt ${attempt + 1}, useProxy=${useProxy})...`);
-  const t0 = Date.now();
-  try {
-    const launchOpts = await buildLaunchOptions(useProxy);
-    browser = await chromium.launch(launchOpts);
-    page = await browser.newPage();
-    await page.goto(SITE, { waitUntil: "domcontentloaded", timeout: 25000 });
-    await page.waitForTimeout(2000);
-    await getToken().catch(() => {});
-    ready = true;
-    console.log(`✅ [Bakong Bypass Ready] Connected successfully in ${Date.now() - t0} ms!`);
-  } catch (err) {
-    console.warn(`⚠️ [Bakong Bypass Warning]: Attempt ${attempt + 1} notice (${err.message}). Retrying...`);
-    if (browser) {
-      await browser.close().catch(() => {});
-      browser = null;
-    }
-    if (attempt < 4) {
-      await new Promise(r => setTimeout(r, 1500));
-      return init(attempt + 1);
-    }
-  }
-}
-
-async function getToken() {
-  return page.evaluate(
-    (key) =>
-      new Promise((resolve, reject) => {
-        if (!window.grecaptcha) return reject(new Error("grecaptcha not loaded"));
-        grecaptcha.ready(() => {
-          grecaptcha.execute(key, { action: "submit" }).then(resolve, reject);
-        });
-      }),
-    SITE_KEY
+/**
+ * Queries NBC Bakong Open API v2.0.3 using direct SSR verification
+ */
+async function queryBakongByMd5(md5) {
+  const cookieVal = encodeURIComponent(
+    JSON.stringify({
+      type: "MD5",
+      value: md5,
+      amount: "",
+      ccy: "USD",
+    })
   );
-}
 
-async function postFromPage(md5, token) {
-  return page.evaluate(
-    async ({ md5, token }) => {
-      const r = await fetch("/local/v1/check_transaction_by_md5", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ md5, recaptchaToken: token }),
-      });
-      const text = await r.text();
-      let parsed = null;
-      try { parsed = JSON.parse(text); } catch { parsed = null; }
-      return { httpStatus: r.status, raw: text, parsed };
+  const response = await fetch(SITE, {
+    method: "GET",
+    headers: {
+      "Cookie": `tx_search=${cookieVal}`,
+      "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0.0.0 Safari/537.36",
+      "Accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "Cache-Control": "no-cache",
     },
-    { md5, token }
-  );
-}
+    signal: AbortSignal.timeout(8000),
+  });
 
-async function checkMd5(md5, attempt = 0) {
-  let token;
-  try {
-    token = await getToken();
-  } catch {
-    await page.waitForFunction(() => window.grecaptcha !== undefined, null, { timeout: 30000 });
-    token = await getToken();
+  if (!response.ok) {
+    return {
+      status: "PENDING",
+      responseCode: 1,
+      errorCode: 18,
+      message: `NBC gateway HTTP status ${response.status}`,
+      data: null,
+    };
   }
-  const result = await postFromPage(md5, token);
-  if (result.parsed && result.parsed.errorCode === 18 && attempt < 2) {
-    await new Promise((r) => setTimeout(r, 1500));
-    return checkMd5(md5, attempt + 1);
+
+  const html = await response.text();
+  const match = html.match(/<script type="application\/json" data-nuxt-data="nuxt-app"[^>]*>([\s\S]*?)<\/script>/);
+  if (!match) {
+    return {
+      status: "PENDING",
+      responseCode: 1,
+      errorCode: 18,
+      message: "Unable to parse NBC response payload",
+      data: null,
+    };
   }
-  return result;
-}
 
-let lastJob = Promise.resolve();
-function enqueue(fn) {
-  const run = lastJob.then(fn, fn);
-  lastJob = run.catch(() => {});
-  return run;
-}
+  const rawArray = JSON.parse(match[1]);
+  const parsed = unflattenNuxtPayload(rawArray);
+  const txLookup = parsed?.data?.["tx-lookup"];
 
-const initPromise = init();
+  if (txLookup?.txResult) {
+    return {
+      status: "SUCCESS",
+      responseCode: 0,
+      errorCode: 0,
+      responseMessage: "Transaction confirmed successfully",
+      data: txLookup.txResult,
+    };
+  }
+
+  if (txLookup?.txError?.errorCode === 1) {
+    return {
+      status: "PENDING",
+      responseCode: 1,
+      errorCode: 1,
+      responseMessage: "Transaction not found (waiting for payment)",
+      data: null,
+    };
+  }
+
+  return {
+    status: "PENDING",
+    responseCode: 1,
+    errorCode: txLookup?.txError?.errorCode || 18,
+    responseMessage: "Waiting for transaction confirmation",
+    data: null,
+  };
+}
 
 function sendJson(res, status, obj) {
   const body = JSON.stringify(obj, null, 2);
@@ -157,7 +140,7 @@ function sendJson(res, status, obj) {
   res.end(body);
 }
 
-const server = http.createServer((req, res) => {
+const server = http.createServer(async (req, res) => {
   const url = req.url || "/";
 
   if (req.method === "OPTIONS") {
@@ -172,7 +155,8 @@ const server = http.createServer((req, res) => {
   if (url === "/" || url === "/health") {
     return sendJson(res, 200, {
       service: "bakong-md5-api",
-      status: ready ? "ready" : "warming_up",
+      status: "ready",
+      engine: "direct-ssr-v2",
       usage: "GET /api/bakong/unofficial/md5=<32-char-md5>",
     });
   }
@@ -183,26 +167,21 @@ const server = http.createServer((req, res) => {
   }
 
   const md5 = m[1];
-  enqueue(async () => {
-    try {
-      await initPromise;
-      const result = await checkMd5(md5);
-      const httpStatus = typeof result.httpStatus === "number" ? result.httpStatus : 200;
-      const raw = typeof result.raw === "string" ? result.raw : "null";
-      res.writeHead(httpStatus, {
-        "Content-Type": "application/json; charset=utf-8",
-        "Access-Control-Allow-Origin": "*",
-        "Access-Control-Allow-Methods": "GET, OPTIONS",
-        "Access-Control-Allow-Headers": "Content-Type",
-      });
-      res.end(raw);
-    } catch (err) {
-      console.error("Check error:", err.message);
-      sendJson(res, 500, { error: err.message });
-    }
-  });
+  try {
+    const result = await queryBakongByMd5(md5);
+    sendJson(res, 200, result);
+  } catch (err) {
+    console.warn("⚠️ [Bakong Bypass Check Notice]:", err.message);
+    sendJson(res, 200, {
+      status: "PENDING",
+      responseCode: 1,
+      errorCode: 18,
+      message: err.message,
+      data: null,
+    });
+  }
 });
 
 server.listen(PORT, () => {
-  console.log(`API listening on http://localhost:${PORT}`);
+  console.log(`✅ [Bakong Bypass Ready] High-speed direct SSR engine listening on http://localhost:${PORT}`);
 });
