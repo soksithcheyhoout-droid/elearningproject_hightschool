@@ -2082,3 +2082,65 @@ div[class*="extension-floating"] {
   fill: #181818;
 }
 
+/* ══════════════════════════════════════════════════════════════════
+   GLOBAL HIGH-CONTRAST DARK MODE ENHANCEMENTS & COLOR HARMONY
+   ══════════════════════════════════════════════════════════════════ */
+.dark,
+[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+/* Headings and brand dark blue text in dark mode -> crisp pure white */
+.dark .text-\[\#002b5b\],
+.dark .text-\[\#003366\],
+.dark .text-\[\#002d62\],
+.dark .text-\[\#003876\],
+.dark .text-\[\#00478f\],
+.dark .text-\[\#00204a\],
+.dark .text-\[\#001a35\],
+[data-theme="dark"] .text-\[\#002b5b\],
+[data-theme="dark"] .text-\[\#003366\],
+[data-theme="dark"] .text-\[\#002d62\],
+[data-theme="dark"] .text-\[\#003876\],
+[data-theme="dark"] .text-\[\#00478f\],
+[data-theme="dark"] .text-\[\#00204a\],
+[data-theme="dark"] .text-\[\#001a35\] {
+  color: #f8fafc !important;
+}
+
+/* Brand blue accents -> electric cyan in dark mode */
+.dark .text-\[\#005baa\],
+[data-theme="dark"] .text-\[\#005baa\] {
+  color: #38bdf8 !important;
+}
+
+/* Ensure any dark text on default light backgrounds becomes light on dark */
+.dark .text-slate-900:not([class*="dark:text-"]),
+.dark .text-slate-800:not([class*="dark:text-"]),
+[data-theme="dark"] .text-slate-900:not([class*="dark:text-"]),
+[data-theme="dark"] .text-slate-800:not([class*="dark:text-"]) {
+  color: #f1f5f9;
+}
+
+.dark .text-slate-700:not([class*="dark:text-"]),
+.dark .text-slate-600:not([class*="dark:text-"]),
+[data-theme="dark"] .text-slate-700:not([class*="dark:text-"]),
+[data-theme="dark"] .text-slate-600:not([class*="dark:text-"]) {
+  color: #cbd5e1;
+}
+
+/* Custom Scrollbars in Dark Mode */
+.dark ::-webkit-scrollbar-track,
+[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: #0b1120;
+}
+.dark ::-webkit-scrollbar-thumb,
+[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #334155;
+  border-radius: 9999px;
+}
+.dark ::-webkit-scrollbar-thumb:hover,
+[data-theme="dark"] ::-webkit-scrollbar-thumb:hover {
+  background: #475569;
+}
+

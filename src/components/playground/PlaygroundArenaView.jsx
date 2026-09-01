@@ -631,16 +631,16 @@ export default function PlaygroundArenaView() {
       </div>
 
       {/* DUAL-STREAM GAME FILTER CONTROLS */}
-      <div className="bg-white p-4 sm:p-5 rounded-3xl border border-slate-200 shadow-sm space-y-4">
+      <div className="bg-white dark:bg-[#0f172a] p-4 sm:p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
         
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 pb-3">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-100 dark:border-slate-800 pb-3">
           <div className="flex items-center gap-2">
-            <Gamepad2 className="w-5 h-5 text-[#005baa]" />
-            <h3 className="text-sm sm:text-base font-extrabold text-[#003366]">
+            <Gamepad2 className="w-5 h-5 text-[#005baa] dark:text-cyan-400" />
+            <h3 className="text-sm sm:text-base font-extrabold text-[#003366] dark:text-white">
               សង្វៀនហ្គេមហាត់សមវិជ្ជា (Academic Gaming Arena - {playgroundGamesData.length} Master Games)
             </h3>
           </div>
-          <span className="text-xs font-bold text-slate-500">
+          <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
             ហ្គេមសរុប៖ {playgroundGamesData.length} (វិទ្យាសាស្ត្រ៖ {scienceCount}, សង្គម៖ {socialCount})
           </span>
         </div>
@@ -652,8 +652,8 @@ export default function PlaygroundArenaView() {
             onClick={() => setSelectedStream('all')}
             className={`p-3 rounded-2xl border transition-all flex items-center justify-center gap-2 cursor-pointer ${
               selectedStream === 'all'
-                ? 'bg-gradient-to-r from-[#003366] to-[#005baa] text-white border-[#003366] shadow-sm'
-                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                ? 'bg-gradient-to-r from-[#003366] to-[#005baa] dark:from-blue-600 dark:to-cyan-600 text-white border-[#003366] dark:border-blue-500 shadow-sm'
+                : 'bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700'
             }`}
           >
             <Gamepad2 className="w-4 h-4 text-amber-300" />
@@ -666,7 +666,7 @@ export default function PlaygroundArenaView() {
             className={`p-3 rounded-2xl border transition-all flex items-center justify-center gap-2 cursor-pointer ${
               selectedStream === 'science'
                 ? 'bg-gradient-to-r from-blue-600 to-cyan-600 text-white border-blue-600 shadow-sm ring-2 ring-blue-400/40'
-                : 'bg-blue-50/50 hover:bg-blue-100/70 text-[#003366] border-blue-200'
+                : 'bg-blue-50/50 dark:bg-slate-800 hover:bg-blue-100/70 dark:hover:bg-slate-700 text-[#003366] dark:text-cyan-300 border-blue-200 dark:border-slate-700'
             }`}
           >
             <Atom className="w-4 h-4 text-cyan-300" />
@@ -679,7 +679,7 @@ export default function PlaygroundArenaView() {
             className={`p-3 rounded-2xl border transition-all flex items-center justify-center gap-2 cursor-pointer ${
               selectedStream === 'social'
                 ? 'bg-gradient-to-r from-amber-600 to-amber-700 text-white border-amber-600 shadow-sm ring-2 ring-amber-400/40'
-                : 'bg-amber-50/50 hover:bg-amber-100/70 text-amber-950 border-amber-200'
+                : 'bg-amber-50/50 dark:bg-slate-800 hover:bg-amber-100/70 dark:hover:bg-slate-700 text-amber-950 dark:text-amber-300 border-amber-200 dark:border-slate-700'
             }`}
           >
             <Landmark className="w-4 h-4 text-amber-200" />
@@ -689,9 +689,9 @@ export default function PlaygroundArenaView() {
           <button
             type="button"
             onClick={() => setShowEnglishSpellGame(true)}
-            className="p-3 rounded-2xl border transition-all flex items-center justify-center gap-2 cursor-pointer bg-gradient-to-r from-cyan-900/40 via-blue-900/40 to-indigo-900/40 hover:from-cyan-600 hover:to-blue-600 text-cyan-900 hover:text-white border-cyan-400/60 shadow-xs"
+            className="p-3 rounded-2xl border transition-all flex items-center justify-center gap-2 cursor-pointer bg-gradient-to-r from-cyan-900/40 via-blue-900/40 to-indigo-900/40 dark:from-cyan-950/60 dark:via-blue-950/60 dark:to-indigo-950/60 hover:from-cyan-600 hover:to-blue-600 text-cyan-900 dark:text-cyan-300 hover:text-white border-cyan-400/60 dark:border-cyan-500/50 shadow-xs"
           >
-            <Headphones className="w-4 h-4 text-cyan-500 hover:text-white animate-pulse" />
+            <Headphones className="w-4 h-4 text-cyan-500 dark:text-cyan-400 hover:text-white animate-pulse" />
             <span className="truncate">English Practice: Listen & Spell</span>
           </button>
         </div>
@@ -705,7 +705,7 @@ export default function PlaygroundArenaView() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="វាយ '1v1', 'bot', ឬឈ្មោះមេរៀន (ឧ. លីមីត, ចំនួនកុំផ្លិច, ADN, ប្រវត្តិ)..."
-              className="w-full bg-slate-50 border border-slate-300 rounded-2xl pl-10 pr-3 py-2.5 text-xs text-slate-800 focus:outline-none focus:border-[#005baa] focus:bg-white"
+              className="w-full bg-slate-50 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-700 rounded-2xl pl-10 pr-3 py-2.5 text-xs text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-[#005baa] dark:focus:border-cyan-400 focus:bg-white dark:focus:bg-slate-900 transition-colors"
             />
           </div>
 
@@ -713,7 +713,7 @@ export default function PlaygroundArenaView() {
             <select
               value={selectedDifficulty}
               onChange={(e) => setSelectedDifficulty(e.target.value)}
-              className="w-full bg-slate-50 text-slate-800 font-bold border border-slate-300 rounded-2xl px-3 py-2.5 focus:outline-none focus:border-[#005baa] cursor-pointer"
+              className="w-full bg-slate-50 dark:bg-slate-900/90 text-slate-800 dark:text-slate-200 font-bold border border-slate-300 dark:border-slate-700 rounded-2xl px-3 py-2.5 focus:outline-none focus:border-[#005baa] dark:focus:border-cyan-400 cursor-pointer"
             >
               <option value="all">គ្រប់កម្រិតលំបាកទាំងអស់ (All Tiers)</option>
               <option value="beginner">កម្រិតងាយស្រួល (Beginner Tier)</option>
@@ -743,8 +743,8 @@ export default function PlaygroundArenaView() {
               onClick={() => setSelectedSubject(sub.key)}
               className={`px-3 py-1 rounded-xl border whitespace-nowrap transition-all cursor-pointer ${
                 selectedSubject === sub.key
-                  ? 'bg-[#003366] text-white border-[#003366] shadow-2xs font-extrabold'
-                  : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                  ? 'bg-[#003366] dark:bg-cyan-600 text-white border-[#003366] dark:border-cyan-500 shadow-2xs font-extrabold'
+                  : 'bg-slate-50 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-700 border-slate-200 dark:border-slate-700'
               }`}
             >
               {sub.label}

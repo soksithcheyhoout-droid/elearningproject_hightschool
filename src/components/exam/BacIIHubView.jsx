@@ -217,7 +217,7 @@ export default function BacIIHubView() {
               {lang === 'km' ? 'ជ្រើសរើសផ្នែកជំនាញប្រឡងបាក់ឌុប' : 'Select Examination Stream'}
             </h2>
           </div>
-          <span className="text-[10px] sm:text-[11px] font-bold text-slate-600 bg-slate-100 px-2.5 sm:px-3 py-1 rounded-xl border border-slate-200 self-start sm:self-auto">
+          <span className="text-[10px] sm:text-[11px] font-bold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 sm:px-3 py-1 rounded-xl border border-slate-200 dark:border-slate-700 self-start sm:self-auto">
             {lang === 'km' ? `វិញ្ញាសាសរុប៖ ${allPapers.length} (វិទ្យាសាស្ត្រ៖ ${scienceCount}, សង្គម៖ ${socialCount})` : `Total Papers: ${allPapers.length} (Science: ${scienceCount}, Social: ${socialCount})`}
           </span>
         </div>
@@ -230,11 +230,11 @@ export default function BacIIHubView() {
             onClick={() => handleSelectStream('all')}
             className={`p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl border transition-all flex items-center justify-center gap-2 cursor-pointer font-bold active:scale-[0.98] ${
               selectedStream === 'all'
-                ? 'bg-gradient-to-r from-[#003366] to-[#005baa] text-white border-[#003366] shadow-md ring-2 ring-blue-500/30'
-                : 'bg-slate-50 hover:bg-slate-100 text-slate-700 border-slate-200'
+                ? 'bg-gradient-to-r from-[#003366] to-[#005baa] dark:from-blue-600 dark:to-cyan-600 text-white border-[#003366] dark:border-blue-500 shadow-md ring-2 ring-blue-500/30'
+                : 'bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700'
             }`}
           >
-            <Layers className={`w-4 h-4 ${selectedStream === 'all' ? 'text-amber-300' : 'text-slate-500'}`} />
+            <Layers className={`w-4 h-4 ${selectedStream === 'all' ? 'text-amber-300' : 'text-slate-500 dark:text-slate-400'}`} />
             <span>{lang === 'km' ? 'វិញ្ញាសាទាំងពីរផ្នែក' : 'All Streams'} ({allPapers.length})</span>
           </button>
 
@@ -244,10 +244,10 @@ export default function BacIIHubView() {
             className={`p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl border transition-all flex items-center justify-center gap-2 cursor-pointer font-bold active:scale-[0.98] ${
               selectedStream === 'social'
                 ? 'bg-gradient-to-r from-amber-600 to-amber-700 text-white border-amber-600 shadow-md ring-2 ring-amber-400/40'
-                : 'bg-amber-50/50 hover:bg-amber-100/70 text-amber-950 border-amber-200'
+                : 'bg-amber-50/50 dark:bg-slate-800 hover:bg-amber-100/70 dark:hover:bg-slate-700 text-amber-950 dark:text-amber-300 border-amber-200 dark:border-slate-700'
             }`}
           >
-            <Landmark className={`w-4 h-4 ${selectedStream === 'social' ? 'text-amber-200' : 'text-amber-600'}`} />
+            <Landmark className={`w-4 h-4 ${selectedStream === 'social' ? 'text-amber-200' : 'text-amber-600 dark:text-amber-400'}`} />
             <span>{lang === 'km' ? 'ថ្នាក់វិទ្យាសាស្ត្រសង្គម' : 'Social Sciences'} ({socialCount})</span>
           </button>
 
@@ -257,18 +257,18 @@ export default function BacIIHubView() {
             className={`p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl border transition-all flex items-center justify-center gap-2 cursor-pointer font-bold active:scale-[0.98] ${
               selectedStream === 'science'
                 ? 'bg-gradient-to-r from-[#005baa] to-[#0284c7] text-white border-[#005baa] shadow-md ring-2 ring-blue-400/40'
-                : 'bg-blue-50/50 hover:bg-blue-100/70 text-[#003366] border-blue-200'
+                : 'bg-blue-50/50 dark:bg-slate-800 hover:bg-blue-100/70 dark:hover:bg-slate-700 text-[#003366] dark:text-cyan-300 border-blue-200 dark:border-slate-700'
             }`}
           >
-            <Atom className={`w-4 h-4 ${selectedStream === 'science' ? 'text-cyan-300' : 'text-[#005baa]'}`} />
+            <Atom className={`w-4 h-4 ${selectedStream === 'science' ? 'text-cyan-300' : 'text-[#005baa] dark:text-cyan-400'}`} />
             <span>{lang === 'km' ? 'ថ្នាក់វិទ្យាសាស្ត្រពិត' : 'Science Stream'} ({scienceCount})</span>
           </button>
 
         </div>
 
         {/* Multi-Year Horizontal Carousel Selector with Dynamic Stream Counts */}
-        <div className="space-y-1.5 pt-2 border-t border-slate-100">
-          <label className="text-[10.5px] sm:text-[11px] font-bold text-slate-500 block">
+        <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
+          <label className="text-[10.5px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400 block">
             {lang === 'km' ? 'ជ្រើសរើសឆ្នាំប្រឡង (Filter by Exam Year):' : 'Filter by Exam Year:'}
           </label>
           <div className="flex items-center gap-1.5 overflow-x-auto pb-1.5 text-xs font-bold touch-pan-x [scrollbar-width:none] [-webkit-overflow-scrolling:touch]">
@@ -286,7 +286,7 @@ export default function BacIIHubView() {
                   className={`px-3 py-1.5 rounded-xl transition-all flex-shrink-0 flex items-center gap-1.5 cursor-pointer font-bold text-[11px] sm:text-xs active:scale-95 ${
                     isSelected
                       ? 'bg-[#005baa] text-white shadow-xs'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700'
                   }`}
                 >
                   <Calendar className="w-3.5 h-3.5" />
@@ -326,7 +326,7 @@ export default function BacIIHubView() {
                   className={`px-3 py-1.5 rounded-xl transition-all flex-shrink-0 flex items-center gap-1.5 cursor-pointer font-bold text-[11px] sm:text-xs active:scale-95 ${
                     isSelected
                       ? 'bg-[#003366] dark:bg-cyan-600 text-white shadow-xs'
-                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700'
                   }`}
                 >
                   <span>{lang === 'km' ? sub.nameKm : sub.nameEn}</span>

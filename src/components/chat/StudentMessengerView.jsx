@@ -296,11 +296,11 @@ function VoiceMessagePlayer({ audioUrl, duration, isMe }) {
     <div className={`flex items-center gap-3 p-3 rounded-2xl border transition-all duration-300 ${
       isPlaying
         ? isMe 
-          ? 'bg-gradient-to-r from-blue-100/90 to-sky-50 border-blue-400 shadow-md ring-2 ring-blue-300/50' 
-          : 'bg-gradient-to-r from-slate-100 to-blue-50/70 border-blue-400/80 shadow-md ring-2 ring-blue-300/40'
+          ? 'bg-gradient-to-r from-blue-100/90 to-sky-50 dark:from-blue-900/50 dark:to-cyan-950/50 border-blue-400 dark:border-blue-500 shadow-md ring-2 ring-blue-300/50' 
+          : 'bg-gradient-to-r from-slate-100 to-blue-50/70 dark:from-slate-800 dark:to-slate-850 border-blue-400/80 dark:border-blue-500/60 shadow-md ring-2 ring-blue-300/40'
         : isMe 
-          ? 'bg-blue-600/10 border-blue-300/80 text-blue-950 shadow-2xs' 
-          : 'bg-slate-100 border-slate-200 text-slate-900 shadow-2xs'
+          ? 'bg-blue-600/10 dark:bg-cyan-950/40 border-blue-300/80 dark:border-cyan-700/60 text-blue-950 dark:text-cyan-200 shadow-2xs' 
+          : 'bg-slate-100 dark:bg-slate-800/90 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-slate-100 shadow-2xs'
     } min-w-[220px] sm:min-w-[280px] max-w-sm font-kantumruy select-none my-1 relative overflow-hidden`}>
       
       {/* Background Animated Sound Wave Aura when Playing */}
@@ -328,7 +328,7 @@ function VoiceMessagePlayer({ audioUrl, duration, isMe }) {
             ? 'bg-gradient-to-tr from-[#005baa] to-sky-500 text-white scale-105 ring-4 ring-blue-400/40 shadow-blue-500/30' 
             : isMe 
               ? 'bg-[#005baa] hover:bg-[#004785] text-white hover:scale-105 active:scale-95' 
-              : 'bg-[#002b5b] hover:bg-[#001f42] text-white hover:scale-105 active:scale-95'
+              : 'bg-[#002b5b] dark:bg-blue-600 hover:bg-[#001f42] dark:hover:bg-blue-500 text-white hover:scale-105 active:scale-95'
         }`}
       >
         {isPlaying ? (
@@ -368,8 +368,8 @@ function VoiceMessagePlayer({ audioUrl, duration, isMe }) {
                     : isPlaying
                       ? 'animate-audio-wave bg-blue-300/80'
                       : isPassed 
-                        ? (isMe ? 'bg-[#005baa]' : 'bg-slate-900') 
-                        : (isMe ? 'bg-blue-300/60' : 'bg-slate-300')
+                        ? (isMe ? 'bg-[#005baa] dark:bg-cyan-400' : 'bg-slate-900 dark:bg-slate-100') 
+                        : (isMe ? 'bg-blue-300/60 dark:bg-cyan-800' : 'bg-slate-300 dark:bg-slate-700')
                 }`}
               />
             );
@@ -1110,16 +1110,16 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
   });
 
   return (
-    <div className="w-full max-w-[1600px] mx-auto h-full flex-1 flex flex-col bg-white border-0 md:border border-slate-200 rounded-none md:rounded-3xl shadow-none md:shadow-lg overflow-hidden font-kantumruy select-none" style={{minHeight:0}}>
+    <div className="w-full max-w-[1600px] mx-auto h-full flex-1 flex flex-col bg-white dark:bg-[#070b14] border-0 md:border border-slate-200 dark:border-slate-800 rounded-none md:rounded-3xl shadow-none md:shadow-lg overflow-hidden font-kantumruy select-none" style={{minHeight:0}}>
       
       {/* Header Bar */}
-      <div className="bg-white border-b border-slate-200 px-2.5 sm:px-6 py-2 sm:py-3 flex items-center justify-between gap-2 flex-shrink-0 select-none shadow-2xs">
+      <div className="bg-white dark:bg-[#0f172a] border-b border-slate-200 dark:border-slate-800 px-2.5 sm:px-6 py-2 sm:py-3 flex items-center justify-between gap-2 flex-shrink-0 select-none shadow-2xs">
         <div className="flex items-center gap-2 sm:gap-3 min-w-0">
           {onBack && (
             <button
               type="button"
               onClick={onBack}
-              className="sm:hidden p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-slate-700 flex-shrink-0 cursor-pointer transition-colors"
+              className="sm:hidden p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-300 flex-shrink-0 cursor-pointer transition-colors"
               title="ត្រឡប់ទៅទំព័រដើម (Back to Home)"
             >
               <ArrowLeft className="w-4 h-4" />
@@ -1130,22 +1130,22 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
           </div>
           <div className="min-w-0">
             <div className="flex items-center gap-1 sm:gap-2">
-              <span className="text-[9px] sm:text-[11px] font-extrabold text-[#005baa] uppercase tracking-wider font-cinzel truncate">
+              <span className="text-[9px] sm:text-[11px] font-extrabold text-[#005baa] dark:text-cyan-400 uppercase tracking-wider font-cinzel truncate">
                 LIVE MESSENGER
               </span>
-              <span className="inline-flex items-center gap-1 text-[8px] sm:text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-emerald-50 text-emerald-700 border border-emerald-200 shadow-2xs flex-shrink-0">
+              <span className="inline-flex items-center gap-1 text-[8px] sm:text-[10px] font-bold px-1.5 py-0.2 rounded-full bg-emerald-50 dark:bg-emerald-950/60 text-emerald-700 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-700/60 shadow-2xs flex-shrink-0">
                 <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-ping" />
                 <span>{registeredStudents.length || 2} Online</span>
               </span>
             </div>
-            <h2 className="hidden sm:block text-sm sm:text-base font-extrabold text-[#003366] truncate">
+            <h2 className="hidden sm:block text-sm sm:text-base font-extrabold text-[#003366] dark:text-white truncate">
               ប្រព័ន្ធជជែកសិក្សា & បន្ទប់សន្ទនាទូទាំងប្រទេស
             </h2>
           </div>
         </div>
 
         {/* Global / Direct Tab Switcher with Unread Count Badges */}
-        <div className="flex items-center bg-slate-100 p-0.5 sm:p-1 rounded-xl sm:rounded-2xl border border-slate-200/90 shadow-inner flex-shrink-0">
+        <div className="flex items-center bg-slate-100 dark:bg-slate-900/90 p-0.5 sm:p-1 rounded-xl sm:rounded-2xl border border-slate-200/90 dark:border-slate-800 shadow-inner flex-shrink-0">
           {(() => {
             const totalGlobalUnread = CHAT_CHANNELS.reduce((sum, ch) => sum + getUnreadCount(ch.id), 0);
             const totalDmUnread = registeredStudents.reduce((sum, s) => {
@@ -1160,11 +1160,11 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                   onClick={() => { setChatType('global'); setMobileChatView('list'); }}
                   className={`px-2 sm:px-4 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                     chatType === 'global'
-                      ? 'bg-white text-[#005baa] shadow-xs border border-slate-200/80 font-extrabold'
-                      : 'text-slate-600 hover:text-slate-950'
+                      ? 'bg-white dark:bg-slate-800 text-[#005baa] dark:text-cyan-300 shadow-xs border border-slate-200/80 dark:border-slate-700 font-extrabold'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white'
                   }`}
                 >
-                  <Globe className="w-3.5 h-3.5 text-[#005baa]" />
+                  <Globe className="w-3.5 h-3.5 text-[#005baa] dark:text-cyan-400" />
                   <span className="hidden sm:inline">បន្ទប់រួម (Global)</span>
                   <span className="sm:hidden">បន្ទប់រួម</span>
                   {totalGlobalUnread > 0 && (
@@ -1179,11 +1179,11 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                   onClick={() => { setChatType('direct'); setMobileChatView('list'); }}
                   className={`px-2 sm:px-4 py-1 sm:py-1.5 rounded-lg sm:rounded-xl text-[10.5px] sm:text-xs font-bold transition-all cursor-pointer flex items-center gap-1.5 ${
                     chatType === 'direct'
-                      ? 'bg-white text-[#005baa] shadow-xs border border-slate-200/80 font-extrabold'
-                      : 'text-slate-600 hover:text-slate-950'
+                      ? 'bg-white dark:bg-slate-800 text-[#005baa] dark:text-cyan-300 shadow-xs border border-slate-200/80 dark:border-slate-700 font-extrabold'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-950 dark:hover:text-white'
                   }`}
                 >
-                  <Users className="w-3.5 h-3.5 text-[#005baa]" />
+                  <Users className="w-3.5 h-3.5 text-[#005baa] dark:text-cyan-400" />
                   <span className="hidden sm:inline">សារផ្ទាល់ខ្លួន (DMs)</span>
                   <span className="sm:hidden">សារផ្ទាល់</span>
                   {totalDmUnread > 0 && (
@@ -1202,12 +1202,12 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
       <div className="flex-1 flex overflow-hidden relative">
         
         {/* LEFT COLUMN: CHANNELS OR REAL STUDENTS LIST */}
-        <div className={`w-full md:w-80 bg-slate-50 border-r border-slate-200 flex-col flex-shrink-0 select-none ${
+        <div className={`w-full md:w-80 bg-slate-50 dark:bg-[#0b101b] border-r border-slate-200 dark:border-slate-800 flex-col flex-shrink-0 select-none ${
           mobileChatView === 'list' ? 'flex' : 'hidden md:flex'
         }`}>
           
           {/* Search Box */}
-          <div className="p-3.5 border-b border-slate-200 bg-white">
+          <div className="p-3.5 border-b border-slate-200 dark:border-slate-800 bg-white dark:bg-[#0f172a]">
             <div className="relative">
               <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-1/2 -translate-y-1/2" />
               <input
@@ -1215,7 +1215,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                 placeholder={chatType === 'global' ? "ស្វែងរកបន្ទប់ជជែក..." : "ស្វែងរកសិស្សក្នុងប្រព័ន្ធ..."}
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-9 pr-3.5 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#005baa] focus:bg-white transition-all shadow-inner"
+                className="w-full bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl pl-9 pr-3.5 py-2 text-xs text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#005baa] dark:focus:border-cyan-400 focus:bg-white dark:focus:bg-slate-900 transition-all shadow-inner"
               />
             </div>
           </div>
@@ -1239,14 +1239,14 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                       onClick={() => { setActiveChannelId(channel.id); setMobileChatView('chat'); }}
                       className={`w-full p-2.5 sm:p-3 rounded-2xl text-left transition-all cursor-pointer flex items-center gap-2.5 sm:gap-3 group relative ${
                         isActive
-                          ? 'bg-blue-50/90 border border-blue-200 text-[#005baa] shadow-xs'
-                          : 'hover:bg-white text-slate-700 hover:text-[#005baa] border border-transparent'
+                          ? 'bg-blue-50/90 dark:bg-cyan-500/20 border border-blue-200 dark:border-cyan-500/40 text-[#005baa] dark:text-cyan-300 shadow-xs'
+                          : 'hover:bg-white dark:hover:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:text-[#005baa] dark:hover:text-white border border-transparent'
                       }`}
                     >
                       {getChannelIcon(channel.id, isActive)}
                       <div className="min-w-0 flex-1">
                         <div className="flex items-center justify-between gap-1">
-                          <h4 className="font-bold text-xs truncate group-hover:text-[#005baa] transition-colors">{channel.name}</h4>
+                          <h4 className="font-bold text-xs truncate text-slate-900 dark:text-white group-hover:text-[#005baa] dark:group-hover:text-cyan-300 transition-colors">{channel.name}</h4>
                           {latest?.created_at && (
                             <span className="text-[9px] text-slate-400 font-mono font-bold flex-shrink-0">
                               {formatTimeShort(latest.created_at)}
@@ -1390,17 +1390,17 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
         </div>
 
         {/* RIGHT COLUMN: ACTIVE CHAT CANVAS */}
-        <div className={`flex-1 flex flex-col bg-[#f8fafc] overflow-hidden relative ${
+        <div className={`flex-1 flex flex-col bg-[#f8fafc] dark:bg-[#070b14] overflow-hidden relative ${
           mobileChatView === 'chat' ? 'flex' : 'hidden md:flex'
         }`} style={{minHeight:0}}>
           
           {/* Active Chat Header */}
-          <div className="bg-white border-b border-slate-200 px-2.5 sm:px-6 py-2 sm:py-3 flex items-center justify-between flex-shrink-0 shadow-2xs gap-1.5">
+          <div className="bg-white dark:bg-[#0f172a] border-b border-slate-200 dark:border-slate-800 px-2.5 sm:px-6 py-2 sm:py-3 flex items-center justify-between flex-shrink-0 shadow-2xs gap-1.5">
             <div className="flex items-center gap-2 sm:gap-3 min-w-0 flex-1">
               <button
                 type="button"
                 onClick={() => setMobileChatView('list')}
-                className="md:hidden p-1.5 rounded-xl bg-slate-100 hover:bg-slate-200 text-[#005baa] flex items-center justify-center cursor-pointer shadow-2xs border border-slate-200 flex-shrink-0"
+                className="md:hidden p-1.5 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-[#005baa] dark:text-cyan-400 flex items-center justify-center cursor-pointer shadow-2xs border border-slate-200 dark:border-slate-700 flex-shrink-0"
               >
                 <ArrowLeft className="w-4 h-4" />
               </button>
@@ -1411,14 +1411,14 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                     {getChannelIcon(activeChannel.id, true)}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-extrabold text-xs sm:text-sm text-[#003366] truncate">{activeChannel.name}</h3>
-                    <p className="text-[9.5px] sm:text-[11px] text-slate-500 truncate hidden xs:block">{activeChannel.desc}</p>
+                    <h3 className="font-extrabold text-xs sm:text-sm text-[#003366] dark:text-white truncate">{activeChannel.name}</h3>
+                    <p className="text-[9.5px] sm:text-[11px] text-slate-500 dark:text-slate-400 truncate hidden xs:block">{activeChannel.desc}</p>
                   </div>
                 </>
               ) : (
                 <>
                   <div className="relative w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center flex-shrink-0">
-                    <div className="w-[82%] h-[82%] rounded-full overflow-hidden bg-slate-900 border border-blue-200 shadow-xs">
+                    <div className="w-[82%] h-[82%] rounded-full overflow-hidden bg-slate-900 border border-blue-200 dark:border-slate-700 shadow-xs">
                       <img 
                         src={api.formatAvatarUrl(activeContact.avatar)} 
                         alt={activeContact.full_name} 
@@ -1435,8 +1435,8 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                     )}
                   </div>
                   <div className="min-w-0 flex-1">
-                    <h3 className="font-extrabold text-xs sm:text-sm text-[#003366] truncate">{activeContact.full_name || activeContact.username}</h3>
-                    <p className="text-[9.5px] sm:text-[11px] text-emerald-600 flex items-center gap-1 font-bold truncate">
+                    <h3 className="font-extrabold text-xs sm:text-sm text-[#003366] dark:text-white truncate">{activeContact.full_name || activeContact.username}</h3>
+                    <p className="text-[9.5px] sm:text-[11px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-bold truncate">
                       <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 flex-shrink-0" />
                       <span className="truncate">{activeContact.school || 'វិទ្យាល័យ ព្រះស៊ីសុវត្ថិ'}</span>
                     </p>
@@ -1516,16 +1516,16 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                       {/* Header: Name, Grade, Role */}
                       <div className="flex items-center justify-between gap-1.5 mb-1 min-w-0">
                         <div className="flex items-center gap-1 sm:gap-1.5 flex-wrap min-w-0">
-                          <span className={`font-black text-[11px] sm:text-xs truncate max-w-[100px] sm:max-w-none ${isMe ? 'text-[#005baa]' : 'text-slate-900'}`}>
+                          <span className={`font-black text-[11px] sm:text-xs truncate max-w-[100px] sm:max-w-none ${isMe ? 'text-[#005baa] dark:text-cyan-400' : 'text-slate-900 dark:text-white'}`}>
                             {msg.sender_name || msg.sender_username || (isMe ? (student?.name || student?.username) : 'Student')}
                           </span>
                           {(msg.sender_grade || (isMe && student?.grade)) && (
-                            <span className="text-[8.5px] sm:text-[9.5px] font-bold px-1.5 sm:px-2 py-0.2 rounded-full bg-slate-100 text-slate-600 border border-slate-200 flex-shrink-0">
+                            <span className="text-[8.5px] sm:text-[9.5px] font-bold px-1.5 sm:px-2 py-0.2 rounded-full bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border border-slate-200 dark:border-slate-700 flex-shrink-0">
                               {msg.sender_grade || `ថ្នាក់ទី${student?.grade || '12'} (${student?.stream || 'វិទ្យាសាស្ត្រ'})`}
                             </span>
                           )}
                           {(msg.sender_badge || (isMe && levelInfo.rankTitleKm)) && (
-                            <span className="text-[8px] sm:text-[9px] font-black px-1.5 sm:px-2 py-0.2 rounded-full shadow-2xs bg-[#005baa] text-white truncate max-w-[110px] sm:max-w-none">
+                            <span className="text-[8px] sm:text-[9px] font-black px-1.5 sm:px-2 py-0.2 rounded-full shadow-2xs bg-[#005baa] dark:bg-cyan-600 text-white truncate max-w-[110px] sm:max-w-none">
                               {msg.sender_badge || levelInfo.rankTitleKm}
                             </span>
                           )}
@@ -1573,11 +1573,11 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                                   index >= Math.max(0, channelMessages.length - 3)
                                     ? 'bottom-full mb-1.5 origin-bottom-right'
                                     : 'top-full mt-1.5 origin-top-right'
-                                } w-44 sm:w-48 bg-white/98 backdrop-blur-2xl rounded-2xl border border-slate-200 shadow-2xl p-1.5 z-50 animate-scale-up font-kantumruy select-none ring-1 ring-black/5`}
+                                } w-44 sm:w-48 bg-white/98 dark:bg-[#0f172a] backdrop-blur-2xl rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xl p-1.5 z-50 animate-scale-up font-kantumruy select-none ring-1 ring-black/5 dark:ring-white/10`}
                                 onClick={(e) => e.stopPropagation()}
                               >
                                 {/* Quick Reactions inside Menu */}
-                                <div className="flex items-center justify-between gap-1 p-1 bg-slate-50 rounded-xl mb-1 border border-slate-100">
+                                <div className="flex items-center justify-between gap-1 p-1 bg-slate-50 dark:bg-slate-850 rounded-xl mb-1 border border-slate-100 dark:border-slate-800">
                                   {QUICK_REACTIONS.slice(0, 6).map((emoji) => (
                                     <button
                                       key={emoji}
@@ -1602,7 +1602,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                                       setActiveMenuMsgId(null);
                                       handleSpeakMessage(msg.id, msg.content);
                                     }}
-                                    className="w-full px-2.5 py-1.5 rounded-xl text-[11px] font-bold text-slate-700 hover:text-[#005baa] hover:bg-blue-50/80 transition-all flex items-center gap-2 cursor-pointer text-left"
+                                    className="w-full px-2.5 py-1.5 rounded-xl text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:text-[#005baa] dark:hover:text-cyan-300 hover:bg-blue-50/80 dark:hover:bg-slate-800 transition-all flex items-center gap-2 cursor-pointer text-left"
                                   >
                                     <Volume2 className={`w-3.5 h-3.5 ${speakingMsgId === msg.id ? 'text-blue-600 animate-pulse' : 'text-slate-500'} flex-shrink-0`} />
                                     <span className="truncate">{speakingMsgId === msg.id ? 'បញ្ឈប់ការអាន' : 'អានសារជាសំឡេង'}</span>
@@ -1616,7 +1616,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                                     handleCopyMessage(msg.id, msg.content);
                                     setTimeout(() => setActiveMenuMsgId(null), 300);
                                   }}
-                                  className="w-full px-2.5 py-1.5 rounded-xl text-[11px] font-bold text-slate-700 hover:text-[#005baa] hover:bg-blue-50/80 transition-all flex items-center gap-2 cursor-pointer text-left"
+                                  className="w-full px-2.5 py-1.5 rounded-xl text-[11px] font-bold text-slate-700 dark:text-slate-200 hover:text-[#005baa] dark:hover:text-cyan-300 hover:bg-blue-50/80 dark:hover:bg-slate-800 transition-all flex items-center gap-2 cursor-pointer text-left"
                                 >
                                   {copiedMsgId === msg.id ? (
                                     <>
@@ -1670,10 +1670,10 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                       {/* Message Card Bubble */}
                       <div className={`p-3.5 sm:p-4 rounded-2xl text-xs sm:text-sm leading-relaxed border transition-all ${
                         msg.is_duel_challenge 
-                          ? 'bg-gradient-to-r from-amber-50 via-orange-50/60 to-yellow-50 border-amber-300 text-slate-900 shadow-xs' 
+                          ? 'bg-gradient-to-r from-amber-50 via-orange-50/60 to-yellow-50 dark:from-amber-950/40 dark:via-orange-950/40 dark:to-yellow-950/40 border-amber-300 dark:border-amber-700 text-slate-900 dark:text-amber-200 shadow-xs' 
                           : isMe 
-                            ? 'bg-blue-50/70 border-blue-200/90 text-slate-800 shadow-2xs'
-                            : 'bg-white border-slate-200/90 text-slate-800 shadow-2xs'
+                            ? 'bg-blue-50/70 dark:bg-blue-950/50 border-blue-200/90 dark:border-blue-800/60 text-slate-800 dark:text-slate-100 shadow-2xs'
+                            : 'bg-white dark:bg-[#131c2e] border-slate-200/90 dark:border-slate-800 text-slate-800 dark:text-slate-100 shadow-2xs'
                       }`}>
                         {/* 📷 Attached Image Photo */}
                         {msg.media_type === 'image' && msg.media_url && (
@@ -1905,7 +1905,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
           </div>
 
           {/* Input Bar Form */}
-          <div className="bg-white border-t border-slate-200 px-1.5 sm:px-3 py-1.5 sm:py-2.5 flex-shrink-0 relative z-40 shadow-xs w-full max-w-full overflow-visible" style={{paddingBottom:'max(6px, env(safe-area-inset-bottom, 6px))'}}>
+          <div className="bg-white dark:bg-[#0f172a] border-t border-slate-200 dark:border-slate-800 px-1.5 sm:px-3 py-1.5 sm:py-2.5 flex-shrink-0 relative z-40 shadow-xs w-full max-w-full overflow-visible" style={{paddingBottom:'max(6px, env(safe-area-inset-bottom, 6px))'}}>
             <form onSubmit={handleSendMessage} className="flex items-center gap-1 sm:gap-2 relative w-full max-w-full">
               
               {/* 1. Native Clean Emoji / Reaction Trigger Button */}
@@ -1919,8 +1919,8 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                   }}
                   className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl transition-all cursor-pointer border shadow-2xs flex items-center justify-center flex-shrink-0 ${
                     isEmojiPickerOpen 
-                      ? 'bg-amber-100 text-amber-900 border-amber-300 ring-2 ring-amber-400/40 shadow-md' 
-                      : 'bg-slate-100 hover:bg-amber-50 text-slate-600 hover:text-amber-700 border-slate-200/90'
+                      ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-300 border-amber-300 dark:border-amber-700 ring-2 ring-amber-400/40 shadow-md' 
+                      : 'bg-slate-100 dark:bg-slate-800 hover:bg-amber-50 dark:hover:bg-amber-950/40 text-slate-600 dark:text-slate-300 hover:text-amber-700 dark:hover:text-amber-300 border-slate-200/90 dark:border-slate-700'
                   }`}
                   title="Emoji"
                 >
@@ -2033,7 +2033,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                   className={`w-9 h-9 rounded-xl font-black text-xs transition-all cursor-pointer border shadow-2xs flex items-center justify-center gap-1 flex-shrink-0 ${
                     isGifPickerOpen 
                       ? 'bg-indigo-600 text-white border-indigo-500 ring-2 ring-indigo-400/40 shadow-md' 
-                      : 'bg-slate-100 hover:bg-indigo-50 text-indigo-700 hover:text-indigo-900 border-slate-200/90'
+                      : 'bg-slate-100 dark:bg-slate-800 hover:bg-indigo-50 dark:hover:bg-indigo-950/40 text-indigo-700 dark:text-indigo-300 hover:text-indigo-900 border-slate-200/90 dark:border-slate-700'
                   }`}
                   title="GIF"
                 >
@@ -2151,7 +2151,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                 type="button"
                 onClick={() => imageInputRef.current?.click()}
                 disabled={isSending || isRecordingVoice}
-                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-100 hover:bg-emerald-50 text-slate-600 hover:text-emerald-600 border border-slate-200/90 transition-all cursor-pointer flex items-center justify-center flex-shrink-0 disabled:opacity-40"
+                className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-emerald-50 dark:hover:bg-emerald-950/40 text-slate-600 dark:text-slate-300 hover:text-emerald-600 border border-slate-200/90 dark:border-slate-700 transition-all cursor-pointer flex items-center justify-center flex-shrink-0 disabled:opacity-40"
                 title="Photo"
               >
                 <ImageIcon className="w-4 h-4 text-emerald-600" />
@@ -2162,7 +2162,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                 type="button"
                 onClick={() => videoInputRef.current?.click()}
                 disabled={isSending || isRecordingVoice}
-                className="hidden sm:flex w-9 h-9 rounded-xl bg-slate-100 hover:bg-purple-50 text-slate-600 hover:text-purple-600 border border-slate-200/90 transition-all cursor-pointer flex-shrink-0 items-center justify-center disabled:opacity-40"
+                className="hidden sm:flex w-9 h-9 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-purple-50 dark:hover:bg-purple-950/40 text-slate-600 dark:text-slate-300 hover:text-purple-600 border border-slate-200/90 dark:border-slate-700 transition-all cursor-pointer flex-shrink-0 items-center justify-center disabled:opacity-40"
                 title="Video"
               >
                 <Video className="w-4 h-4 text-purple-600" />
@@ -2170,10 +2170,10 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
 
               {/* Live Voice Recording UI vs Text Input Box */}
               {isRecordingVoice ? (
-                <div className="flex-1 min-w-0 flex items-center justify-between gap-1.5 bg-rose-50 border border-rose-200 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl animate-fade-in">
+                <div className="flex-1 min-w-0 flex items-center justify-between gap-1.5 bg-rose-50 dark:bg-rose-950/40 border border-rose-200 dark:border-rose-800/60 px-2 sm:px-3 py-1 sm:py-1.5 rounded-xl animate-fade-in">
                   <div className="flex items-center gap-1.5 min-w-0">
                     <span className="w-2 h-2 rounded-full bg-rose-600 animate-ping flex-shrink-0" />
-                    <span className="text-[11px] font-black text-rose-700 font-mono truncate">
+                    <span className="text-[11px] font-black text-rose-700 dark:text-rose-400 font-mono truncate">
                       REC {Math.floor(recordingDuration / 60)}:{recordingDuration % 60 < 10 ? '0' : ''}{recordingDuration % 60}
                     </span>
                   </div>
@@ -2182,7 +2182,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                     <button
                       type="button"
                       onClick={cancelVoiceRecording}
-                      className="px-2 py-1 rounded-lg bg-white text-rose-600 border border-rose-200 text-[10px] font-bold cursor-pointer"
+                      className="px-2 py-1 rounded-lg bg-white dark:bg-slate-800 text-rose-600 dark:text-rose-400 border border-rose-200 dark:border-rose-700 text-[10px] font-bold cursor-pointer"
                     >
                       បោះបង់
                     </button>
@@ -2209,7 +2209,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                     autoCorrect="off"
                     autoCapitalize="sentences"
                     spellCheck="false"
-                    className="flex-1 min-w-0 bg-slate-50 border border-slate-200 rounded-xl px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-[16px] sm:text-sm text-slate-800 placeholder-slate-400 focus:outline-none focus:border-[#005baa] focus:bg-white transition-all shadow-inner font-medium leading-tight"
+                    className="flex-1 min-w-0 bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl px-2.5 sm:px-3.5 py-1.5 sm:py-2 text-[16px] sm:text-sm text-slate-800 dark:text-white placeholder-slate-400 dark:placeholder-slate-500 focus:outline-none focus:border-[#005baa] dark:focus:border-cyan-400 focus:bg-white dark:focus:bg-slate-900 transition-all shadow-inner font-medium leading-tight"
                   />
 
                   {/* Mic Voice Record Button */}
@@ -2217,7 +2217,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                     type="button"
                     onClick={startVoiceRecording}
                     disabled={isSending}
-                    className="p-1.5 sm:px-2 sm:py-2 rounded-xl bg-slate-100 hover:bg-rose-50 text-rose-600 border border-slate-200/90 transition-all cursor-pointer flex-shrink-0"
+                    className="p-1.5 sm:px-2 sm:py-2 rounded-xl bg-slate-100 dark:bg-slate-800 hover:bg-rose-50 dark:hover:bg-rose-950/40 text-rose-600 dark:text-rose-400 border border-slate-200/90 dark:border-slate-700 transition-all cursor-pointer flex-shrink-0"
                     title="ថតសំឡេង (Voice Note)"
                   >
                     <Mic className="w-4 h-4 text-rose-500" />
@@ -2227,7 +2227,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                   <button
                     type="submit"
                     disabled={!inputMessage.trim() || isSending}
-                    className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-[#005baa] via-[#004785] to-[#003366] text-white font-bold text-xs flex items-center justify-center gap-1 shadow-md active:scale-95 transition-all flex-shrink-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
+                    className="px-2.5 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-gradient-to-r from-[#005baa] via-[#004785] to-[#003366] dark:from-blue-600 dark:via-blue-500 dark:to-cyan-600 text-white font-bold text-xs flex items-center justify-center gap-1 shadow-md active:scale-95 transition-all flex-shrink-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
                     title="ផ្ញើសារ (Send Message)"
                   >
                     {isSending ? (

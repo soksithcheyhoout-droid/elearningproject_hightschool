@@ -889,10 +889,10 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
 
                 {/* 🌟 RICH USER ACCOUNT DROPDOWN MENU */}
                 {isUserMenuOpen && (
-                  <div className="absolute top-full right-0 mt-2 w-80 bg-white/95 backdrop-blur-2xl rounded-2xl border border-blue-100 shadow-[0_20px_50px_rgba(0,35,80,0.2)] p-3.5 z-50 animate-scale-up font-kantumruy select-none ring-1 ring-black/5 text-slate-800">
+                  <div className="absolute top-full right-0 mt-2 w-80 bg-white/95 dark:bg-[#0f172a] backdrop-blur-2xl rounded-2xl border border-blue-100 dark:border-slate-800 shadow-[0_20px_50px_rgba(0,35,80,0.2)] dark:shadow-[0_20px_50px_rgba(0,0,0,0.7)] p-3.5 z-50 animate-scale-up font-kantumruy select-none ring-1 ring-black/5 dark:ring-white/10 text-slate-800 dark:text-slate-200">
                     
                     {/* User Card Header */}
-                    <div className="flex items-center gap-3 p-2.5 rounded-xl bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-blue-50/80 border border-blue-100 mb-2.5">
+                    <div className="flex items-center gap-3 p-2.5 rounded-xl bg-gradient-to-r from-blue-50/80 via-indigo-50/50 to-blue-50/80 dark:from-slate-800/95 dark:via-slate-850/95 dark:to-slate-800/95 border border-blue-100 dark:border-slate-700/80 mb-2.5">
                       <div className="relative flex-shrink-0 w-12 h-12 flex items-center justify-center">
                         <div className="w-[82%] h-[82%] rounded-full overflow-hidden bg-slate-900 shadow-sm">
                           <img 
@@ -918,58 +918,58 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
 
                       <div className="min-w-0 flex-1 text-left">
                         <div className="flex items-center gap-1.5">
-                          <h4 className="font-extrabold text-sm text-[#002d62] truncate">
+                          <h4 className="font-extrabold text-sm text-[#002d62] dark:text-white truncate">
                             {student?.name || 'riki.dev'}
                           </h4>
                           <span className="px-1.5 py-0.2 text-[9px] font-black bg-blue-600 text-white rounded-full">
                             Lv.{student?.level || 12}
                           </span>
                         </div>
-                        <p className="text-[11px] text-slate-500 truncate">
+                        <p className="text-[11px] text-slate-500 dark:text-slate-400 truncate">
                           {student?.email || student?.studentId || 'BACII-2026-STUDENT'}
                         </p>
-                        <p className="text-[10px] text-amber-700 font-bold mt-0.5">
+                        <p className="text-[10px] text-amber-700 dark:text-amber-400 font-bold mt-0.5">
                           ⭐ {(student?.xp || 3568).toLocaleString()} XP • {student?.streakDays || 14} ថ្ងៃ Streak
                         </p>
                       </div>
                     </div>
 
                     {/* Quick Menu Actions */}
-                    <div className="space-y-1 py-1 border-b border-slate-100 mb-2">
+                    <div className="space-y-1 py-1 border-b border-slate-100 dark:border-slate-800 mb-2">
                       <button
                         type="button"
                         onClick={() => { setActiveTab('dashboard'); setIsUserMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                        className="w-full px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-[#005baa] hover:bg-blue-50/80 transition-all flex items-center justify-between group cursor-pointer"
+                        className="w-full px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-[#005baa] dark:hover:text-cyan-300 hover:bg-blue-50/80 dark:hover:bg-slate-800/80 transition-all flex items-center justify-between group cursor-pointer"
                       >
                         <div className="flex items-center gap-2.5">
-                          <BookOpen className="w-4 h-4 text-[#005baa]" />
+                          <BookOpen className="w-4 h-4 text-[#005baa] dark:text-cyan-400" />
                           <span>{lang === 'km' ? 'ព័ត៌មានរូបសង្ខេប & ពិន្ទុ' : 'My Dashboard & Profile'}</span>
                         </div>
-                        <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#005baa] group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-[#005baa] dark:group-hover:text-cyan-300 group-hover:translate-x-1 transition-transform" />
                       </button>
 
                       <button
                         type="button"
                         onClick={() => { setActiveTab('playground'); setIsUserMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                        className="w-full px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-amber-600 hover:bg-amber-50/80 transition-all flex items-center justify-between group cursor-pointer"
+                        className="w-full px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-amber-600 dark:hover:text-amber-400 hover:bg-amber-50/80 dark:hover:bg-slate-800/80 transition-all flex items-center justify-between group cursor-pointer"
                       >
                         <div className="flex items-center gap-2.5">
                           <Gamepad2 className="w-4 h-4 text-amber-500" />
                           <span>{lang === 'km' ? 'សង្វៀនហាត់សម 1v1 Arena' : 'Game & Quiz Arena'}</span>
                         </div>
-                        <span className="text-[10px] font-black text-amber-600 bg-amber-100 px-1.5 py-0.2 rounded-md">+500 XP</span>
+                        <span className="text-[10px] font-black text-amber-600 dark:text-amber-400 bg-amber-100 dark:bg-amber-950/60 px-1.5 py-0.2 rounded-md border border-amber-200/60 dark:border-amber-700/50">+500 XP</span>
                       </button>
 
                       <button
                         type="button"
                         onClick={() => { setActiveTab('chat'); setIsUserMenuOpen(false); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-                        className="w-full px-3 py-2 rounded-xl text-xs font-bold text-slate-700 hover:text-cyan-600 hover:bg-cyan-50/80 transition-all flex items-center justify-between group cursor-pointer"
+                        className="w-full px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-cyan-600 dark:hover:text-cyan-400 hover:bg-cyan-50/80 dark:hover:bg-slate-800/80 transition-all flex items-center justify-between group cursor-pointer"
                       >
                         <div className="flex items-center gap-2.5">
                           <MessageSquare className="w-4 h-4 text-cyan-500" />
                           <span>{lang === 'km' ? 'បន្ទប់ជជែកជាតិ Messenger' : 'National Student Chat'}</span>
                         </div>
-                        <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-cyan-600 group-hover:translate-x-1 transition-transform" />
+                        <ArrowRight className="w-3.5 h-3.5 text-slate-400 group-hover:text-cyan-600 dark:group-hover:text-cyan-400 group-hover:translate-x-1 transition-transform" />
                       </button>
 
                       {/* 🛡️ Only display Super Admin Portal link if the current user is an Admin or in an active Admin session */}
@@ -980,7 +980,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
                             setIsUserMenuOpen(false);
                             onOpenAdminLogin?.();
                           }}
-                          className="w-full px-3 py-2 rounded-xl text-xs font-bold text-amber-700 hover:bg-amber-50/80 transition-all flex items-center justify-between group cursor-pointer border border-amber-200/60"
+                          className="w-full px-3 py-2 rounded-xl text-xs font-bold text-amber-700 dark:text-amber-400 hover:bg-amber-50/80 dark:hover:bg-slate-800/80 transition-all flex items-center justify-between group cursor-pointer border border-amber-200/60 dark:border-amber-700/50"
                         >
                           <div className="flex items-center gap-2.5">
                             <ShieldCheck className="w-4 h-4 text-amber-600" />
@@ -1017,9 +1017,9 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
                         setIsUserMenuOpen(false);
                         logout();
                       }}
-                      className="w-full py-2.5 px-3 rounded-xl bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-200 hover:border-rose-600 text-xs font-black transition-all shadow-xs hover:shadow-md flex items-center justify-center gap-2 cursor-pointer group"
+                      className="w-full py-2.5 px-3 rounded-xl bg-rose-50 dark:bg-rose-950/40 hover:bg-rose-600 dark:hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white dark:hover:text-white border border-rose-200 dark:border-rose-800/60 hover:border-rose-600 text-xs font-black transition-all shadow-xs hover:shadow-md flex items-center justify-center gap-2 cursor-pointer group"
                     >
-                      <LogOut className="w-4 h-4 text-rose-600 group-hover:text-white transition-colors" />
+                      <LogOut className="w-4 h-4 text-rose-600 dark:text-rose-400 group-hover:text-white transition-colors" />
                       <span>{lang === 'km' ? 'ចាកចេញពីគណនី (Sign Out / Logout)' : 'Sign Out / Logout'}</span>
                     </button>
 
