@@ -286,12 +286,12 @@ export default function BacIIHubView() {
                   className={`px-3 py-1.5 rounded-xl transition-all flex-shrink-0 flex items-center gap-1.5 cursor-pointer font-bold text-[11px] sm:text-xs active:scale-95 ${
                     isSelected
                       ? 'bg-[#005baa] text-white shadow-xs'
-                      : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/60'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700'
                   }`}
                 >
                   <Calendar className="w-3.5 h-3.5" />
                   <span>{yr === 'all' ? (lang === 'km' ? 'គ្រប់ឆ្នាំទាំងអស់' : 'All Years') : (lang === 'km' ? `ឆ្នាំ ${yr}` : `Year ${yr}`)}</span>
-                  <span className={`text-[9.5px] px-1.5 py-0.2 rounded-full ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600'}`}>
+                  <span className={`text-[9.5px] px-1.5 py-0.2 rounded-full ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'}`}>
                     {count}
                   </span>
                 </button>
@@ -301,9 +301,9 @@ export default function BacIIHubView() {
         </div>
 
         {/* Dynamic Subject Filter Pills - Synced to Selected Stream! */}
-        <div className="space-y-1.5 pt-2 border-t border-slate-100">
+        <div className="space-y-1.5 pt-2 border-t border-slate-100 dark:border-slate-800">
           <div className="flex items-center justify-between">
-            <label className="text-[10.5px] sm:text-[11px] font-bold text-slate-500 block">
+            <label className="text-[10.5px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400 block">
               {lang === 'km' ? 'ជ្រើសរើសមុខវិជ្ជា (Filter by Subject):' : 'Filter by Subject:'}
             </label>
             <span className="text-[10px] sm:text-[10.5px] text-slate-400 font-medium">
@@ -325,12 +325,12 @@ export default function BacIIHubView() {
                   onClick={() => setSelectedSubjectKey(sub.key)}
                   className={`px-3 py-1.5 rounded-xl transition-all flex-shrink-0 flex items-center gap-1.5 cursor-pointer font-bold text-[11px] sm:text-xs active:scale-95 ${
                     isSelected
-                      ? 'bg-[#003366] text-white shadow-xs'
-                      : 'bg-slate-100 text-slate-600 hover:bg-slate-200 border border-slate-200/60'
+                      ? 'bg-[#003366] dark:bg-cyan-600 text-white shadow-xs'
+                      : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700'
                   }`}
                 >
                   <span>{lang === 'km' ? sub.nameKm : sub.nameEn}</span>
-                  <span className={`text-[9.5px] px-1.5 py-0.2 rounded-full ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-200 text-slate-600'}`}>
+                  <span className={`text-[9.5px] px-1.5 py-0.2 rounded-full ${isSelected ? 'bg-white/20 text-white' : 'bg-slate-200 dark:bg-slate-700 text-slate-600 dark:text-slate-300'}`}>
                     {subCount}
                   </span>
                 </button>
@@ -344,18 +344,18 @@ export default function BacIIHubView() {
       {/* Quick Mock Quiz Launchers */}
       <div className="space-y-3 sm:space-y-4">
         <div className="flex items-center justify-between">
-          <h3 className="text-xs sm:text-base font-black text-[#003366] flex items-center gap-1.5 sm:gap-2">
-            <Award className="w-4 h-4 sm:w-5 sm:h-5 text-[#005baa]" />
+          <h3 className="text-xs sm:text-base font-black text-[#003366] dark:text-white flex items-center gap-1.5 sm:gap-2">
+            <Award className="w-4 h-4 sm:w-5 sm:h-5 text-[#005baa] dark:text-cyan-400" />
             <span>{lang === 'km' ? 'វិញ្ញាសាតេស្តសាកល្បងកំណត់ម៉ោង MoTDAR (Timed Mock Tests)' : 'Timed National Mock Tests'}</span>
           </h3>
-          <span className="text-[10px] sm:text-[11px] font-bold text-slate-500">
+          <span className="text-[10px] sm:text-[11px] font-bold text-slate-500 dark:text-slate-400">
             {filteredQuizzes.length} {lang === 'km' ? 'តេស្ត' : 'Tests'}
           </span>
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-3.5">
           {filteredQuizzes.map((quiz) => (
-            <div key={quiz.id} className="p-3.5 sm:p-5 bg-white border border-slate-200 flex flex-col justify-between gap-3 sm:gap-3.5 shadow-xs hover:border-[#005baa] hover:shadow-lg transition-all rounded-2xl sm:rounded-3xl">
+            <div key={quiz.id} className="p-3.5 sm:p-5 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 flex flex-col justify-between gap-3 sm:gap-3.5 shadow-xs hover:border-[#005baa] dark:hover:border-cyan-500 hover:shadow-lg transition-all rounded-2xl sm:rounded-3xl">
               <div className="space-y-1.5 sm:space-y-2">
                 <div className="flex items-center justify-between gap-1 sm:gap-2 flex-wrap">
                   <div className="flex items-center gap-1.5">
@@ -366,16 +366,16 @@ export default function BacIIHubView() {
                       {quiz.subject}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] text-slate-500 font-medium">
+                  <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium">
                     <span className="flex items-center gap-0.5">
-                      <Clock className="w-3 h-3 text-[#005baa]" />
+                      <Clock className="w-3 h-3 text-[#005baa] dark:text-cyan-400" />
                       <span>{Math.round(quiz.timeLimitSeconds / 60)} {lang === 'km' ? 'នាទី' : 'mins'}</span>
                     </span>
                     <span>•</span>
                     <span>{quiz.questions?.length || 5} {lang === 'km' ? 'សំណួរ' : 'Q'}</span>
                   </div>
                 </div>
-                <h4 className="font-black text-xs sm:text-sm text-[#003366] leading-snug">
+                <h4 className="font-black text-xs sm:text-sm text-[#003366] dark:text-white leading-snug">
                   {lang === 'km' ? quiz.titleKm : quiz.titleEn}
                 </h4>
               </div>

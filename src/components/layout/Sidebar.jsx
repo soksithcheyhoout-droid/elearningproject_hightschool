@@ -120,8 +120,8 @@ export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor }) {
               onClick={() => setActiveTab(item.id)}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-2xl text-xs sm:text-[12.5px] font-bold transition-all duration-200 group cursor-pointer relative ${
                 isActive
-                  ? 'bg-gradient-to-r from-blue-500/12 via-indigo-500/8 to-transparent text-[#005baa] border border-blue-300/60 shadow-xs'
-                  : 'text-slate-700 hover:text-[#005baa] hover:bg-slate-50/80 border border-transparent'
+                  ? 'bg-gradient-to-r from-blue-500/15 via-indigo-500/10 to-transparent dark:from-blue-600/30 dark:via-indigo-600/20 dark:to-transparent text-[#005baa] dark:text-cyan-300 border border-blue-300/60 dark:border-cyan-500/40 shadow-xs'
+                  : 'text-slate-700 dark:text-slate-300 hover:text-[#005baa] dark:hover:text-white hover:bg-slate-50/80 dark:hover:bg-slate-800/70 border border-transparent'
               }`}
             >
               {/* Left Active Glow Indicator */}
@@ -133,17 +133,17 @@ export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor }) {
                 <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 ${
                   isActive 
                     ? `bg-gradient-to-br ${item.iconColor} text-white shadow-md shadow-blue-500/25` 
-                    : 'bg-slate-100 text-slate-500 group-hover:bg-blue-50 group-hover:text-[#005baa] group-hover:scale-105'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 group-hover:bg-blue-50 dark:group-hover:bg-slate-700 group-hover:text-[#005baa] dark:group-hover:text-cyan-300 group-hover:scale-105'
                 }`}>
                   <Icon className="w-4 h-4" />
                 </div>
-                <span className={`truncate text-xs ${isActive ? 'text-[#003366] font-extrabold' : 'text-slate-700 font-semibold group-hover:text-[#005baa]'}`}>
+                <span className={`truncate text-xs ${isActive ? 'text-[#003366] dark:text-white font-extrabold' : 'text-slate-700 dark:text-slate-300 font-semibold group-hover:text-[#005baa] dark:group-hover:text-white'}`}>
                   {item.label}
                 </span>
               </div>
               
               {item.badge && (
-                <span className={`text-[9.5px] font-black px-2 py-0.5 rounded-full border flex-shrink-0 shadow-2xs whitespace-nowrap transition-transform duration-200 group-hover:scale-105 ${item.badgeClass || 'bg-slate-100 text-slate-600 border-slate-200'}`}>
+                <span className={`text-[9.5px] font-black px-2 py-0.5 rounded-full border flex-shrink-0 shadow-2xs whitespace-nowrap transition-transform duration-200 group-hover:scale-105 ${item.badgeClass || 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}>
                   {item.badge}
                 </span>
               )}

@@ -204,20 +204,20 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
       )}
 
       {/* 🧭 UNIFIED FILTER BAR (Stream Switcher + Grade 1-12 Selector Ribbon) */}
-      <div className="bg-white p-2.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200 shadow-sm space-y-2.5 sm:space-y-3 overflow-hidden">
+      <div className="bg-white dark:bg-[#0f172a] p-2.5 sm:p-5 rounded-2xl sm:rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-2.5 sm:space-y-3 overflow-hidden">
         
         {/* Top Row: Stream Switcher & Status */}
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-2.5 sm:gap-4">
           <div className="min-w-0">
             <div className="flex items-center gap-1.5 sm:gap-2 mb-0.5 flex-wrap">
-              <span className="bg-[#002b5b] text-amber-300 text-[8.5px] sm:text-[10px] font-black uppercase tracking-wider px-2 sm:px-2.5 py-0.5 rounded-full shadow-2xs font-mono">
+              <span className="bg-[#002b5b] dark:bg-slate-900 border dark:border-slate-700 text-amber-300 text-[8.5px] sm:text-[10px] font-black uppercase tracking-wider px-2 sm:px-2.5 py-0.5 rounded-full shadow-2xs font-mono">
                 MoTDAR STANDARDS
               </span>
-              <span className="text-[10px] sm:text-xs text-slate-500 font-bold truncate">
+              <span className="text-[10px] sm:text-xs text-slate-500 dark:text-slate-400 font-bold truncate">
                 • {filteredSubjects.length} {lang === 'km' ? 'មុខវិជ្ជាសរុប' : 'Subjects'} ({lang === 'km' ? 'វិទ្យាសាស្ត្រ' : 'Science'}: {scienceSubjects.length}, {lang === 'km' ? 'សង្គម' : 'Social'}: {socialSubjects.length})
               </span>
             </div>
-            <h2 className="text-xs sm:text-lg font-black text-[#002b5b] tracking-tight">
+            <h2 className="text-xs sm:text-lg font-black text-[#002b5b] dark:text-white tracking-tight">
               {lang === 'km' ? 'តារាងមុខវិជ្ជា និងមេរៀនតាមកម្រិតថ្នាក់' : 'Select Grade & Stream'}
             </h2>
           </div>
@@ -229,7 +229,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
               className={`py-1.5 px-3 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl transition-all font-black flex items-center justify-center gap-1 text-[10.5px] sm:text-xs cursor-pointer active:scale-95 shrink-0 ${
                 filterStream === 'all'
                   ? 'bg-gradient-to-r from-[#005baa] to-[#003875] text-white shadow-md'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
               }`}
             >
               <Layers className="w-3.5 h-3.5 shrink-0" />
@@ -241,7 +241,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
               className={`py-1.5 px-3 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl transition-all font-black flex items-center justify-center gap-1 text-[10.5px] sm:text-xs cursor-pointer active:scale-95 shrink-0 ${
                 filterStream === 'science'
                   ? 'bg-gradient-to-r from-[#005baa] to-[#003875] text-white shadow-md'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
               }`}
             >
               <Atom className="w-3.5 h-3.5 text-sky-500 shrink-0" />
@@ -253,7 +253,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
               className={`py-1.5 px-3 sm:px-4 sm:py-2 rounded-xl sm:rounded-2xl transition-all font-black flex items-center justify-center gap-1 text-[10.5px] sm:text-xs cursor-pointer active:scale-95 shrink-0 ${
                 filterStream === 'social'
                   ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white shadow-md'
-                  : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200 dark:border-slate-700'
               }`}
             >
               <BookOpen className="w-3.5 h-3.5 text-amber-600 shrink-0" />
@@ -263,9 +263,9 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
         </div>
 
         {/* Bottom Row: Comprehensive Grade 1-12 Selector Ribbon */}
-        <div className="pt-2 sm:pt-2.5 border-t border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-2.5">
+        <div className="pt-2 sm:pt-2.5 border-t border-slate-100 dark:border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-2 sm:gap-2.5">
           <div className="flex items-center gap-1 sm:gap-2 overflow-x-auto pb-1 sm:pb-0 scrollbar-none flex-nowrap text-xs w-full sm:w-auto -mx-0.5 px-0.5">
-            <span className="text-[11px] font-bold text-slate-500 whitespace-nowrap mr-1 hidden lg:inline">
+            <span className="text-[11px] font-bold text-slate-500 dark:text-slate-400 whitespace-nowrap mr-1 hidden lg:inline">
               កម្រិតថ្នាក់ (Grade):
             </span>
 
@@ -276,7 +276,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
               className={`px-2.5 sm:px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                 filterGrade === 'all'
                   ? 'bg-indigo-600 text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
               ទាំងអស់ (Grades 1–12)
@@ -288,7 +288,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
               className={`px-2.5 sm:px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                 filterGrade === 'primary' || filterGrade === '1-6'
                   ? 'bg-sky-600 text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
               🎒 បឋម (ទី១-៦)
@@ -300,7 +300,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
               className={`px-2.5 sm:px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                 filterGrade === 'junior' || filterGrade === '7-9'
                   ? 'bg-violet-600 text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
               🏛️ អនុវិទ្យាល័យ (ទី៧-៩)
@@ -312,7 +312,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
               className={`px-2.5 sm:px-3 py-1.5 rounded-xl text-[10px] sm:text-xs font-bold transition-all cursor-pointer whitespace-nowrap shrink-0 ${
                 filterGrade === 'high' || filterGrade === '10-12'
                   ? 'bg-amber-600 text-white shadow-xs'
-                  : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
               }`}
             >
               🎓 វិទ្យាល័យ (ទី១០-១២)
@@ -329,7 +329,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
                 className={`w-7 h-7 sm:w-8 sm:h-8 rounded-lg text-[11px] font-bold transition-all cursor-pointer flex items-center justify-center shrink-0 ${
                   filterGrade === g
                     ? 'bg-indigo-600 text-white shadow-xs scale-105 ring-2 ring-indigo-400/40'
-                    : 'bg-slate-100 text-slate-600 hover:bg-slate-200'
+                    : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 hover:bg-slate-200 dark:hover:bg-slate-700'
                 }`}
                 title={`ថ្នាក់ទី ${g}`}
               >
@@ -344,9 +344,9 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
       {/* 1. Science Stream Section */}
       {(filterStream === 'all' || filterStream === 'science') && scienceSubjects.length > 0 && (
         <div className="space-y-3 sm:space-y-4">
-          <div className="flex items-center justify-between bg-white p-3 sm:p-4 rounded-2xl border border-slate-200 shadow-xs">
+          <div className="flex items-center justify-between bg-white dark:bg-[#0f172a] p-3 sm:p-4 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
             <div className="flex items-center gap-2 min-w-0 pr-2">
-              <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-200 text-[#005baa] flex items-center justify-center font-bold flex-shrink-0 shadow-2xs">
+              <div className="w-8 h-8 rounded-xl bg-blue-50 dark:bg-slate-900 border border-blue-200 dark:border-slate-800 text-[#005baa] dark:text-cyan-400 flex items-center justify-center font-bold flex-shrink-0 shadow-2xs">
                 <Atom className="w-4 h-4" />
               </div>
               <div className="min-w-0">

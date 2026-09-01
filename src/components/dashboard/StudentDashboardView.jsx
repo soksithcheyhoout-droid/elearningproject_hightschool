@@ -574,17 +574,17 @@ export default function StudentDashboardView({ setActiveTab }) {
                 setEditSchool(student.school);
                 setIsEditingProfile(true);
               }}
-              className="px-3.5 py-2 rounded-2xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-bold transition-all shadow-2xs hover:border-[#005baa] flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-2 rounded-2xl bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all shadow-2xs hover:border-[#005baa] flex items-center gap-1.5 cursor-pointer"
             >
-              <Edit3 className="w-3.5 h-3.5 text-slate-500" />
+              <Edit3 className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
               <span>{lang === 'km' ? 'កែប្រែព័ត៌មាន' : 'Edit Info'}</span>
             </button>
 
             <button
               onClick={() => setShowIdCardModal(true)}
-              className="px-3.5 py-2 rounded-2xl bg-white hover:bg-slate-50 border border-slate-300 text-slate-700 text-xs font-bold transition-all shadow-2xs hover:border-sky-500 flex items-center gap-1.5 cursor-pointer"
+              className="px-3.5 py-2 rounded-2xl bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 text-slate-700 dark:text-slate-200 text-xs font-bold transition-all shadow-2xs hover:border-sky-500 flex items-center gap-1.5 cursor-pointer"
             >
-              <QrCode className="w-3.5 h-3.5 text-slate-500" />
+              <QrCode className="w-3.5 h-3.5 text-slate-500 dark:text-slate-400" />
               <span>{lang === 'km' ? 'ប័ណ្ណសិស្ស (Digital ID)' : 'Student ID Card'}</span>
             </button>
 
@@ -592,10 +592,10 @@ export default function StudentDashboardView({ setActiveTab }) {
             <button
               type="button"
               onClick={logout}
-              className="px-4 py-2 rounded-2xl bg-rose-50 hover:bg-rose-600 text-rose-600 hover:text-white border border-rose-200 hover:border-rose-600 text-xs font-black transition-all shadow-2xs hover:shadow-md flex items-center gap-1.5 cursor-pointer group active:scale-95"
+              className="px-4 py-2 rounded-2xl bg-rose-50 hover:bg-rose-600 dark:bg-rose-950/40 dark:hover:bg-rose-600 text-rose-600 dark:text-rose-400 hover:text-white dark:hover:text-white border border-rose-200 dark:border-rose-800/60 hover:border-rose-600 text-xs font-black transition-all shadow-2xs hover:shadow-md flex items-center gap-1.5 cursor-pointer group active:scale-95"
               title={lang === 'km' ? 'ចាកចេញពីគណនី (Sign Out / Logout)' : 'Sign Out'}
             >
-              <LogOut className="w-3.5 h-3.5 text-rose-600 group-hover:text-white transition-colors" />
+              <LogOut className="w-3.5 h-3.5 text-rose-600 dark:text-rose-400 group-hover:text-white transition-colors" />
               <span>{lang === 'km' ? 'ចាកចេញ' : 'Sign Out'}</span>
             </button>
           </div>

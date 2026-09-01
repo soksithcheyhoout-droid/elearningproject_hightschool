@@ -333,14 +333,14 @@ export default function ClassroomView({ subject: initialSubject, onBack, onOpenA
           </div>
 
           {/* Lesson Header & Mark Completed */}
-          <div className="bg-white p-5 sm:p-6 rounded-3xl border border-slate-200 space-y-4 shadow-sm">
+          <div className="bg-white dark:bg-[#0f172a] p-5 sm:p-6 rounded-3xl border border-slate-200 dark:border-slate-800 space-y-4 shadow-sm">
             <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <h2 className="text-base sm:text-xl font-black text-[#003366] leading-snug">
+                <h2 className="text-base sm:text-xl font-black text-[#003366] dark:text-white leading-snug">
                   {activeLesson ? (lang === 'km' ? activeLesson.titleKm : activeLesson.titleEn) : ''}
                 </h2>
-                <p className="text-xs text-slate-600 mt-1 font-medium">
-                  {lang === 'km' ? 'បង្រៀនដោយ៖' : 'Taught by:'} <span className="text-[#005baa] font-bold">{currentSubject.teacher || 'សាស្ត្រាចារ្យជាតិ'}</span> ({currentSubject.teacherRole || 'MoTDAR'})
+                <p className="text-xs text-slate-600 dark:text-slate-300 mt-1 font-medium">
+                  {lang === 'km' ? 'បង្រៀនដោយ៖' : 'Taught by:'} <span className="text-[#005baa] dark:text-cyan-400 font-bold">{currentSubject.teacher || 'សាស្ត្រាចារ្យជាតិ'}</span> ({currentSubject.teacherRole || 'MoTDAR'})
                 </p>
               </div>
 
@@ -348,34 +348,34 @@ export default function ClassroomView({ subject: initialSubject, onBack, onOpenA
                 onClick={handleComplete}
                 className={`px-4 py-2.5 rounded-2xl text-xs font-black transition-all flex items-center gap-2 cursor-pointer ${
                   isCompleted
-                    ? 'bg-emerald-50 text-emerald-800 border border-emerald-300 shadow-2xs'
+                    ? 'bg-emerald-50 dark:bg-emerald-950/60 text-emerald-800 dark:text-emerald-300 border border-emerald-300 dark:border-emerald-700/60 shadow-2xs'
                     : 'bg-gradient-to-r from-amber-400 to-yellow-400 hover:from-amber-300 hover:to-yellow-300 text-slate-950 shadow-md shadow-amber-400/20 active:scale-95'
                 }`}
               >
-                <CheckCircle2 className="w-4 h-4 text-emerald-700" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-700 dark:text-emerald-400" />
                 <span>{isCompleted ? (lang === 'km' ? 'បានបញ្ចប់មេរៀននេះ (+50 XP)' : 'Completed (+50 XP)') : (lang === 'km' ? 'កត់ចំណាំថាបានរៀន (+50 XP)' : 'Mark as Completed (+50 XP)')}</span>
               </button>
             </div>
 
             {/* FULL CLEAN LESSON SUMMARY NOTES (No raw asterisks, clean academic formatting) */}
-            <div className="border-t border-slate-100 pt-4 space-y-4">
-              <div className="flex items-center gap-2 text-xs font-black text-[#003366]">
-                <FileText className="w-4 h-4 text-[#005baa]" />
+            <div className="border-t border-slate-100 dark:border-slate-800 pt-4 space-y-4">
+              <div className="flex items-center gap-2 text-xs font-black text-[#003366] dark:text-cyan-300">
+                <FileText className="w-4 h-4 text-[#005baa] dark:text-cyan-400" />
                 <span>{lang === 'km' ? 'ខ្លឹមសារសង្ខេបមេរៀន និងរូបមន្តគន្លឹះ (Official Lesson Summary & Notes)' : 'Official Lesson Summary & Notes'}</span>
               </div>
 
-              <div className="bg-slate-50 p-5 rounded-2xl border border-slate-200 text-xs sm:text-sm text-slate-800 leading-relaxed space-y-3 shadow-inner font-medium">
+              <div className="bg-slate-50 dark:bg-slate-900/90 p-5 rounded-2xl border border-slate-200 dark:border-slate-800 text-xs sm:text-sm text-slate-800 dark:text-slate-200 leading-relaxed space-y-3 shadow-inner font-medium">
                 <AcademicTextRenderer content={activeLesson?.notes} baseTextSize="text-xs sm:text-sm" />
 
                 {activeLesson?.keyFormulas && activeLesson.keyFormulas.length > 0 && (
-                  <div className="mt-4 pt-3 border-t border-slate-200">
-                    <p className="font-black text-[#003366] text-xs mb-2 flex items-center gap-1.5">
+                  <div className="mt-4 pt-3 border-t border-slate-200 dark:border-slate-800">
+                    <p className="font-black text-[#003366] dark:text-amber-300 text-xs mb-2 flex items-center gap-1.5">
                       <Sparkles className="w-3.5 h-3.5 text-amber-500" />
                       <span>{lang === 'km' ? 'រូបមន្តគន្លឹះត្រូវចាំ (Essential Formulas):' : 'Key Formulas to Remember:'}</span>
                     </p>
                     <div className="space-y-2">
                       {activeLesson.keyFormulas.map((formula, idx) => (
-                        <div key={idx} className="bg-slate-900 text-cyan-300 p-2.5 sm:p-3 rounded-xl border border-slate-700 font-mono text-xs shadow-2xs font-bold overflow-x-auto [scrollbar-width:none]">
+                        <div key={idx} className="bg-slate-900 dark:bg-slate-950 text-cyan-300 p-2.5 sm:p-3 rounded-xl border border-slate-700 dark:border-slate-800 font-mono text-xs shadow-2xs font-bold overflow-x-auto [scrollbar-width:none]">
                           <code>{formula}</code>
                         </div>
                       ))}
@@ -391,15 +391,15 @@ export default function ClassroomView({ subject: initialSubject, onBack, onOpenA
 
         {/* Right 1 Col: Course Playlist */}
         <div className="space-y-4">
-          <div className="bg-white p-5 rounded-3xl border border-slate-200 shadow-sm space-y-4">
-            <div className="flex items-center justify-between border-b border-slate-100 pb-3">
+          <div className="bg-white dark:bg-[#0f172a] p-5 rounded-3xl border border-slate-200 dark:border-slate-800 shadow-sm space-y-4">
+            <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-800 pb-3">
               <div className="flex items-center gap-2">
-                <BookOpen className="w-4 h-4 text-[#005baa]" />
-                <h3 className="text-sm font-black text-[#003366]">
+                <BookOpen className="w-4 h-4 text-[#005baa] dark:text-cyan-400" />
+                <h3 className="text-sm font-black text-[#003366] dark:text-white">
                   {lang === 'km' ? 'មាតិកាមេរៀនក្នុងមុខវិជ្ជា' : 'Course Curriculum'}
                 </h3>
               </div>
-              <span className="text-xs font-bold text-slate-500">
+              <span className="text-xs font-bold text-slate-500 dark:text-slate-400">
                 {currentSubject.totalLessons || 20} {lang === 'km' ? 'មេរៀន' : 'lessons'}
               </span>
             </div>
@@ -407,7 +407,7 @@ export default function ClassroomView({ subject: initialSubject, onBack, onOpenA
             <div className="space-y-4 max-h-[600px] overflow-y-auto pr-1">
               {currentSubject.chapters && currentSubject.chapters.map((chapter) => (
                 <div key={chapter.id} className="space-y-2">
-                  <h4 className="text-xs font-black text-slate-800 px-2 py-1 bg-slate-50 rounded-lg">
+                  <h4 className="text-xs font-black text-slate-800 dark:text-slate-200 px-2 py-1 bg-slate-50 dark:bg-slate-800/80 rounded-lg">
                     {lang === 'km' ? chapter.titleKm : chapter.titleEn}
                   </h4>
 
@@ -425,8 +425,8 @@ export default function ClassroomView({ subject: initialSubject, onBack, onOpenA
                           }}
                           className={`p-3 rounded-2xl border transition-all flex items-center justify-between gap-3 cursor-pointer ${
                             isCurrent
-                              ? 'bg-blue-50/80 border-[#005baa] text-[#003366] shadow-xs'
-                              : 'bg-white hover:bg-slate-50 border-slate-200 text-slate-700'
+                              ? 'bg-blue-50/80 dark:bg-cyan-500/20 border-[#005baa] dark:border-cyan-400 text-[#003366] dark:text-cyan-200 shadow-xs'
+                              : 'bg-white dark:bg-slate-900/80 hover:bg-slate-50 dark:hover:bg-slate-800 border-slate-200 dark:border-slate-800 text-slate-700 dark:text-slate-300'
                           }`}
                         >
                           <div className="flex items-center gap-2.5 flex-1 min-w-0">
@@ -435,7 +435,7 @@ export default function ClassroomView({ subject: initialSubject, onBack, onOpenA
                                 ? 'bg-emerald-100 text-emerald-700' 
                                 : isCurrent 
                                   ? 'bg-[#005baa] text-white' 
-                                  : 'bg-slate-100 text-slate-600'
+                                  : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-400'
                             }`}>
                               {done ? (
                                 <CheckCircle2 className="w-3.5 h-3.5" />

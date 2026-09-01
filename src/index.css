@@ -159,6 +159,50 @@ html[data-theme="dark"] .border-emerald-200 {
    TARGETED DARK MODE FIXES FOR UI COMPONENTS (100% High Contrast)
    ========================================================================== */
 
+/* Universal Dark Mode Headings, Numbers, & Brand Titles */
+html.dark .text-\[\#002b5b\],
+html.dark .text-\[\#003366\],
+html.dark .text-\[\#002d62\],
+html.dark .text-\[\#003876\],
+html.dark .text-\[\#00478f\],
+html.dark .text-slate-900,
+html.dark .text-slate-800,
+html[data-theme="dark"] .text-\[\#002b5b\],
+html[data-theme="dark"] .text-\[\#003366\],
+html[data-theme="dark"] .text-\[\#002d62\],
+html[data-theme="dark"] .text-\[\#003876\],
+html[data-theme="dark"] .text-\[\#00478f\],
+html[data-theme="dark"] .text-slate-900,
+html[data-theme="dark"] .text-slate-800 {
+  color: #f8fafc !important;
+}
+
+/* Universal Brand Blue Accent Links & Icons -> Electric Sky Cyan */
+html.dark .text-\[\#005baa\],
+html.dark .text-blue-700,
+html.dark .text-blue-800,
+html[data-theme="dark"] .text-\[\#005baa\],
+html[data-theme="dark"] .text-blue-700,
+html[data-theme="dark"] .text-blue-800 {
+  color: #38bdf8 !important;
+}
+
+/* Universal Body Text -> Highly Legible Light Slate */
+html.dark .text-slate-700,
+html.dark .text-slate-600,
+html[data-theme="dark"] .text-slate-700,
+html[data-theme="dark"] .text-slate-600 {
+  color: #cbd5e1 !important;
+}
+
+/* Universal Captions & Labels -> Readable Silvery Slate */
+html.dark .text-slate-500,
+html.dark .text-slate-400,
+html[data-theme="dark"] .text-slate-500,
+html[data-theme="dark"] .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
 /* 1. Navbar Active Tab Pill ([ក្រសួង ▾]) */
 html.dark .bg-\[\#e0f0ff\],
 html[data-theme="dark"] .bg-\[\#e0f0ff\] {
@@ -207,7 +251,129 @@ html[data-theme="dark"] header [title*="គណនីសិស្ស"] span {
   color: #f8fafc !important;
 }
 
-/* 5. Subject Cards (SubjectGrid.jsx) in Dark Mode */
+/* 5. Sidebar Navigation in Dark Mode */
+html.dark aside,
+html[data-theme="dark"] aside {
+  background-color: rgba(10, 15, 29, 0.98) !important;
+  border-right-color: #1e293b !important;
+}
+html.dark aside nav button,
+html[data-theme="dark"] aside nav button {
+  color: #cbd5e1 !important;
+}
+html.dark aside nav button:hover,
+html[data-theme="dark"] aside nav button:hover {
+  color: #ffffff !important;
+  background-color: rgba(30, 41, 59, 0.6) !important;
+}
+html.dark aside nav button .bg-slate-100,
+html[data-theme="dark"] aside nav button .bg-slate-100 {
+  background-color: #1e293b !important;
+  color: #94a3b8 !important;
+}
+html.dark aside nav button .bg-white,
+html[data-theme="dark"] aside nav button .bg-white {
+  background: linear-gradient(135deg, rgba(14, 165, 233, 0.25) 0%, rgba(59, 130, 246, 0.25) 100%) !important;
+  border-color: rgba(56, 189, 248, 0.45) !important;
+}
+html.dark aside nav button .bg-white span,
+html[data-theme="dark"] aside nav button .bg-white span {
+  color: #ffffff !important;
+}
+
+/* 6. Hextech Student Metric Cards (Dashboard & Profile) */
+html.dark .my-3 .bg-white,
+html[data-theme="dark"] .my-3 .bg-white {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+}
+html.dark .my-3 .bg-white:hover,
+html[data-theme="dark"] .my-3 .bg-white:hover {
+  border-color: #0284c7 !important;
+}
+html.dark .my-3 .bg-white span.text-slate-600,
+html[data-theme="dark"] .my-3 .bg-white span.text-slate-600 {
+  color: #cbd5e1 !important;
+}
+html.dark .my-3 .bg-white span.text-slate-900,
+html.dark .my-3 .bg-white span.text-\[\#002b5b\],
+html[data-theme="dark"] .my-3 .bg-white span.text-slate-900,
+html[data-theme="dark"] .my-3 .bg-white span.text-\[\#002b5b\] {
+  color: #f8fafc !important;
+}
+html.dark .my-3 .bg-white .bg-slate-100,
+html[data-theme="dark"] .my-3 .bg-white .bg-slate-100 {
+  background-color: #1e293b !important;
+}
+
+/* 7. Live Masterclass & Daily Quiz in Dark Mode */
+html.dark .grid-cols-1.lg\:grid-cols-3 .bg-white\/95,
+html[data-theme="dark"] .grid-cols-1.lg\:grid-cols-3 .bg-white\/95 {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+}
+html.dark .grid-cols-1.lg\:grid-cols-3 .bg-slate-50,
+html[data-theme="dark"] .grid-cols-1.lg\:grid-cols-3 .bg-slate-50 {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #cbd5e1 !important;
+}
+html.dark .grid-cols-1.lg\:grid-cols-3 .bg-slate-50 span,
+html[data-theme="dark"] .grid-cols-1.lg\:grid-cols-3 .bg-slate-50 span {
+  color: #cbd5e1 !important;
+}
+html.dark .grid-cols-1.lg\:grid-cols-3 button.bg-slate-50,
+html[data-theme="dark"] .grid-cols-1.lg\:grid-cols-3 button.bg-slate-50 {
+  background-color: #141f36 !important;
+  border-color: #334155 !important;
+  color: #f1f5f9 !important;
+}
+html.dark .grid-cols-1.lg\:grid-cols-3 button.bg-slate-50:hover,
+html[data-theme="dark"] .grid-cols-1.lg\:grid-cols-3 button.bg-slate-50:hover {
+  border-color: #f59e0b !important;
+  background-color: rgba(245, 158, 11, 0.15) !important;
+  color: #fbbf24 !important;
+}
+
+/* 8. Classroom View Notes & Summary in Dark Mode */
+html.dark .bg-slate-50.p-5,
+html[data-theme="dark"] .bg-slate-50.p-5 {
+  background-color: #111827 !important;
+  border-color: #1e293b !important;
+  color: #cbd5e1 !important;
+}
+html.dark .bg-slate-50.p-5 p,
+html[data-theme="dark"] .bg-slate-50.p-5 p {
+  color: #cbd5e1 !important;
+}
+html.dark .bg-slate-50.p-5 span,
+html[data-theme="dark"] .bg-slate-50.p-5 span {
+  color: #f1f5f9 !important;
+}
+
+/* 9. Bac II Hub Mock Tests & Year Filters in Dark Mode */
+html.dark .bg-slate-100.text-slate-700,
+html.dark .bg-slate-100.text-slate-600,
+html[data-theme="dark"] .bg-slate-100.text-slate-700,
+html[data-theme="dark"] .bg-slate-100.text-slate-600 {
+  background-color: #1e293b !important;
+  color: #cbd5e1 !important;
+  border-color: #334155 !important;
+}
+html.dark .bg-slate-100.text-slate-700:hover,
+html.dark .bg-slate-100.text-slate-600:hover,
+html[data-theme="dark"] .bg-slate-100.text-slate-700:hover,
+html[data-theme="dark"] .bg-slate-100.text-slate-600:hover {
+  background-color: #334155 !important;
+  color: #ffffff !important;
+}
+html.dark .bg-slate-200.text-slate-600,
+html[data-theme="dark"] .bg-slate-200.text-slate-600 {
+  background-color: #334155 !important;
+  color: #94a3b8 !important;
+}
+
+/* 10. Subject Cards (SubjectGrid.jsx) in Dark Mode */
 html.dark .group.bg-white,
 html[data-theme="dark"] .group.bg-white {
   background-color: #0f172a !important;
