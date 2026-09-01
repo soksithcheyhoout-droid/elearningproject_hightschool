@@ -20,20 +20,20 @@ export default function Footer({ setActiveTab }) {
   const { lang, t } = useLanguage();
 
   return (
-    <footer className="bg-white border-t-2 border-[#005baa] text-slate-600 font-kantumruy mt-6 pt-8 pb-6 shadow-sm">
+    <footer className="bg-white dark:bg-[#070b14] border-t-2 border-[#005baa] dark:border-cyan-500/40 text-slate-600 dark:text-slate-400 font-kantumruy mt-6 pt-8 pb-6 shadow-sm">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 space-y-8">
         
         {/* Support & Issue Reporting Banner */}
-        <div className="bg-gradient-to-r from-blue-50 via-indigo-50/60 to-cyan-50 p-4 sm:p-5 rounded-2xl border border-blue-200/80 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-2xs">
+        <div className="bg-gradient-to-r from-blue-50 via-indigo-50/60 to-cyan-50 dark:from-slate-900 dark:via-slate-850 dark:to-slate-900 p-4 sm:p-5 rounded-2xl border border-blue-200/80 dark:border-slate-800 flex flex-col md:flex-row items-start md:items-center justify-between gap-4 shadow-2xs">
           <div className="flex items-start gap-3">
             <div className="w-10 h-10 rounded-xl bg-[#005baa] text-white flex items-center justify-center flex-shrink-0 shadow-xs">
               <AlertCircle className="w-5 h-5" />
             </div>
             <div>
-              <h4 className="text-xs sm:text-sm font-extrabold text-[#003366]">
+              <h4 className="text-xs sm:text-sm font-extrabold text-[#003366] dark:text-white">
                 {lang === 'km' ? 'ជំនួយការបច្ចេកទេស និងរាយការណ៍បញ្ហា (Technical Support & Bug Report)' : 'Technical Support & Issue Reporting'}
               </h4>
-              <p className="text-xs text-slate-600 leading-relaxed mt-0.5">
+              <p className="text-xs text-slate-600 dark:text-slate-300 leading-relaxed mt-0.5">
                 {lang === 'km' 
                   ? 'បើមានបញ្ហាបច្ចេកទេស ឬកំហុសឆ្គងក្នុងប្រព័ន្ធ សូមទាក់ទងមកកាន់ Gmail ឬ Telegram @kaixite តាមរយៈលេខ 097 741 6126' 
                   : 'If you encounter any technical issues, bugs, or errors, please contact via Gmail or Telegram @kaixite at 097 741 6126'}
@@ -45,10 +45,10 @@ export default function Footer({ setActiveTab }) {
           <div className="flex items-center flex-wrap gap-2 w-full md:w-auto">
             <a
               href="mailto:soksithcheyhoout@gmail.com"
-              className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 text-[#005baa] font-bold text-xs border border-blue-200 flex items-center gap-1.5 shadow-2xs transition-all hover:scale-102"
+              className="px-3.5 py-1.5 rounded-xl bg-white hover:bg-slate-50 dark:bg-slate-800 dark:hover:bg-slate-700 text-[#005baa] dark:text-cyan-300 font-bold text-xs border border-blue-200 dark:border-slate-700 flex items-center gap-1.5 shadow-2xs transition-all hover:scale-102"
               title="Send Gmail"
             >
-              <Mail className="w-3.5 h-3.5 text-[#005baa]" />
+              <Mail className="w-3.5 h-3.5 text-[#005baa] dark:text-cyan-400" />
               <span>soksithcheyhoout@gmail.com</span>
             </a>
 

@@ -413,19 +413,19 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
                     onClick={() => { setActiveTab(menu.tab); setActiveDropdown(null); }}
                     className={`px-1.5 xl:px-2 py-1.5 rounded-xl text-xs xl:text-[12.5px] font-bold transition-all duration-150 flex items-center gap-0.5 cursor-pointer whitespace-nowrap flex-shrink-0 ${
                       isTabActive
-                        ? 'text-[#002d62] font-black bg-[#e0f0ff] shadow-2xs'
-                        : 'text-[#005baa] hover:text-[#002d62] hover:bg-[#eaf4ff]'
+                        ? 'text-[#002d62] font-black bg-[#e0f0ff] dark:bg-cyan-500/20 dark:text-cyan-300 dark:border dark:border-cyan-500/40 shadow-2xs'
+                        : 'text-[#005baa] dark:text-slate-300 hover:text-[#002d62] dark:hover:text-white hover:bg-[#eaf4ff] dark:hover:bg-slate-800'
                     }`}
                   >
                     <span>{label}</span>
                     <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                      isMenuOpen ? 'rotate-180 text-[#002d62]' : 'text-[#005baa]/70'
+                      isMenuOpen ? 'rotate-180 text-[#002d62] dark:text-cyan-300' : 'text-[#005baa]/70 dark:text-slate-400'
                     }`} />
                   </button>
 
                   {/* Dropdown Menu Box */}
                   {isMenuOpen && (
-                    <div className="absolute top-full left-0 mt-1.5 w-72 bg-white/95 backdrop-blur-2xl rounded-2xl border border-white/80 shadow-2xl p-2 z-50 animate-scale-up select-none ring-1 ring-black/5">
+                    <div className="absolute top-full left-0 mt-1.5 w-72 bg-white/95 dark:bg-slate-900/95 backdrop-blur-2xl rounded-2xl border border-white/80 dark:border-slate-800 shadow-2xl p-2 z-50 animate-scale-up select-none ring-1 ring-black/5">
                       {menu.items.map((sub, sIdx) => (
                         <button
                           key={sIdx}
@@ -435,10 +435,10 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
                             else if (sub.tab) setActiveTab(sub.tab);
                             setActiveDropdown(null);
                           }}
-                          className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-[#003876] hover:text-[#005baa] hover:bg-blue-50/90 transition-all flex items-center justify-between group cursor-pointer"
+                          className="w-full text-left px-3.5 py-2.5 rounded-xl text-xs font-bold text-[#003876] dark:text-slate-200 hover:text-[#005baa] dark:hover:text-cyan-300 hover:bg-blue-50/90 dark:hover:bg-slate-800 transition-all flex items-center justify-between group cursor-pointer"
                         >
                           <span className="truncate">{lang === 'km' ? sub.labelKm : sub.labelEn}</span>
-                          <ArrowRight className="w-3.5 h-3.5 text-[#005baa]/60 group-hover:text-[#005baa] group-hover:translate-x-1 transition-transform" />
+                          <ArrowRight className="w-3.5 h-3.5 text-[#005baa]/60 group-hover:text-[#005baa] dark:group-hover:text-cyan-300 group-hover:translate-x-1 transition-transform" />
                         </button>
                       ))}
                     </div>
@@ -453,11 +453,11 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
               onClick={() => setActiveTab('chat')}
               className={`px-2 xl:px-2.5 py-1.5 rounded-xl text-xs xl:text-[13px] font-bold transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap flex-shrink-0 ${
                 activeTab === 'chat' 
-                  ? 'text-[#002d62] font-black bg-[#e0f0ff] shadow-2xs' 
-                  : 'text-[#005baa] hover:text-[#002d62] hover:bg-[#eaf4ff]'
+                  ? 'text-[#002d62] font-black bg-[#e0f0ff] dark:bg-cyan-500/20 dark:text-cyan-300 dark:border dark:border-cyan-500/40 shadow-2xs' 
+                  : 'text-[#005baa] dark:text-slate-300 hover:text-[#002d62] dark:hover:text-white hover:bg-[#eaf4ff] dark:hover:bg-slate-800'
               }`}
             >
-              <MessageSquare className="w-3.5 h-3.5 text-[#005baa]" />
+              <MessageSquare className="w-3.5 h-3.5 text-[#005baa] dark:text-cyan-400" />
               <span>{lang === 'km' ? 'បន្ទប់ជជែក' : 'Messenger'}</span>
             </button>
           </nav>
@@ -839,8 +839,8 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
                   onClick={() => setIsUserMenuOpen(!isUserMenuOpen)}
                   className={`flex items-center gap-1.5 sm:gap-2 cursor-pointer group select-none flex-shrink-0 p-1 sm:px-2.5 sm:py-1 rounded-2xl border transition-all ${
                     isUserMenuOpen 
-                      ? 'bg-blue-100 border-[#005baa] shadow-sm ring-2 ring-[#005baa]/20' 
-                      : 'bg-gradient-to-r from-blue-50/90 to-indigo-50/80 hover:from-blue-100 hover:to-indigo-100 border-blue-200/80 hover:border-blue-300 shadow-2xs'
+                      ? 'bg-blue-100 dark:bg-slate-800 border-[#005baa] dark:border-cyan-500 shadow-sm ring-2 ring-[#005baa]/20 dark:ring-cyan-500/20' 
+                      : 'bg-gradient-to-r from-blue-50/90 to-indigo-50/80 hover:from-blue-100 hover:to-indigo-100 dark:from-slate-800/95 dark:to-slate-850/95 dark:hover:from-slate-750 dark:hover:to-slate-800 border-blue-200/80 dark:border-slate-700/80 hover:border-blue-300 dark:hover:border-slate-600 shadow-2xs'
                   }`}
                   title={`គណនីសិស្ស: ${student?.name || student?.username || 'riki.dev'}`}
                 >

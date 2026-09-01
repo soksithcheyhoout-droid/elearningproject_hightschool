@@ -744,14 +744,14 @@ export default function StudentDashboardView({ setActiveTab }) {
           <div className="lg:col-span-7 space-y-4">
             
             {/* Stream Switcher Tabs */}
-            <div className="flex items-center gap-2 p-1.5 bg-slate-100/90 rounded-2xl border border-slate-200">
+            <div className="flex items-center gap-2 p-1.5 bg-slate-100/90 dark:bg-slate-900/90 rounded-2xl border border-slate-200 dark:border-slate-800">
               <button
                 type="button"
                 onClick={() => setActiveStream('science')}
                 className={`flex-1 px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
                   activeStream === 'science'
                     ? 'bg-[#005baa] text-white shadow-sm'
-                    : 'bg-transparent text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                    : 'bg-transparent text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800'
                 }`}
               >
                 <Microscope className="w-4 h-4" />
@@ -764,7 +764,7 @@ export default function StudentDashboardView({ setActiveTab }) {
                 className={`flex-1 px-4 py-2 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer ${
                   activeStream === 'social'
                     ? 'bg-amber-600 text-white shadow-sm'
-                    : 'bg-transparent text-slate-600 hover:text-slate-900 hover:bg-white/60'
+                    : 'bg-transparent text-slate-600 dark:text-slate-300 hover:text-slate-900 dark:hover:text-white hover:bg-white/60 dark:hover:bg-slate-800'
                 }`}
               >
                 <BookOpen className="w-4 h-4" />
@@ -780,14 +780,14 @@ export default function StudentDashboardView({ setActiveTab }) {
                 return (
                   <div 
                     key={sub.key} 
-                    className="bg-white p-2.5 sm:p-4 rounded-xl border border-slate-200/90 hover:border-slate-300 shadow-2xs transition-all space-y-1.5 sm:space-y-2.5 flex flex-col justify-between"
+                    className="bg-white dark:bg-[#0f172a] p-2.5 sm:p-4 rounded-xl border border-slate-200/90 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 shadow-2xs transition-all space-y-1.5 sm:space-y-2.5 flex flex-col justify-between"
                   >
                     <div>
                       <div className="flex justify-between items-center mb-1">
-                        <span className="text-slate-800 font-bold font-khmer text-[10.5px] sm:text-xs truncate">
-                          {sub.nameKm} <span className="text-[9px] sm:text-[10px] text-slate-400 font-mono">(/{sub.max})</span>
+                        <span className="text-slate-800 dark:text-slate-100 font-bold font-khmer text-[10.5px] sm:text-xs truncate">
+                          {sub.nameKm} <span className="text-[9px] sm:text-[10px] text-slate-400 dark:text-slate-500 font-mono">(/{sub.max})</span>
                         </span>
-                        <span className={`font-black text-xs sm:text-sm font-cinzel bg-slate-50 px-1.5 sm:px-2 py-0.5 rounded border border-slate-200 ${sub.textClass} flex-shrink-0`}>
+                        <span className={`font-black text-xs sm:text-sm font-cinzel bg-slate-50 dark:bg-slate-900 px-1.5 sm:px-2 py-0.5 rounded border border-slate-200 dark:border-slate-800 ${sub.textClass} flex-shrink-0`}>
                           {val}
                         </span>
                       </div>
@@ -802,9 +802,9 @@ export default function StudentDashboardView({ setActiveTab }) {
                       />
                     </div>
 
-                    <div className="flex justify-between items-center text-[8.5px] sm:text-[10px] text-slate-400 border-t border-slate-100 pt-1 sm:pt-1.5 font-mono">
+                    <div className="flex justify-between items-center text-[8.5px] sm:text-[10px] text-slate-400 dark:text-slate-500 border-t border-slate-100 dark:border-slate-800/80 pt-1 sm:pt-1.5 font-mono">
                       <span>0 pt</span>
-                      <span className={`font-bold ${isPassing ? 'text-emerald-700' : 'text-rose-600'}`}>
+                      <span className={`font-bold ${isPassing ? 'text-emerald-500' : 'text-rose-500'}`}>
                         ≥ {sub.pass}
                       </span>
                       <span>{sub.max} pts</span>

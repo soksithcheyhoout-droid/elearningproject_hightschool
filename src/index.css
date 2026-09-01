@@ -116,6 +116,7 @@ html[data-theme="dark"] .bg-white\/95,
 html[data-theme="dark"] .bg-white\/90,
 html[data-theme="dark"] .bg-white\/80 {
   background-color: #0f172a !important;
+  color: #f8fafc;
 }
 
 /* Secondary surface cards (like subtle blue or slate tints) */
@@ -138,7 +139,9 @@ html.dark .border-slate-100,
 html.dark .border-slate-100\/90,
 html.dark .border-blue-100,
 html.dark .border-blue-100\/80,
+html.dark .border-blue-200,
 html.dark .border-blue-200\/80,
+html.dark .border-emerald-200,
 html[data-theme="dark"] .border-slate-200,
 html[data-theme="dark"] .border-slate-200\/80,
 html[data-theme="dark"] .border-slate-200\/90,
@@ -146,39 +149,44 @@ html[data-theme="dark"] .border-slate-100,
 html[data-theme="dark"] .border-slate-100\/90,
 html[data-theme="dark"] .border-blue-100,
 html[data-theme="dark"] .border-blue-100\/80,
-html[data-theme="dark"] .border-blue-200\/80 {
+html[data-theme="dark"] .border-blue-200,
+html[data-theme="dark"] .border-blue-200\/80,
+html[data-theme="dark"] .border-emerald-200 {
   border-color: #1e293b !important;
 }
 
-/* Text colors in dark mode */
-html.dark .text-slate-900,
-html.dark .text-slate-800,
-html.dark .text-\[\#002d62\],
-html.dark .text-\[\#003366\],
-html.dark .text-\[\#00478f\],
-html[data-theme="dark"] .text-slate-900,
-html[data-theme="dark"] .text-slate-800,
-html[data-theme="dark"] .text-\[\#002d62\],
-html[data-theme="dark"] .text-\[\#003366\],
-html[data-theme="dark"] .text-\[\#00478f\] {
-  color: #f8fafc !important;
+/* ==========================================================================
+   TARGETED DARK MODE FIXES FOR UI COMPONENTS (100% High Contrast)
+   ========================================================================== */
+
+/* 1. Navbar Active Tab Pill ([ក្រសួង ▾]) */
+html.dark .bg-\[\#e0f0ff\],
+html[data-theme="dark"] .bg-\[\#e0f0ff\] {
+  background-color: rgba(14, 165, 233, 0.22) !important;
+  color: #38bdf8 !important;
+  border: 1px solid rgba(56, 189, 248, 0.4) !important;
+}
+html.dark .bg-\[\#e0f0ff\] *,
+html[data-theme="dark"] .bg-\[\#e0f0ff\] * {
+  color: #38bdf8 !important;
 }
 
-html.dark .text-slate-700,
-html.dark .text-slate-600,
-html[data-theme="dark"] .text-slate-700,
-html[data-theme="dark"] .text-slate-600 {
+/* 2. Navbar Inactive Nav Links */
+html.dark header nav button:not(.bg-\[\#e0f0ff\]),
+html[data-theme="dark"] header nav button:not(.bg-\[\#e0f0ff\]) {
   color: #cbd5e1 !important;
 }
-
-html.dark .text-slate-500,
-html.dark .text-slate-400,
-html[data-theme="dark"] .text-slate-500,
-html[data-theme="dark"] .text-slate-400 {
+html.dark header nav button:not(.bg-\[\#e0f0ff\]):hover,
+html[data-theme="dark"] header nav button:not(.bg-\[\#e0f0ff\]):hover {
+  color: #ffffff !important;
+  background-color: rgba(30, 41, 59, 0.8) !important;
+}
+html.dark header nav button:not(.bg-\[\#e0f0ff\]) svg,
+html[data-theme="dark"] header nav button:not(.bg-\[\#e0f0ff\]) svg {
   color: #94a3b8 !important;
 }
 
-/* Header navbar in dark mode */
+/* 3. Header Navbar Background & Watermark in Dark Mode */
 html.dark header.bg-white,
 html.dark header.bg-white\/95,
 html[data-theme="dark"] header.bg-white,
@@ -187,45 +195,180 @@ html[data-theme="dark"] header.bg-white\/95 {
   border-bottom-color: #1e293b !important;
 }
 
-/* Sidebar in dark mode */
-html.dark aside,
-html[data-theme="dark"] aside {
-  background-color: rgba(10, 15, 29, 0.96) !important;
-  border-right-color: #1e293b !important;
-}
-
-/* Inputs in dark mode */
-html.dark input:not([type="checkbox"]):not([type="radio"]),
-html.dark textarea,
-html.dark select,
-html[data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]),
-html[data-theme="dark"] textarea,
-html[data-theme="dark"] select {
-  background-color: #111827 !important;
-  color: #ffffff !important;
+/* 4. Navbar Profile Card in Dark Mode */
+html.dark header [title*="គណនីសិស្ស"],
+html[data-theme="dark"] header [title*="គណនីសិស្ស"] {
+  background: linear-gradient(to right, #1e293b, #0f172a) !important;
   border-color: #334155 !important;
+  color: #f8fafc !important;
 }
-
-/* Popovers & Dropdown menus */
-html.dark .animate-scale-up,
-html[data-theme="dark"] .animate-scale-up {
-  background-color: #0f172a !important;
-  border-color: #1e293b !important;
+html.dark header [title*="គណនីសិស្ស"] span,
+html[data-theme="dark"] header [title*="គណនីសិស្ស"] span {
   color: #f8fafc !important;
 }
 
-/* Hover styles */
-html.dark .hover\:bg-blue-50:hover,
-html.dark .hover\:bg-blue-50\/80:hover,
-html.dark .hover\:bg-slate-50:hover,
-html.dark .hover\:bg-slate-50\/80:hover,
-html.dark .hover\:bg-slate-100:hover,
-html[data-theme="dark"] .hover\:bg-blue-50:hover,
-html[data-theme="dark"] .hover\:bg-blue-50\/80:hover,
-html[data-theme="dark"] .hover\:bg-slate-50:hover,
-html[data-theme="dark"] .hover\:bg-slate-50\/80:hover,
-html[data-theme="dark"] .hover\:bg-slate-100:hover {
+/* 5. Subject Cards (SubjectGrid.jsx) in Dark Mode */
+html.dark .group.bg-white,
+html[data-theme="dark"] .group.bg-white {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+}
+html.dark .group.bg-white:hover,
+html[data-theme="dark"] .group.bg-white:hover {
+  border-color: #0284c7 !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5) !important;
+}
+html.dark .group.bg-white h4,
+html[data-theme="dark"] .group.bg-white h4 {
+  color: #f8fafc !important;
+}
+html.dark .group.bg-white p,
+html[data-theme="dark"] .group.bg-white p {
+  color: #94a3b8 !important;
+}
+html.dark .group.bg-white .bg-slate-50,
+html[data-theme="dark"] .group.bg-white .bg-slate-50 {
   background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+html.dark .group.bg-white .bg-slate-50 span,
+html[data-theme="dark"] .group.bg-white .bg-slate-50 span {
+  color: #f1f5f9 !important;
+}
+html.dark .group.bg-white .bg-slate-50 span.text-slate-400,
+html[data-theme="dark"] .group.bg-white .bg-slate-50 span.text-slate-400 {
+  color: #94a3b8 !important;
+}
+html.dark .group.bg-white .bg-slate-50 span.text-amber-700,
+html[data-theme="dark"] .group.bg-white .bg-slate-50 span.text-amber-700 {
+  color: #fbbf24 !important;
+}
+html.dark .group.bg-white .text-\[\#005baa\],
+html[data-theme="dark"] .group.bg-white .text-\[\#005baa\] {
+  color: #38bdf8 !important;
+}
+html.dark .group.bg-white .bg-blue-50,
+html[data-theme="dark"] .group.bg-white .bg-blue-50 {
+  background-color: #1e293b !important;
+  color: #38bdf8 !important;
+  border-color: #334155 !important;
+}
+
+/* 6. Virtual Lab View in Dark Mode */
+html.dark .lg\:col-span-2.bg-white,
+html[data-theme="dark"] .lg\:col-span-2.bg-white {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+}
+html.dark .lg\:col-span-2.bg-white .bg-slate-50,
+html[data-theme="dark"] .lg\:col-span-2.bg-white .bg-slate-50 {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+html.dark .lg\:col-span-2.bg-white .bg-slate-50 span.text-slate-900,
+html[data-theme="dark"] .lg\:col-span-2.bg-white .bg-slate-50 span.text-slate-900 {
+  color: #f8fafc !important;
+}
+html.dark .lg\:col-span-2.bg-white .bg-slate-50 span.text-slate-600,
+html[data-theme="dark"] .lg\:col-span-2.bg-white .bg-slate-50 span.text-slate-600 {
+  color: #94a3b8 !important;
+}
+html.dark .bg-gradient-to-b.from-white.to-emerald-50\/40,
+html[data-theme="dark"] .bg-gradient-to-b.from-white.to-emerald-50\/40 {
+  background: linear-gradient(to bottom, #0f172a, #0b1f1c) !important;
+  border-color: #064e3b !important;
+}
+html.dark .bg-gradient-to-b.from-white.to-emerald-50\/40 .bg-white,
+html[data-theme="dark"] .bg-gradient-to-b.from-white.to-emerald-50\/40 .bg-white {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+}
+html.dark .bg-gradient-to-b.from-white.to-emerald-50\/40 .bg-white span,
+html[data-theme="dark"] .bg-gradient-to-b.from-white.to-emerald-50\/40 .bg-white span {
+  color: #e2e8f0 !important;
+}
+html.dark .bg-gradient-to-b.from-white.to-emerald-50\/40 .bg-emerald-50\/80,
+html[data-theme="dark"] .bg-gradient-to-b.from-white.to-emerald-50\/40 .bg-emerald-50\/80 {
+  background-color: rgba(6, 78, 59, 0.4) !important;
+  border-color: #065f46 !important;
+  color: #a7f3d0 !important;
+}
+html.dark .bg-gradient-to-b.from-white.to-emerald-50\/40 .bg-emerald-50\/80 p,
+html[data-theme="dark"] .bg-gradient-to-b.from-white.to-emerald-50\/40 .bg-emerald-50\/80 p {
+  color: #d1fae5 !important;
+}
+html.dark .bg-gradient-to-b.from-white.to-emerald-50\/40 .bg-emerald-50\/80 p.text-emerald-900,
+html[data-theme="dark"] .bg-gradient-to-b.from-white.to-emerald-50\/40 .bg-emerald-50\/80 p.text-emerald-900 {
+  color: #6ee7b7 !important;
+}
+
+/* 7. Student Dashboard Score Cards in Dark Mode */
+html.dark .bg-slate-100\/90,
+html[data-theme="dark"] .bg-slate-100\/90 {
+  background-color: #111827 !important;
+  border-color: #1e293b !important;
+}
+html.dark .grid-cols-2 .bg-white,
+html[data-theme="dark"] .grid-cols-2 .bg-white {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+}
+html.dark .grid-cols-2 .bg-white .bg-slate-50,
+html[data-theme="dark"] .grid-cols-2 .bg-white .bg-slate-50 {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #38bdf8 !important;
+}
+html.dark .grid-cols-2 .bg-white span.text-slate-800,
+html[data-theme="dark"] .grid-cols-2 .bg-white span.text-slate-800 {
+  color: #f1f5f9 !important;
+}
+html.dark .grid-cols-2 .bg-white span.text-slate-400,
+html[data-theme="dark"] .grid-cols-2 .bg-white span.text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+/* 8. Footer & Technical Support Banner in Dark Mode */
+html.dark footer,
+html[data-theme="dark"] footer {
+  background-color: #070b14 !important;
+  border-top-color: #1e293b !important;
+  color: #94a3b8 !important;
+}
+html.dark footer .bg-gradient-to-r.from-blue-50,
+html[data-theme="dark"] footer .bg-gradient-to-r.from-blue-50 {
+  background: linear-gradient(to right, #0f172a, #131d33, #0f172a) !important;
+  border-color: #1e293b !important;
+}
+html.dark footer .bg-gradient-to-r.from-blue-50 h4,
+html[data-theme="dark"] footer .bg-gradient-to-r.from-blue-50 h4 {
+  color: #ffffff !important;
+}
+html.dark footer .bg-gradient-to-r.from-blue-50 p,
+html[data-theme="dark"] footer .bg-gradient-to-r.from-blue-50 p {
+  color: #94a3b8 !important;
+}
+html.dark footer .bg-gradient-to-r.from-blue-50 a.bg-white,
+html[data-theme="dark"] footer .bg-gradient-to-r.from-blue-50 a.bg-white {
+  background-color: #1e293b !important;
+  border-color: #334155 !important;
+  color: #38bdf8 !important;
+}
+html.dark footer h4,
+html[data-theme="dark"] footer h4 {
+  color: #f8fafc !important;
+}
+html.dark footer button,
+html[data-theme="dark"] footer button {
+  color: #94a3b8 !important;
+}
+html.dark footer button:hover,
+html[data-theme="dark"] footer button:hover {
+  color: #38bdf8 !important;
+}
+html.dark footer span.text-\[\#003366\],
+html[data-theme="dark"] footer span.text-\[\#003366\] {
+  color: #f8fafc !important;
 }
 
 /* Mobile Curved Cutout in dark mode */

@@ -129,13 +129,13 @@ export default function VirtualLabView() {
       </div>
 
       {/* Lab Tabs */}
-      <div className="flex flex-wrap items-center gap-2 sm:gap-3 border-b border-slate-200 pb-3 text-xs font-bold">
+      <div className="flex flex-wrap items-center gap-2 sm:gap-3 border-b border-slate-200 dark:border-slate-800 pb-3 text-xs font-bold">
         <button
           onClick={() => setActiveLabTab('chemistry')}
           className={`px-4 sm:px-5 py-2.5 rounded-2xl transition-all flex items-center gap-2 cursor-pointer ${
             activeLabTab === 'chemistry'
               ? 'bg-gradient-to-r from-emerald-600 to-teal-600 text-white font-black shadow-md'
-              : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+              : 'bg-white dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
           }`}
         >
           <FlaskConical className="w-4 h-4" />
@@ -147,7 +147,7 @@ export default function VirtualLabView() {
           className={`px-4 sm:px-5 py-2.5 rounded-2xl transition-all flex items-center gap-2 cursor-pointer ${
             activeLabTab === 'physics'
               ? 'bg-gradient-to-r from-sky-600 to-blue-600 text-white font-black shadow-md'
-              : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+              : 'bg-white dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
           }`}
         >
           <Atom className="w-4 h-4" />
@@ -159,7 +159,7 @@ export default function VirtualLabView() {
           className={`px-4 sm:px-5 py-2.5 rounded-2xl transition-all flex items-center gap-2 cursor-pointer ${
             activeLabTab === 'math'
               ? 'bg-gradient-to-r from-amber-500 to-amber-600 text-white font-black shadow-md'
-              : 'bg-white text-slate-700 border border-slate-200 hover:bg-slate-50'
+              : 'bg-white dark:bg-slate-800/90 text-slate-700 dark:text-slate-200 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700'
           }`}
         >
           <Calculator className="w-4 h-4" />
@@ -172,10 +172,10 @@ export default function VirtualLabView() {
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
           
           {/* Elements Grid (2 cols) */}
-          <div className="lg:col-span-2 bg-white rounded-3xl border border-slate-200 p-5 sm:p-6 space-y-4 shadow-sm">
+          <div className="lg:col-span-2 bg-white dark:bg-[#0f172a] rounded-3xl border border-slate-200 dark:border-slate-800 p-5 sm:p-6 space-y-4 shadow-sm">
             <div className="flex items-center justify-between">
-              <h3 className="text-sm font-black text-emerald-800 flex items-center gap-2">
-                <FlaskConical className="w-4 h-4 text-emerald-600" />
+              <h3 className="text-sm font-black text-emerald-800 dark:text-emerald-400 flex items-center gap-2">
+                <FlaskConical className="w-4 h-4 text-emerald-600 dark:text-emerald-400" />
                 <span>{lang === 'km' ? 'តារាងខួបនៃធាតុគីមី (ចុចលើធាតុដើម្បីពិនិត្យលក្ខណៈ)' : 'Periodic Table of Chemical Elements'}</span>
               </h3>
             </div>
@@ -189,13 +189,13 @@ export default function VirtualLabView() {
                     onClick={() => setSelectedElement(el)}
                     className={`p-3 rounded-2xl border text-center transition-all flex flex-col items-center justify-between shadow-2xs cursor-pointer ${
                       isSelected
-                        ? 'bg-emerald-50 border-emerald-500 scale-105 shadow-md ring-2 ring-emerald-300'
-                        : 'bg-slate-50 border-slate-200 hover:border-emerald-300 hover:bg-emerald-50/40'
+                        ? 'bg-emerald-50 dark:bg-emerald-950/60 border-emerald-500 scale-105 shadow-md ring-2 ring-emerald-300 dark:ring-emerald-500/40'
+                        : 'bg-slate-50 dark:bg-slate-900/80 border-slate-200 dark:border-slate-800 hover:border-emerald-300 dark:hover:border-emerald-600 hover:bg-emerald-50/40 dark:hover:bg-emerald-950/30'
                     }`}
                   >
-                    <span className="text-[10px] text-slate-400 font-cinzel font-bold">{el.number}</span>
-                    <span className="text-base sm:text-lg font-black text-slate-900 font-cinzel">{el.symbol}</span>
-                    <span className="text-[10px] text-slate-600 truncate max-w-full font-bold">{lang === 'km' ? el.nameKm : el.nameEn}</span>
+                    <span className="text-[10px] text-slate-400 dark:text-slate-500 font-cinzel font-bold">{el.number}</span>
+                    <span className="text-base sm:text-lg font-black text-slate-900 dark:text-white font-cinzel">{el.symbol}</span>
+                    <span className="text-[10px] text-slate-600 dark:text-slate-300 truncate max-w-full font-bold">{lang === 'km' ? el.nameKm : el.nameEn}</span>
                   </button>
                 );
               })}
@@ -203,47 +203,47 @@ export default function VirtualLabView() {
           </div>
 
           {/* Selected Element Detail Inspector (1 col) */}
-          <div className="bg-white rounded-3xl p-5 sm:p-6 bg-gradient-to-b from-white to-emerald-50/40 border border-emerald-200 space-y-5 flex flex-col justify-between shadow-sm">
+          <div className="bg-white dark:bg-[#0f172a] rounded-3xl p-5 sm:p-6 bg-gradient-to-b from-white to-emerald-50/40 dark:from-[#0f172a] dark:to-[#091f1a] border border-emerald-200 dark:border-emerald-800/60 space-y-5 flex flex-col justify-between shadow-sm">
             {selectedElement ? (
               <div className="space-y-4">
                 <div className="flex items-start justify-between">
-                  <div className="w-16 h-16 rounded-2xl bg-emerald-100 border-2 border-emerald-400 flex flex-col items-center justify-center shadow-sm">
-                    <span className="text-[10px] text-emerald-800 font-cinzel font-bold">{selectedElement.number}</span>
-                    <span className="text-2xl font-black text-emerald-950 font-cinzel">{selectedElement.symbol}</span>
+                  <div className="w-16 h-16 rounded-2xl bg-emerald-100 dark:bg-emerald-950/80 border-2 border-emerald-400 dark:border-emerald-500 flex flex-col items-center justify-center shadow-sm">
+                    <span className="text-[10px] text-emerald-800 dark:text-emerald-300 font-cinzel font-bold">{selectedElement.number}</span>
+                    <span className="text-2xl font-black text-emerald-950 dark:text-emerald-100 font-cinzel">{selectedElement.symbol}</span>
                   </div>
-                  <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-100 text-emerald-800 border border-emerald-200">
+                  <span className="text-[10px] font-black uppercase px-2.5 py-0.5 rounded-full bg-emerald-100 dark:bg-emerald-950/80 text-emerald-800 dark:text-emerald-300 border border-emerald-200 dark:border-emerald-800">
                     {selectedElement.category}
                   </span>
                 </div>
 
                 <div>
-                  <h4 className="font-black text-lg text-slate-900">
+                  <h4 className="font-black text-lg text-slate-900 dark:text-white">
                     {lang === 'km' ? selectedElement.nameKm : selectedElement.nameEn} ({selectedElement.nameEn})
                   </h4>
-                  <p className="text-xs text-slate-500 font-medium">
-                    {lang === 'km' ? 'ម៉ាសអាតូម៖' : 'Atomic Mass:'} <span className="font-black text-slate-800 font-cinzel">{selectedElement.mass} g/mol</span>
+                  <p className="text-xs text-slate-500 dark:text-slate-400 font-medium">
+                    {lang === 'km' ? 'ម៉ាសអាតូម៖' : 'Atomic Mass:'} <span className="font-black text-slate-800 dark:text-emerald-300 font-cinzel">{selectedElement.mass} g/mol</span>
                   </p>
                 </div>
 
-                <div className="bg-white p-3.5 rounded-2xl border border-slate-200 space-y-2 text-xs shadow-2xs">
+                <div className="bg-white dark:bg-slate-900/90 p-3.5 rounded-2xl border border-slate-200 dark:border-slate-800 space-y-2 text-xs shadow-2xs">
                   <div className="flex justify-between">
-                    <span className="text-slate-500 font-medium">{lang === 'km' ? 'ការរៀបចំអេឡិចត្រុង៖' : 'Electron Config:'}</span>
-                    <span className="font-mono text-emerald-700 font-bold">{selectedElement.config}</span>
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">{lang === 'km' ? 'ការរៀបចំអេឡិចត្រុង៖' : 'Electron Config:'}</span>
+                    <span className="font-mono text-emerald-700 dark:text-emerald-400 font-bold">{selectedElement.config}</span>
                   </div>
                   <div className="flex justify-between">
-                    <span className="text-slate-500 font-medium">{lang === 'km' ? 'ខួប (Period) / ក្រុម (Group)៖' : 'Period / Group:'}</span>
-                    <span className="font-cinzel text-slate-800 font-bold">{selectedElement.period} / {selectedElement.group}</span>
+                    <span className="text-slate-500 dark:text-slate-400 font-medium">{lang === 'km' ? 'ខួប (Period) / ក្រុម (Group)៖' : 'Period / Group:'}</span>
+                    <span className="font-cinzel text-slate-800 dark:text-slate-200 font-bold">{selectedElement.period} / {selectedElement.group}</span>
                   </div>
                 </div>
 
-                <div className="text-xs text-slate-700 leading-relaxed bg-emerald-50/80 p-3.5 rounded-2xl border border-emerald-200 font-medium">
-                  <p className="font-black text-emerald-900 mb-1">{lang === 'km' ? 'លក្ខណៈ និងការប្រើប្រាស់៖' : 'Properties & Uses:'}</p>
+                <div className="text-xs text-slate-700 dark:text-emerald-200 leading-relaxed bg-emerald-50/80 dark:bg-emerald-950/40 p-3.5 rounded-2xl border border-emerald-200 dark:border-emerald-800/60 font-medium">
+                  <p className="font-black text-emerald-900 dark:text-emerald-300 mb-1">{lang === 'km' ? 'លក្ខណៈ និងការប្រើប្រាស់៖' : 'Properties & Uses:'}</p>
                   <p>{lang === 'km' ? selectedElement.descriptionKm : selectedElement.descriptionEn}</p>
                 </div>
               </div>
             ) : null}
 
-            <div className="text-[11px] text-slate-400 pt-2 border-t border-slate-200 text-center font-bold">
+            <div className="text-[11px] text-slate-400 dark:text-slate-500 pt-2 border-t border-slate-200 dark:border-slate-800 text-center font-bold">
               {lang === 'km' ? 'ស្តង់ដារ IUPAC & កម្មវិធីសិក្សាគីមីវិទ្យា MoTDAR' : 'IUPAC Standards & MoTDAR STEM Framework'}
             </div>
           </div>
