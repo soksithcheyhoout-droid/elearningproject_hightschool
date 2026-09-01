@@ -31,6 +31,17 @@
     --text-muted: #94a3b8;
   }
 
+  html.dark, html[data-theme="dark"] {
+    /* Dark Theme Surface Colors (Deep Black / Midnight Slate) */
+    --bg-surface: #090d16;
+    --bg-card: #0f172a;
+    --card-border: #1e293b;
+    --card-border-subtle: #162032;
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+  }
+
   body {
     background-color: var(--bg-surface);
     color: var(--text-primary);
@@ -68,6 +79,178 @@
   *, *::before, *::after {
     box-sizing: border-box;
   }
+}
+
+/* ==========================================================================
+   Comprehensive Dark Theme System (Black & Midnight Slate Mode)
+   ========================================================================== */
+html.dark, html[data-theme="dark"] {
+  color-scheme: dark;
+}
+
+html.dark body,
+html[data-theme="dark"] body {
+  background-color: #090d16 !important;
+  color: #f8fafc !important;
+}
+
+/* Background conversions in dark mode */
+html.dark .bg-\[\#f4f7fb\],
+html.dark .bg-\[\#f8fafc\],
+html.dark .bg-slate-50,
+html.dark .bg-gray-50,
+html[data-theme="dark"] .bg-\[\#f4f7fb\],
+html[data-theme="dark"] .bg-\[\#f8fafc\],
+html[data-theme="dark"] .bg-slate-50,
+html[data-theme="dark"] .bg-gray-50 {
+  background-color: #090d16 !important;
+}
+
+/* Card & surface backgrounds */
+html.dark .bg-white,
+html.dark .bg-white\/95,
+html.dark .bg-white\/90,
+html.dark .bg-white\/80,
+html[data-theme="dark"] .bg-white,
+html[data-theme="dark"] .bg-white\/95,
+html[data-theme="dark"] .bg-white\/90,
+html[data-theme="dark"] .bg-white\/80 {
+  background-color: #0f172a !important;
+}
+
+/* Secondary surface cards (like subtle blue or slate tints) */
+html.dark .bg-blue-50,
+html.dark .bg-blue-50\/80,
+html.dark .bg-blue-50\/90,
+html.dark .bg-slate-100,
+html[data-theme="dark"] .bg-blue-50,
+html[data-theme="dark"] .bg-blue-50\/80,
+html[data-theme="dark"] .bg-blue-50\/90,
+html[data-theme="dark"] .bg-slate-100 {
+  background-color: #141f36 !important;
+}
+
+/* Borders in dark mode */
+html.dark .border-slate-200,
+html.dark .border-slate-200\/80,
+html.dark .border-slate-200\/90,
+html.dark .border-slate-100,
+html.dark .border-slate-100\/90,
+html.dark .border-blue-100,
+html.dark .border-blue-100\/80,
+html.dark .border-blue-200\/80,
+html[data-theme="dark"] .border-slate-200,
+html[data-theme="dark"] .border-slate-200\/80,
+html[data-theme="dark"] .border-slate-200\/90,
+html[data-theme="dark"] .border-slate-100,
+html[data-theme="dark"] .border-slate-100\/90,
+html[data-theme="dark"] .border-blue-100,
+html[data-theme="dark"] .border-blue-100\/80,
+html[data-theme="dark"] .border-blue-200\/80 {
+  border-color: #1e293b !important;
+}
+
+/* Text colors in dark mode */
+html.dark .text-slate-900,
+html.dark .text-slate-800,
+html.dark .text-\[\#002d62\],
+html.dark .text-\[\#003366\],
+html.dark .text-\[\#00478f\],
+html[data-theme="dark"] .text-slate-900,
+html[data-theme="dark"] .text-slate-800,
+html[data-theme="dark"] .text-\[\#002d62\],
+html[data-theme="dark"] .text-\[\#003366\],
+html[data-theme="dark"] .text-\[\#00478f\] {
+  color: #f8fafc !important;
+}
+
+html.dark .text-slate-700,
+html.dark .text-slate-600,
+html[data-theme="dark"] .text-slate-700,
+html[data-theme="dark"] .text-slate-600 {
+  color: #cbd5e1 !important;
+}
+
+html.dark .text-slate-500,
+html.dark .text-slate-400,
+html[data-theme="dark"] .text-slate-500,
+html[data-theme="dark"] .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+/* Header navbar in dark mode */
+html.dark header.bg-white,
+html.dark header.bg-white\/95,
+html[data-theme="dark"] header.bg-white,
+html[data-theme="dark"] header.bg-white\/95 {
+  background-color: rgba(10, 15, 29, 0.96) !important;
+  border-bottom-color: #1e293b !important;
+}
+
+/* Sidebar in dark mode */
+html.dark aside,
+html[data-theme="dark"] aside {
+  background-color: rgba(10, 15, 29, 0.96) !important;
+  border-right-color: #1e293b !important;
+}
+
+/* Inputs in dark mode */
+html.dark input:not([type="checkbox"]):not([type="radio"]),
+html.dark textarea,
+html.dark select,
+html[data-theme="dark"] input:not([type="checkbox"]):not([type="radio"]),
+html[data-theme="dark"] textarea,
+html[data-theme="dark"] select {
+  background-color: #111827 !important;
+  color: #ffffff !important;
+  border-color: #334155 !important;
+}
+
+/* Popovers & Dropdown menus */
+html.dark .animate-scale-up,
+html[data-theme="dark"] .animate-scale-up {
+  background-color: #0f172a !important;
+  border-color: #1e293b !important;
+  color: #f8fafc !important;
+}
+
+/* Hover styles */
+html.dark .hover\:bg-blue-50:hover,
+html.dark .hover\:bg-blue-50\/80:hover,
+html.dark .hover\:bg-slate-50:hover,
+html.dark .hover\:bg-slate-50\/80:hover,
+html.dark .hover\:bg-slate-100:hover,
+html[data-theme="dark"] .hover\:bg-blue-50:hover,
+html[data-theme="dark"] .hover\:bg-blue-50\/80:hover,
+html[data-theme="dark"] .hover\:bg-slate-50:hover,
+html[data-theme="dark"] .hover\:bg-slate-50\/80:hover,
+html[data-theme="dark"] .hover\:bg-slate-100:hover {
+  background-color: #1e293b !important;
+}
+
+/* Mobile Curved Cutout in dark mode */
+html.dark nav svg path[fill="#f8fafc"],
+html[data-theme="dark"] nav svg path[fill="#f8fafc"] {
+  fill: #090d16 !important;
+}
+html.dark nav svg path[stroke="#e2e8f0"],
+html[data-theme="dark"] nav svg path[stroke="#e2e8f0"] {
+  stroke: #1e293b !important;
+}
+
+/* Scrollbar dark mode */
+html.dark ::-webkit-scrollbar-track,
+html[data-theme="dark"] ::-webkit-scrollbar-track {
+  background: #0b1120;
+}
+html.dark ::-webkit-scrollbar-thumb,
+html[data-theme="dark"] ::-webkit-scrollbar-thumb {
+  background: #334155;
+}
+
+/* Smooth transition for theme switching */
+body, header, aside, main {
+  transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease;
 }
 
 /* Hide scrollbar utility for horizontal scroll areas */

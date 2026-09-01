@@ -317,7 +317,7 @@ function MainApp() {
   }
 
   return (
-    <div className={`${activeTab === 'chat' ? 'h-[100dvh] overflow-hidden' : 'min-h-screen'} bg-[#f4f7fb] flex flex-col font-kantumruy relative selection:bg-blue-500 selection:text-white overflow-x-clip w-full max-w-[100vw]`}>
+    <div className={`${activeTab === 'chat' ? 'h-[100dvh] overflow-hidden' : 'min-h-screen'} bg-[#f4f7fb] dark:bg-[#090d16] text-slate-800 dark:text-slate-100 flex flex-col font-kantumruy relative selection:bg-blue-500 selection:text-white overflow-x-clip w-full max-w-[100vw]`}>
       
       {/* 🎓 Subtle Ambient Lighting Orbs */}
       <div className="fixed inset-0 pointer-events-none select-none z-0 overflow-hidden">

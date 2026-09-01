@@ -18,6 +18,7 @@ import {
   MessageSquare
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
+import ThemeToggle from '../common/ThemeToggle';
 
 export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor }) {
   const { lang, t } = useLanguage();
@@ -151,8 +152,16 @@ export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor }) {
         })}
       </nav>
 
+      {/* ☀️ / 🌙 Background Theme Selector (White or Black) */}
+      <div className="mt-auto pt-2 pb-1">
+        <div className="text-[10px] font-black text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-1.5 px-1 flex items-center justify-between">
+          <span>{lang === 'km' ? 'ផ្ទៃពណ៌ (Theme)' : 'Appearance'}</span>
+        </div>
+        <ThemeToggle variant="segmented" className="w-full justify-between" />
+      </div>
+
       {/* Official MoEYS Hotline & National Info Card */}
-      <div className="mt-auto pt-3 border-t border-slate-100">
+      <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
         <div className="bg-gradient-to-br from-blue-50/80 via-slate-50 to-indigo-50/60 rounded-2xl p-3 border border-blue-100/80 space-y-2 text-center shadow-2xs">
           <div className="flex items-center justify-center gap-1.5 text-[#003366] font-extrabold text-[11px]">
             <img src="/assets/moeys-crest-transparent.png" alt="MoTDAR" className="w-4 h-4 object-contain" />

@@ -27,19 +27,24 @@ import {
   ShieldCheck,
   Crown,
   Heart,
-  Send
+  Send,
+  Sun,
+  Moon
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
+import { useTheme } from '../../context/ThemeContext';
 import { curriculumData } from '../../data/curriculumData';
 import { bacIIData } from '../../data/bacIIData';
 import { libraryBooks } from '../../data/libraryBooks';
 import api from '../../services/api';
 import NatureFundButton from '../common/NatureFundButton';
+import ThemeToggle from '../common/ThemeToggle';
 
 export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelectSubject, adminSession, onOpenAdminLogin, onOpenDonation }) {
   const { lang, setLang, t } = useLanguage();
   const { student, selectedGrade, setSelectedGrade, logout } = useAuth();
+  const { theme, toggleTheme, isDark } = useTheme();
   
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
@@ -801,8 +806,11 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
               )}
             </div>
 
+            {/* ☀️ / 🌙 THEME SWITCHER TOGGLE (WHITE / BLACK BACKGROUND) */}
+            <ThemeToggle />
+
             {/* USER PROFILE SUITE (PF + Streak + XP) - Guaranteed 0% Clipping on all screen sizes */}
-            <div className="flex items-center gap-1 sm:gap-2 pl-1 sm:pl-2 border-l border-slate-200 flex-shrink-0 mr-0.5 sm:mr-2">
+            <div className="flex items-center gap-1 sm:gap-2 pl-1 sm:pl-2 border-l border-slate-200 dark:border-slate-800 flex-shrink-0 mr-0.5 sm:mr-2">
               
               {/* Streak Badge */}
               <div 
@@ -981,6 +989,25 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
                           <ArrowRight className="w-3.5 h-3.5 text-amber-500 group-hover:translate-x-1 transition-transform" />
                         </button>
                       )}
+
+                      {/* ☀️ / 🌙 Quick Theme Mode Option */}
+                      <button
+                        type="button"
+                        onClick={toggleTheme}
+                        className="w-full px-3 py-2 rounded-xl text-xs font-bold text-slate-700 dark:text-slate-200 hover:text-[#005baa] dark:hover:text-amber-300 hover:bg-blue-50/80 dark:hover:bg-slate-800 transition-all flex items-center justify-between group cursor-pointer border border-transparent hover:border-blue-200 dark:hover:border-slate-700"
+                      >
+                        <div className="flex items-center gap-2.5">
+                          {isDark ? (
+                            <Sun className="w-4 h-4 text-amber-400 animate-spin-slow" />
+                          ) : (
+                            <Moon className="w-4 h-4 text-indigo-500" />
+                          )}
+                          <span>{lang === 'km' ? 'ផ្ទៃពណ៌ (Theme)' : 'Appearance'}</span>
+                        </div>
+                        <span className="text-[10px] font-extrabold px-2 py-0.5 rounded-md bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-amber-300 border border-slate-200 dark:border-slate-700 shadow-2xs">
+                          {isDark ? (lang === 'km' ? 'ផ្ទៃខ្មៅ (Dark)' : 'Dark') : (lang === 'km' ? 'ផ្ទៃស (White)' : 'White')}
+                        </span>
+                      </button>
                     </div>
 
                     {/* 🚪 PROMINENT LOGOUT BUTTON INSIDE ACCOUNT MENU */}
@@ -1051,15 +1078,19 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
                       </button>
                     </div>
 
-                    {/* ✕ Direct Close Button */}
-                    <button
-                      type="button"
-                      onClick={() => setMobileMenuOpen(false)}
-                      className="w-6 h-6 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 flex items-center justify-center cursor-pointer transition-colors"
-                      title="បិទ (Close Menu)"
-                    >
-                      <X className="w-4 h-4" />
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      <ThemeToggle showLabel={false} className="!h-6 !px-1.5 !rounded-lg border-slate-200 dark:border-slate-700" />
+
+                      {/* ✕ Direct Close Button */}
+                      <button
+                        type="button"
+                        onClick={() => setMobileMenuOpen(false)}
+                        className="w-6 h-6 rounded-lg text-slate-400 hover:text-slate-800 hover:bg-slate-100 dark:hover:bg-slate-800 flex items-center justify-center cursor-pointer transition-colors"
+                        title="បិទ (Close Menu)"
+                      >
+                        <X className="w-4 h-4" />
+                      </button>
+                    </div>
                   </div>
 
                   {/* 2-Column Compact Grid with Game Arena */}
