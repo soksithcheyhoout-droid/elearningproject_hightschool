@@ -392,14 +392,14 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
             </div>
           </div>
 
-          {/* Desktop Navigation Links (Responsive: Scaled down on 1280px-1440px laptops, full on 2K+) */}
-          <nav className="hidden xl:flex items-center gap-0.5 xl:gap-1 2xl:gap-2 whitespace-nowrap flex-shrink-0">
+          {/* Desktop Navigation Links (Responsive: Scaled down on 1280px-1599px laptops, full on 1600px+) */}
+          <nav className="hidden xl:flex items-center gap-0.5 xl:gap-1 whitespace-nowrap flex-shrink-0">
             {navMenus.map((menu, idx) => {
               const isMenuOpen = activeDropdown === menu.id;
               const isTabActive = activeTab === menu.tab;
               const label = lang === 'km' ? menu.labelKm : menu.labelEn;
-              // On xl screens hide 4th and 5th items to prevent overcrowding
-              const hideOnSmallDesktop = idx >= 3 ? 'hidden 2xl:flex' : 'flex';
+              // On screens under 1600px, hide 4th & 5th menus to guarantee 0% right-side clipping
+              const hideOnSmallDesktop = idx >= 3 ? 'hidden min-[1600px]:flex' : 'flex';
 
               return (
                 <div 
@@ -411,7 +411,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
                   <button
                     type="button"
                     onClick={() => { setActiveTab(menu.tab); setActiveDropdown(null); }}
-                    className={`px-2 xl:px-2.5 py-1.5 rounded-xl text-xs xl:text-[13px] font-bold transition-all duration-150 flex items-center gap-0.5 xl:gap-1 cursor-pointer whitespace-nowrap flex-shrink-0 ${
+                    className={`px-1.5 xl:px-2 py-1.5 rounded-xl text-xs xl:text-[12.5px] font-bold transition-all duration-150 flex items-center gap-0.5 cursor-pointer whitespace-nowrap flex-shrink-0 ${
                       isTabActive
                         ? 'text-[#002d62] font-black bg-[#e0f0ff] shadow-2xs'
                         : 'text-[#005baa] hover:text-[#002d62] hover:bg-[#eaf4ff]'
@@ -463,7 +463,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
           </nav>
 
           {/* Right Utilities: Search, Language Switcher, and USER PROFILE (PF) */}
-          <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 flex-shrink-0 ml-auto pl-1 sm:pl-2">
+          <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 flex-shrink-0 ml-auto pl-1 sm:pl-2 pr-1.5 sm:pr-3">
             
             {/* 🏛️ OFFICIAL MINISTRY NATIONAL FUND BUTTON (NATURE SLAY VINES) */}
             <NatureFundButton onClick={onOpenDonation} lang={lang} />
@@ -812,24 +812,24 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
             {/* USER PROFILE SUITE (PF + Streak + XP) - Guaranteed 0% Clipping on all screen sizes */}
             <div className="flex items-center gap-1 sm:gap-2 pl-1 sm:pl-2 border-l border-slate-200 dark:border-slate-800 flex-shrink-0 mr-0.5 sm:mr-2">
               
-              {/* Streak Badge */}
+              {/* Streak Badge (Visible on wide screens 1680px+ to prevent clipping) */}
               <div 
-                className="hidden 2xl:flex items-center gap-1.5 bg-amber-50/90 border border-amber-300/90 px-2 py-1 rounded-xl shadow-2xs cursor-help hover:scale-105 transition-transform flex-shrink-0"
+                className="hidden min-[1680px]:flex items-center gap-1.5 bg-amber-50/90 dark:bg-amber-950/40 border border-amber-300/90 dark:border-amber-600/50 px-2 py-1 rounded-xl shadow-2xs cursor-help hover:scale-105 transition-transform flex-shrink-0"
                 title={`${student?.streakDays || 14} ថ្ងៃបន្តបន្ទាប់`}
               >
                 <Flame className="w-3.5 h-3.5 text-amber-500 animate-pulse fill-amber-500/20" />
-                <span className="text-xs font-black text-amber-900 font-cinzel">{student?.streakDays || 14}</span>
-                <span className="text-[9px] text-amber-800 font-bold hidden 2xl:inline">{lang === 'km' ? 'ថ្ងៃ' : 'd'}</span>
+                <span className="text-xs font-black text-amber-900 dark:text-amber-200 font-cinzel">{student?.streakDays || 14}</span>
+                <span className="text-[9px] text-amber-800 dark:text-amber-300 font-bold hidden 2xl:inline">{lang === 'km' ? 'ថ្ងៃ' : 'd'}</span>
               </div>
 
               {/* XP Badge */}
               <div 
-                className="hidden xl:flex items-center gap-1.5 bg-blue-50/90 border border-blue-300/90 px-2 py-1 rounded-xl shadow-2xs hover:scale-105 transition-transform flex-shrink-0"
+                className="hidden 2xl:flex items-center gap-1.5 bg-blue-50/90 dark:bg-blue-950/40 border border-blue-300/90 dark:border-blue-600/50 px-2 py-1 rounded-xl shadow-2xs hover:scale-105 transition-transform flex-shrink-0"
                 title={`${(student?.xp || 3568).toLocaleString()} XP`}
               >
-                <Sparkles className="w-3.5 h-3.5 text-[#005baa]" />
-                <span className="text-xs font-black text-[#003876] font-cinzel">{(student?.xp || 3568).toLocaleString()}</span>
-                <span className="text-[9px] text-blue-800 font-black hidden 2xl:inline">XP</span>
+                <Sparkles className="w-3.5 h-3.5 text-[#005baa] dark:text-cyan-400" />
+                <span className="text-xs font-black text-[#003876] dark:text-cyan-200 font-cinzel">{(student?.xp || 3568).toLocaleString()}</span>
+                <span className="text-[9px] text-blue-800 dark:text-cyan-300 font-black hidden 2xl:inline">XP</span>
               </div>
 
               {/* User Profile Avatar Card with Interactive Dropdown Menu */}
@@ -875,8 +875,8 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
                     <div className="absolute bottom-0 right-0 w-2.5 h-2.5 bg-emerald-500 rounded-full border-2 border-white shadow-xs z-20" />
                   </div>
 
-                  <div className="hidden min-[600px]:flex flex-col text-left leading-tight min-w-0 max-w-[120px] sm:max-w-[150px]">
-                    <span className="font-black text-xs sm:text-[12.5px] text-[#00478f] group-hover:text-[#002d62] transition-colors truncate block">
+                  <div className="hidden min-[600px]:flex flex-col text-left leading-tight min-w-0 max-w-[80px] xl:max-w-[95px] 2xl:max-w-[115px]">
+                    <span className="font-black text-xs sm:text-[12.5px] text-[#00478f] dark:text-slate-200 group-hover:text-[#002d62] dark:group-hover:text-white transition-colors truncate block">
                       {student?.name || student?.username || 'riki.dev'}
                     </span>
                     <span className="text-[10px] text-emerald-600 font-bold flex items-center gap-1 whitespace-nowrap">

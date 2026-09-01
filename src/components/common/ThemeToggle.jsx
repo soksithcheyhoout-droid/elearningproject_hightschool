@@ -3,20 +3,20 @@ import { Sun, Moon } from 'lucide-react';
 import { useTheme } from '../../context/ThemeContext';
 import { useLanguage } from '../../context/LanguageContext';
 
-export default function ThemeToggle({ className = '', showLabel = true, variant = 'button' }) {
+export default function ThemeToggle({ className = '', showLabel = false, variant = 'button' }) {
   const { theme, toggleTheme, isDark } = useTheme();
   const { lang } = useLanguage();
 
   if (variant === 'segmented') {
     return (
-      <div className={`inline-flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 ${className}`}>
+      <div className={`inline-flex items-center p-1 rounded-xl bg-slate-100 dark:bg-slate-800/90 border border-slate-200 dark:border-slate-700/80 shadow-2xs ${className}`}>
         <button
           type="button"
           onClick={() => isDark && toggleTheme()}
-          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+          className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer select-none ${
             !isDark 
-              ? 'bg-white text-[#002d62] shadow-xs border border-slate-200' 
-              : 'text-slate-400 hover:text-white'
+              ? 'bg-white text-[#002d62] shadow-xs border border-slate-200/90 font-black' 
+              : 'text-slate-400 hover:text-slate-200'
           }`}
           title={lang === 'km' ? 'ផ្ទៃពណ៌ស (White Background)' : 'White Background'}
         >
@@ -26,9 +26,9 @@ export default function ThemeToggle({ className = '', showLabel = true, variant 
         <button
           type="button"
           onClick={() => !isDark && toggleTheme()}
-          className={`flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+          className={`flex-1 flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer select-none ${
             isDark 
-              ? 'bg-[#0f172a] text-amber-300 shadow-xs border border-slate-700' 
+              ? 'bg-slate-900 text-amber-300 shadow-xs border border-amber-400/30 font-black ring-1 ring-amber-400/20' 
               : 'text-slate-500 hover:text-slate-800'
           }`}
           title={lang === 'km' ? 'ផ្ទៃពណ៌ខ្មៅ (Black Background)' : 'Black Background'}
@@ -44,31 +44,31 @@ export default function ThemeToggle({ className = '', showLabel = true, variant 
     <button
       type="button"
       onClick={toggleTheme}
-      className={`h-[33px] sm:h-[35px] md:h-[36px] px-2 sm:px-2.5 rounded-xl border transition-all duration-300 flex items-center gap-1.5 cursor-pointer shadow-2xs whitespace-nowrap select-none active:scale-95 flex-shrink-0 ${
+      className={`p-1.5 sm:p-2 rounded-xl transition-all duration-200 flex items-center justify-center cursor-pointer border flex-shrink-0 select-none active:scale-95 ${
         isDark
-          ? 'bg-slate-800/95 hover:bg-slate-700/90 text-amber-300 border-amber-400/40 hover:border-amber-300 ring-1 ring-amber-400/20 shadow-[0_2px_8px_rgba(245,158,11,0.15)]'
-          : 'bg-white hover:bg-slate-50 text-slate-700 hover:text-[#005baa] border-slate-200/90 hover:border-[#005baa]/50'
+          ? 'bg-slate-800/90 hover:bg-slate-700 text-amber-300 hover:text-amber-200 border-amber-400/30 hover:border-amber-300/60 shadow-xs ring-1 ring-amber-400/15'
+          : 'bg-slate-50 hover:bg-blue-50/80 text-slate-700 hover:text-[#005baa] border-slate-200/90 hover:border-[#005baa]/40 shadow-2xs'
       } ${className}`}
       title={
         isDark 
-          ? (lang === 'km' ? 'ចុចដើម្បីប្តូរទៅផ្ទៃពណ៌ស (Switch to White Background)' : 'Switch to White Background')
-          : (lang === 'km' ? 'ចុចដើម្បីប្តូរទៅផ្ទៃពណ៌ខ្មៅ (Switch to Black Background)' : 'Switch to Black Background')
+          ? (lang === 'km' ? 'ប្តូរទៅផ្ទៃពណ៌ស (Switch to White Background)' : 'Switch to White Background')
+          : (lang === 'km' ? 'ប្តូរទៅផ្ទៃពណ៌ខ្មៅ (Switch to Black Background)' : 'Switch to Black Background')
       }
       aria-label="Toggle White or Black Background"
     >
-      <div className="relative w-4 h-4 flex items-center justify-center flex-shrink-0">
+      <div className="relative w-4 h-4 sm:w-4.5 sm:h-4.5 flex items-center justify-center flex-shrink-0">
         {isDark ? (
-          <Sun className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 animate-spin-slow" />
+          <Sun className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-amber-400 animate-spin-slow drop-shadow-[0_0_6px_rgba(251,191,36,0.5)]" />
         ) : (
-          <Moon className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-700 group-hover:text-[#005baa]" />
+          <Moon className="w-4 h-4 sm:w-4.5 sm:h-4.5 text-slate-700 hover:text-[#005baa] transition-colors" />
         )}
       </div>
 
       {showLabel && (
-        <span className="text-[11px] sm:text-xs font-black hidden min-[450px]:inline">
+        <span className="text-[11px] sm:text-xs font-black ml-1.5 hidden min-[450px]:inline">
           {isDark 
-            ? (lang === 'km' ? 'ផ្ទៃខ្មៅ' : 'Dark')
-            : (lang === 'km' ? 'ផ្ទៃស' : 'Light')}
+            ? (lang === 'km' ? 'ផ្ទៃស' : 'Light')
+            : (lang === 'km' ? 'ផ្ទៃខ្មៅ' : 'Dark')}
         </span>
       )}
     </button>

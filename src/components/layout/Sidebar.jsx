@@ -162,25 +162,25 @@ export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor }) {
 
       {/* Official MoEYS Hotline & National Info Card */}
       <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-        <div className="bg-gradient-to-br from-blue-50/80 via-slate-50 to-indigo-50/60 rounded-2xl p-3 border border-blue-100/80 space-y-2 text-center shadow-2xs">
-          <div className="flex items-center justify-center gap-1.5 text-[#003366] font-extrabold text-[11px]">
+        <div className="bg-gradient-to-br from-blue-50/80 via-slate-50 to-indigo-50/60 dark:from-slate-900/90 dark:via-[#0c1427] dark:to-slate-900/90 rounded-2xl p-3 border border-blue-100/80 dark:border-slate-800/80 space-y-2 text-center shadow-2xs">
+          <div className="flex items-center justify-center gap-1.5 text-[#003366] dark:text-amber-300 font-extrabold text-[11px]">
             <img src="/assets/moeys-crest-transparent.png" alt="MoTDAR" className="w-4 h-4 object-contain" />
             <span>{lang === 'km' ? 'ជំនួយការសិក្សាជាតិ' : 'National Support'}</span>
           </div>
-          <div className="text-[10px] text-slate-600 font-semibold space-y-0.5">
+          <div className="text-[10px] text-slate-600 dark:text-slate-300 font-semibold space-y-0.5">
             <p>
-              <a href="https://t.me/kaixite" target="_blank" rel="noopener noreferrer" className="hover:text-[#005baa] font-mono font-bold">
+              <a href="https://t.me/kaixite" target="_blank" rel="noopener noreferrer" className="hover:text-[#005baa] dark:hover:text-cyan-400 font-mono font-bold">
                 {lang === 'km' ? 'Telegram: @kaixite (097 741 6126)' : 'Telegram: @kaixite (097 741 6126)'}
               </a>
             </p>
-            <p className="text-[9.5px] text-slate-500 truncate font-mono">
+            <p className="text-[9.5px] text-slate-500 dark:text-slate-400 truncate font-mono">
               soksithcheyhoout@gmail.com
             </p>
           </div>
           <button
             type="button"
             onClick={onOpenAITutor}
-            className="w-full py-1.5 px-2.5 rounded-xl bg-[#005baa] hover:bg-[#003d7a] text-white text-[10.5px] font-bold transition-all shadow-xs flex items-center justify-center gap-1 cursor-pointer active:scale-95"
+            className="w-full py-1.5 px-2.5 rounded-xl bg-[#005baa] hover:bg-[#003d7a] dark:bg-blue-600 dark:hover:bg-blue-500 text-white text-[10.5px] font-bold transition-all shadow-xs flex items-center justify-center gap-1 cursor-pointer active:scale-95"
           >
             <Bot className="w-3 h-3 text-amber-300" />
             <span>{lang === 'km' ? 'សួរគ្រូ AI MoTDAR' : 'Ask MoTDAR AI'}</span>
