@@ -9,8 +9,8 @@ export default function NatureFundButton({ onClick, lang = 'km', className = '' 
       className={`nature-fund-btn active:scale-95 flex-shrink-0 ${className}`}
       title={lang === 'km' ? 'មូលនិធិជាតិ MoTDAR គាំទ្រការអប់រំ និងទេពកោសល្យ' : 'MoTDAR National Education & Talent Fund'}
     >
-      {/* Ministry Crest */}
-      <div className="w-4 h-4 rounded-full bg-amber-950/10 border border-amber-900/30 flex items-center justify-center flex-shrink-0 p-0.5 shadow-2xs relative z-10">
+      {/* Ministry Crest: Pushed inside so left vine stays on the outer corner without covering crest */}
+      <div className="w-4 h-4 sm:w-4.5 sm:h-4.5 rounded-full bg-amber-950/10 border border-amber-900/30 flex items-center justify-center flex-shrink-0 p-0.5 shadow-2xs relative z-20 ml-0.5">
         <img 
           src="/assets/moeys-crest-transparent.png" 
           alt="MoTDAR Emblem" 
@@ -18,15 +18,15 @@ export default function NatureFundButton({ onClick, lang = 'km', className = '' 
         />
       </div>
 
-      {/* Button Text */}
-      <span className="font-extrabold tracking-tight relative z-10 text-[#181818] whitespace-nowrap">
+      {/* Button Text: Responsive typography with high contrast */}
+      <span className="hidden min-[390px]:inline font-extrabold tracking-tight relative z-20 text-[#181818] whitespace-nowrap text-[11px] sm:text-xs md:text-[12.5px]">
         {lang === 'km' ? 'មូលនិធិជាតិ' : 'Edu Fund'}
       </span>
 
       {/* Heart Icon */}
-      <Heart className="w-3.5 h-3.5 fill-rose-600 text-rose-600 animate-pulse flex-shrink-0 relative z-10 -ml-0.5" />
+      <Heart className="w-3 h-3 sm:w-3.5 sm:h-3.5 fill-rose-600 text-rose-600 animate-pulse flex-shrink-0 relative z-20" />
 
-      {/* Hanging Vine Icon 1 (Right Vine) */}
+      {/* Hanging Vine Icon 1 (Right Corner Vine) */}
       <div className="icon-1">
         <svg
           viewBox="0 0 26.3 65.33"
@@ -43,7 +43,7 @@ export default function NatureFundButton({ onClick, lang = 'km', className = '' 
         </svg>
       </div>
 
-      {/* Hanging Vine Icon 2 (Middle Vine) */}
+      {/* Hanging Vine Icon 2 (Middle Vine - Placed beside Heart) */}
       <div className="icon-2">
         <svg
           viewBox="0 0 11.67 37.63"
@@ -60,7 +60,7 @@ export default function NatureFundButton({ onClick, lang = 'km', className = '' 
         </svg>
       </div>
 
-      {/* Hanging Vine Icon 3 (Left Vine) */}
+      {/* Hanging Vine Icon 3 (Left Corner Vine) */}
       <div className="icon-3">
         <svg
           viewBox="0 0 25.29 76.92"

@@ -458,7 +458,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
           </nav>
 
           {/* Right Utilities: Search, Language Switcher, and USER PROFILE (PF) */}
-          <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 flex-shrink-0 ml-auto">
+          <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 flex-shrink-0 ml-auto pl-1 sm:pl-2">
             
             {/* 🏛️ OFFICIAL MINISTRY NATIONAL FUND BUTTON (NATURE SLAY VINES) */}
             <NatureFundButton onClick={onOpenDonation} lang={lang} />
