@@ -35,6 +35,7 @@ import { curriculumData } from '../../data/curriculumData';
 import { bacIIData } from '../../data/bacIIData';
 import { libraryBooks } from '../../data/libraryBooks';
 import api from '../../services/api';
+import NatureFundButton from '../common/NatureFundButton';
 
 export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelectSubject, adminSession, onOpenAdminLogin, onOpenDonation }) {
   const { lang, setLang, t } = useLanguage();
@@ -459,25 +460,8 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
           {/* Right Utilities: Search, Language Switcher, and USER PROFILE (PF) */}
           <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 flex-shrink-0 ml-auto">
             
-            {/* 🏛️ OFFICIAL MINISTRY NATIONAL FUND BUTTON */}
-            <button
-              type="button"
-              onClick={onOpenDonation}
-              className="flex items-center gap-1 sm:gap-1.5 px-2 sm:px-3 py-1.5 rounded-xl sm:rounded-2xl bg-gradient-to-r from-[#002d62] via-[#004080] to-[#002d62] hover:from-[#00387a] hover:to-[#004d99] text-white border border-amber-400/60 hover:border-amber-300 shadow-xs hover:shadow-md font-black text-[11px] sm:text-xs transition-all duration-200 cursor-pointer active:scale-95 flex-shrink-0 select-none whitespace-nowrap ring-1 ring-amber-400/20"
-              title={lang === 'km' ? 'មូលនិធិជាតិ MoTDAR គាំទ្រការអប់រំ និងទេពកោសល្យ' : 'MoTDAR National Education & Talent Fund'}
-            >
-              <div className="w-4 h-4 rounded-full bg-amber-400/20 border border-amber-400/50 flex items-center justify-center flex-shrink-0 p-0.5 shadow-2xs">
-                <img 
-                  src="/assets/moeys-crest-transparent.png" 
-                  alt="MoTDAR Emblem" 
-                  className="w-full h-full object-contain filter drop-shadow-xs" 
-                />
-              </div>
-              <span className="hidden md:inline font-extrabold text-amber-300 hover:text-amber-200 whitespace-nowrap tracking-tight">
-                {lang === 'km' ? 'មូលនិធិជាតិ' : 'Edu Fund'}
-              </span>
-              <Heart className="w-3 h-3 fill-rose-500 text-rose-500 animate-pulse flex-shrink-0 -ml-0.5" />
-            </button>
+            {/* 🏛️ OFFICIAL MINISTRY NATIONAL FUND BUTTON (NATURE SLAY VINES) */}
+            <NatureFundButton onClick={onOpenDonation} lang={lang} />
             
             {/* Search Icon Trigger (Attached Popover Live Search) */}
             <div ref={searchContainerRef} className="relative flex-shrink-0">
