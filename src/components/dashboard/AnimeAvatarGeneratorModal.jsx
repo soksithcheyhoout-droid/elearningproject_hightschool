@@ -173,7 +173,7 @@ export default function AnimeAvatarGeneratorModal({ isOpen, onClose }) {
 
   return createPortal(
     <div className="fixed inset-0 z-[9999] flex items-center justify-center p-3 sm:p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto animate-fadeIn">
-      <div className="bg-white rounded-3xl border border-slate-200 shadow-2xl max-w-5xl w-full my-auto max-h-[92vh] overflow-hidden flex flex-col font-kantumruy">
+      <div className="bg-white dark:bg-[#0f172a] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-2xl max-w-5xl w-full my-auto max-h-[92vh] overflow-hidden flex flex-col font-kantumruy">
         
         {/* Modal Header */}
         <div className="px-3.5 py-2.5 sm:px-6 sm:py-4 bg-gradient-to-r from-[#003366] via-[#005baa] to-[#0284c7] text-white flex items-center justify-between shadow-md flex-shrink-0">
@@ -206,19 +206,19 @@ export default function AnimeAvatarGeneratorModal({ isOpen, onClose }) {
         </div>
 
         {/* Modal Body */}
-        <div className="p-3 sm:p-5 md:p-6 overflow-y-auto space-y-3 sm:space-y-4 flex-1 bg-slate-50/50">
+        <div className="p-3 sm:p-5 md:p-6 overflow-y-auto space-y-3 sm:space-y-4 flex-1 bg-slate-50/50 dark:bg-[#070b14]">
           
           {/* Top Live Preview Hub (Desktop: 2-Col Side-by-side, Mobile: Top Compact Live Bar + Selector Grid) */}
-          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-6 items-start bg-white p-3 sm:p-5 rounded-2xl border border-slate-200 shadow-xs">
+          <div className="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-6 items-start bg-white dark:bg-[#0f172a] p-3 sm:p-5 rounded-2xl border border-slate-200 dark:border-slate-800 shadow-xs">
             
             {/* Live Preview Card */}
-            <div className="md:col-span-5 flex flex-row md:flex-col items-center justify-center text-left md:text-center gap-3 sm:gap-4 p-2.5 sm:p-4 bg-gradient-to-br from-slate-50 to-blue-50/30 md:bg-none rounded-xl border border-slate-200/80 md:border-0">
+            <div className="md:col-span-5 flex flex-row md:flex-col items-center justify-center text-left md:text-center gap-3 sm:gap-4 p-2.5 sm:p-4 bg-gradient-to-br from-slate-50 to-blue-50/30 md:bg-none dark:from-slate-800/60 dark:to-slate-900/60 rounded-xl border border-slate-200/80 dark:border-slate-800 md:border-0">
               
               {/* Perfectly Calibrated Avatar Frame Container */}
               <div className="relative w-24 h-24 sm:w-28 sm:h-28 md:w-36 md:h-36 flex items-center justify-center flex-shrink-0 select-none">
                 
                 {/* Pure Circular Avatar Base (Calibrated to 80% to fit frame inner ring) */}
-                <div className={`w-[80%] h-[80%] rounded-full overflow-hidden bg-slate-900 shadow-sm flex items-center justify-center ${selectedFrame && selectedFrame !== 'none' ? '' : 'border border-slate-300'}`}>
+                <div className={`w-[80%] h-[80%] rounded-full overflow-hidden bg-slate-900 shadow-sm flex items-center justify-center ${selectedFrame && selectedFrame !== 'none' ? '' : 'border border-slate-300 dark:border-slate-700'}`}>
                   <img
                     src={api.formatAvatarUrl(selectedAvatar || student?.avatar)}
                     alt="Selected Anime Avatar Preview"
@@ -251,7 +251,7 @@ export default function AnimeAvatarGeneratorModal({ isOpen, onClose }) {
 
               {/* Editable Name Input & Quick Action in Modal */}
               <div className="w-full space-y-1 sm:space-y-1.5 flex-1 md:max-w-xs">
-                <label className="text-[10px] sm:text-[11px] font-bold text-slate-600 block text-left">
+                <label className="text-[10px] sm:text-[11px] font-bold text-slate-600 dark:text-slate-300 block text-left">
                   ឈ្មោះសិស្ស (Student Name):
                 </label>
                 <input
@@ -259,7 +259,7 @@ export default function AnimeAvatarGeneratorModal({ isOpen, onClose }) {
                   value={studentCustomName}
                   onChange={(e) => setStudentCustomName(e.target.value)}
                   placeholder="វាយបញ្ចូលឈ្មោះសិស្ស..."
-                  className="w-full bg-white md:bg-slate-50 border border-slate-300 rounded-xl px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs text-slate-900 font-bold text-left md:text-center focus:outline-none focus:border-[#005baa] focus:bg-white focus:ring-1 focus:ring-[#005baa]"
+                  className="w-full bg-white md:bg-slate-50 dark:bg-slate-900/90 border border-slate-300 dark:border-slate-700 rounded-xl px-2.5 sm:px-3 py-1 sm:py-1.5 text-xs text-slate-900 dark:text-white font-bold text-left md:text-center focus:outline-none focus:border-[#005baa] dark:focus:border-cyan-400 focus:bg-white dark:focus:bg-slate-900 focus:ring-1 focus:ring-[#005baa] dark:focus:ring-cyan-400"
                 />
 
                 {/* Action Buttons under Preview */}
@@ -267,7 +267,7 @@ export default function AnimeAvatarGeneratorModal({ isOpen, onClose }) {
                   <button
                     type="button"
                     onClick={handleRandomize}
-                    className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-white md:bg-slate-50 hover:bg-slate-100 border border-slate-300 hover:border-[#005baa] text-[11px] sm:text-xs font-bold text-slate-800 transition-all shadow-2xs flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer"
+                    className="flex-1 px-2 sm:px-3 py-1.5 sm:py-2 rounded-xl bg-white md:bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 border border-slate-300 dark:border-slate-700 hover:border-[#005baa] dark:hover:border-cyan-400 text-[11px] sm:text-xs font-bold text-slate-800 dark:text-slate-200 transition-all shadow-2xs flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer"
                   >
                     <Dice5 className="w-3.5 h-3.5 text-amber-600" />
                     <span>ចៃដន្យ</span>
@@ -299,14 +299,14 @@ export default function AnimeAvatarGeneratorModal({ isOpen, onClose }) {
             <div className="md:col-span-7 space-y-2.5 sm:space-y-3">
               
               {/* Studio Navigation Tabs */}
-              <div className="flex items-center gap-1 sm:gap-2 bg-slate-100 p-1 rounded-xl border border-slate-200">
+              <div className="flex items-center gap-1 sm:gap-2 bg-slate-100 dark:bg-slate-800/80 p-1 rounded-xl border border-slate-200 dark:border-slate-700">
                 <button
                   type="button"
                   onClick={() => setActiveTab('frames')}
                   className={`flex-1 py-1.5 sm:py-2 px-2 rounded-lg text-[11px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer min-w-0 ${
                     activeTab === 'frames'
                       ? 'bg-gradient-to-r from-amber-400 to-amber-500 text-slate-950 shadow-xs font-black'
-                      : 'text-slate-600 hover:text-slate-900'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
                   <Zap className="w-3.5 h-3.5 text-amber-700 flex-shrink-0" />
@@ -318,11 +318,11 @@ export default function AnimeAvatarGeneratorModal({ isOpen, onClose }) {
                   onClick={() => setActiveTab('avatars')}
                   className={`flex-1 py-1.5 sm:py-2 px-2 rounded-lg text-[11px] sm:text-xs font-bold transition-all flex items-center justify-center gap-1 sm:gap-1.5 cursor-pointer min-w-0 ${
                     activeTab === 'avatars'
-                      ? 'bg-white text-[#005baa] shadow-xs border border-slate-200 font-black'
-                      : 'text-slate-600 hover:text-slate-900'
+                      ? 'bg-white dark:bg-slate-700 text-[#005baa] dark:text-cyan-300 shadow-xs border border-slate-200 dark:border-slate-600 font-black'
+                      : 'text-slate-600 dark:text-slate-400 hover:text-slate-900 dark:hover:text-white'
                   }`}
                 >
-                  <User className="w-3.5 h-3.5 text-[#005baa] flex-shrink-0" />
+                  <User className="w-3.5 h-3.5 text-[#005baa] dark:text-cyan-400 flex-shrink-0" />
                   <span className="truncate">រូប Anime ({allAvatars.length})</span>
                 </button>
               </div>
@@ -344,10 +344,10 @@ export default function AnimeAvatarGeneratorModal({ isOpen, onClose }) {
                           className={`px-2.5 py-1 rounded-xl transition-all flex-shrink-0 flex items-center gap-1.5 cursor-pointer ${
                             isSelected 
                               ? 'bg-[#005baa] text-white shadow-xs font-bold' 
-                              : 'bg-slate-100 text-slate-700 hover:bg-slate-200 border border-slate-200/60'
+                              : 'bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-200 hover:bg-slate-200 dark:hover:bg-slate-700 border border-slate-200/60 dark:border-slate-700'
                           }`}
                         >
-                          <IconComponent className={`w-3.5 h-3.5 ${isSelected ? 'text-amber-300' : 'text-slate-500'}`} />
+                          <IconComponent className={`w-3.5 h-3.5 ${isSelected ? 'text-amber-300' : 'text-slate-500 dark:text-slate-400'}`} />
                           <span>{cat.nameKm}</span>
                         </button>
                       );
@@ -362,7 +362,7 @@ export default function AnimeAvatarGeneratorModal({ isOpen, onClose }) {
                       value={frameSearch}
                       onChange={(e) => setFrameSearch(e.target.value)}
                       placeholder="ស្វែងរកស៊ុមចលនា (ឧ. Dragon, Saiyan, Cyberpunk)..."
-                      className="w-full bg-white border border-slate-200 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-800 placeholder:text-slate-400 focus:outline-none focus:border-[#005baa]"
+                      className="w-full bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-xl pl-8 pr-3 py-1.5 text-xs text-slate-800 dark:text-white placeholder:text-slate-400 dark:placeholder:text-slate-500 focus:outline-none focus:border-[#005baa] dark:focus:border-cyan-400"
                     />
                   </div>
 
@@ -376,8 +376,8 @@ export default function AnimeAvatarGeneratorModal({ isOpen, onClose }) {
                           onClick={() => handleSelectFrame(frame)}
                           className={`p-1.5 sm:p-2 rounded-xl border cursor-pointer transition-all flex items-center gap-2 sm:gap-2.5 group ${
                             isSelected 
-                              ? 'border-[#005baa] ring-2 ring-[#005baa] bg-blue-50/70 shadow-sm' 
-                              : 'border-slate-200 hover:border-slate-300 bg-white hover:bg-slate-50'
+                              ? 'border-[#005baa] ring-2 ring-[#005baa] dark:ring-cyan-400 bg-blue-50/70 dark:bg-cyan-950/40 shadow-sm' 
+                              : 'border-slate-200 dark:border-slate-800 hover:border-slate-300 dark:hover:border-slate-700 bg-white dark:bg-slate-850 hover:bg-slate-50 dark:hover:bg-slate-800'
                           }`}
                         >
                           {/* Circular Thumbnail Preview */}
@@ -395,15 +395,15 @@ export default function AnimeAvatarGeneratorModal({ isOpen, onClose }) {
 
                           {/* Full Name & Tag */}
                           <div className="overflow-hidden flex-1 min-w-0">
-                            <p className="text-[11px] sm:text-xs font-bold text-slate-900 leading-tight truncate group-hover:text-[#005baa]">
+                            <p className="text-[11px] sm:text-xs font-bold text-slate-900 dark:text-slate-100 leading-tight truncate group-hover:text-[#005baa] dark:group-hover:text-cyan-300">
                               {frame.nameKm}
                             </p>
                             <div className="flex items-center gap-1 mt-0.5">
-                              <span className="text-[9px] sm:text-[10px] font-semibold text-slate-500 truncate">
+                              <span className="text-[9px] sm:text-[10px] font-semibold text-slate-500 dark:text-slate-400 truncate">
                                 {frame.tag}
                               </span>
                               {isSelected && (
-                                <span className="text-[8px] sm:text-[9px] font-black text-[#005baa] bg-blue-100 px-1 rounded flex-shrink-0">
+                                <span className="text-[8px] sm:text-[9px] font-black text-[#005baa] dark:text-cyan-400 bg-blue-100 dark:bg-cyan-950/60 px-1 rounded flex-shrink-0">
                                   ✓
                                 </span>
                               )}
@@ -420,26 +420,26 @@ export default function AnimeAvatarGeneratorModal({ isOpen, onClose }) {
               {activeTab === 'avatars' && (
                 <div className="space-y-2 sm:space-y-3">
                   <div className="flex items-center justify-between">
-                    <span className="text-[11px] sm:text-xs text-slate-500 font-bold">ជ្រើសរើសរូបសិស្ស៖</span>
+                    <span className="text-[11px] sm:text-xs text-slate-500 dark:text-slate-400 font-bold">ជ្រើសរើសរូបសិស្ស៖</span>
                     <div className="flex items-center gap-1">
                       <button
                         type="button"
                         onClick={() => setGenderFilter('all')}
-                        className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded text-[10px] sm:text-[11px] font-bold cursor-pointer ${genderFilter === 'all' ? 'bg-[#005baa] text-white' : 'bg-slate-100 text-slate-600'}`}
+                        className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded text-[10px] sm:text-[11px] font-bold cursor-pointer ${genderFilter === 'all' ? 'bg-[#005baa] text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'}`}
                       >
                         ទាំងអស់ (២៤)
                       </button>
                       <button
                         type="button"
                         onClick={() => setGenderFilter('boy')}
-                        className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded text-[10px] sm:text-[11px] font-bold cursor-pointer ${genderFilter === 'boy' ? 'bg-[#005baa] text-white' : 'bg-slate-100 text-slate-600'}`}
+                        className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded text-[10px] sm:text-[11px] font-bold cursor-pointer ${genderFilter === 'boy' ? 'bg-[#005baa] text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'}`}
                       >
                         សិស្សប្រុស (១២)
                       </button>
                       <button
                         type="button"
                         onClick={() => setGenderFilter('girl')}
-                        className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded text-[10px] sm:text-[11px] font-bold cursor-pointer ${genderFilter === 'girl' ? 'bg-pink-600 text-white' : 'bg-slate-100 text-slate-600'}`}
+                        className={`px-2 sm:px-2.5 py-0.5 sm:py-1 rounded text-[10px] sm:text-[11px] font-bold cursor-pointer ${genderFilter === 'girl' ? 'bg-pink-600 text-white' : 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300'}`}
                       >
                         សិស្សស្រី (១២)
                       </button>
@@ -455,8 +455,8 @@ export default function AnimeAvatarGeneratorModal({ isOpen, onClose }) {
                           onClick={() => handleSelectAvatar(item)}
                           className={`p-1 rounded-xl border cursor-pointer transition-all flex flex-col items-center group ${
                             isSelected 
-                              ? 'border-[#005baa] ring-2 ring-[#005baa] bg-blue-50/60 shadow-sm' 
-                              : 'border-slate-200 hover:border-slate-400 bg-white'
+                              ? 'border-[#005baa] ring-2 ring-[#005baa] dark:ring-cyan-400 bg-blue-50/60 dark:bg-cyan-950/40 shadow-sm' 
+                              : 'border-slate-200 dark:border-slate-800 hover:border-slate-400 dark:hover:border-slate-600 bg-white dark:bg-slate-850'
                           }`}
                         >
                           <img
@@ -478,9 +478,9 @@ export default function AnimeAvatarGeneratorModal({ isOpen, onClose }) {
         </div>
 
         {/* Modal Footer */}
-        <div className="px-4 py-2.5 sm:px-6 sm:py-3.5 bg-slate-50 border-t border-slate-200 flex items-center justify-between flex-shrink-0">
-          <p className="text-[10px] sm:text-[11px] text-slate-500 hidden sm:flex items-center gap-1">
-            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600" />
+        <div className="px-4 py-2.5 sm:px-6 sm:py-3.5 bg-slate-50 dark:bg-[#0b101b] border-t border-slate-200 dark:border-slate-800 flex items-center justify-between flex-shrink-0">
+          <p className="text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 hidden sm:flex items-center gap-1">
+            <CheckCircle2 className="w-3.5 h-3.5 text-emerald-600 dark:text-emerald-400" />
             <span>រូបតំណាង និងស៊ុមចលនារក្សាទុកក្នុង Profile សិស្សដោយស្វ័យប្រវត្តិ</span>
           </p>
 
@@ -488,7 +488,7 @@ export default function AnimeAvatarGeneratorModal({ isOpen, onClose }) {
             <button
               type="button"
               onClick={onClose}
-              className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-white border border-slate-300 hover:bg-slate-100 text-xs font-bold text-slate-700 transition-colors cursor-pointer"
+              className="px-3 sm:px-4 py-1.5 sm:py-2 rounded-xl bg-white dark:bg-slate-800 border border-slate-300 dark:border-slate-700 hover:bg-slate-100 dark:hover:bg-slate-700 text-xs font-bold text-slate-700 dark:text-slate-200 transition-colors cursor-pointer"
             >
               បិទ (Close)
             </button>
