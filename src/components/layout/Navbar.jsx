@@ -240,9 +240,9 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
   // Official MoEYS Gov Navigation Menu Structure (ដូច moeys.gov.kh)
   const navMenus = [
     {
-      id: 'inspection',
-      labelKm: 'ត្រួតពិនិត្យ',
-      labelEn: 'Inspection',
+      id: 'ministry',
+      labelKm: 'ក្រសួង',
+      labelEn: 'Ministry',
       tab: 'home',
       items: [
         { labelKm: 'ស្តង់ដារគុណភាពអប់រំជាតិ', labelEn: 'National Education Standards', tab: 'home' },
@@ -285,7 +285,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
     },
     {
       id: 'media',
-      labelKm: 'មជ្ឈមណ្ឌលព័ត៌មាន',
+      labelKm: 'មណ្ឌលព័ត៌មាន',
       labelEn: 'Media Center',
       tab: 'library',
       items: [
@@ -295,7 +295,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
     },
     {
       id: 'services',
-      labelKm: 'សេវាកម្ម',
+      labelKm: 'ផ្សេងៗ',
       labelEn: 'Services',
       tab: 'dashboard',
       items: [
@@ -308,15 +308,17 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
 
   return (
     <header 
-      className={`fixed top-0 left-0 right-0 z-[100] w-full select-none font-kantumruy transition-[background-color,box-shadow,border-color] duration-300 ${
+      className={`fixed top-0 left-0 right-0 z-[100] w-full select-none font-kantumruy transition-all duration-300 ${
         isScrolled 
-          ? 'bg-white/95 backdrop-blur-xl shadow-md border-b border-[#005baa]/20' 
-          : 'bg-white border-b border-slate-200/80'
+          ? 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-md border-b border-slate-200/60 dark:border-slate-800/60' 
+          : 'bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800'
       }`}
     >
       
-      {/* 1. Authentic MoEYS Top Utility Ribbon (Curved Royal Blue Gradient touching the right edge) */}
-      <div className="w-full bg-transparent flex items-center justify-end text-xs select-none h-8 sm:h-9 overflow-hidden">
+      {/* 1. Authentic MoEYS Top Utility Ribbon (Collapses and smoothly slides up on scroll) */}
+      <div className={`w-full bg-transparent flex items-center justify-end text-xs select-none overflow-hidden transition-all duration-300 ease-in-out ${
+        isScrolled ? 'max-h-0 opacity-0 -translate-y-2 pointer-events-none' : 'max-h-10 opacity-100 translate-y-0 h-8 sm:h-9'
+      }`}>
         {/* Right: Curved MoEYS Royal Blue Gradient Ribbon extending 100% to the right edge */}
         <div className="ml-auto bg-gradient-to-r from-[#005baa] via-[#006bbd] to-[#008fe3] text-white pl-5 sm:pl-7 lg:pl-8 pr-3 sm:pr-5 lg:pr-6 h-full rounded-bl-2xl sm:rounded-bl-3xl flex items-center gap-3 sm:gap-5 text-[11px] sm:text-xs font-medium shadow-xs">
           <a 
@@ -343,7 +345,9 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
 
       {/* 2. Main Navigation Bar with Grand 4K Emblem, Vibrant Blue Links & User Profile (PF) */}
       <div className="w-full max-w-[1600px] mx-auto px-2 sm:px-4 lg:px-6 relative z-20">
-        <div className="h-[74px] sm:h-[80px] flex items-center justify-between gap-1 sm:gap-3 min-w-0">
+        <div className={`flex items-center justify-between gap-1 sm:gap-3 min-w-0 transition-all duration-300 ${
+          isScrolled ? 'h-[60px] sm:h-[64px]' : 'h-[74px] sm:h-[80px]'
+        }`}>
           
           {/* Mobile / Tablet Menu Hamburger Toggle (Visible on screens < xl) */}
           <button

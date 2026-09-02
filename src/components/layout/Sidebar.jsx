@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { 
   Home, 
   BookOpen, 
@@ -23,6 +23,27 @@ import ThemeToggle from '../common/ThemeToggle';
 
 export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor, isOpen, onClose }) {
   const { lang, t } = useLanguage();
+  const [isScrolled, setIsScrolled] = useState(false);
+
+  useEffect(() => {
+    let ticking = false;
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const scrollY = window.scrollY;
+          setIsScrolled((prev) => {
+            if (!prev && scrollY > 40) return true;
+            if (prev && scrollY < 10) return false;
+            return prev;
+          });
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const navItems = [
     { 
@@ -102,7 +123,9 @@ export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor, isOpen
       )}
 
       {/* Sidebar: Permanently docked on xl: (1280px+), Smooth slide-out drawer on < xl */}
-      <aside className={`w-72 flex flex-col flex-shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200/90 dark:border-slate-800 py-4 px-3 space-y-3 select-none shadow-2xl xl:shadow-xs font-kantumruy overflow-y-auto fixed top-[102px] sm:top-[110px] left-0 bottom-0 z-[200] xl:z-30 pb-8 transition-transform duration-300 ease-in-out ${
+      <aside className={`w-72 flex flex-col flex-shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200/90 dark:border-slate-800 py-4 px-3 space-y-3 select-none shadow-2xl xl:shadow-xs font-kantumruy overflow-y-auto fixed ${
+        isScrolled ? 'top-[60px] sm:top-[64px]' : 'top-[102px] sm:top-[110px]'
+      } left-0 bottom-0 z-[200] xl:z-30 pb-8 transition-all duration-300 ease-in-out ${
         isOpen ? 'translate-x-0' : '-translate-x-full xl:translate-x-0'
       } [scrollbar-width:thin] [scrollbar-color:rgba(0,91,170,0.15)_transparent]`}>
         
