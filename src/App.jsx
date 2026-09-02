@@ -115,9 +115,12 @@ function MainApp() {
     }
   });
 
+  const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
   // URL Browser History Sync
   const setTabAndUrl = (tab) => {
     setActiveTab(tab);
+    setIsMobileSidebarOpen(false);
     const targetPath = tab === 'home' ? '/' : `/${tab}`;
     try {
       if (window.location.pathname !== targetPath) {
@@ -342,19 +345,22 @@ function MainApp() {
           setTabAndUrl('admin');
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
+        onToggleSidebar={() => setIsMobileSidebarOpen(prev => !prev)}
       />
 
       {/* Spacer to offset the fixed top navbar permanently */}
       <div className="h-[102px] sm:h-[110px] flex-shrink-0 w-full" aria-hidden="true" />
 
       {/* Main Content Body */}
-      <div className={`flex-1 flex w-full overflow-x-clip md:pl-72 ${activeTab === 'chat' ? 'min-h-0 overflow-hidden' : ''}`}>
+      <div className={`flex-1 flex w-full overflow-x-clip xl:pl-72 ${activeTab === 'chat' ? 'min-h-0 overflow-hidden' : ''}`}>
         
         {/* Left Navigation Sidebar */}
         <Sidebar
           activeTab={activeTab}
           setActiveTab={setTabAndUrl}
           onOpenAITutor={() => setIsAITutorOpen(true)}
+          isOpen={isMobileSidebarOpen}
+          onClose={() => setIsMobileSidebarOpen(false)}
         />
 
         {/* Dynamic Center Canvas View */}

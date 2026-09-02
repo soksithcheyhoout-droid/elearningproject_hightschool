@@ -15,12 +15,13 @@ import {
   Award,
   Gamepad2,
   Flame,
-  MessageSquare
+  MessageSquare,
+  X
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import ThemeToggle from '../common/ThemeToggle';
 
-export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor }) {
+export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor, isOpen, onClose }) {
   const { lang, t } = useLanguage();
 
   const navItems = [
@@ -90,22 +91,47 @@ export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor }) {
   ];
 
   return (
-    <aside className="w-72 hidden md:flex flex-col flex-shrink-0 bg-white/95 backdrop-blur-md border-r border-slate-200/90 py-4 px-3 space-y-3 select-none shadow-xs font-kantumruy overflow-y-auto fixed top-[102px] sm:top-[110px] left-0 bottom-0 z-30 pb-8 [scrollbar-width:thin] [scrollbar-color:rgba(0,91,170,0.15)_transparent]">
-      
-      {/* Header Menu Section Badge */}
-      <div className="flex items-center justify-between px-3 pb-2.5 border-b border-slate-100/90">
-        <div className="flex items-center gap-2">
-          <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500/15 to-indigo-500/10 border border-blue-200/80 text-[#005baa] flex items-center justify-center font-bold shadow-2xs">
-            <Building2 className="w-3.5 h-3.5" />
+    <>
+      {/* Mobile / Tablet Drawer Backdrop Scrim */}
+      {isOpen && (
+        <div 
+          className="fixed inset-0 bg-slate-950/50 backdrop-blur-xs z-[190] xl:hidden transition-opacity duration-300"
+          onClick={onClose}
+          aria-hidden="true"
+        />
+      )}
+
+      {/* Sidebar: Permanently docked on xl: (1280px+), Smooth slide-out drawer on < xl */}
+      <aside className={`w-72 flex flex-col flex-shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200/90 dark:border-slate-800 py-4 px-3 space-y-3 select-none shadow-2xl xl:shadow-xs font-kantumruy overflow-y-auto fixed top-[102px] sm:top-[110px] left-0 bottom-0 z-[200] xl:z-30 pb-8 transition-transform duration-300 ease-in-out ${
+        isOpen ? 'translate-x-0' : '-translate-x-full xl:translate-x-0'
+      } [scrollbar-width:thin] [scrollbar-color:rgba(0,91,170,0.15)_transparent]`}>
+        
+        {/* Header Menu Section Badge */}
+        <div className="flex items-center justify-between px-3 pb-2.5 border-b border-slate-100/90 dark:border-slate-800">
+          <div className="flex items-center gap-2">
+            <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500/15 to-indigo-500/10 border border-blue-200/80 text-[#005baa] flex items-center justify-center font-bold shadow-2xs">
+              <Building2 className="w-3.5 h-3.5" />
+            </div>
+            <span className="text-[11px] font-black text-[#003366] dark:text-slate-100 uppercase tracking-wider">
+              {lang === 'km' ? 'ម៉ឺនុយចម្បង' : 'Main Menu'}
+            </span>
           </div>
-          <span className="text-[11px] font-black text-[#003366] uppercase tracking-wider">
-            {lang === 'km' ? 'ម៉ឺនុយចម្បង' : 'Main Menu'}
-          </span>
+          
+          <div className="flex items-center gap-1.5">
+            <span className="text-[9.5px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
+              MoEYS Portal
+            </span>
+            {/* Close Button on Mobile / Tablet */}
+            <button
+              type="button"
+              onClick={onClose}
+              className="xl:hidden p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              aria-label="Close menu"
+            >
+              <X className="w-4 h-4" />
+            </button>
+          </div>
         </div>
-        <span className="text-[9.5px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
-          MoEYS Portal
-        </span>
-      </div>
 
       {/* Navigation Items List */}
       <nav className="space-y-1 font-kantumruy">
@@ -116,7 +142,10 @@ export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor }) {
             <button
               key={item.id}
               type="button"
-              onClick={() => setActiveTab(item.id)}
+              onClick={() => {
+                setActiveTab(item.id);
+                if (onClose) onClose();
+              }}
               className={`w-full flex items-center justify-between px-3 py-2 rounded-2xl text-xs sm:text-[12.5px] font-bold transition-all duration-200 group cursor-pointer relative ${
                 isActive
                   ? 'bg-gradient-to-r from-blue-500/15 via-indigo-500/10 to-transparent dark:from-blue-600/30 dark:via-indigo-600/20 dark:to-transparent text-[#005baa] dark:text-cyan-300 border border-blue-300/60 dark:border-cyan-500/40 shadow-xs'
@@ -188,5 +217,6 @@ export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor }) {
       </div>
 
     </aside>
+  </>
   );
 }

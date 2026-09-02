@@ -41,7 +41,7 @@ import api from '../../services/api';
 import NatureFundButton from '../common/NatureFundButton';
 import ThemeToggle from '../common/ThemeToggle';
 
-export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelectSubject, adminSession, onOpenAdminLogin, onOpenDonation }) {
+export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelectSubject, adminSession, onOpenAdminLogin, onOpenDonation, onToggleSidebar }) {
   const { lang, setLang, t } = useLanguage();
   const { student, selectedGrade, setSelectedGrade, logout } = useAuth();
   const { theme, toggleTheme, isDark } = useTheme();
@@ -347,12 +347,23 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
 
       {/* 2. Main Navigation Bar with Grand 4K Emblem, Vibrant Blue Links & User Profile (PF) */}
       <div className="w-full max-w-[1600px] mx-auto px-2 sm:px-4 lg:px-6 relative z-20">
-        <div className="h-[74px] sm:h-[80px] flex items-center justify-between gap-1.5 sm:gap-3">
+        <div className="h-[74px] sm:h-[80px] flex items-center justify-between gap-1 sm:gap-3 min-w-0">
           
+          {/* Mobile / Tablet Menu Hamburger Toggle (Visible on screens < xl) */}
+          <button
+            type="button"
+            onClick={onToggleSidebar}
+            className="xl:hidden p-1.5 sm:p-2 rounded-xl text-[#002d62] dark:text-slate-200 hover:bg-blue-50 dark:hover:bg-slate-800 transition-colors flex items-center justify-center flex-shrink-0 cursor-pointer"
+            title={lang === 'km' ? 'បើកម៉ឺនុយ' : 'Open Menu'}
+            aria-label="Toggle Navigation Menu"
+          >
+            <Menu className="w-5 h-5 text-[#002d62] dark:text-cyan-400" />
+          </button>
+
           {/* Official Ministry 4K Crest & High-End Royal Typography */}
           <div 
             onClick={() => { setActiveTab('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); }}
-            className="cursor-pointer group select-none flex items-center gap-1.5 sm:gap-2.5 transition-all duration-300 flex-shrink-0"
+            className="cursor-pointer group select-none flex items-center gap-1.5 sm:gap-2.5 transition-all duration-300 min-w-0 flex-shrink-0"
           >
             {/* Grand 4K Gold Angkor Emblem Crest */}
             <div className="w-9 h-9 sm:w-12 sm:h-12 flex items-center justify-center relative flex-shrink-0 transition-transform duration-200 group-hover:scale-105">
@@ -373,7 +384,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
               }`}>
                 {lang === 'km' ? 'ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ' : 'Ministry of Talent Dev'}
               </span>
-              <span className={`font-extrabold tracking-wider uppercase font-cinzel whitespace-nowrap mt-0.5 transition-colors hidden md:block ${
+              <span className={`font-extrabold tracking-wider uppercase font-cinzel whitespace-nowrap mt-0.5 transition-colors hidden xl:block ${
                 isScrolled 
                   ? 'text-[7px] sm:text-[8px] text-[#005baa]/80' 
                   : 'text-[7.5px] sm:text-[8.5px] text-amber-700 font-bold'
@@ -457,7 +468,9 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
           <div className="flex items-center gap-1 sm:gap-1.5 md:gap-2 flex-shrink-0 ml-auto pl-1 sm:pl-2 pr-1.5 sm:pr-3">
             
             {/* 🏛️ OFFICIAL MINISTRY NATIONAL FUND BUTTON (NATURE SLAY VINES) */}
-            <NatureFundButton onClick={onOpenDonation} lang={lang} />
+            <div className="hidden lg:flex flex-shrink-0">
+              <NatureFundButton onClick={onOpenDonation} lang={lang} />
+            </div>
             
             {/* Search Icon Trigger (Attached Popover Live Search) */}
             <div ref={searchContainerRef} className="relative flex-shrink-0">
