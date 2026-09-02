@@ -2144,3 +2144,175 @@ div[class*="extension-floating"] {
   background: #475569;
 }
 
+/* ==========================================================================
+   Animated Express Delivery Truck Payment Loader (ABA & Bakong KHQR)
+   ========================================================================== */
+.truck-loader-container {
+  width: fit-content;
+  height: fit-content;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.truckWrapper {
+  width: 220px;
+  height: 98px;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  align-items: center;
+  justify-content: flex-end;
+  overflow-x: hidden;
+  user-select: none;
+}
+
+/* Truck upper body */
+.truckBody {
+  width: 136px;
+  height: fit-content;
+  margin-bottom: 6px;
+  animation: truckMotion 1s ease-in-out infinite;
+  z-index: 2;
+}
+
+/* Truck suspension bouncing animation */
+@keyframes truckMotion {
+  0% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(2.5px);
+  }
+  100% {
+    transform: translateY(0px);
+  }
+}
+
+/* Truck tires container */
+.truckTires {
+  width: 136px;
+  height: fit-content;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0px 10px 0px 16px;
+  position: absolute;
+  bottom: 0px;
+  z-index: 3;
+}
+
+.truckTires .tiresvg {
+  width: 24px;
+  height: 24px;
+}
+
+/* Tire Alloy Spinning Animation */
+.wheel-spin {
+  animation: wheelRotation 0.65s linear infinite;
+  transform-origin: 15px 15px;
+}
+
+@keyframes wheelRotation {
+  from {
+    transform: rotate(0deg);
+  }
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Road surface line */
+.truck-road {
+  width: 100%;
+  height: 2px;
+  background-color: #cbd5e1;
+  position: relative;
+  bottom: 0;
+  align-self: flex-end;
+  border-radius: 9999px;
+  z-index: 1;
+}
+
+html.dark .truck-road,
+html[data-theme="dark"] .truck-road,
+.dark .truck-road {
+  background-color: rgba(255, 255, 255, 0.22);
+}
+
+/* Dashed moving lane markings - Transparent background prevents dark artifact box */
+.truck-road::before {
+  content: "";
+  position: absolute;
+  width: 24px;
+  height: 100%;
+  background-color: transparent;
+  right: -30%;
+  border-radius: 2px;
+  animation: truckRoadAnimation 1.35s linear infinite;
+  border-left: 14px solid #00A3E0;
+}
+
+.truck-road::after {
+  content: "";
+  position: absolute;
+  width: 18px;
+  height: 100%;
+  background-color: transparent;
+  right: -75%;
+  border-radius: 2px;
+  animation: truckRoadAnimation 1.35s linear infinite;
+  border-left: 10px solid #ffffff;
+}
+
+html.dark .truck-road::before,
+html[data-theme="dark"] .truck-road::before,
+.dark .truck-road::before {
+  border-left-color: #38bdf8;
+  filter: drop-shadow(0 0 4px rgba(56, 189, 248, 0.6));
+}
+
+html.dark .truck-road::after,
+html[data-theme="dark"] .truck-road::after,
+.dark .truck-road::after {
+  border-left-color: #f8fafc;
+  filter: drop-shadow(0 0 3px rgba(255, 255, 255, 0.5));
+}
+
+/* Street lamp post passing by in the background */
+.truck-lampPost {
+  position: absolute;
+  bottom: 0;
+  right: -40%;
+  height: 88px;
+  animation: truckLampAnimation 1.35s linear infinite;
+  z-index: 1;
+  pointer-events: none;
+  color: #64748b;
+}
+
+html.dark .truck-lampPost,
+html[data-theme="dark"] .truck-lampPost,
+.dark .truck-lampPost {
+  color: #94a3b8;
+}
+
+@keyframes truckRoadAnimation {
+  0% {
+    transform: translateX(0px);
+  }
+  100% {
+    transform: translateX(-360px);
+  }
+}
+
+@keyframes truckLampAnimation {
+  0% {
+    transform: translateX(0px);
+  }
+  100% {
+    transform: translateX(-380px);
+  }
+}
+
+

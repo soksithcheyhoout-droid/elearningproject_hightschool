@@ -37,6 +37,7 @@ import { useAuth } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
 import { generateKhqrString, checkBakongTransactionStatus } from '../../utils/khqrGenerator';
 import { generateAbaPaymentQr, checkAbaPaymentStatus } from '../../utils/abaPayment';
+import TruckPaymentLoader from './TruckPaymentLoader';
 
 // Official ABA Bank Logo Badge Component
 function AbaLogoBadge({ size = "sm" }) {
@@ -1022,42 +1023,35 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                 </div>
               </div>
 
-              {/* 1-Click ABA Mobile Deep Link Button (Only on ABA gateway) */}
-              {paymentGateway === 'aba' && (
-                <a
-                  href={abaData?.deepLink || `abapay://qr?payload=${khqrData?.qrString || ''}`}
-                  className="w-full max-w-sm py-2.5 px-4 rounded-xl bg-[#002D56] hover:bg-[#001f3d] text-white text-xs font-bold flex items-center justify-center gap-2 transition-all shadow-sm active:scale-98"
-                >
-                  <Smartphone className="w-4 h-4 text-[#00A3E0]" />
-                  <span>បើកទូទាត់ក្នុង ABA Mobile App (1-Click)</span>
-                  <ExternalLink className="w-3 h-3 opacity-70" />
-                </a>
-              )}
-
-              {/* Live Auto-Checking Indicator & Countdown Timer Bar */}
-              <div className="w-full max-w-sm bg-white border border-slate-200/90 rounded-2xl p-3 shadow-xs space-y-2">
+              {/* Live Auto-Checking Indicator with Animated Express Delivery Truck & Countdown Timer Bar */}
+              <div className="w-full max-w-sm bg-white dark:bg-slate-900 border border-slate-200/90 dark:border-slate-800 rounded-2xl p-3 shadow-xs space-y-2.5 flex flex-col items-center">
                 
-                {/* Auto Status Row */}
-                <div className="flex items-center justify-between">
+                {/* Express Delivery Truck Animation (Dynamic ABA vs Bakong) */}
+                <div className="w-full py-0.5 flex items-center justify-center">
+                  <TruckPaymentLoader gateway={paymentGateway} />
+                </div>
+
+                {/* Auto Status & Timer Row */}
+                <div className="w-full flex items-center justify-between pt-1 border-t border-slate-100 dark:border-slate-800/80">
                   <div className="flex items-center gap-2">
                     <span className="relative flex h-2.5 w-2.5">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
                       <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
                     </span>
-                    <span className="text-[11px] font-bold text-slate-800">
+                    <span className="text-[11px] font-bold text-slate-800 dark:text-slate-200">
                       កំពុងរង់ចាំការស្កេនទូទាត់... (Auto-Checking)
                     </span>
                   </div>
                   
                   {/* Timer Badge */}
-                  <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 border border-slate-200 font-mono text-[11px] font-bold text-slate-700">
-                    <Clock className="w-3 h-3 text-slate-500" />
+                  <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-100 dark:bg-slate-800 border border-slate-200 dark:border-slate-700 font-mono text-[11px] font-bold text-slate-700 dark:text-slate-300">
+                    <Clock className="w-3 h-3 text-slate-500 dark:text-slate-400" />
                     <span>{formatTime(timeLeft)}</span>
                   </div>
                 </div>
 
                 {/* Smooth Progress Bar */}
-                <div className="w-full h-1 bg-slate-100 rounded-full overflow-hidden">
+                <div className="w-full h-1 bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
                   <div 
                     className={`h-full transition-all duration-1000 ease-linear ${
                       timeLeft > 60 ? 'bg-emerald-500' : timeLeft > 30 ? 'bg-amber-500' : 'bg-red-500'
