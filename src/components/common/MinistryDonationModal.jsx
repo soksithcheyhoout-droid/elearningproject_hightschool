@@ -523,7 +523,7 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
         </div>
 
         {/* ══════════ RIGHT INTERACTIVE FORM & BAKONG KHQR ══════════ */}
-        <div className="flex-1 flex flex-col justify-between bg-[#0b1328] p-4 sm:p-6 md:p-7 overflow-y-auto relative min-h-0 text-white">
+        <div className="flex-1 flex flex-col justify-between bg-[#0b1328] p-3 sm:p-5 md:p-5 overflow-y-auto relative min-h-0 text-white">
           
           {/* Modal Header */}
           <div className="flex items-center justify-between pb-3 border-b border-slate-800">
@@ -911,17 +911,17 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
 
           {/* ── STEP 2: Authentic QR Card Screen with Live Auto-Check & 1-Click Mobile Deep Link ── */}
           {step === 2 && !isGeneratingQR && (
-            <div className="space-y-3.5 py-1 flex flex-col items-center justify-center animate-fadeIn">
+            <div className="space-y-2 py-0.5 flex flex-col items-center justify-center animate-fadeIn">
               
-              {/* Dynamic Payment Card (ABA PayWay vs Bakong KHQR) */}
-              <div className="rounded-[22px] w-[285px] sm:w-[300px] flex flex-col bg-[#0b1428] shadow-[0_18px_40px_rgba(0,10,30,0.6)] border border-slate-700/80 overflow-hidden text-white relative">
+              {/* Dynamic Payment Card (ABA PayWay vs Bakong KHQR) - Compact & Elegant */}
+              <div className="rounded-[20px] w-[275px] sm:w-[285px] flex flex-col bg-[#0b1428] shadow-[0_12px_32px_rgba(0,10,30,0.5)] border border-slate-700/80 overflow-hidden text-white relative">
                 
                 {/* Header Bar: KHQR Vector Header with Dynamic Theme Color (ABA Blue vs Bakong Red) */}
                 <div 
-                  className="flex items-center justify-center h-[46px] transition-colors relative shadow-xs"
+                  className="flex items-center justify-center h-[38px] transition-colors relative shadow-xs"
                   style={{ backgroundColor: paymentGateway === 'aba' ? '#002D56' : 'rgb(226,26,26)' }}
                 >
-                  <svg width="64" height="15" viewBox="0 0 60 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <svg width="56" height="13" viewBox="0 0 60 14" fill="none" xmlns="http://www.w3.org/2000/svg">
                     <path d="M39.006 5.19439V9.59764H34.5318C34.0729 9.59764 33.7288 9.2307 33.7288 8.80731V5.22264C33.7288 4.77103 34.1016 4.43231 34.5318 4.43231H38.1743C38.6619 4.40408 39.006 4.74278 39.006 5.19439Z" fill="white"/>
                     <path d="M59.9717 6.97176H57.7345C57.7345 4.34676 55.5548 2.20159 52.8875 2.20159C50.7651 2.20159 48.9008 3.55645 48.2699 5.53225C48.1265 6.01209 48.0404 6.49192 48.0404 6.97176V13.9718H47.9831C46.7785 13.9718 45.8033 13.0121 45.8033 11.8266V6.97176H45.832C45.832 5.05241 46.6351 3.21773 48.0691 1.89112C49.3884 0.677406 51.1093 0 52.9162 0C56.8168 0 59.9717 3.13305 59.9717 6.97176Z" fill="white"/>
                     <path d="M59.9999 13.9718L56.845 14L56.0706 13.2379L54.3497 11.5444L51.9692 9.20166H55.1241L59.9999 13.9718Z" fill="white"/>
@@ -934,49 +934,49 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                 {/* Right Fold Triangle Notch with Dynamic Theme Color */}
                 <div className="flex justify-end">
                   <div style={{
-                    borderLeft: '20px solid transparent',
-                    borderTop: `20px solid ${paymentGateway === 'aba' ? '#002D56' : 'rgb(226, 26, 26)'}`,
+                    borderLeft: '16px solid transparent',
+                    borderTop: `16px solid ${paymentGateway === 'aba' ? '#002D56' : 'rgb(226, 26, 26)'}`,
                     height: 0,
                     width: 0
                   }}></div>
                 </div>
 
                 {/* Merchant Name chey_dev & Amount */}
-                <div className="py-2.5 px-4">
+                <div className="py-2 px-3.5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <div className="w-5 h-5 rounded-md bg-amber-400/15 border border-amber-400/30 p-0.5 flex items-center justify-center">
+                      <div className="w-4.5 h-4.5 rounded-md bg-amber-400/15 border border-amber-400/30 p-0.5 flex items-center justify-center">
                         <img src="/assets/moeys-crest-transparent.png" alt="Crest" className="w-full h-full object-contain filter drop-shadow-xs" />
                       </div>
-                      <span className="text-[12.5px] font-black text-white font-mono tracking-wide">chey_dev</span>
+                      <span className="text-[12px] font-black text-white font-mono tracking-wide">chey_dev</span>
                     </div>
-                    <span className={`text-[9px] px-2 py-0.5 rounded-full font-mono font-bold border ${
+                    <span className={`text-[8.5px] px-2 py-0.2 rounded-full font-mono font-bold border ${
                       paymentGateway === 'aba' 
                         ? 'bg-[#002D56] text-[#00A3E0] border-[#00A3E0]/40' 
                         : 'bg-red-950 text-red-400 border-red-500/40'
                     }`}>
-                      {paymentGateway === 'aba' ? 'ABA Merchant ID' : 'Bakong Merchant ID'}
+                      {paymentGateway === 'aba' ? 'ABA Merchant' : 'Bakong Merchant'}
                     </span>
                   </div>
 
                   {/* PRICE DISPLAY - PERFECT FINTECH TYPOGRAPHY */}
-                  <div className="mt-2 flex items-baseline justify-between">
+                  <div className="mt-1.5 flex items-baseline justify-between">
                     <div className="flex items-baseline gap-1 font-mono">
-                      <span className={`text-lg font-black ${paymentGateway === 'aba' ? 'text-[#00A3E0]' : 'text-red-400'}`}>
+                      <span className={`text-base font-black ${paymentGateway === 'aba' ? 'text-[#00A3E0]' : 'text-red-400'}`}>
                         {amountType === 'usd' ? '$' : '៛'}
                       </span>
-                      <span className="text-2xl sm:text-3xl font-black text-white tracking-tight drop-shadow-xs">
+                      <span className="text-2xl font-black text-white tracking-tight drop-shadow-xs">
                         {amountType === 'usd' ? Number(currentAmount).toFixed(2) : Number(currentAmount).toLocaleString()}
                       </span>
-                      <span className={`text-[10.5px] font-mono font-black ml-1 px-1.5 py-0.5 rounded uppercase tracking-wider ${
+                      <span className={`text-[10px] font-mono font-black ml-1 px-1.5 py-0.2 rounded uppercase tracking-wider ${
                         paymentGateway === 'aba' ? 'bg-[#002D56] text-cyan-300 border border-[#00A3E0]/30' : 'bg-red-950 text-red-300 border border-red-500/30'
                       }`}>
                         {amountType.toUpperCase()}
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-[9px] font-mono text-slate-400 uppercase tracking-wider block">Total Amount</span>
-                      <span className="text-[9.5px] font-bold text-emerald-400 flex items-center gap-1 justify-end font-mono">
+                      <span className="text-[8.5px] font-mono text-slate-400 uppercase tracking-wider block">Total Amount</span>
+                      <span className="text-[9px] font-bold text-emerald-400 flex items-center gap-1 justify-end font-mono">
                         <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
                         Zero Fee
                       </span>
@@ -985,12 +985,12 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                 </div>
 
                 {/* Perforated dashed divider */}
-                <div className="w-full border-b border-dashed border-slate-700/70 my-0.5" />
+                <div className="w-full border-b border-dashed border-slate-700/70" />
 
                 {/* Vector QR Code SVG with High-DPI Center Crest Badge */}
-                <div className="flex justify-center items-center relative p-3 bg-white/95 rounded-2xl mx-3.5 my-2 shadow-inner min-h-[195px] khqr-svg-wrapper">
-                  <div className="relative bg-white rounded-xl p-1 flex items-center justify-center min-w-[180px] min-h-[180px]">
-                    <div className="relative w-[180px] h-[180px] flex items-center justify-center p-1 bg-white rounded-lg">
+                <div className="flex justify-center items-center relative p-2 bg-white/95 rounded-xl mx-3 my-1.5 shadow-inner min-h-[165px] khqr-svg-wrapper">
+                  <div className="relative bg-white rounded-lg p-0.5 flex items-center justify-center min-w-[155px] min-h-[155px]">
+                    <div className="relative w-[155px] h-[155px] flex items-center justify-center p-0.5 bg-white rounded-md">
                       <QRCodeSVG
                         value={
                           (paymentGateway === 'aba' && abaData?.qrString)
@@ -1004,7 +1004,7 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                                 storeLabel: 'chey_dev'
                               }).qrString)
                         }
-                        size={175}
+                        size={150}
                         level="H"
                         marginSize={1}
                         fgColor={paymentGateway === 'aba' ? '#002D56' : '#081b37'}
@@ -1013,14 +1013,14 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                           src: '/assets/moeys-crest-transparent.png',
                           x: undefined,
                           y: undefined,
-                          height: 40,
-                          width: 40,
+                          height: 36,
+                          width: 36,
                           excavate: true,
                         }}
                       />
                       
                       {/* Ultra-Crisp High-DPI Golden Crest Center Badge */}
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.18)] border border-slate-100 flex items-center justify-center p-1 pointer-events-none ring-2 ring-white">
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-9 h-9 bg-white rounded-lg shadow-[0_2px_8px_rgba(0,0,0,0.18)] border border-slate-100 flex items-center justify-center p-0.5 pointer-events-none ring-2 ring-white">
                         <img 
                           src="/assets/moeys-crest-transparent.png" 
                           alt="Ministry Golden Crest" 
@@ -1033,14 +1033,14 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                   
                   {/* Expired Overlay if timer reaches 0 */}
                   {isExpired && (
-                    <div className="absolute inset-0 bg-slate-950/95 backdrop-blur-xs flex flex-col items-center justify-center p-4 text-center z-20 rounded-2xl">
-                      <AlertCircle className="w-8 h-8 text-amber-400 mb-1" />
+                    <div className="absolute inset-0 bg-slate-950/95 backdrop-blur-xs flex flex-col items-center justify-center p-3 text-center z-20 rounded-xl">
+                      <AlertCircle className="w-7 h-7 text-amber-400 mb-1" />
                       <p className="text-xs font-bold text-white">កាត QR ផុតកំណត់</p>
-                      <p className="text-[10.5px] text-slate-400 mb-3">សូមចុច Refresh ដើម្បីបង្កើតកាតថ្មី</p>
+                      <p className="text-[10px] text-slate-400 mb-2">សូមចុច Refresh ដើម្បីបង្កើតកាតថ្មី</p>
                       <button
                         type="button"
                         onClick={handleProceedToQR}
-                        className="px-3.5 py-1.5 rounded-xl bg-slate-800 text-white text-xs font-bold hover:bg-slate-700 transition-colors shadow-xs cursor-pointer border border-slate-700"
+                        className="px-3 py-1 rounded-lg bg-slate-800 text-white text-xs font-bold hover:bg-slate-700 transition-colors shadow-xs cursor-pointer border border-slate-700"
                       >
                         បង្កើតកាតថ្មី (Refresh)
                       </button>
@@ -1049,8 +1049,8 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                 </div>
 
                 {/* Card Subtitle */}
-                <div className="pb-2.5 pt-0.5 text-center px-2">
-                  <p className="text-[10.5px] text-slate-300 leading-tight">
+                <div className="pb-1.5 pt-0.5 text-center px-2">
+                  <p className="text-[10px] text-slate-300 leading-tight">
                     {paymentGateway === 'aba' ? (
                       <span>ស្កេនជាមួយ <strong className="text-white font-bold">ABA Mobile</strong> ឬ KHQR គ្រប់ធនាគារ</span>
                     ) : (
@@ -1060,77 +1060,41 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                 </div>
               </div>
 
-              {/* High-End Fintech Auto-Checking Terminal (NO GREEN LINE!) */}
-              <div className="w-full max-w-sm bg-gradient-to-b from-slate-900/95 via-[#0b1428] to-[#070d1d] border border-slate-700/80 rounded-2xl p-3.5 shadow-[0_12px_36px_rgba(0,10,30,0.5)] flex flex-col items-center space-y-2.5 relative overflow-hidden">
-                {/* Subtle Ambient Top Glow Line */}
+              {/* Ultra-Compact Fintech Auto-Checking Bar (Steady, Non-Scrolling, Zero Page Overflow) */}
+              <div className="w-full max-w-[275px] sm:max-w-[285px] bg-gradient-to-r from-slate-900/95 via-[#0b1428] to-slate-900/95 border border-slate-700/80 rounded-2xl p-2.5 shadow-md flex items-center justify-between gap-2.5 relative overflow-hidden">
+                {/* Subtle Ambient Top Accent Glow */}
                 <div className={`absolute top-0 left-1/4 right-1/4 h-[1.5px] bg-gradient-to-r from-transparent ${
                   paymentGateway === 'aba' ? 'via-[#00A3E0]' : 'via-red-500'
                 } to-transparent opacity-80`} />
-                
-                {/* Modern Tri-Spinner & Cycling Dynamic Text Loader (Fintech Grade) */}
-                <div className="payment-spinner-container py-1">
-                  <div className={`payment-tri-spinner ${paymentGateway === 'aba' ? '' : 'bakong'}`} />
-                  
-                  <div className="payment-words-loader mt-2.5">
-                    <p className="text-slate-200 font-bold tracking-tight">Waiting for</p>
-                    <div className="payment-words-box">
-                      <span className={`payment-cycle-word ${paymentGateway === 'aba' ? '' : 'bakong'}`}>Payment...</span>
-                      <span className={`payment-cycle-word ${paymentGateway === 'aba' ? '' : 'bakong'}`}>
-                        {paymentGateway === 'aba' ? 'ABA Mobile...' : 'Bakong App...'}
-                      </span>
-                      <span className={`payment-cycle-word ${paymentGateway === 'aba' ? '' : 'bakong'}`}>KHQR Scan...</span>
-                      <span className={`payment-cycle-word ${paymentGateway === 'aba' ? '' : 'bakong'}`}>Confirmation...</span>
-                      <span className={`payment-cycle-word ${paymentGateway === 'aba' ? '' : 'bakong'}`}>Payment...</span>
-                    </div>
-                  </div>
-                  
-                  <p className="text-[10.5px] text-slate-400 font-kantumruy mt-0.5 text-center font-medium">
-                    សូមបើកកម្មវិធីធនាគាររបស់អ្នកដើម្បីស្កេនទូទាត់ (Scan & Pay)
-                  </p>
-                </div>
 
-                {/* Telemetry Status & Digital Timer Row (NO GREEN LINE) */}
-                <div className="w-full flex items-center justify-between pt-2 border-t border-slate-800/80">
-                  <div className="flex items-center gap-2 min-w-0">
-                    <span className="relative flex h-2.5 w-2.5 shrink-0">
-                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
+                {/* Left: Compact Tri-Spinner & Steady Clean Text (No Scrolling Words!) */}
+                <div className="flex items-center gap-2.5 min-w-0">
+                  <div className={`payment-tri-spinner shrink-0 ${paymentGateway === 'aba' ? '' : 'bakong'}`} />
+                  <div className="min-w-0">
+                    <div className="flex items-center gap-1">
+                      <span className="text-xs font-black text-white font-mono tracking-tight truncate">
+                        Waiting for <span className={paymentGateway === 'aba' ? 'text-[#00A3E0]' : 'text-red-400'}>Payment...</span>
+                      </span>
+                    </div>
+                    <span className="text-[9.5px] text-slate-400 font-kantumruy block leading-tight truncate">
+                      កំពុងរង់ចាំការទូទាត់ (Auto-Detect)
                     </span>
-                    <div className="min-w-0">
-                      <span className="text-[11.5px] font-bold text-white block leading-tight font-kantumruy">
-                        កំពុងរង់ចាំការស្កេនទូទាត់...
-                      </span>
-                      <span className="text-[9px] font-mono text-slate-400 block leading-tight">
-                        Auto-Polling Gateway (2s)
-                      </span>
-                    </div>
-                  </div>
-                  
-                  {/* Digital Clock Badge */}
-                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-950/90 border border-slate-700/80 font-mono text-xs font-black text-cyan-400 shadow-inner shrink-0">
-                    <Clock className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-                    <span className="tracking-wider">{formatTime(timeLeft)}</span>
                   </div>
                 </div>
 
-                {/* Sub-footer inside Auto-Checking Card */}
-                <div className="w-full flex items-center justify-between text-[9px] font-mono text-slate-400 pt-1.5 border-t border-slate-800/60">
-                  <span className="flex items-center gap-1 text-slate-400">
-                    <ShieldCheck className="w-3 h-3 text-emerald-400" />
-                    <span>EMVCo 256-bit Secure</span>
-                  </span>
-                  <span className="text-slate-400">
-                    {paymentGateway === 'aba' ? 'ABA PayWay API' : 'Bakong Open API'}
-                  </span>
+                {/* Right: Digital Countdown Timer Badge */}
+                <div className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-950/90 border border-slate-700/80 font-mono text-xs font-black text-cyan-400 shadow-inner shrink-0">
+                  <Clock className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+                  <span className="tracking-wider">{formatTime(timeLeft)}</span>
                 </div>
               </div>
 
-              {/* Clean Action Buttons: Back and Save QR Only */}
-              <div className="flex items-center justify-between gap-2.5 w-full max-w-sm pt-1">
+              {/* Clean Action Buttons: Back and Save QR Only (Fits 100% on Screen Without Scroll) */}
+              <div className="flex items-center justify-between gap-2 w-full max-w-[275px] sm:max-w-[285px] pt-0.5">
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-bold cursor-pointer transition-colors text-center border border-slate-700 flex items-center justify-center gap-1.5 shadow-xs active:scale-98"
+                  className="flex-1 py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-bold cursor-pointer transition-colors text-center border border-slate-700 flex items-center justify-center gap-1.5 shadow-xs active:scale-98"
                 >
                   <ArrowLeft className="w-3.5 h-3.5" />
                   <span>ថយក្រោយ (Back)</span>
@@ -1138,7 +1102,7 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                 <button
                   type="button"
                   onClick={handleDownloadQr}
-                  className={`flex-1 py-2.5 rounded-xl text-white text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-md active:scale-98 ${
+                  className={`flex-1 py-2 rounded-xl text-white text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-md active:scale-98 ${
                     paymentGateway === 'aba'
                       ? 'bg-gradient-to-r from-[#002D56] via-[#004B87] to-[#00A3E0] hover:brightness-110'
                       : 'bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:brightness-110'
