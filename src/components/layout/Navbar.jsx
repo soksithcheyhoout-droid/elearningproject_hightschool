@@ -324,21 +324,21 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
           <a 
             href="tel:0977416126" 
             className="flex items-center gap-1.5 hover:text-amber-200 transition-colors font-mono"
-            title="Hotline: +855 66 901 800 / 097 741 6126"
+            title="Hotline: 097 741 6126"
           >
             <Phone className="w-3 h-3 text-white" />
-            <span>+855 66 901 800</span>
+            <span>097 741 6126</span>
           </a>
 
           <span className="text-white/40 hidden sm:inline">|</span>
 
           <a 
-            href="mailto:support@motdar.gov.kh" 
+            href="mailto:soksithcheyhoout@gmail.com" 
             className="hidden sm:flex items-center gap-1.5 hover:text-amber-200 transition-colors"
-            title="Official Email: info@moeys.gov.kh / support@motdar.gov.kh"
+            title="Email: soksithcheyhoout@gmail.com"
           >
             <Mail className="w-3 h-3 text-white" />
-            <span className="truncate max-w-[200px] lg:max-w-none">info@moeys.gov.kh / support@motdar.gov.kh</span>
+            <span className="truncate max-w-[220px] lg:max-w-none">soksithcheyhoout@gmail.com</span>
           </a>
         </div>
       </div>
