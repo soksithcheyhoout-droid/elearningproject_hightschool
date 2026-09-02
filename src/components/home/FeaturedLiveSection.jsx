@@ -49,19 +49,15 @@ export default function FeaturedLiveSection({ onStartQuiz, onSelectSubject }) {
       <div className="lg:col-span-2 p-3.5 sm:p-6 bg-white/95 dark:bg-[#0f172a] backdrop-blur-md rounded-2xl sm:rounded-3xl border border-slate-200/90 dark:border-slate-800 flex flex-col justify-between shadow-md">
         <div className="space-y-2.5 sm:space-y-4">
           
-          <div className="flex items-center justify-between flex-wrap gap-1.5 sm:gap-2">
+          <div className="flex items-center justify-between flex-wrap gap-2">
             <div className="flex items-center gap-2">
-              <span className="flex h-2.5 w-2.5 relative">
-                <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-rose-400 opacity-75"></span>
-                <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-rose-500"></span>
-              </span>
-              <span className="text-[10px] sm:text-xs font-bold text-rose-600 uppercase tracking-wide">
-                Live Masterclass {'\u179c\u1782\u17d2\u1782\u1796\u17b7\u179f\u17c1\u179f'}
+              <span className="w-2.5 h-2.5 rounded-full bg-rose-600"></span>
+              <span className="text-xs font-bold text-rose-600 uppercase tracking-wide">
+                Live Masterclass • វគ្គពិសេស
               </span>
             </div>
-            <span className="badge-moeys-gold text-[9px] sm:text-xs">
-              <Sparkles className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-amber-600" />
-              <span>{'\u178a\u17c4\u1799\u17a5\u178f\u1782\u17b7\u178f\u1790\u17d2\u179b\u17c3'} (Free Access)</span>
+            <span className="text-[11px] font-semibold text-slate-600 dark:text-slate-300 bg-slate-100 dark:bg-slate-800 px-2.5 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
+              កម្មវិធីបើកចំហ (Open Access)
             </span>
           </div>
 
