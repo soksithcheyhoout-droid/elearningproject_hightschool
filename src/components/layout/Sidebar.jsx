@@ -16,6 +16,8 @@ import {
   Gamepad2,
   Flame,
   MessageSquare,
+  Phone,
+  Mail,
   X
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
@@ -116,39 +118,55 @@ export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor, isOpen
       {/* Mobile / Tablet Drawer Backdrop Scrim */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-slate-950/50 backdrop-blur-xs z-[190] xl:hidden transition-opacity duration-300"
+          className="fixed inset-0 bg-slate-950/60 backdrop-blur-sm z-[299] xl:hidden transition-opacity duration-300 animate-fadeIn"
           onClick={onClose}
           aria-hidden="true"
         />
       )}
 
-      {/* Sidebar: Permanently docked on xl: (1280px+), Smooth slide-out drawer on < xl */}
-      <aside className={`w-72 flex flex-col flex-shrink-0 bg-white dark:bg-slate-900 border-r border-slate-200/90 dark:border-slate-800 py-4 px-3 space-y-3 select-none shadow-2xl xl:shadow-xs font-kantumruy overflow-y-auto fixed ${
-        isScrolled ? 'top-[60px] sm:top-[64px]' : 'top-[102px] sm:top-[110px]'
-      } left-0 bottom-0 z-[200] xl:z-30 pb-8 transition-all duration-300 ease-in-out ${
-        isOpen ? 'translate-x-0' : '-translate-x-full xl:translate-x-0'
-      } [scrollbar-width:thin] [scrollbar-color:rgba(0,91,170,0.15)_transparent]`}>
+      {/* Sidebar:
+          - Mobile / Tablet (< xl): Full-screen height off-canvas sheet (top-0 to bottom-0)
+          - Desktop (xl:): Permanently docked on left below top navbar
+      */}
+      <aside 
+        className={`fixed flex flex-col flex-shrink-0 bg-white dark:bg-[#0c1427] border-r border-slate-200/90 dark:border-slate-800/90 select-none shadow-2xl xl:shadow-none font-kantumruy transition-transform duration-300 ease-in-out [scrollbar-width:thin] [scrollbar-color:rgba(0,91,170,0.15)_transparent]
+          top-0 bottom-0 left-0 w-[86vw] max-w-[330px] z-[300] h-[100dvh]
+          ${isOpen ? 'translate-x-0' : '-translate-x-full xl:translate-x-0'}
+          xl:w-72 xl:z-30 xl:shadow-xs
+          ${isScrolled ? 'xl:top-[60px] xl:sm:top-[64px] xl:h-[calc(100vh-64px)]' : 'xl:top-[106px] xl:sm:top-[116px] xl:h-[calc(100vh-116px)]'}
+        `}
+      >
         
-        {/* Header Menu Section Badge */}
-        <div className="flex items-center justify-between px-3 pb-2.5 border-b border-slate-100/90 dark:border-slate-800">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded-lg bg-gradient-to-br from-blue-500/15 to-indigo-500/10 border border-blue-200/80 text-[#005baa] flex items-center justify-center font-bold shadow-2xs">
-              <Building2 className="w-3.5 h-3.5" />
+        {/* Header Menu Section Badge (Prominent on Mobile, Compact on PC) */}
+        <div className="flex items-center justify-between px-3.5 py-3 border-b border-slate-100 dark:border-slate-800/80 flex-shrink-0 bg-slate-50/70 dark:bg-slate-900/70">
+          <div className="flex items-center gap-2.5">
+            <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-200/80 dark:border-blue-500/30 flex items-center justify-center p-1 shadow-2xs flex-shrink-0">
+              <img 
+                src="/assets/moeys-crest-transparent.png" 
+                alt="MoEYS Crest" 
+                className="w-full h-full object-contain filter drop-shadow-2xs"
+                onError={(e) => { e.target.src = '/assets/moeys-custom-logo-transparent.png'; }}
+              />
             </div>
-            <span className="text-[11px] font-black text-[#003366] dark:text-slate-100 uppercase tracking-wider">
-              {lang === 'km' ? 'ម៉ឺនុយចម្បង' : 'Main Menu'}
-            </span>
+            <div className="flex flex-col text-left leading-tight min-w-0">
+              <span className="text-xs font-black text-[#002d62] dark:text-white uppercase tracking-wider truncate">
+                {lang === 'km' ? 'ម៉ឺនុយចម្បង' : 'Main Menu'}
+              </span>
+              <span className="text-[9.5px] font-bold text-[#005baa] dark:text-cyan-400 truncate">
+                MoEYS National Portal
+              </span>
+            </div>
           </div>
           
-          <div className="flex items-center gap-1.5">
-            <span className="text-[9.5px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
-              MoEYS Portal
+          <div className="flex items-center gap-1.5 flex-shrink-0">
+            <span className="hidden sm:inline-block text-[9.5px] font-bold text-slate-500 dark:text-slate-400 bg-slate-100 dark:bg-slate-800 px-2 py-0.5 rounded-md border border-slate-200 dark:border-slate-700">
+              Portal
             </span>
             {/* Close Button on Mobile / Tablet */}
             <button
               type="button"
               onClick={onClose}
-              className="xl:hidden p-1 rounded-lg text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors cursor-pointer"
+              className="xl:hidden w-8 h-8 rounded-xl bg-slate-100 hover:bg-slate-200 dark:bg-slate-800 dark:hover:bg-slate-700 text-slate-500 hover:text-slate-800 dark:text-slate-300 dark:hover:text-white flex items-center justify-center transition-colors cursor-pointer border border-slate-200/60 dark:border-slate-700"
               aria-label="Close menu"
             >
               <X className="w-4 h-4" />
@@ -156,90 +174,122 @@ export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor, isOpen
           </div>
         </div>
 
-      {/* Navigation Items List */}
-      <nav className="space-y-1 font-kantumruy">
-        {navItems.map((item) => {
-          const Icon = item.icon;
-          const isActive = activeTab === item.id;
-          return (
-            <button
-              key={item.id}
-              type="button"
-              onClick={() => {
-                setActiveTab(item.id);
-                if (onClose) onClose();
-              }}
-              className={`w-full flex items-center justify-between px-3 py-2 rounded-2xl text-xs sm:text-[12.5px] font-bold transition-all duration-200 group cursor-pointer relative ${
-                isActive
-                  ? 'bg-gradient-to-r from-blue-500/15 via-indigo-500/10 to-transparent dark:from-blue-600/30 dark:via-indigo-600/20 dark:to-transparent text-[#005baa] dark:text-cyan-300 border border-blue-300/60 dark:border-cyan-500/40 shadow-xs'
-                  : 'text-slate-700 dark:text-slate-300 hover:text-[#005baa] dark:hover:text-white hover:bg-slate-50/80 dark:hover:bg-slate-800/70 border border-transparent'
-              }`}
-            >
-              {/* Left Active Glow Indicator */}
-              {isActive && (
-                <span className="absolute left-0 top-2 bottom-2 w-1.5 rounded-r-full bg-gradient-to-b from-[#005baa] to-indigo-500 shadow-sm shadow-blue-500/40" />
-              )}
+        {/* Scrollable Container for Navigation & Footer Info */}
+        <div className="flex-1 overflow-y-auto px-3 py-3 space-y-3 [scrollbar-width:thin] [scrollbar-color:rgba(0,91,170,0.15)_transparent]">
+          
+          {/* Navigation Items List */}
+          <nav className="space-y-1 font-kantumruy">
+            {navItems.map((item) => {
+              const Icon = item.icon;
+              const isActive = activeTab === item.id;
+              return (
+                <button
+                  key={item.id}
+                  type="button"
+                  onClick={() => {
+                    setActiveTab(item.id);
+                    if (onClose) onClose();
+                  }}
+                  className={`w-full flex items-center justify-between px-3 py-2.5 rounded-2xl text-xs sm:text-[12.5px] font-bold transition-all duration-200 group cursor-pointer relative ${
+                    isActive
+                      ? 'bg-gradient-to-r from-blue-500/15 via-indigo-500/10 to-transparent dark:from-blue-600/30 dark:via-indigo-600/20 dark:to-transparent text-[#005baa] dark:text-cyan-300 border border-blue-300/60 dark:border-cyan-500/40 shadow-xs'
+                      : 'text-slate-700 dark:text-slate-300 hover:text-[#005baa] dark:hover:text-white hover:bg-slate-50/80 dark:hover:bg-slate-800/70 border border-transparent'
+                  }`}
+                >
+                  {/* Left Active Glow Indicator */}
+                  {isActive && (
+                    <span className="absolute left-0 top-2.5 bottom-2.5 w-1.5 rounded-r-full bg-gradient-to-b from-[#005baa] to-indigo-500 shadow-sm shadow-blue-500/40" />
+                  )}
 
-              <div className="flex items-center gap-2.5 min-w-0 pr-1">
-                <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 ${
-                  isActive 
-                    ? `bg-gradient-to-br ${item.iconColor} text-white shadow-md shadow-blue-500/25` 
-                    : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 group-hover:bg-blue-50 dark:group-hover:bg-slate-700 group-hover:text-[#005baa] dark:group-hover:text-cyan-300 group-hover:scale-105'
-                }`}>
-                  <Icon className="w-4 h-4" />
-                </div>
-                <span className={`truncate text-xs ${isActive ? 'text-[#003366] dark:text-white font-extrabold' : 'text-slate-700 dark:text-slate-300 font-semibold group-hover:text-[#005baa] dark:group-hover:text-white'}`}>
-                  {item.label}
-                </span>
+                  <div className="flex items-center gap-2.5 min-w-0 pr-1">
+                    <div className={`w-8 h-8 rounded-xl flex items-center justify-center transition-all duration-200 flex-shrink-0 ${
+                      isActive 
+                        ? `bg-gradient-to-br ${item.iconColor} text-white shadow-md shadow-blue-500/25` 
+                        : 'bg-slate-100 dark:bg-slate-800 text-slate-500 dark:text-slate-400 group-hover:bg-blue-50 dark:group-hover:bg-slate-700 group-hover:text-[#005baa] dark:group-hover:text-cyan-300 group-hover:scale-105'
+                    }`}>
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <span className={`truncate text-xs ${isActive ? 'text-[#003366] dark:text-white font-extrabold' : 'text-slate-700 dark:text-slate-300 font-semibold group-hover:text-[#005baa] dark:group-hover:text-white'}`}>
+                      {item.label}
+                    </span>
+                  </div>
+                  
+                  {item.badge && (
+                    <span className={`text-[9.5px] font-black px-2 py-0.5 rounded-full border flex-shrink-0 shadow-2xs whitespace-nowrap transition-transform duration-200 group-hover:scale-105 ${item.badgeClass || 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}>
+                      {item.badge}
+                    </span>
+                  )}
+                </button>
+              );
+            })}
+          </nav>
+
+          {/* ☀️ / 🌙 Background Theme Selector (White or Black) */}
+          <div className="pt-2 pb-1">
+            <div className="text-[10px] font-black text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-1.5 px-1 flex items-center justify-between">
+              <span>{lang === 'km' ? 'ផ្ទៃពណ៌ (Theme)' : 'Appearance'}</span>
+            </div>
+            <ThemeToggle variant="segmented" className="w-full justify-between" />
+          </div>
+
+          {/* Official MoEYS Hotline & National Info Card (With Phone, Gmail, Telegram) */}
+          <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
+            <div className="bg-gradient-to-br from-blue-50/80 via-slate-50 to-indigo-50/60 dark:from-slate-900/90 dark:via-[#0c1427] dark:to-slate-900/90 rounded-2xl p-3 border border-blue-100/80 dark:border-slate-800/80 space-y-2 text-center shadow-2xs">
+              <div className="flex items-center justify-center gap-1.5 text-[#003366] dark:text-amber-300 font-extrabold text-[11px]">
+                <img src="/assets/moeys-crest-transparent.png" alt="MoTDAR" className="w-4 h-4 object-contain" />
+                <span>{lang === 'km' ? 'ជំនួយការសិក្សាជាតិ' : 'National Support'}</span>
               </div>
               
-              {item.badge && (
-                <span className={`text-[9.5px] font-black px-2 py-0.5 rounded-full border flex-shrink-0 shadow-2xs whitespace-nowrap transition-transform duration-200 group-hover:scale-105 ${item.badgeClass || 'bg-slate-100 dark:bg-slate-800 text-slate-600 dark:text-slate-300 border-slate-200 dark:border-slate-700'}`}>
-                  {item.badge}
-                </span>
-              )}
-            </button>
-          );
-        })}
-      </nav>
+              <div className="text-[10.5px] text-slate-600 dark:text-slate-300 font-semibold space-y-1">
+                {/* Phone Link */}
+                <a 
+                  href="tel:0977416126" 
+                  className="flex items-center justify-center gap-1.5 hover:text-[#005baa] dark:hover:text-cyan-400 font-mono font-bold text-xs"
+                >
+                  <Phone className="w-3 h-3 text-[#005baa] dark:text-cyan-400" />
+                  <span>097 741 6126</span>
+                </a>
 
-      {/* ☀️ / 🌙 Background Theme Selector (White or Black) */}
-      <div className="mt-auto pt-2 pb-1">
-        <div className="text-[10px] font-black text-slate-400 dark:text-slate-400 uppercase tracking-wider mb-1.5 px-1 flex items-center justify-between">
-          <span>{lang === 'km' ? 'ផ្ទៃពណ៌ (Theme)' : 'Appearance'}</span>
-        </div>
-        <ThemeToggle variant="segmented" className="w-full justify-between" />
-      </div>
+                {/* Email Link */}
+                <a 
+                  href="mailto:soksithcheyhoout@gmail.com" 
+                  className="flex items-center justify-center gap-1.5 text-[10px] text-slate-500 dark:text-slate-400 hover:text-[#005baa] dark:hover:text-cyan-400 font-mono truncate"
+                >
+                  <Mail className="w-3 h-3 text-slate-400" />
+                  <span className="truncate">soksithcheyhoout@gmail.com</span>
+                </a>
 
-      {/* Official MoEYS Hotline & National Info Card */}
-      <div className="pt-2 border-t border-slate-100 dark:border-slate-800">
-        <div className="bg-gradient-to-br from-blue-50/80 via-slate-50 to-indigo-50/60 dark:from-slate-900/90 dark:via-[#0c1427] dark:to-slate-900/90 rounded-2xl p-3 border border-blue-100/80 dark:border-slate-800/80 space-y-2 text-center shadow-2xs">
-          <div className="flex items-center justify-center gap-1.5 text-[#003366] dark:text-amber-300 font-extrabold text-[11px]">
-            <img src="/assets/moeys-crest-transparent.png" alt="MoTDAR" className="w-4 h-4 object-contain" />
-            <span>{lang === 'km' ? 'ជំនួយការសិក្សាជាតិ' : 'National Support'}</span>
+                {/* Telegram Link */}
+                <a 
+                  href="https://t.me/kaixite" 
+                  target="_blank" 
+                  rel="noopener noreferrer" 
+                  className="block text-[10px] text-sky-600 dark:text-sky-400 hover:underline font-mono font-bold pt-0.5"
+                >
+                  Telegram: @kaixite
+                </a>
+              </div>
+
+              <button
+                type="button"
+                onClick={() => {
+                  onOpenAITutor();
+                  if (onClose) onClose();
+                }}
+                className="w-full py-2 px-2.5 rounded-xl bg-[#005baa] hover:bg-[#003d7a] dark:bg-blue-600 dark:hover:bg-blue-500 text-white text-[10.5px] font-bold transition-all shadow-xs flex items-center justify-center gap-1.5 cursor-pointer active:scale-95"
+              >
+                <Bot className="w-3.5 h-3.5 text-amber-300" />
+                <span>{lang === 'km' ? 'សួរគ្រូ AI MoTDAR' : 'Ask MoTDAR AI'}</span>
+              </button>
+            </div>
           </div>
-          <div className="text-[10px] text-slate-600 dark:text-slate-300 font-semibold space-y-0.5">
-            <p>
-              <a href="https://t.me/kaixite" target="_blank" rel="noopener noreferrer" className="hover:text-[#005baa] dark:hover:text-cyan-400 font-mono font-bold">
-                {lang === 'km' ? 'Telegram: @kaixite (097 741 6126)' : 'Telegram: @kaixite (097 741 6126)'}
-              </a>
-            </p>
-            <p className="text-[9.5px] text-slate-500 dark:text-slate-400 truncate font-mono">
-              soksithcheyhoout@gmail.com
-            </p>
-          </div>
-          <button
-            type="button"
-            onClick={onOpenAITutor}
-            className="w-full py-1.5 px-2.5 rounded-xl bg-[#005baa] hover:bg-[#003d7a] dark:bg-blue-600 dark:hover:bg-blue-500 text-white text-[10.5px] font-bold transition-all shadow-xs flex items-center justify-center gap-1 cursor-pointer active:scale-95"
-          >
-            <Bot className="w-3 h-3 text-amber-300" />
-            <span>{lang === 'km' ? 'សួរគ្រូ AI MoTDAR' : 'Ask MoTDAR AI'}</span>
-          </button>
-        </div>
-      </div>
 
-    </aside>
-  </>
+          {/* Bottom Buffer to Guarantee No Cut-Off on iOS Safari & Mobile Browsers */}
+          <div className="h-8 flex-shrink-0" />
+
+        </div>
+
+      </aside>
+    </>
   );
 }

@@ -349,7 +349,7 @@ function MainApp() {
       />
 
       {/* Spacer to offset the fixed top navbar permanently */}
-      <div className="h-[102px] sm:h-[110px] flex-shrink-0 w-full" aria-hidden="true" />
+      <div className="h-[106px] sm:h-[116px] flex-shrink-0 w-full" aria-hidden="true" />
 
       {/* Main Content Body */}
       <div className={`flex-1 flex w-full overflow-x-clip xl:pl-72 ${activeTab === 'chat' ? 'min-h-0 overflow-hidden' : ''}`}>
@@ -364,7 +364,7 @@ function MainApp() {
         />
 
         {/* Dynamic Center Canvas View */}
-        <main className={`flex-1 flex flex-col min-w-0 ${activeTab === 'chat' ? 'min-h-0 overflow-hidden p-0' : 'overflow-x-hidden pb-16 md:pb-0'}`} style={activeTab === 'chat' ? {minHeight:0, flex:'1 1 0%'} : undefined}>
+        <main className={`flex-1 flex flex-col min-w-0 ${activeTab === 'chat' ? 'min-h-0 overflow-hidden p-0' : 'overflow-x-hidden pb-24 md:pb-0'}`} style={activeTab === 'chat' ? {minHeight:0, flex:'1 1 0%'} : undefined}>
           
           {/* HOME TAB */}
           {activeTab === 'home' && (
@@ -709,8 +709,8 @@ function MainApp() {
 
         return (
           <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden select-none font-kantumruy">
-            {/* Main White Bar Container */}
-            <div className="relative bg-white border-t border-slate-200/80 shadow-[0_-6px_25px_rgba(0,0,0,0.08)] h-[66px] flex items-center px-1 pb-[calc(0.35rem+env(safe-area-inset-bottom,0px))]">
+            {/* Main Bar Container (Light & Dark Mode Support) */}
+            <div className="relative bg-white dark:bg-[#0c1427] border-t border-slate-200/80 dark:border-slate-800 shadow-[0_-6px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_-6px_25px_rgba(0,0,0,0.5)] h-[66px] flex items-center px-1 pb-[calc(0.35rem+env(safe-area-inset-bottom,0px))]">
               
               {/* Dynamic Curved Cutout Scoop (Smooth S-curve Notch) */}
               <svg
@@ -723,18 +723,18 @@ function MainApp() {
               >
                 <path
                   d="M0 0 C 16 0, 22 26, 40 26 C 58 26, 64 0, 80 0 L 80 0 L 0 0 Z"
-                  fill="#f8fafc"
+                  className="fill-[#f4f7fb] dark:fill-[#090d16]"
                 />
                 <path
                   d="M0 0 C 16 0, 22 26, 40 26 C 58 26, 64 0, 80 0"
-                  stroke="#e2e8f0"
+                  className="stroke-slate-200 dark:stroke-slate-800"
                   strokeWidth="1.5"
                   strokeLinecap="round"
                   fill="none"
                 />
               </svg>
 
-              {/* Floating Active Circular Bubble */}
+              {/* Floating Active Circular Bubble with Signature MoEYS Royal Blue Gradient */}
               <div
                 className="absolute -top-[18px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-20"
                 style={{
@@ -742,7 +742,7 @@ function MainApp() {
                   transform: 'translateX(-50%)'
                 }}
               >
-                <div className="w-[48px] h-[48px] rounded-full bg-gradient-to-tr from-[#00828a] to-[#0ea5e9] text-white flex items-center justify-center shadow-[0_6px_20px_rgba(0,130,138,0.45)] border-[3.5px] border-white">
+                <div className="w-[48px] h-[48px] rounded-full bg-gradient-to-tr from-[#005baa] via-[#006bbd] to-[#008fe3] text-white flex items-center justify-center shadow-[0_6px_20px_rgba(0,91,170,0.45)] border-[3.5px] border-white dark:border-[#0c1427]">
                   {activeIndex === 0 && <Home className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
                   {activeIndex === 1 && <BookOpen className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
                   {activeIndex === 2 && <Gamepad2 className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
@@ -767,7 +767,7 @@ function MainApp() {
                     {/* Inactive Icon or Spacing Placeholder */}
                     <div className="relative flex items-center justify-center h-6">
                       {!isActive ? (
-                        <IconComponent className={`w-5 h-5 text-slate-600 group-hover:text-slate-900 transition-colors stroke-[1.8] ${item.id === 'playground' ? 'text-amber-500' : ''}`} />
+                        <IconComponent className={`w-5 h-5 text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors stroke-[1.8] ${item.id === 'playground' ? 'text-amber-500' : ''}`} />
                       ) : (
                         <div className="h-2" />
                       )}
@@ -785,8 +785,8 @@ function MainApp() {
                     <span
                       className={`text-[9.5px] font-bold transition-all ${
                         isActive
-                          ? 'text-[#00828a] font-black scale-105 mt-2'
-                          : 'text-slate-500 group-hover:text-slate-800'
+                          ? 'text-[#005baa] dark:text-cyan-400 font-black scale-105 mt-2'
+                          : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-200'
                       }`}
                     >
                       {lang === 'km' ? item.labelKm : item.labelEn}

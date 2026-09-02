@@ -315,31 +315,53 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
       }`}
     >
       
-      {/* 1. Authentic MoEYS Top Utility Ribbon (Collapses and smoothly slides up on scroll) */}
-      <div className={`w-full bg-transparent flex items-center justify-end text-xs select-none overflow-hidden transition-all duration-300 ease-in-out ${
-        isScrolled ? 'max-h-0 opacity-0 -translate-y-2 pointer-events-none' : 'max-h-10 opacity-100 translate-y-0 h-8 sm:h-9'
-      }`}>
-        {/* Right: Curved MoEYS Royal Blue Gradient Ribbon extending 100% to the right edge */}
-        <div className="ml-auto bg-gradient-to-r from-[#005baa] via-[#006bbd] to-[#008fe3] text-white pl-5 sm:pl-7 lg:pl-8 pr-3 sm:pr-5 lg:pr-6 h-full rounded-bl-2xl sm:rounded-bl-3xl flex items-center gap-3 sm:gap-5 text-[11px] sm:text-xs font-medium shadow-xs">
-          <a 
-            href="tel:0977416126" 
-            className="flex items-center gap-1.5 hover:text-amber-200 transition-colors font-mono"
-            title="Hotline: 097 741 6126"
-          >
-            <Phone className="w-3 h-3 text-white" />
-            <span>097 741 6126</span>
-          </a>
+      {/* 1. Official MoEYS Full-Width Top Utility Ribbon (Edge-to-Edge with Phone & Gmail on Mobile & PC) */}
+      <div 
+        className={`w-full bg-gradient-to-r from-[#002d62] via-[#005baa] to-[#0077cc] text-white select-none overflow-hidden transition-all duration-300 ease-in-out border-b border-white/15 ${
+          isScrolled ? 'max-h-0 opacity-0 -translate-y-2 pointer-events-none' : 'max-h-12 opacity-100 translate-y-0 h-8 sm:h-9'
+        }`}
+      >
+        <div className="w-full max-w-[1600px] mx-auto px-2.5 sm:px-4 lg:px-6 h-full flex items-center justify-between text-[10.5px] sm:text-xs font-medium">
+          {/* Left: Official Government & Ministry Portal Identity */}
+          <div className="flex items-center gap-1.5 sm:gap-2 min-w-0">
+            <span className="text-amber-300 text-xs sm:text-sm font-bold flex-shrink-0">🇰🇭</span>
+            <span className="hidden lg:inline text-amber-200 font-bold tracking-wide">
+              {lang === 'km' 
+                ? 'ព្រះរាជាណាចក្រកម្ពុជា • ក្រសួងអប់រំ យុវជន និងកីឡា' 
+                : 'Kingdom of Cambodia • Ministry of Education, Youth and Sport'}
+            </span>
+            <span className="hidden sm:inline lg:hidden text-amber-200 font-bold tracking-wide truncate">
+              {lang === 'km' ? 'ក្រសួងអប់រំ យុវជន និងកីឡា' : 'MoEYS National Portal'}
+            </span>
+            <span className="sm:hidden text-amber-200 font-bold tracking-wide truncate text-[10px]">
+              {lang === 'km' ? 'MoEYS វិទ្យាល័យជាតិ' : 'MoEYS Portal'}
+            </span>
+          </div>
 
-          <span className="text-white/40 hidden sm:inline">|</span>
+          {/* Right: Contact Information - Hotline Phone & Official Gmail (Always Visible on Mobile & PC!) */}
+          <div className="flex items-center gap-1.5 sm:gap-3 flex-shrink-0 font-sans">
+            {/* Phone Hotline */}
+            <a 
+              href="tel:0977416126" 
+              className="flex items-center gap-1 sm:gap-1.5 text-white/95 hover:text-amber-200 transition-colors font-mono text-[10px] sm:text-xs font-semibold py-0.5 px-1 sm:px-1.5 rounded hover:bg-white/10 flex-shrink-0"
+              title="Hotline: 097 741 6126"
+            >
+              <Phone className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-300 flex-shrink-0" />
+              <span className="whitespace-nowrap">097 741 6126</span>
+            </a>
 
-          <a 
-            href="mailto:soksithcheyhoout@gmail.com" 
-            className="hidden sm:flex items-center gap-1.5 hover:text-amber-200 transition-colors"
-            title="Email: soksithcheyhoout@gmail.com"
-          >
-            <Mail className="w-3 h-3 text-white" />
-            <span className="truncate max-w-[220px] lg:max-w-none">soksithcheyhoout@gmail.com</span>
-          </a>
+            <span className="text-white/30 text-[10px] sm:text-xs">|</span>
+
+            {/* Official Gmail Address */}
+            <a 
+              href="mailto:soksithcheyhoout@gmail.com" 
+              className="flex items-center gap-1 sm:gap-1.5 text-white/95 hover:text-amber-200 transition-colors text-[10px] sm:text-xs font-medium py-0.5 px-1 sm:px-1.5 rounded hover:bg-white/10 max-w-[155px] min-[390px]:max-w-[200px] sm:max-w-none flex-shrink min-w-0"
+              title="Email: soksithcheyhoout@gmail.com"
+            >
+              <Mail className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-300 flex-shrink-0" />
+              <span className="truncate">soksithcheyhoout@gmail.com</span>
+            </a>
+          </div>
         </div>
       </div>
 
@@ -376,18 +398,19 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
             </div>
 
             {/* High-End Official Ministry Typography */}
-            <div className="hidden min-[460px]:flex flex-col justify-center leading-tight">
+            <div className="flex flex-col justify-center leading-tight min-w-0">
               <span className={`font-koulen tracking-wide transition-colors line-clamp-1 ${
                 isScrolled 
-                  ? 'text-xs sm:text-sm text-[#005baa] group-hover:text-[#002d62]' 
-                  : 'text-xs sm:text-[15px] lg:text-[16.5px] text-[#002d62] group-hover:text-[#005baa] drop-shadow-2xs'
+                  ? 'text-xs sm:text-sm text-[#005baa] dark:text-cyan-400 group-hover:text-[#002d62]' 
+                  : 'text-xs sm:text-[15px] lg:text-[16.5px] text-[#002d62] dark:text-white group-hover:text-[#005baa] drop-shadow-2xs'
               }`}>
-                {lang === 'km' ? 'ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ' : 'Ministry of Talent Dev'}
+                <span className="min-[460px]:hidden">{lang === 'km' ? 'វិទ្យាល័យជាតិ' : 'MoEYS'}</span>
+                <span className="hidden min-[460px]:inline">{lang === 'km' ? 'ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ' : 'Ministry of Talent Dev'}</span>
               </span>
               <span className={`font-extrabold tracking-wider uppercase font-cinzel whitespace-nowrap mt-0.5 transition-colors hidden xl:block ${
                 isScrolled 
-                  ? 'text-[7px] sm:text-[8px] text-[#005baa]/80' 
-                  : 'text-[7.5px] sm:text-[8.5px] text-amber-700 font-bold'
+                  ? 'text-[7px] sm:text-[8px] text-[#005baa]/80 dark:text-cyan-400/80' 
+                  : 'text-[7.5px] sm:text-[8.5px] text-amber-700 dark:text-amber-400 font-bold'
               }`}>
                 MINISTRY OF TALENT DEVELOPMENT & ADVANCED RESEARCH
               </span>
