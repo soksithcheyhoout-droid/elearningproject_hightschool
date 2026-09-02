@@ -176,44 +176,62 @@ export const sendOtpEmail = async (toEmail, otpCode, purpose = 'login') => {
   // Plaintext version for multipart/alternative MIME compliance
   const plainText = `[ក្រសួងអប់រំ យុវជន និងកីឡា - MoEYS Cambodia]\n\nលេខកូដផ្ទៀងផ្ទាត់សុវត្ថិភាពរបស់អ្នកគឺ៖ ${otpCode}\n(Security Verification PIN: ${otpCode})\n\nលេខកូដនេះមានសុពលភាពរយៈពេល ៥ នាទីសម្រាប់ចូលប្រើប្រាស់ ឬចុះឈ្មោះក្នុងប្រព័ន្ធ MoEYS E-Learning ។\n\nប្រសិនបើលោកអ្នកមិនបានស្នើសុំលេខកូដនេះទេ សូមមិនបាច់អើពើចំពោះអ៊ីមែលនេះ។\n\n© ${currentYear} MoEYS Cambodia. All rights reserved.`;
 
-  // Clean, high-deliverability HTML layout with strict table formatting & inline styling
+  // High-contrast, client-safe HTML layout compatible with iOS/Android Gmail, Apple Mail, and Web
   const htmlContent = `
   <!DOCTYPE html>
   <html lang="km">
   <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light">
+    <meta name="supported-color-schemes" content="light">
     <title>MoEYS Security Verification Code</title>
+    <style>
+      :root {
+        color-scheme: light;
+        supported-color-schemes: light;
+      }
+      body, table, td, a { -webkit-text-size-adjust: 100%; -ms-text-size-adjust: 100%; }
+      .otp-pin {
+        color: #002b5b !important;
+        letter-spacing: 12px !important;
+      }
+    </style>
   </head>
-  <body style="margin:0;padding:0;background-color:#0b1329;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;">
-    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#0b1329;padding:30px 10px;">
+  <body style="margin:0;padding:0;background-color:#f1f5f9;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;-webkit-font-smoothing:antialiased;">
+    <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="background-color:#f1f5f9;padding:30px 10px;">
       <tr>
         <td align="center">
           <!-- Main Email Container -->
-          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:540px;background-color:#0f172a;border-radius:18px;overflow:hidden;border:1px solid #1e293b;box-shadow:0 20px 40px rgba(0,0,0,0.5);">
+          <table role="presentation" width="100%" cellspacing="0" cellpadding="0" border="0" style="max-width:520px;background-color:#ffffff;border-radius:16px;overflow:hidden;border:1px solid #e2e8f0;box-shadow:0 10px 30px rgba(0,0,0,0.08);">
             
+            <!-- Top Gold Accent Line -->
+            <tr>
+              <td style="background-color:#f59e0b;height:5px;line-height:5px;font-size:5px;">&nbsp;</td>
+            </tr>
+
             <!-- Header -->
             <tr>
-              <td align="center" style="background:linear-gradient(135deg,#03152e 0%,#002b5b 100%);padding:30px 20px 24px;border-bottom:3px solid #f59e0b;">
+              <td align="center" style="background-color:#ffffff;padding:28px 20px 20px;border-bottom:1px solid #f1f5f9;">
                 <table role="presentation" cellspacing="0" cellpadding="0" border="0">
                   <tr>
                     <td align="center" style="padding-bottom:10px;">
-                      <span style="font-size:32px;">🇰🇭 🎓</span>
+                      <span style="font-size:34px;">🇰🇭 🎓</span>
                     </td>
                   </tr>
                   <tr>
-                    <td align="center" style="color:#fbbf24;font-size:12px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin:0;">
+                    <td align="center" style="color:#b45309;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin:0;">
                       MINISTRY OF EDUCATION, YOUTH AND SPORT
                     </td>
                   </tr>
                   <tr>
-                    <td align="center" style="color:#ffffff;font-size:16px;font-weight:700;padding-top:4px;">
+                    <td align="center" style="color:#002b5b;font-size:17px;font-weight:800;padding-top:6px;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Helvetica,Arial,sans-serif;">
                       ក្រសួងអប់រំ យុវជន និងកីឡា (MoEYS)
                     </td>
                   </tr>
                   <tr>
-                    <td align="center" style="padding-top:8px;">
-                      <span style="display:inline-block;background-color:rgba(56,189,248,0.15);border:1px solid rgba(56,189,248,0.4);color:#7dd3fc;padding:3px 14px;border-radius:20px;font-size:11px;font-weight:700;">
+                    <td align="center" style="padding-top:10px;">
+                      <span style="display:inline-block;background-color:#f0f9ff;border:1px solid #bae6fd;color:#0369a1;padding:4px 16px;border-radius:20px;font-size:11px;font-weight:700;">
                         ប្រព័ន្ធគ្រប់គ្រងការសិក្សាឌីជីថលថ្នាក់ជាតិ
                       </span>
                     </td>
@@ -224,22 +242,22 @@ export const sendOtpEmail = async (toEmail, otpCode, purpose = 'login') => {
 
             <!-- Body Content -->
             <tr>
-              <td style="padding:32px 28px;background-color:#0f172a;text-align:center;">
-                <h2 style="color:#ffffff;font-size:18px;font-weight:800;margin:0 0 10px;letter-spacing:-0.2px;">
+              <td style="padding:32px 28px;background-color:#ffffff;text-align:center;">
+                <h2 style="color:#0f172a;font-size:19px;font-weight:800;margin:0 0 10px;letter-spacing:-0.2px;">
                   លេខកូដផ្ទៀងផ្ទាត់សុវត្ថិភាព (OTP Code)
                 </h2>
-                <p style="color:#94a3b8;font-size:13px;line-height:1.6;margin:0 0 24px;">
-                  សូមប្រើប្រាស់លេខកូដសម្ងាត់ <strong>៦ ខ្ទង់</strong> ខាងក្រោម ដើម្បីផ្ទៀងផ្ទាត់ចូលប្រើប្រាស់គណនីរបស់អ្នក៖
+                <p style="color:#475569;font-size:13px;line-height:1.6;margin:0 0 24px;">
+                  សូមប្រើប្រាស់លេខកូដសម្ងាត់ <strong style="color:#0f172a;">៦ ខ្ទង់</strong> ខាងក្រោម ដើម្បីផ្ទៀងផ្ទាត់ចូលប្រើប្រាស់គណនីរបស់អ្នក៖
                 </p>
 
                 <!-- OTP Display Box -->
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 auto 24px;width:100%;max-width:340px;">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="margin:0 auto 24px;width:100%;max-width:360px;">
                   <tr>
-                    <td align="center" style="background:linear-gradient(135deg,#021a38 0%,#052c5c 100%);border-radius:14px;padding:20px;border:2px solid #0284c7;box-shadow:0 8px 24px rgba(2,132,199,0.3);">
-                      <div style="color:#38bdf8;font-size:10px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px;">
-                        Security Verification PIN
+                    <td align="center" style="background-color:#f0f7ff;border-radius:14px;padding:22px 16px;border:2px solid #0284c7;box-shadow:0 4px 16px rgba(2,132,199,0.12);">
+                      <div style="color:#0284c7;font-size:11px;font-weight:800;letter-spacing:2px;text-transform:uppercase;margin-bottom:8px;">
+                        SECURITY VERIFICATION PIN
                       </div>
-                      <div style="font-size:36px;font-weight:900;letter-spacing:10px;color:#ffffff;font-family:'Courier New',Courier,monospace;padding-left:10px;">
+                      <div class="otp-pin" style="font-size:38px;font-weight:900;letter-spacing:12px;color:#002b5b;font-family:'Courier New',Courier,monospace;padding-left:12px;line-height:1.2;">
                         ${otpCode}
                       </div>
                     </td>
@@ -247,10 +265,10 @@ export const sendOtpEmail = async (toEmail, otpCode, purpose = 'login') => {
                 </table>
 
                 <!-- Security Tips Box -->
-                <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="width:100%;background-color:#1e293b;border-radius:10px;border-left:4px solid #f59e0b;padding:14px 16px;text-align:left;">
+                <table role="presentation" cellspacing="0" cellpadding="0" border="0" style="width:100%;background-color:#fffbeb;border-radius:10px;border:1px solid #fef3c7;border-left:4px solid #f59e0b;padding:14px 16px;text-align:left;">
                   <tr>
-                    <td style="font-size:12px;color:#cbd5e1;line-height:1.5;">
-                      <div style="margin-bottom:6px;">⏱️ លេខកូដនេះមានសុពលភាពត្រឹមតែ <strong>៥ នាទី</strong> ប៉ុណ្ណោះ។</div>
+                    <td style="font-size:12px;color:#78350f;line-height:1.6;">
+                      <div style="margin-bottom:6px;">⏱️ លេខកូដនេះមានសុពលភាពត្រឹមតែ <strong style="color:#92400e;">៥ នាទី</strong> ប៉ុណ្ណោះ។</div>
                       <div>🔒 សូមកុំចែករំលែកលេខកូដនេះទៅកាន់អ្នកដទៃ ដើម្បីសុវត្ថិភាពគណនី។</div>
                     </td>
                   </tr>
@@ -260,12 +278,12 @@ export const sendOtpEmail = async (toEmail, otpCode, purpose = 'login') => {
 
             <!-- Footer -->
             <tr>
-              <td align="center" style="background-color:#080e1a;padding:20px 20px;border-top:1px solid #1e293b;color:#64748b;font-size:11px;line-height:1.6;">
-                <div style="font-weight:700;color:#94a3b8;margin-bottom:3px;">
+              <td align="center" style="background-color:#f8fafc;padding:22px 20px;border-top:1px solid #e2e8f0;color:#64748b;font-size:11px;line-height:1.6;">
+                <div style="font-weight:700;color:#334155;margin-bottom:4px;">
                   © ${currentYear} ក្រសួងអប់រំ យុវជន និងកីឡា (MoEYS Cambodia)
                 </div>
-                <div>Official National High School Digital Learning Platform</div>
-                <div style="color:#475569;margin-top:6px;font-size:10px;">
+                <div style="color:#64748b;">Official National High School Digital Learning Platform</div>
+                <div style="color:#94a3b8;margin-top:6px;font-size:10px;">
                   សារនេះផ្ញើចេញដោយស្វ័យប្រវត្តិតាមរយៈ MoEYS SSO Authentication Gateway
                 </div>
               </td>
