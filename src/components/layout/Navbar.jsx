@@ -240,13 +240,13 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
   // Official MoEYS Gov Navigation Menu Structure (ដូច moeys.gov.kh)
   const navMenus = [
     {
-      id: 'ministry',
-      labelKm: 'ក្រសួង',
-      labelEn: 'Ministry',
+      id: 'inspection',
+      labelKm: 'ត្រួតពិនិត្យ',
+      labelEn: 'Inspection',
       tab: 'home',
       items: [
+        { labelKm: 'ស្តង់ដារគុណភាពអប់រំជាតិ', labelEn: 'National Education Standards', tab: 'home' },
         { labelKm: 'ទំព័រដើមវិទ្យាល័យជាតិ', labelEn: 'National High School Portal', tab: 'home' },
-        { labelKm: 'គណនីសិស្ស & សមិទ្ធផល', labelEn: 'Student Profile & Badges', tab: 'dashboard' },
         { labelKm: 'ជំនួយការគ្រូ AI ផ្លូវការ', labelEn: 'Official AI Tutor Assistant', action: onOpenAITutor }
       ]
     },
@@ -292,6 +292,17 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
         { labelKm: 'បណ្ណាល័យសៀវភៅពុម្ពឌីជីថល', labelEn: 'Digital Textbooks Library', tab: 'library' },
         { labelKm: 'បន្ទប់ជជែកសិស្សានុសិស្សទូទាំងប្រទេស', labelEn: 'National Student Messenger', tab: 'chat' }
       ]
+    },
+    {
+      id: 'services',
+      labelKm: 'សេវាកម្ម',
+      labelEn: 'Services',
+      tab: 'dashboard',
+      items: [
+        { labelKm: 'មូលនិធិជាតិអភិវឌ្ឍន៍ការអប់រំ', labelEn: 'National Education Fund', action: onOpenDonation },
+        { labelKm: 'គណនីសិស្ស & សមិទ្ធផល', labelEn: 'Student Profile & Badges', tab: 'dashboard' },
+        { labelKm: 'ទាញយកវិញ្ញាសាបាក់ឌុប PDF', labelEn: 'Download BacII Exam PDFs', tab: 'bacii' }
+      ]
     }
   ];
 
@@ -304,65 +315,36 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
       }`}
     >
       
-      {/* 1. Official National Ministry Utility Ribbon */}
-      <div 
-        className="w-full bg-[#001733] text-slate-300 py-1.5 px-3 sm:px-6 text-[10.5px] sm:text-[11px] font-medium select-none border-b border-amber-500/20 block shadow-2xs"
-      >
-        <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-3">
+      {/* 1. Authentic MoEYS Top Utility Ribbon (Curved Royal Blue Gradient on Right) */}
+      <div className="w-full bg-white dark:bg-[#070c18] border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs select-none h-8 sm:h-9">
+        <div className="max-w-[1600px] w-full mx-auto flex items-center justify-between pl-2 sm:pl-4 lg:pl-6 h-full">
           
-          {/* Left: Official National Identity & Portal Status */}
-          <div className="flex items-center gap-2.5 min-w-0">
-            <div className="flex items-center gap-1.5 font-cinzel text-amber-400 font-extrabold text-[10.5px] tracking-wider flex-shrink-0">
-              <Crown className="w-3 h-3 text-amber-400" />
-              <span>KINGDOM OF CAMBODIA</span>
-            </div>
-            <span className="text-white/20 hidden sm:inline">•</span>
-            <span className="text-slate-300 font-medium text-[11.5px] font-koulen tracking-wide hidden sm:inline truncate">
-              {lang === 'km' ? 'ព្រះរាជាណាចក្រកម្ពុជា ជាតិ សាសនា ព្រះមហាក្សត្រ' : 'Nation Religion King'}
-            </span>
-            <span className="text-white/20 hidden md:inline">•</span>
-            <div className="hidden md:flex items-center gap-1.5 text-emerald-400 font-semibold text-[10px] bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/25">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              <span className="font-koulen tracking-wide">{lang === 'km' ? 'ប្រព័ន្ធរដ្ឋបាលអប់រំឌីជីថល (ផ្លូវការ)' : 'Official National E-Learning Gateway'}</span>
-            </div>
+          {/* Left: National Motto in elegant Koulen font */}
+          <div className="hidden md:flex items-center gap-2 text-xs font-koulen text-[#002b5b] dark:text-amber-300 tracking-wider">
+            <Crown className="w-3.5 h-3.5 text-amber-500 shrink-0" />
+            <span>{lang === 'km' ? 'ព្រះរាជាណាចក្រកម្ពុជា ជាតិ សាសនា ព្រះមហាក្សត្រ' : 'KINGDOM OF CAMBODIA • Nation Religion King'}</span>
           </div>
 
-          {/* Right: Technical Support Hotline & Channels */}
-          <div className="flex items-center gap-3.5 text-[10.5px] text-slate-300 flex-shrink-0">
-            <div className="flex items-center gap-1.5">
-              <span className="text-slate-400 hidden sm:inline">{lang === 'km' ? 'ផ្នែកជំនួយបច្ចេកទេស:' : 'Support Hotline:'}</span>
-              <a 
-                href="tel:0977416126" 
-                className="flex items-center gap-1 text-amber-300 hover:text-amber-200 transition-colors font-mono font-bold"
-                title="Support Hotline: 097 741 6126"
-              >
-                <Phone className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-400" />
-                <span>097 741 6126</span>
-              </a>
-            </div>
-
-            <span className="text-white/20 hidden md:inline">|</span>
-
+          {/* Right: Curved MoEYS Royal Blue Gradient Ribbon */}
+          <div className="ml-auto bg-gradient-to-r from-[#005baa] via-[#006bbd] to-[#008fe3] text-white px-4 sm:px-6 lg:px-8 h-full rounded-bl-2xl sm:rounded-bl-3xl flex items-center gap-3 sm:gap-5 text-[11px] sm:text-xs font-medium shadow-xs">
             <a 
-              href="https://t.me/kaixite" 
-              target="_blank"
-              rel="noopener noreferrer"
-              className="hidden md:flex items-center gap-1 text-slate-300 hover:text-cyan-300 transition-colors font-medium"
-              title="Official Telegram Support Desk"
+              href="tel:0977416126" 
+              className="flex items-center gap-1.5 hover:text-amber-200 transition-colors font-mono"
+              title="Hotline: +855 66 901 800 / 097 741 6126"
             >
-              <Send className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-cyan-400" />
-              <span>{lang === 'km' ? 'ជំនួយការ Telegram' : 'Telegram Support'}</span>
+              <Phone className="w-3 h-3 text-white" />
+              <span>+855 66 901 800</span>
             </a>
 
-            <span className="text-white/20 hidden lg:inline">|</span>
+            <span className="text-white/40 hidden sm:inline">|</span>
 
             <a 
               href="mailto:support@motdar.gov.kh" 
-              className="hidden lg:flex items-center gap-1 text-slate-300 hover:text-amber-300 transition-colors font-medium"
-              title="Official Support Email"
+              className="hidden sm:flex items-center gap-1.5 hover:text-amber-200 transition-colors"
+              title="Official Email: info@moeys.gov.kh / support@motdar.gov.kh"
             >
-              <Mail className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-400" />
-              <span>support@motdar.gov.kh</span>
+              <Mail className="w-3 h-3 text-white" />
+              <span className="truncate max-w-[200px] lg:max-w-none">info@moeys.gov.kh / support@motdar.gov.kh</span>
             </a>
           </div>
 
@@ -426,15 +408,15 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
                   <button
                     type="button"
                     onClick={() => { setActiveTab(menu.tab); setActiveDropdown(null); }}
-                    className={`px-1.5 xl:px-2 py-1.5 rounded-xl text-xs xl:text-[12.5px] font-bold transition-all duration-150 flex items-center gap-0.5 cursor-pointer whitespace-nowrap flex-shrink-0 ${
+                    className={`px-2 xl:px-2.5 py-1.5 rounded-lg text-sm xl:text-[14.5px] font-koulen tracking-wide transition-all duration-150 flex items-center gap-1 cursor-pointer whitespace-nowrap flex-shrink-0 ${
                       isTabActive
-                        ? 'text-[#002d62] font-black bg-[#e0f0ff] dark:bg-cyan-500/20 dark:text-cyan-300 dark:border dark:border-cyan-500/40 shadow-2xs'
-                        : 'text-[#005baa] dark:text-slate-300 hover:text-[#002d62] dark:hover:text-white hover:bg-[#eaf4ff] dark:hover:bg-slate-800'
+                        ? 'text-[#005baa] dark:text-cyan-400 font-bold'
+                        : 'text-[#002d62] dark:text-slate-200 hover:text-[#005baa] dark:hover:text-cyan-300'
                     }`}
                   >
                     <span>{label}</span>
                     <ChevronDown className={`w-3.5 h-3.5 transition-transform duration-200 ${
-                      isMenuOpen ? 'rotate-180 text-[#002d62] dark:text-cyan-300' : 'text-[#005baa]/70 dark:text-slate-400'
+                      isMenuOpen ? 'rotate-180 text-[#005baa] dark:text-cyan-300' : 'text-[#002d62]/70 dark:text-slate-400'
                     }`} />
                   </button>
 
