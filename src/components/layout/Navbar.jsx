@@ -315,33 +315,29 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
       }`}
     >
       
-      {/* 1. Authentic MoEYS Top Utility Ribbon (Curved Royal Blue Gradient on Right) */}
-      <div className="w-full bg-transparent flex items-center justify-end text-xs select-none h-8 sm:h-9">
-        <div className="max-w-[1600px] w-full mx-auto flex items-center justify-end h-full">
-          
-          {/* Right: Curved MoEYS Royal Blue Gradient Ribbon */}
-          <div className="ml-auto bg-gradient-to-r from-[#005baa] via-[#006bbd] to-[#008fe3] text-white px-4 sm:px-6 lg:px-8 h-full rounded-bl-2xl sm:rounded-bl-3xl flex items-center gap-3 sm:gap-5 text-[11px] sm:text-xs font-medium shadow-xs">
-            <a 
-              href="tel:0977416126" 
-              className="flex items-center gap-1.5 hover:text-amber-200 transition-colors font-mono"
-              title="Hotline: +855 66 901 800 / 097 741 6126"
-            >
-              <Phone className="w-3 h-3 text-white" />
-              <span>+855 66 901 800</span>
-            </a>
+      {/* 1. Authentic MoEYS Top Utility Ribbon (Curved Royal Blue Gradient touching the right edge) */}
+      <div className="w-full bg-transparent flex items-center justify-end text-xs select-none h-8 sm:h-9 overflow-hidden">
+        {/* Right: Curved MoEYS Royal Blue Gradient Ribbon extending 100% to the right edge */}
+        <div className="ml-auto bg-gradient-to-r from-[#005baa] via-[#006bbd] to-[#008fe3] text-white pl-5 sm:pl-7 lg:pl-8 pr-3 sm:pr-5 lg:pr-6 h-full rounded-bl-2xl sm:rounded-bl-3xl flex items-center gap-3 sm:gap-5 text-[11px] sm:text-xs font-medium shadow-xs">
+          <a 
+            href="tel:0977416126" 
+            className="flex items-center gap-1.5 hover:text-amber-200 transition-colors font-mono"
+            title="Hotline: +855 66 901 800 / 097 741 6126"
+          >
+            <Phone className="w-3 h-3 text-white" />
+            <span>+855 66 901 800</span>
+          </a>
 
-            <span className="text-white/40 hidden sm:inline">|</span>
+          <span className="text-white/40 hidden sm:inline">|</span>
 
-            <a 
-              href="mailto:support@motdar.gov.kh" 
-              className="hidden sm:flex items-center gap-1.5 hover:text-amber-200 transition-colors"
-              title="Official Email: info@moeys.gov.kh / support@motdar.gov.kh"
-            >
-              <Mail className="w-3 h-3 text-white" />
-              <span className="truncate max-w-[200px] lg:max-w-none">info@moeys.gov.kh / support@motdar.gov.kh</span>
-            </a>
-          </div>
-
+          <a 
+            href="mailto:support@motdar.gov.kh" 
+            className="hidden sm:flex items-center gap-1.5 hover:text-amber-200 transition-colors"
+            title="Official Email: info@moeys.gov.kh / support@motdar.gov.kh"
+          >
+            <Mail className="w-3 h-3 text-white" />
+            <span className="truncate max-w-[200px] lg:max-w-none">info@moeys.gov.kh / support@motdar.gov.kh</span>
+          </a>
         </div>
       </div>
 
