@@ -191,8 +191,8 @@ export async function generateAbaQr(req, res) {
 
     const md5Hash = crypto.createHash('md5').update(qrString).digest('hex');
     const encodedPayload = encodeURIComponent(qrString);
-    const deepLink = `abapay://qr?payload=${encodedPayload}`;
-    const androidIntent = `intent://qr?payload=${encodedPayload}#Intent;scheme=abapay;package=com.ababank.mobile;end`;
+    const deepLink = `abamobilebank://ababank.com?type=payway&qrcode=${encodedPayload}`;
+    const androidIntent = `intent://ababank.com?type=payway&qrcode=${encodedPayload}#Intent;scheme=abamobilebank;package=com.ababank.mobile;end`;
 
     return res.json({
       success: true,

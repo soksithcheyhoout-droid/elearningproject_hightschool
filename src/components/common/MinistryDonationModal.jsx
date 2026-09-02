@@ -453,27 +453,8 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
     return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
-  const handleOpenDeepLink = (e) => {
+  const handleOpenDeepLink = () => {
     playSound.click?.();
-
-    const isAba = paymentGateway === 'aba';
-    const qrStr = isAba ? (abaData?.qrString || khqrData?.qrString || '') : (khqrData?.qrString || '');
-    const encodedPayload = encodeURIComponent(qrStr);
-
-    let targetDeepLink = '';
-    if (isAba) {
-      const isAndroid = typeof navigator !== 'undefined' && /Android/i.test(navigator.userAgent);
-      if (isAndroid && abaData?.androidIntent) {
-        targetDeepLink = abaData.androidIntent;
-      } else {
-        targetDeepLink = abaData?.deepLink || `abapay://qr?payload=${encodedPayload}`;
-      }
-    } else {
-      targetDeepLink = `bakong://qr?payload=${encodedPayload}`;
-    }
-
-    // Pure Deep Link ONLY
-    window.location.href = targetDeepLink;
   };
 
   return (
@@ -1189,12 +1170,17 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                 </div>
               </div>
 
-              {/* Direct Deep Link Action Controls (Pure abapay:// & bakong://) */}
+              {/* Direct Deep Link Action Controls (Official abamobilebank:// & bakong://) */}
               <div className="w-full max-w-[310px] sm:max-w-[330px] flex flex-col gap-2">
                 {paymentGateway === 'aba' ? (
-                  /* Primary Pure ABA Deep Link Button */
+                  /* Primary Official ABA Mobile Deep Link Button */
                   <a
-                    href={abaData?.deepLink || `abapay://qr?payload=${encodeURIComponent(abaData?.qrString || khqrData?.qrString || '')}`}
+                    href={
+                      abaData?.deepLink ||
+                      `abamobilebank://ababank.com?type=payway&qrcode=${encodeURIComponent(
+                        abaData?.qrString || khqrData?.qrString || ''
+                      )}`
+                    }
                     onClick={handleOpenDeepLink}
                     className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#002D56] via-[#004B87] to-[#00A3E0] hover:brightness-110 text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all border border-[#00A3E0]/50 shadow-md active:scale-98 cursor-pointer select-none text-center"
                   >
