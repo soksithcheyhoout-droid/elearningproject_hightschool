@@ -945,7 +945,7 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                 <div className="py-2 px-3.5">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <div className="w-4.5 h-4.5 rounded-md bg-amber-400/15 border border-amber-400/30 p-0.5 flex items-center justify-center">
+                      <div className="w-5 h-5 min-w-[20px] max-w-[20px] min-h-[20px] max-h-[20px] shrink-0 rounded-md bg-amber-400/15 border border-amber-400/30 p-0.5 flex items-center justify-center">
                         <img src="/assets/moeys-crest-transparent.png" alt="Crest" className="w-full h-full object-contain filter drop-shadow-xs" />
                       </div>
                       <span className="text-[12px] font-black text-white font-mono tracking-wide">chey_dev</span>
@@ -1060,32 +1060,49 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                 </div>
               </div>
 
-              {/* Ultra-Compact Fintech Auto-Checking Bar (Steady, Non-Scrolling, Zero Page Overflow) */}
-              <div className="w-full max-w-[275px] sm:max-w-[285px] bg-gradient-to-r from-slate-900/95 via-[#0b1428] to-slate-900/95 border border-slate-700/80 rounded-2xl p-2.5 shadow-md flex items-center justify-between gap-2.5 relative overflow-hidden">
-                {/* Subtle Ambient Top Accent Glow */}
+              {/* High-End Fintech Auto-Checking Terminal (Centered Tri-Spinner & Cycling Words) */}
+              <div className="w-full max-w-[275px] sm:max-w-[285px] bg-gradient-to-b from-slate-900/95 via-[#0b1428] to-[#070d1d] border border-slate-700/80 rounded-2xl py-2.5 px-3 shadow-md flex flex-col items-center space-y-2 relative overflow-hidden">
+                {/* Subtle Ambient Top Glow Line */}
                 <div className={`absolute top-0 left-1/4 right-1/4 h-[1.5px] bg-gradient-to-r from-transparent ${
                   paymentGateway === 'aba' ? 'via-[#00A3E0]' : 'via-red-500'
                 } to-transparent opacity-80`} />
 
-                {/* Left: Compact Tri-Spinner & Steady Clean Text (No Scrolling Words!) */}
-                <div className="flex items-center gap-2.5 min-w-0">
-                  <div className={`payment-tri-spinner shrink-0 ${paymentGateway === 'aba' ? '' : 'bakong'}`} />
-                  <div className="min-w-0">
-                    <div className="flex items-center gap-1">
-                      <span className="text-xs font-black text-white font-mono tracking-tight truncate">
-                        Waiting for <span className={paymentGateway === 'aba' ? 'text-[#00A3E0]' : 'text-red-400'}>Payment...</span>
-                      </span>
-                    </div>
-                    <span className="text-[9.5px] text-slate-400 font-kantumruy block leading-tight truncate">
-                      កំពុងរង់ចាំការទូទាត់ (Auto-Detect)
+                {/* Centered Tri-Spinner */}
+                <div className="payment-spinner-container pt-0.5">
+                  <div className={`payment-tri-spinner ${paymentGateway === 'aba' ? '' : 'bakong'}`} />
+                </div>
+
+                {/* Animated Cycling Text Loader from UIverse */}
+                <div className="flex items-center justify-center text-xs font-bold text-slate-200 leading-none">
+                  <span>Waiting for</span>
+                  <div className="payment-words-box">
+                    <span className={`payment-cycle-word ${paymentGateway === 'aba' ? '' : 'bakong'}`}>Payment...</span>
+                    <span className={`payment-cycle-word ${paymentGateway === 'aba' ? '' : 'bakong'}`}>
+                      {paymentGateway === 'aba' ? 'ABA Mobile...' : 'Bakong App...'}
                     </span>
+                    <span className={`payment-cycle-word ${paymentGateway === 'aba' ? '' : 'bakong'}`}>KHQR Scan...</span>
+                    <span className={`payment-cycle-word ${paymentGateway === 'aba' ? '' : 'bakong'}`}>Confirmation...</span>
+                    <span className={`payment-cycle-word ${paymentGateway === 'aba' ? '' : 'bakong'}`}>Payment...</span>
                   </div>
                 </div>
 
-                {/* Right: Digital Countdown Timer Badge */}
-                <div className="flex items-center gap-1 px-2.5 py-1 rounded-xl bg-slate-950/90 border border-slate-700/80 font-mono text-xs font-black text-cyan-400 shadow-inner shrink-0">
-                  <Clock className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
-                  <span className="tracking-wider">{formatTime(timeLeft)}</span>
+                {/* Telemetry Status & Digital Countdown Timer Row */}
+                <div className="w-full flex items-center justify-between pt-1.5 border-t border-slate-800/80 text-[10px]">
+                  <div className="flex items-center gap-1.5 min-w-0">
+                    <span className="relative flex h-2 w-2 shrink-0">
+                      <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
+                      <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500 shadow-[0_0_6px_rgba(16,185,129,0.8)]"></span>
+                    </span>
+                    <span className="font-bold text-slate-200 truncate font-kantumruy">
+                      កំពុងរង់ចាំការស្កេន...
+                    </span>
+                  </div>
+                  
+                  {/* Digital Clock Badge */}
+                  <div className="flex items-center gap-1 px-2 py-0.5 rounded-lg bg-slate-950/90 border border-slate-700/80 font-mono text-[10.5px] font-black text-cyan-400 shadow-inner shrink-0">
+                    <Clock className="w-3 h-3 text-cyan-400 animate-pulse" />
+                    <span>{formatTime(timeLeft)}</span>
+                  </div>
                 </div>
               </div>
 
