@@ -2318,101 +2318,95 @@ html[data-theme="dark"] .truck-lampPost,
 }
 
 /* ══════════════════════════════════════════════════════════════════
-   HIGH-END TRI-SPINNER & CYCLING WORDS LOADER (FINTECH GRADE)
+   HIGH-END FINTECH RADAR & LIVE SCANNER ANIMATIONS
    ══════════════════════════════════════════════════════════════════ */
-.payment-spinner-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
+.payment-radar-ring {
+  position: absolute;
+  border-radius: 9999px;
+  border: 1.5px solid rgba(0, 163, 224, 0.4);
+  animation: payment-radar-wave 2.4s cubic-bezier(0.1, 0.7, 0.1, 1) infinite;
 }
 
-.payment-tri-spinner {
-  width: 44px;
-  height: 44px;
-  display: grid;
-  border: 3.5px solid transparent;
-  border-radius: 50%;
-  border-right-color: #00A3E0;
-  animation: tri-spinner-anim 1s infinite linear;
-  filter: drop-shadow(0 0 10px rgba(0, 163, 224, 0.5));
+.payment-radar-ring.bakong {
+  border-color: rgba(226, 26, 26, 0.4);
 }
 
-.payment-tri-spinner.bakong {
-  border-right-color: #ef4444;
-  filter: drop-shadow(0 0 10px rgba(239, 68, 68, 0.5));
+.payment-radar-ring:nth-child(2) {
+  animation-delay: 0.8s;
 }
 
-.payment-tri-spinner::before,
-.payment-tri-spinner::after {
-  content: "";
-  grid-area: 1/1;
-  margin: 2.5px;
-  border: inherit;
-  border-radius: 50%;
-  animation: tri-spinner-anim 2s infinite;
+.payment-radar-ring:nth-child(3) {
+  animation-delay: 1.6s;
 }
 
-.payment-tri-spinner::after {
-  margin: 6.5px;
-  animation-duration: 3s;
-}
-
-@keyframes tri-spinner-anim {
-  100% {
-    transform: rotate(1turn);
-  }
-}
-
-.payment-words-box {
-  overflow: hidden;
-  height: 22px;
-  display: inline-block;
-  vertical-align: top;
-}
-
-.payment-cycle-word {
-  display: block;
-  height: 22px;
-  line-height: 22px;
-  padding-left: 5px;
-  color: #00A3E0;
-  font-weight: 800;
-  animation: cycle-payment-words 6s infinite;
-  letter-spacing: -0.01em;
-}
-
-.payment-cycle-word.bakong {
-  color: #f87171;
-}
-
-@keyframes cycle-payment-words {
+@keyframes payment-radar-wave {
   0% {
-    transform: translateY(0%);
+    width: 24px;
+    height: 24px;
+    opacity: 0.9;
+    transform: scale(0.6);
   }
-  10% {
-    transform: translateY(-105%);
+  100% {
+    width: 72px;
+    height: 72px;
+    opacity: 0;
+    transform: scale(1.6);
   }
-  25% {
-    transform: translateY(-100%);
-  }
-  35% {
-    transform: translateY(-205%);
+}
+
+.qr-scan-beam-anim {
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, #00A3E0, transparent);
+  box-shadow: 0 0 12px 2px rgba(0, 163, 224, 0.6);
+  animation: qr-beam-scan 2.6s ease-in-out infinite alternate;
+  pointer-events: none;
+}
+
+.qr-scan-beam-anim.bakong {
+  background: linear-gradient(90deg, transparent, #ef4444, transparent);
+  box-shadow: 0 0 12px 2px rgba(239, 68, 68, 0.6);
+}
+
+@keyframes qr-beam-scan {
+  0% {
+    top: 6%;
+    opacity: 0.2;
   }
   50% {
-    transform: translateY(-200%);
-  }
-  60% {
-    transform: translateY(-305%);
-  }
-  75% {
-    transform: translateY(-300%);
-  }
-  85% {
-    transform: translateY(-405%);
+    opacity: 1;
   }
   100% {
-    transform: translateY(-400%);
+    top: 92%;
+    opacity: 0.2;
+  }
+}
+
+.payment-shimmer-btn {
+  position: relative;
+  overflow: hidden;
+}
+
+.payment-shimmer-btn::after {
+  content: "";
+  position: absolute;
+  top: -50%;
+  left: -50%;
+  width: 200%;
+  height: 200%;
+  background: linear-gradient(60deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transform: rotate(30deg) translateY(-100%);
+  animation: payment-shimmer 4s infinite;
+}
+
+@keyframes payment-shimmer {
+  0% {
+    transform: rotate(30deg) translateY(-100%);
+  }
+  20%, 100% {
+    transform: rotate(30deg) translateY(100%);
   }
 }
 

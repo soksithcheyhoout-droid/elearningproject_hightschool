@@ -190,7 +190,9 @@ export async function generateAbaQr(req, res) {
     }
 
     const md5Hash = crypto.createHash('md5').update(qrString).digest('hex');
-    const deepLink = `abapay://qr?payload=${qrString}`;
+    const encodedPayload = encodeURIComponent(qrString);
+    const deepLink = `abapay://qr?payload=${encodedPayload}`;
+    const androidIntent = `intent://qr?payload=${encodedPayload}#Intent;scheme=abapay;package=com.ababank.mobile;end`;
 
     return res.json({
       success: true,
@@ -206,7 +208,8 @@ export async function generateAbaQr(req, res) {
       clientId,
       token,
       requestTime,
-      deepLink
+      deepLink,
+      androidIntent
     });
   } catch (error) {
     console.error('[ABA QR Generation Error]:', error);
