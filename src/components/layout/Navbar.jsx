@@ -304,53 +304,68 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
       }`}
     >
       
-      {/* 1. Official MoTDAR Top Utility & Beta Testing Notice Ribbon */}
+      {/* 1. Official National Ministry Utility Ribbon */}
       <div 
-        className="w-full bg-gradient-to-r from-[#00224d] via-[#004080] to-[#00224d] text-white py-1 px-3 sm:px-6 text-[10.5px] sm:text-[11px] font-medium select-none border-b border-amber-400/25 block"
+        className="w-full bg-[#001733] text-slate-300 py-1.5 px-3 sm:px-6 text-[10.5px] sm:text-[11px] font-medium select-none border-b border-amber-500/20 block shadow-2xs"
       >
         <div className="max-w-[1600px] mx-auto flex items-center justify-between gap-3">
-          <div className="flex items-center gap-2 min-w-0">
-            <span className="bg-amber-400 text-slate-950 px-2 py-0.5 rounded-full text-[9px] sm:text-[9.5px] font-black uppercase tracking-wider shadow-xs flex-shrink-0 flex items-center gap-1">
-              <span className="w-1.5 h-1.5 rounded-full bg-slate-950 animate-ping" />
-              BETA TEST
+          
+          {/* Left: Official National Identity & Portal Status */}
+          <div className="flex items-center gap-2.5 min-w-0">
+            <div className="flex items-center gap-1.5 font-cinzel text-amber-400 font-extrabold text-[10.5px] tracking-wider flex-shrink-0">
+              <Crown className="w-3 h-3 text-amber-400" />
+              <span>KINGDOM OF CAMBODIA</span>
+            </div>
+            <span className="text-white/20 hidden sm:inline">•</span>
+            <span className="text-slate-300 font-medium text-[10.5px] hidden sm:inline truncate">
+              {lang === 'km' ? 'ព្រះរាជាណាចក្រកម្ពុជា ជាតិ សាសនា ព្រះមហាក្សត្រ' : 'Nation Religion King'}
             </span>
-            <span className="text-amber-200 font-semibold truncate text-[10px] sm:text-[11px]">
-              {lang === 'km' 
-                ? 'ប្រព័ន្ធកំពុងស្ថិតក្នុងដំណាក់កាលសាកល្បងបច្ចេកវិទ្យា (Beta Phase) • រាល់មុខងារទាំងអស់បើកដំណើរការឥតគិតថ្លៃ!' 
-                : 'National E-Learning platform is currently in Beta Testing • All premium features are active & free!'}
-            </span>
+            <span className="text-white/20 hidden md:inline">•</span>
+            <div className="hidden md:flex items-center gap-1.5 text-emerald-400 font-semibold text-[10px] bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/25">
+              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
+              <span>{lang === 'km' ? 'ប្រព័ន្ធរដ្ឋបាលអប់រំឌីជីថល (ផ្លូវការ)' : 'Official National E-Learning Gateway'}</span>
+            </div>
           </div>
 
-          <div className="flex items-center gap-3 text-[10px] sm:text-[10.5px] text-slate-200 flex-shrink-0">
-            <a 
-              href="tel:0977416126" 
-              className="flex items-center gap-1 hover:text-amber-300 transition-colors font-mono font-bold"
-              title="Call 097 741 6126"
-            >
-              <Phone className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-300" />
-              <span>097 741 6126</span>
-            </a>
-            <span className="text-white/30 hidden sm:inline">|</span>
+          {/* Right: Technical Support Hotline & Channels */}
+          <div className="flex items-center gap-3.5 text-[10.5px] text-slate-300 flex-shrink-0">
+            <div className="flex items-center gap-1.5">
+              <span className="text-slate-400 hidden sm:inline">{lang === 'km' ? 'ផ្នែកជំនួយបច្ចេកទេស:' : 'Support Hotline:'}</span>
+              <a 
+                href="tel:0977416126" 
+                className="flex items-center gap-1 text-amber-300 hover:text-amber-200 transition-colors font-mono font-bold"
+                title="Support Hotline: 097 741 6126"
+              >
+                <Phone className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-400" />
+                <span>097 741 6126</span>
+              </a>
+            </div>
+
+            <span className="text-white/20 hidden md:inline">|</span>
+
             <a 
               href="https://t.me/kaixite" 
               target="_blank"
               rel="noopener noreferrer"
-              className="hidden md:flex items-center gap-1 hover:text-cyan-300 transition-colors font-mono font-bold"
-              title="Telegram: @kaixite"
+              className="hidden md:flex items-center gap-1 text-slate-300 hover:text-cyan-300 transition-colors font-medium"
+              title="Official Telegram Support Desk"
             >
               <Send className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-cyan-400" />
-              <span>Telegram: @kaixite</span>
+              <span>{lang === 'km' ? 'ជំនួយការ Telegram' : 'Telegram Support'}</span>
             </a>
-            <span className="text-white/30 hidden md:inline">|</span>
+
+            <span className="text-white/20 hidden lg:inline">|</span>
+
             <a 
-              href="mailto:soksithcheyhoout@gmail.com" 
-              className="hidden sm:flex items-center gap-1 hover:text-amber-300 transition-colors font-mono"
-              title="Email soksithcheyhoout@gmail.com"
+              href="mailto:support@motdar.gov.kh" 
+              className="hidden lg:flex items-center gap-1 text-slate-300 hover:text-amber-300 transition-colors font-medium"
+              title="Official Support Email"
             >
-              <Mail className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-300" />
-              <span>soksithcheyhoout@gmail.com</span>
+              <Mail className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-400" />
+              <span>support@motdar.gov.kh</span>
             </a>
           </div>
+
         </div>
       </div>
 
