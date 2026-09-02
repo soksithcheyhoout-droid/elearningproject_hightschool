@@ -87,10 +87,10 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
           />
         </div>
 
-        <div className="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-8 items-center w-full min-w-0">
+        <div className="relative z-10 grid grid-cols-1 xl:grid-cols-12 gap-6 sm:gap-8 items-center w-full min-w-0">
           
           {/* Left Column: Heading, Subtitle & Primary Actions */}
-          <div className="lg:col-span-7 space-y-4 sm:space-y-6 min-w-0">
+          <div className="xl:col-span-7 space-y-4 sm:space-y-6 min-w-0">
             
             {/* Official National Institutional Accreditation Badge */}
             <div className="flex items-center gap-2">
@@ -113,8 +113,8 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
 
             {/* Main Title & Description */}
             <div className="space-y-2 sm:space-y-3">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[44px] text-white leading-tight tracking-wide font-koulen">
-                {t('heroTitle') || (lang === 'km' ? 'មជ្ឈមណ្ឌលសិក្សាឌីជីថលកម្រិតវិទ្យាល័យជាតិ' : 'National Secondary E-Learning Portal')}
+              <h1 className="text-2xl sm:text-3xl lg:text-[34px] xl:text-[38px] text-white leading-[1.4] tracking-wide font-koulen break-words">
+                {t('heroTitle') || (lang === 'km' ? 'មជ្ឈមណ្ឌលសិក្សាឌីជីថលវិទ្យាល័យជាតិ' : 'National Secondary E-Learning Portal')}
               </h1>
               <p className="text-xs sm:text-sm md:text-base text-slate-200/90 leading-relaxed max-w-xl font-normal">
                 {t('heroDesc')}
@@ -177,54 +177,54 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
           </div>
 
           {/* Right Column: Clean BacII Countdown & Stream Hub Card */}
-          <div className="lg:col-span-5">
-            <div className="bg-[#001f42]/90 text-white rounded-2xl p-4 sm:p-6 shadow-xl border border-white/15 space-y-4 w-full overflow-hidden">
+          <div className="xl:col-span-5 w-full min-w-0">
+            <div className="bg-[#001f42]/90 text-white rounded-2xl p-4 sm:p-5 shadow-xl border border-white/15 space-y-3.5 w-full min-w-0">
               
               {/* Card Header */}
-              <div className="flex items-center justify-between border-b border-white/10 pb-3 gap-2 min-w-0">
-                <div className="flex items-center gap-2 font-bold text-xs sm:text-[13px] text-amber-300 min-w-0">
+              <div className="flex items-center justify-between border-b border-white/10 pb-3 gap-2 min-w-0 flex-wrap sm:flex-nowrap">
+                <div className="flex items-center gap-2 font-bold text-xs sm:text-[13px] text-amber-300 min-w-0 truncate">
                   <Calendar className="w-4 h-4 text-amber-400 shrink-0" />
-                  <span className="truncate">{lang === 'km' ? 'រាប់ថយក្រោយការប្រឡងបាក់ឌុប' : 'BacII Exam Countdown'}</span>
+                  <span className="truncate font-koulen tracking-wide">{lang === 'km' ? 'រាប់ថយក្រោយការប្រឡងបាក់ឌុប' : 'BacII Exam Countdown'}</span>
                 </div>
-                <span className="text-[10px] font-bold px-2.5 py-0.5 rounded-full bg-amber-400/15 text-amber-300 border border-amber-400/30 font-mono shrink-0">
+                <span className="text-[10px] font-bold px-2 py-0.5 rounded-full bg-amber-400/15 text-amber-300 border border-amber-400/30 font-mono shrink-0 whitespace-nowrap">
                   {lang === 'km' ? '១០-១១ សីហា' : 'Aug 10–11'}
                 </span>
               </div>
 
               {/* 4 Clean Countdown Boxes */}
-              <div className="grid grid-cols-4 gap-2 w-full">
-                <div className="bg-white/5 border border-white/10 rounded-xl p-2 sm:p-2.5 text-center">
-                  <div className="font-black text-lg sm:text-2xl text-amber-300 font-cinzel leading-none">
+              <div className="grid grid-cols-4 gap-1.5 sm:gap-2 w-full min-w-0">
+                <div className="bg-white/5 border border-white/10 rounded-xl p-1.5 sm:p-2 text-center min-w-0">
+                  <div className="font-black text-base sm:text-xl text-amber-300 font-cinzel leading-none">
                     {timeLeft.days}
                   </div>
-                  <div className="text-[9px] sm:text-[10px] text-slate-300 font-medium mt-1 uppercase tracking-wider">
+                  <div className="text-[8.5px] sm:text-[9.5px] text-slate-300 font-medium mt-1 uppercase tracking-wider truncate">
                     {t('days')}
                   </div>
                 </div>
 
-                <div className="bg-white/5 border border-white/10 rounded-xl p-2 sm:p-2.5 text-center">
-                  <div className="font-black text-lg sm:text-2xl text-amber-300 font-cinzel leading-none">
+                <div className="bg-white/5 border border-white/10 rounded-xl p-1.5 sm:p-2 text-center min-w-0">
+                  <div className="font-black text-base sm:text-xl text-amber-300 font-cinzel leading-none">
                     {timeLeft.hours}
                   </div>
-                  <div className="text-[9px] sm:text-[10px] text-slate-300 font-medium mt-1 uppercase tracking-wider">
+                  <div className="text-[8.5px] sm:text-[9.5px] text-slate-300 font-medium mt-1 uppercase tracking-wider truncate">
                     {t('hours')}
                   </div>
                 </div>
 
-                <div className="bg-white/5 border border-white/10 rounded-xl p-2 sm:p-2.5 text-center">
-                  <div className="font-black text-lg sm:text-2xl text-amber-300 font-cinzel leading-none">
+                <div className="bg-white/5 border border-white/10 rounded-xl p-1.5 sm:p-2 text-center min-w-0">
+                  <div className="font-black text-base sm:text-xl text-amber-300 font-cinzel leading-none">
                     {timeLeft.minutes}
                   </div>
-                  <div className="text-[9px] sm:text-[10px] text-slate-300 font-medium mt-1 uppercase tracking-wider">
+                  <div className="text-[8.5px] sm:text-[9.5px] text-slate-300 font-medium mt-1 uppercase tracking-wider truncate">
                     {t('minutes')}
                   </div>
                 </div>
 
-                <div className="bg-white/5 border border-white/10 rounded-xl p-2 sm:p-2.5 text-center">
-                  <div className="font-black text-lg sm:text-2xl text-sky-400 font-cinzel leading-none">
+                <div className="bg-white/5 border border-white/10 rounded-xl p-1.5 sm:p-2 text-center min-w-0">
+                  <div className="font-black text-base sm:text-xl text-sky-400 font-cinzel leading-none">
                     {timeLeft.seconds}
                   </div>
-                  <div className="text-[9px] sm:text-[10px] text-slate-300 font-medium mt-1 uppercase tracking-wider">
+                  <div className="text-[8.5px] sm:text-[9.5px] text-slate-300 font-medium mt-1 uppercase tracking-wider truncate">
                     {t('seconds')}
                   </div>
                 </div>

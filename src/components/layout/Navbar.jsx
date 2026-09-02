@@ -827,9 +827,9 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
             {/* USER PROFILE SUITE (PF + Streak + XP) - Guaranteed 0% Clipping on all screen sizes */}
             <div className="flex items-center gap-1 sm:gap-2 pl-1 sm:pl-2 border-l border-slate-200 dark:border-slate-800 flex-shrink-0 mr-0.5 sm:mr-2">
               
-              {/* Streak Badge (Visible on wide screens 1680px+ to prevent clipping) */}
+              {/* Streak Badge (Visible on ultra-wide screens 1800px+ to prevent clipping) */}
               <div 
-                className="hidden min-[1680px]:flex items-center gap-1.5 bg-amber-50/90 dark:bg-amber-950/40 border border-amber-300/90 dark:border-amber-600/50 px-2 py-1 rounded-xl shadow-2xs cursor-help hover:scale-105 transition-transform flex-shrink-0"
+                className="hidden min-[1800px]:flex items-center gap-1.5 bg-amber-50/90 dark:bg-amber-950/40 border border-amber-300/90 dark:border-amber-600/50 px-2 py-1 rounded-xl shadow-2xs cursor-help hover:scale-105 transition-transform flex-shrink-0"
                 title={`${student?.streakDays || 14} ថ្ងៃបន្តបន្ទាប់`}
               >
                 <Flame className="w-3.5 h-3.5 text-amber-500 animate-pulse fill-amber-500/20" />
@@ -839,7 +839,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
 
               {/* XP Badge */}
               <div 
-                className="hidden 2xl:flex items-center gap-1.5 bg-blue-50/90 dark:bg-blue-950/40 border border-blue-300/90 dark:border-blue-600/50 px-2 py-1 rounded-xl shadow-2xs hover:scale-105 transition-transform flex-shrink-0"
+                className="hidden min-[1800px]:flex items-center gap-1.5 bg-blue-50/90 dark:bg-blue-950/40 border border-blue-300/90 dark:border-blue-600/50 px-2 py-1 rounded-xl shadow-2xs hover:scale-105 transition-transform flex-shrink-0"
                 title={`${(student?.xp || 3568).toLocaleString()} XP`}
               >
                 <Sparkles className="w-3.5 h-3.5 text-[#005baa] dark:text-cyan-400" />
