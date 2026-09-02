@@ -316,15 +316,9 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
     >
       
       {/* 1. Authentic MoEYS Top Utility Ribbon (Curved Royal Blue Gradient on Right) */}
-      <div className="w-full bg-white dark:bg-[#070c18] border-b border-slate-100 dark:border-slate-800/80 flex items-center justify-between text-xs select-none h-8 sm:h-9">
-        <div className="max-w-[1600px] w-full mx-auto flex items-center justify-between pl-2 sm:pl-4 lg:pl-6 h-full">
+      <div className="w-full bg-transparent flex items-center justify-end text-xs select-none h-8 sm:h-9">
+        <div className="max-w-[1600px] w-full mx-auto flex items-center justify-end h-full">
           
-          {/* Left: National Motto in elegant Koulen font */}
-          <div className="hidden md:flex items-center gap-2 text-xs font-koulen text-[#002b5b] dark:text-amber-300 tracking-wider">
-            <Crown className="w-3.5 h-3.5 text-amber-500 shrink-0" />
-            <span>{lang === 'km' ? 'ព្រះរាជាណាចក្រកម្ពុជា ជាតិ សាសនា ព្រះមហាក្សត្រ' : 'KINGDOM OF CAMBODIA • Nation Religion King'}</span>
-          </div>
-
           {/* Right: Curved MoEYS Royal Blue Gradient Ribbon */}
           <div className="ml-auto bg-gradient-to-r from-[#005baa] via-[#006bbd] to-[#008fe3] text-white px-4 sm:px-6 lg:px-8 h-full rounded-bl-2xl sm:rounded-bl-3xl flex items-center gap-3 sm:gap-5 text-[11px] sm:text-xs font-medium shadow-xs">
             <a 
