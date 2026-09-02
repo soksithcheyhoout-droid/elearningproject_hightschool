@@ -317,13 +317,13 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
               <span>KINGDOM OF CAMBODIA</span>
             </div>
             <span className="text-white/20 hidden sm:inline">•</span>
-            <span className="text-slate-300 font-medium text-[10.5px] hidden sm:inline truncate">
+            <span className="text-slate-300 font-medium text-[11.5px] font-koulen tracking-wide hidden sm:inline truncate">
               {lang === 'km' ? 'ព្រះរាជាណាចក្រកម្ពុជា ជាតិ សាសនា ព្រះមហាក្សត្រ' : 'Nation Religion King'}
             </span>
             <span className="text-white/20 hidden md:inline">•</span>
             <div className="hidden md:flex items-center gap-1.5 text-emerald-400 font-semibold text-[10px] bg-emerald-500/10 px-2 py-0.5 rounded-full border border-emerald-500/25">
               <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" />
-              <span>{lang === 'km' ? 'ប្រព័ន្ធរដ្ឋបាលអប់រំឌីជីថល (ផ្លូវការ)' : 'Official National E-Learning Gateway'}</span>
+              <span className="font-koulen tracking-wide">{lang === 'km' ? 'ប្រព័ន្ធរដ្ឋបាលអប់រំឌីជីថល (ផ្លូវការ)' : 'Official National E-Learning Gateway'}</span>
             </div>
           </div>
 
@@ -390,10 +390,10 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
 
             {/* High-End Official Ministry Typography */}
             <div className="hidden min-[460px]:flex flex-col justify-center leading-tight">
-              <span className={`font-black tracking-tight transition-colors line-clamp-1 ${
+              <span className={`font-koulen tracking-wide transition-colors line-clamp-1 ${
                 isScrolled 
-                  ? 'text-[11px] sm:text-[13px] text-[#005baa] group-hover:text-[#002d62]' 
-                  : 'text-[11px] sm:text-[13.5px] lg:text-[14.5px] text-[#002d62] group-hover:text-[#005baa] drop-shadow-2xs'
+                  ? 'text-xs sm:text-sm text-[#005baa] group-hover:text-[#002d62]' 
+                  : 'text-xs sm:text-[15px] lg:text-[16.5px] text-[#002d62] group-hover:text-[#005baa] drop-shadow-2xs'
               }`}>
                 {lang === 'km' ? 'ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ' : 'Ministry of Talent Dev'}
               </span>

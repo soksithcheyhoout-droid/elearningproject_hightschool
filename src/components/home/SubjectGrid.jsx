@@ -125,7 +125,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
 
               {/* Title & Description */}
               <div className="space-y-1.5">
-                <h1 className="text-xl sm:text-2xl lg:text-3xl font-black text-white leading-tight tracking-tight">
+                <h1 className="text-xl sm:text-2xl lg:text-3xl font-koulen text-white leading-tight tracking-wide">
                   {lang === 'km' ? 'កម្មវិធីសិក្សាចំណេះទូទៅ ថ្នាក់ទី ១-១២' : 'Cambodian National Curriculum (Grades 1–12)'}
                 </h1>
                 <p className="text-xs sm:text-sm text-slate-200/90 leading-relaxed font-normal line-clamp-2 sm:line-clamp-none max-w-xl">
@@ -209,7 +209,7 @@ export default function SubjectGrid({ onSelectSubject, showHeroBanner = true }) 
                 • {filteredSubjects.length} {lang === 'km' ? 'មុខវិជ្ជាសរុប' : 'Subjects'} ({lang === 'km' ? 'វិទ្យាសាស្ត្រ' : 'Science'}: {scienceSubjects.length}, {lang === 'km' ? 'សង្គម' : 'Social'}: {socialSubjects.length})
               </span>
             </div>
-            <h2 className="text-xs sm:text-lg font-black text-[#002b5b] dark:text-white tracking-tight">
+            <h2 className="text-sm sm:text-xl font-koulen text-[#002b5b] dark:text-white tracking-wide">
               {lang === 'km' ? 'តារាងមុខវិជ្ជា និងមេរៀនតាមកម្រិតថ្នាក់' : 'Select Grade & Stream'}
             </h2>
           </div>

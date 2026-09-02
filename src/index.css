@@ -710,6 +710,11 @@ body, header, aside, main {
 }
 
 /* Font utilities */
+.font-koulen {
+  font-family: 'Koulen', 'Kantumruy Pro', system-ui, -apple-system, sans-serif;
+  letter-spacing: 0.5px;
+}
+
 .font-kantumruy {
   font-family: 'Kantumruy Pro', system-ui, -apple-system, sans-serif;
 }

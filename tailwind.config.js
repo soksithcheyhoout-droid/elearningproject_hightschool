@@ -17,6 +17,7 @@ export default {
         }
       },
       fontFamily: {
+        koulen: ['Koulen', 'Kantumruy Pro', 'sans-serif'],
         moul: ['Moul', 'cursive'],
         kantumruy: ['Kantumruy Pro', 'sans-serif'],
         battambang: ['Battambang', 'sans-serif'],

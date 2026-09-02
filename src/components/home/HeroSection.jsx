@@ -113,7 +113,7 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
 
             {/* Main Title & Description */}
             <div className="space-y-2 sm:space-y-3">
-              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[42px] font-black text-white leading-tight tracking-tight">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-[44px] text-white leading-tight tracking-wide font-koulen">
                 {t('heroTitle') || (lang === 'km' ? 'មជ្ឈមណ្ឌលសិក្សាឌីជីថលកម្រិតវិទ្យាល័យជាតិ' : 'National Secondary E-Learning Portal')}
               </h1>
               <p className="text-xs sm:text-sm md:text-base text-slate-200/90 leading-relaxed max-w-xl font-normal">
@@ -129,7 +129,7 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
                 className="px-6 py-3 rounded-xl bg-[#d97706] hover:bg-[#b45309] text-white text-xs sm:text-sm font-bold shadow-md hover:shadow-lg active:scale-95 transition-all flex items-center justify-center gap-2 cursor-pointer border border-amber-400/30"
               >
                 <Play className="w-4 h-4 fill-white text-white" />
-                <span>{t('startLearning') || (lang === 'km' ? 'ចូលរៀនតាមមុខវិជ្ជា' : 'Start Learning')}</span>
+                <span className="font-koulen tracking-wide text-sm pt-0.5">{t('startLearning') || (lang === 'km' ? 'ចូលរៀនតាមមុខវិជ្ជា' : 'Start Learning')}</span>
               </button>
               
               <button
@@ -138,7 +138,7 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
                 className="bg-white/10 hover:bg-white/15 text-white px-5 py-3 rounded-xl text-xs sm:text-sm font-semibold transition-all border border-white/20 shadow-xs flex items-center justify-center gap-2 cursor-pointer active:scale-95"
               >
                 <FileText className="w-4 h-4 text-amber-300" />
-                <span>{t('exploreBacII') || (lang === 'km' ? 'ទាញយកវិញ្ញាសាបាក់ឌុប' : 'Explore BacII Papers')}</span>
+                <span className="font-koulen tracking-wide text-sm pt-0.5">{t('exploreBacII') || (lang === 'km' ? 'ទាញយកវិញ្ញាសាបាក់ឌុប' : 'Explore BacII Papers')}</span>
                 <ArrowRight className="w-4 h-4 text-amber-300" />
               </button>
             </div>
