@@ -13,6 +13,7 @@ import {
   Server, 
   Cpu, 
   ArrowRight,
+  ArrowLeft,
   Terminal,
   Download,
   DollarSign,
@@ -310,11 +311,33 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
   };
 
   const handleDownloadQr = () => {
-    if (canvasRef.current) {
-      const link = document.createElement('a');
-      link.download = `BAKONG_KHQR_CHEY_DEV_${currentAmount}_${amountType.toUpperCase()}.png`;
-      link.href = canvasRef.current.toDataURL('image/png');
-      link.click();
+    try {
+      const svg = document.querySelector('.khqr-svg-wrapper svg');
+      if (svg) {
+        const svgData = new XMLSerializer().serializeToString(svg);
+        const svgBlob = new Blob([svgData], { type: 'image/svg+xml;charset=utf-8' });
+        const URL = window.URL || window.webkitURL || window;
+        const blobURL = URL.createObjectURL(svgBlob);
+        const image = new Image();
+        image.onload = () => {
+          const canvas = document.createElement('canvas');
+          canvas.width = 600;
+          canvas.height = 600;
+          const context = canvas.getContext('2d');
+          context.fillStyle = '#ffffff';
+          context.fillRect(0, 0, 600, 600);
+          context.drawImage(image, 0, 0, 600, 600);
+          const png = canvas.toDataURL('image/png');
+          const link = document.createElement('a');
+          link.download = `KHQR_${paymentGateway.toUpperCase()}_CHEY_DEV_${currentAmount}_${amountType.toUpperCase()}.png`;
+          link.href = png;
+          link.click();
+          URL.revokeObjectURL(blobURL);
+        };
+        image.src = blobURL;
+      }
+    } catch (e) {
+      console.warn('Download QR failed', e);
     }
   };
 
@@ -889,14 +912,14 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
 
           {/* ── STEP 2: Authentic QR Card Screen with Live Auto-Check & 1-Click Mobile Deep Link ── */}
           {step === 2 && !isGeneratingQR && (
-            <div className="space-y-3 py-1 flex flex-col items-center justify-center animate-fadeIn">
+            <div className="space-y-3.5 py-1 flex flex-col items-center justify-center animate-fadeIn">
               
               {/* Dynamic Payment Card (ABA PayWay vs Bakong KHQR) */}
-              <div className="rounded-[22px] w-[280px] sm:w-[290px] flex flex-col bg-white shadow-[0_15px_35px_rgba(0,0,0,0.12)] border border-slate-200 overflow-hidden text-[rgb(8,27,55)] relative">
+              <div className="rounded-[22px] w-[285px] sm:w-[300px] flex flex-col bg-[#0b1428] shadow-[0_18px_40px_rgba(0,10,30,0.6)] border border-slate-700/80 overflow-hidden text-white relative">
                 
                 {/* Header Bar: KHQR Vector Header with Dynamic Theme Color (ABA Blue vs Bakong Red) */}
                 <div 
-                  className="flex items-center justify-center h-[46px] transition-colors"
+                  className="flex items-center justify-center h-[46px] transition-colors relative shadow-xs"
                   style={{ backgroundColor: paymentGateway === 'aba' ? '#002D56' : 'rgb(226,26,26)' }}
                 >
                   <svg width="64" height="15" viewBox="0 0 60 14" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -920,40 +943,55 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                 </div>
 
                 {/* Merchant Name chey_dev & Amount */}
-                <div 
-                  className="py-2.5 px-4 pl-6"
-                  style={{
-                    background: 'linear-gradient(90deg, rgba(160, 174, 192, 0.9) 65%, rgba(255,255,255,0) 0px)',
-                    backgroundSize: '14px 1.5px',
-                    backgroundPosition: '50% 100%',
-                    backgroundRepeat: 'repeat-x'
-                  }}
-                >
+                <div className="py-2.5 px-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-1.5">
-                      <div className="w-5 h-5 rounded-md bg-amber-500/10 border border-amber-500/20 p-0.5 flex items-center justify-center">
-                        <img src="/assets/moeys-crest-transparent.png" alt="Crest" className="w-full h-full object-contain" />
+                      <div className="w-5 h-5 rounded-md bg-amber-400/15 border border-amber-400/30 p-0.5 flex items-center justify-center">
+                        <img src="/assets/moeys-crest-transparent.png" alt="Crest" className="w-full h-full object-contain filter drop-shadow-xs" />
                       </div>
-                      <span className="text-[12px] font-black text-slate-900 font-mono tracking-wide">chey_dev</span>
+                      <span className="text-[12.5px] font-black text-white font-mono tracking-wide">chey_dev</span>
                     </div>
-                    <span className={`text-[9px] px-2 py-0.5 rounded font-mono font-bold ${
-                      paymentGateway === 'aba' ? 'bg-blue-50 text-[#004B87]' : 'bg-slate-100 text-[#005baa]'
+                    <span className={`text-[9px] px-2 py-0.5 rounded-full font-mono font-bold border ${
+                      paymentGateway === 'aba' 
+                        ? 'bg-[#002D56] text-[#00A3E0] border-[#00A3E0]/40' 
+                        : 'bg-red-950 text-red-400 border-red-500/40'
                     }`}>
-                      {paymentGateway === 'aba' ? 'ABA Developer ID' : 'Developer ID'}
+                      {paymentGateway === 'aba' ? 'ABA Merchant ID' : 'Bakong Merchant ID'}
                     </span>
                   </div>
-                  <div className="mt-0.5 font-['Nunito_Sans']">
-                    <div className="flex items-baseline text-xl font-black text-black">
-                      <span>{amountType === 'usd' ? Number(currentAmount).toFixed(2) : Number(currentAmount).toLocaleString()}</span>
-                      <span className="text-[10px] font-bold ml-1.5 text-slate-500 font-mono uppercase">{amountType}</span>
+
+                  {/* PRICE DISPLAY - PERFECT FINTECH TYPOGRAPHY */}
+                  <div className="mt-2 flex items-baseline justify-between">
+                    <div className="flex items-baseline gap-1 font-mono">
+                      <span className={`text-lg font-black ${paymentGateway === 'aba' ? 'text-[#00A3E0]' : 'text-red-400'}`}>
+                        {amountType === 'usd' ? '$' : '៛'}
+                      </span>
+                      <span className="text-2xl sm:text-3xl font-black text-white tracking-tight drop-shadow-xs">
+                        {amountType === 'usd' ? Number(currentAmount).toFixed(2) : Number(currentAmount).toLocaleString()}
+                      </span>
+                      <span className={`text-[10.5px] font-mono font-black ml-1 px-1.5 py-0.5 rounded uppercase tracking-wider ${
+                        paymentGateway === 'aba' ? 'bg-[#002D56] text-cyan-300 border border-[#00A3E0]/30' : 'bg-red-950 text-red-300 border border-red-500/30'
+                      }`}>
+                        {amountType.toUpperCase()}
+                      </span>
+                    </div>
+                    <div className="text-right">
+                      <span className="text-[9px] font-mono text-slate-400 uppercase tracking-wider block">Total Amount</span>
+                      <span className="text-[9.5px] font-bold text-emerald-400 flex items-center gap-1 justify-end font-mono">
+                        <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 inline-block animate-pulse"></span>
+                        Zero Fee
+                      </span>
                     </div>
                   </div>
                 </div>
 
+                {/* Perforated dashed divider */}
+                <div className="w-full border-b border-dashed border-slate-700/70 my-0.5" />
+
                 {/* Vector QR Code SVG with High-DPI Center Crest Badge */}
-                <div className="flex justify-center items-center relative p-3 bg-white min-h-[200px]">
-                  <div className="relative bg-white rounded-2xl shadow-xs p-1 flex items-center justify-center min-w-[185px] min-h-[185px]">
-                    <div className="relative w-[185px] h-[185px] flex items-center justify-center p-1 bg-white rounded-xl">
+                <div className="flex justify-center items-center relative p-3 bg-white/95 rounded-2xl mx-3.5 my-2 shadow-inner min-h-[195px] khqr-svg-wrapper">
+                  <div className="relative bg-white rounded-xl p-1 flex items-center justify-center min-w-[180px] min-h-[180px]">
+                    <div className="relative w-[180px] h-[180px] flex items-center justify-center p-1 bg-white rounded-lg">
                       <QRCodeSVG
                         value={
                           (paymentGateway === 'aba' && abaData?.qrString)
@@ -967,7 +1005,7 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                                 storeLabel: 'chey_dev'
                               }).qrString)
                         }
-                        size={180}
+                        size={175}
                         level="H"
                         marginSize={1}
                         fgColor={paymentGateway === 'aba' ? '#002D56' : '#081b37'}
@@ -976,14 +1014,14 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                           src: '/assets/moeys-crest-transparent.png',
                           x: undefined,
                           y: undefined,
-                          height: 42,
-                          width: 42,
+                          height: 40,
+                          width: 40,
                           excavate: true,
                         }}
                       />
                       
                       {/* Ultra-Crisp High-DPI Golden Crest Center Badge */}
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11 h-11 bg-white rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.18)] border border-slate-100 flex items-center justify-center p-1 pointer-events-none ring-2 ring-white">
+                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-10 h-10 bg-white rounded-xl shadow-[0_2px_10px_rgba(0,0,0,0.18)] border border-slate-100 flex items-center justify-center p-1 pointer-events-none ring-2 ring-white">
                         <img 
                           src="/assets/moeys-crest-transparent.png" 
                           alt="Ministry Golden Crest" 
@@ -996,14 +1034,14 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                   
                   {/* Expired Overlay if timer reaches 0 */}
                   {isExpired && (
-                    <div className="absolute inset-0 bg-white/95 backdrop-blur-xs flex flex-col items-center justify-center p-4 text-center z-20">
-                      <AlertCircle className="w-8 h-8 text-amber-600 mb-1" />
-                      <p className="text-xs font-bold text-slate-900">កាត QR ផុតកំណត់</p>
-                      <p className="text-[10.5px] text-slate-500 mb-3">សូមចុច Refresh ដើម្បីបង្កើតកាតថ្មី</p>
+                    <div className="absolute inset-0 bg-slate-950/95 backdrop-blur-xs flex flex-col items-center justify-center p-4 text-center z-20 rounded-2xl">
+                      <AlertCircle className="w-8 h-8 text-amber-400 mb-1" />
+                      <p className="text-xs font-bold text-white">កាត QR ផុតកំណត់</p>
+                      <p className="text-[10.5px] text-slate-400 mb-3">សូមចុច Refresh ដើម្បីបង្កើតកាតថ្មី</p>
                       <button
                         type="button"
                         onClick={handleProceedToQR}
-                        className="px-3.5 py-1.5 rounded-xl bg-slate-900 text-white text-xs font-bold hover:bg-slate-800 transition-colors shadow-xs cursor-pointer"
+                        className="px-3.5 py-1.5 rounded-xl bg-slate-800 text-white text-xs font-bold hover:bg-slate-700 transition-colors shadow-xs cursor-pointer border border-slate-700"
                       >
                         បង្កើតកាតថ្មី (Refresh)
                       </button>
@@ -1012,52 +1050,62 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                 </div>
 
                 {/* Card Subtitle */}
-                <div className="pb-3 text-center px-2">
-                  <p className="text-[10.5px] text-slate-500 leading-tight">
+                <div className="pb-2.5 pt-0.5 text-center px-2">
+                  <p className="text-[10.5px] text-slate-300 leading-tight">
                     {paymentGateway === 'aba' ? (
-                      <span>ស្កេនជាមួយ <strong>ABA Mobile</strong> ឬ KHQR គ្រប់ធនាគារ</span>
+                      <span>ស្កេនជាមួយ <strong className="text-white font-bold">ABA Mobile</strong> ឬ KHQR គ្រប់ធនាគារ</span>
                     ) : (
-                      <span>Scan with <strong>ABA Mobile</strong>, <strong>Bakong</strong> or any KHQR App</span>
+                      <span>Scan with <strong className="text-white font-bold">Bakong</strong> ឬ KHQR App គ្រប់ធនាគារ</span>
                     )}
                   </p>
                 </div>
               </div>
 
-              {/* Live Auto-Checking Indicator with Animated Express Delivery Truck & Countdown Timer Bar */}
-              <div className="w-full max-w-sm bg-slate-900/95 border border-slate-800 rounded-2xl p-3 shadow-lg space-y-2.5 flex flex-col items-center">
+              {/* High-End Fintech Auto-Checking Terminal (NO GREEN LINE!) */}
+              <div className="w-full max-w-sm bg-gradient-to-b from-slate-900/95 via-[#0b1428] to-[#070d1d] border border-slate-700/80 rounded-2xl p-3.5 shadow-[0_12px_36px_rgba(0,10,30,0.5)] flex flex-col items-center space-y-2.5 relative overflow-hidden">
+                {/* Subtle Ambient Top Glow Line */}
+                <div className={`absolute top-0 left-1/4 right-1/4 h-[1.5px] bg-gradient-to-r from-transparent ${
+                  paymentGateway === 'aba' ? 'via-[#00A3E0]' : 'via-red-500'
+                } to-transparent opacity-80`} />
                 
                 {/* Express Delivery Truck Animation (Dynamic ABA vs Bakong) */}
                 <div className="w-full py-0.5 flex items-center justify-center">
                   <TruckPaymentLoader gateway={paymentGateway} />
                 </div>
 
-                {/* Auto Status & Timer Row */}
-                <div className="w-full flex items-center justify-between pt-1 border-t border-slate-800">
-                  <div className="flex items-center gap-2">
-                    <span className="relative flex h-2.5 w-2.5">
+                {/* Telemetry Status & Digital Timer Row (NO GREEN LINE) */}
+                <div className="w-full flex items-center justify-between pt-2 border-t border-slate-800/80">
+                  <div className="flex items-center gap-2 min-w-0">
+                    <span className="relative flex h-2.5 w-2.5 shrink-0">
                       <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500"></span>
+                      <span className="relative inline-flex rounded-full h-2.5 w-2.5 bg-emerald-500 shadow-[0_0_8px_rgba(16,185,129,0.8)]"></span>
                     </span>
-                    <span className="text-[11px] font-bold text-slate-200">
-                      កំពុងរង់ចាំការស្កេនទូទាត់... (Auto-Checking)
-                    </span>
+                    <div className="min-w-0">
+                      <span className="text-[11.5px] font-bold text-white block leading-tight font-kantumruy">
+                        កំពុងរង់ចាំការស្កេនទូទាត់...
+                      </span>
+                      <span className="text-[9px] font-mono text-slate-400 block leading-tight">
+                        Auto-Polling Gateway (2s)
+                      </span>
+                    </div>
                   </div>
                   
-                  {/* Timer Badge */}
-                  <div className="flex items-center gap-1 px-2.5 py-0.5 rounded-full bg-slate-800 border border-slate-700 font-mono text-[11px] font-bold text-slate-300">
-                    <Clock className="w-3 h-3 text-slate-400" />
-                    <span>{formatTime(timeLeft)}</span>
+                  {/* Digital Clock Badge */}
+                  <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-slate-950/90 border border-slate-700/80 font-mono text-xs font-black text-cyan-400 shadow-inner shrink-0">
+                    <Clock className="w-3.5 h-3.5 text-cyan-400 animate-pulse" />
+                    <span className="tracking-wider">{formatTime(timeLeft)}</span>
                   </div>
                 </div>
 
-                {/* Smooth Progress Bar */}
-                <div className="w-full h-1 bg-slate-800 rounded-full overflow-hidden">
-                  <div 
-                    className={`h-full transition-all duration-1000 ease-linear ${
-                      timeLeft > 60 ? 'bg-emerald-500' : timeLeft > 30 ? 'bg-amber-500' : 'bg-red-500'
-                    }`}
-                    style={{ width: `${(timeLeft / 180) * 100}%` }}
-                  />
+                {/* Sub-footer inside Auto-Checking Card */}
+                <div className="w-full flex items-center justify-between text-[9px] font-mono text-slate-400 pt-1.5 border-t border-slate-800/60">
+                  <span className="flex items-center gap-1 text-slate-400">
+                    <ShieldCheck className="w-3 h-3 text-emerald-400" />
+                    <span>EMVCo 256-bit Secure</span>
+                  </span>
+                  <span className="text-slate-400">
+                    {paymentGateway === 'aba' ? 'ABA PayWay API' : 'Bakong Open API'}
+                  </span>
                 </div>
               </div>
 
@@ -1066,14 +1114,19 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                 <button
                   type="button"
                   onClick={() => setStep(1)}
-                  className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-bold cursor-pointer transition-colors text-center border border-slate-700"
+                  className="flex-1 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 hover:text-white text-xs font-bold cursor-pointer transition-colors text-center border border-slate-700 flex items-center justify-center gap-1.5 shadow-xs active:scale-98"
                 >
-                  ថយក្រោយ (Back)
+                  <ArrowLeft className="w-3.5 h-3.5" />
+                  <span>ថយក្រោយ (Back)</span>
                 </button>
                 <button
                   type="button"
                   onClick={handleDownloadQr}
-                  className="flex-1 py-2.5 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-600 hover:brightness-110 text-white text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-md active:scale-98"
+                  className={`flex-1 py-2.5 rounded-xl text-white text-xs font-bold flex items-center justify-center gap-1.5 cursor-pointer transition-all shadow-md active:scale-98 ${
+                    paymentGateway === 'aba'
+                      ? 'bg-gradient-to-r from-[#002D56] via-[#004B87] to-[#00A3E0] hover:brightness-110'
+                      : 'bg-gradient-to-r from-red-600 via-rose-600 to-red-700 hover:brightness-110'
+                  }`}
                 >
                   <Download className="w-3.5 h-3.5" />
                   <span>រក្សាទុកកាត (Save QR)</span>
