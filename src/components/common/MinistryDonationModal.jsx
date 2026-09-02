@@ -38,7 +38,6 @@ import { useAuth } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
 import { generateKhqrString, checkBakongTransactionStatus } from '../../utils/khqrGenerator';
 import { generateAbaPaymentQr, checkAbaPaymentStatus } from '../../utils/abaPayment';
-import TruckPaymentLoader from './TruckPaymentLoader';
 
 // Official ABA Bank Logo Badge Component
 function AbaLogoBadge({ size = "sm" }) {
@@ -1068,9 +1067,26 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                   paymentGateway === 'aba' ? 'via-[#00A3E0]' : 'via-red-500'
                 } to-transparent opacity-80`} />
                 
-                {/* Express Delivery Truck Animation (Dynamic ABA vs Bakong) */}
-                <div className="w-full py-0.5 flex items-center justify-center">
-                  <TruckPaymentLoader gateway={paymentGateway} />
+                {/* Modern Tri-Spinner & Cycling Dynamic Text Loader (Fintech Grade) */}
+                <div className="payment-spinner-container py-1">
+                  <div className={`payment-tri-spinner ${paymentGateway === 'aba' ? '' : 'bakong'}`} />
+                  
+                  <div className="payment-words-loader mt-2.5">
+                    <p className="text-slate-200 font-bold tracking-tight">Waiting for</p>
+                    <div className="payment-words-box">
+                      <span className={`payment-cycle-word ${paymentGateway === 'aba' ? '' : 'bakong'}`}>Payment...</span>
+                      <span className={`payment-cycle-word ${paymentGateway === 'aba' ? '' : 'bakong'}`}>
+                        {paymentGateway === 'aba' ? 'ABA Mobile...' : 'Bakong App...'}
+                      </span>
+                      <span className={`payment-cycle-word ${paymentGateway === 'aba' ? '' : 'bakong'}`}>KHQR Scan...</span>
+                      <span className={`payment-cycle-word ${paymentGateway === 'aba' ? '' : 'bakong'}`}>Confirmation...</span>
+                      <span className={`payment-cycle-word ${paymentGateway === 'aba' ? '' : 'bakong'}`}>Payment...</span>
+                    </div>
+                  </div>
+                  
+                  <p className="text-[10.5px] text-slate-400 font-kantumruy mt-0.5 text-center font-medium">
+                    សូមបើកកម្មវិធីធនាគាររបស់អ្នកដើម្បីស្កេនទូទាត់ (Scan & Pay)
+                  </p>
                 </div>
 
                 {/* Telemetry Status & Digital Timer Row (NO GREEN LINE) */}
