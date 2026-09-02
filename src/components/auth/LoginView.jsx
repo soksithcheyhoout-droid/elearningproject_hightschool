@@ -810,16 +810,6 @@ export default function LoginView() {
         <div className="flex items-center gap-3">
           <button
             type="button"
-            onClick={() => setShowGoogleConfigModal(true)}
-            className="flex items-center gap-1 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-[11px] font-bold text-slate-300 hover:text-amber-400 transition-colors cursor-pointer"
-            title="Configure Google Client ID"
-          >
-            <Settings className="w-3 h-3 text-cyan-400" />
-            <span className="hidden sm:inline">Google API Key</span>
-          </button>
-
-          <button
-            type="button"
             onClick={() => setLang(lang === 'km' ? 'en' : 'km')}
             className="flex items-center gap-1.5 px-2.5 py-1 rounded-lg bg-white/5 hover:bg-white/10 border border-white/10 text-xs font-bold text-slate-200 transition-colors cursor-pointer"
           >
