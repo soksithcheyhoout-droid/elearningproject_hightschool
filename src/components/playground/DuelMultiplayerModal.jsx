@@ -1763,32 +1763,22 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             {tab === 'host' && (
               <div className="space-y-6 my-auto">
 
-                {/* ═══ ARENA COMMAND CENTER: HUMAN-DESIGNED MATCH CONFIGURATION ═══ */}
-                <div className="relative rounded-[28px] p-5 sm:p-7 bg-[#0b1224]/90 backdrop-blur-2xl border border-cyan-500/20 shadow-[0_20px_60px_rgba(0,0,0,0.7),inset_0_1px_1px_rgba(255,255,255,0.1)] space-y-6 overflow-hidden">
+                {/* ═══ ARENA COMMAND CENTER: MODERN REFINED MATCH CONFIGURATION ═══ */}
+                <div className="relative rounded-2xl p-5 sm:p-6 bg-slate-900/80 backdrop-blur-xl border border-slate-800 shadow-xl space-y-5">
                   
-                  {/* Cyber Decorative Tech Accents */}
-                  <div className="absolute top-0 left-0 w-8 h-8 border-t-2 border-l-2 border-cyan-400/50 rounded-tl-2xl pointer-events-none" />
-                  <div className="absolute top-0 right-0 w-8 h-8 border-t-2 border-r-2 border-purple-400/50 rounded-tr-2xl pointer-events-none" />
-                  <div className="absolute bottom-0 left-0 w-8 h-8 border-b-2 border-l-2 border-cyan-400/30 rounded-bl-2xl pointer-events-none" />
-                  <div className="absolute bottom-0 right-0 w-8 h-8 border-b-2 border-r-2 border-amber-400/30 rounded-br-2xl pointer-events-none" />
-                  
-                  {/* Dynamic Multi-Atmosphere Ambient Glow */}
-                  <div className="absolute -left-20 -top-20 w-60 h-60 rounded-full blur-[100px] pointer-events-none opacity-25 bg-cyan-500" />
-                  <div className="absolute -right-20 -bottom-20 w-60 h-60 rounded-full blur-[100px] pointer-events-none opacity-25 bg-amber-500" />
-
                   {/* Header: Title, Active Status, and Host Permission */}
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3.5 relative z-10 pb-4 border-b border-white/[0.08]">
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-4 border-b border-slate-800">
                     <div className="flex items-center gap-3">
-                      <div className="w-11 h-11 rounded-2xl bg-gradient-to-br from-indigo-500/20 via-purple-500/20 to-cyan-500/20 border border-indigo-400/30 flex items-center justify-center text-indigo-300 shadow-[0_0_20px_rgba(99,102,241,0.25)] flex-shrink-0">
-                        <Swords className="w-5 h-5 text-cyan-300" />
+                      <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-200 flex-shrink-0">
+                        <Swords className="w-5 h-5 text-sky-400" />
                       </div>
                       <div>
                         <div className="flex items-center gap-2">
-                          <h4 className="text-sm sm:text-base font-black text-white tracking-wide font-cinzel">
+                          <h4 className="text-sm sm:text-base font-bold text-white tracking-wide">
                             ការកំណត់សង្វៀនប្រកួត
                           </h4>
-                          <span className="text-[10px] font-mono font-bold px-2 py-0.5 rounded-full bg-cyan-400/10 text-cyan-300 border border-cyan-400/20 uppercase tracking-wider">
-                            Match Config
+                          <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase">
+                            Match Setup
                           </span>
                         </div>
                         <p className="text-[11px] text-slate-400">
@@ -1800,13 +1790,13 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                     {/* Right Header Status */}
                     <div className="flex items-center gap-2 flex-wrap">
                       {/* Active Summary Pill */}
-                      <div className="px-3.5 py-1.5 rounded-xl bg-slate-900/80 border border-white/10 text-[11px] font-bold text-slate-200 flex items-center gap-2 shadow-inner">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                      <div className="px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-xs text-slate-300 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400" />
                         <span>ថ្នាក់ទី {KHMER_NUMS[selectedGrade - 1]}</span>
                         {selectedGrade >= 11 && (
                           <>
                             <span className="text-slate-600">•</span>
-                            <span className={selectedStream === 'social' ? 'text-amber-300' : 'text-cyan-300'}>
+                            <span className={selectedStream === 'social' ? 'text-amber-400' : 'text-sky-400'}>
                               {selectedStream === 'social' ? 'សង្គម' : 'ពិត'}
                             </span>
                           </>
@@ -1814,51 +1804,51 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                         {selectedSubjectKey && (
                           <>
                             <span className="text-slate-600">•</span>
-                            <span className="text-emerald-300">{selectedSubjectKey}</span>
+                            <span className="text-emerald-400">{selectedSubjectKey}</span>
                           </>
                         )}
                       </div>
 
                       {/* Host Control Badge */}
                       {!isHost ? (
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-slate-800/80 border border-slate-700 text-slate-400 text-[11px] font-bold">
+                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-slate-400 text-xs font-medium">
                           <Lock className="w-3.5 h-3.5 text-slate-400" />
                           <span>មេបន្ទប់ជាអ្នកកំណត់</span>
                         </div>
                       ) : (
-                        <div className="flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-gradient-to-r from-amber-500/15 via-yellow-500/20 to-amber-500/15 border border-amber-400/40 text-amber-200 text-[11px] font-black shadow-[0_0_15px_rgba(245,158,11,0.2)]">
-                          <Crown className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                          <span>មេបន្ទប់កំណត់ (Host)</span>
+                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-200 text-xs font-medium">
+                          <Crown className="w-3.5 h-3.5 text-amber-400" />
+                          <span>មេបន្ទប់ (Host)</span>
                         </div>
                       )}
                     </div>
                   </div>
 
                   {/* ═══ 1. GRADE SELECTOR (CYCLES: PRIMARY • SECONDARY • HIGH SCHOOL) ═══ */}
-                  <div className="space-y-2.5 relative z-10">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1.5">
+                  <div className="space-y-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
                       <div className="flex items-center gap-2">
-                        <GraduationCap className="w-4 h-4 text-purple-400" />
-                        <span className="text-xs font-black text-slate-200 tracking-wide">
-                          កម្រិតថ្នាក់ (GRADE LEVEL)
+                        <GraduationCap className="w-4 h-4 text-slate-400" />
+                        <span className="text-xs font-bold text-slate-200">
+                          កម្រិតថ្នាក់ (Grade Level)
                         </span>
-                        <span className="text-[10px] text-slate-400 hidden sm:inline">
-                          — ចុចជ្រើសរើសថ្នាក់ទី ១ ដល់ ១២
+                        <span className="text-[11px] text-slate-500 hidden sm:inline">
+                          — ជ្រើសរើសថ្នាក់ទី ១ ដល់ ១២
                         </span>
                       </div>
                       
                       {/* Tier Indicators */}
-                      <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400">
+                      <div className="flex items-center gap-2 text-[10px] font-medium text-slate-400">
                         <span className="flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-cyan-400" />
+                          <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
                           <span>បឋម (1-6)</span>
                         </span>
-                        <span>•</span>
+                        <span className="text-slate-600">•</span>
                         <span className="flex items-center gap-1">
                           <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
                           <span>អនុវិទ្យាល័យ (7-9)</span>
                         </span>
-                        <span>•</span>
+                        <span className="text-slate-600">•</span>
                         <span className="flex items-center gap-1">
                           <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
                           <span>វិទ្យាល័យ (10-12)</span>
@@ -1867,12 +1857,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                     </div>
 
                     {/* 12-Slot Tactical Grade Cards */}
-                    <div className="grid grid-cols-6 sm:grid-cols-12 gap-1.5 sm:gap-2">
+                    <div className="grid grid-cols-6 sm:grid-cols-12 gap-1.5">
                       {Array.from({ length: 12 }, (_, i) => i + 1).map((g) => {
                         const isSelected = selectedGrade === g;
                         const isBac2 = g >= 11;
-                        const isHighSchool = g >= 10;
-                        const isSecondary = g >= 7 && g <= 9;
                         
                         return (
                           <button
@@ -1880,71 +1868,54 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                             type="button"
                             disabled={!isHost}
                             onClick={() => handleSelectGrade(g)}
-                            className={`group relative rounded-2xl py-2 px-1 flex flex-col items-center justify-center transition-all duration-200 ${
+                            className={`group relative rounded-xl py-2 px-1 flex flex-col items-center justify-center transition-all duration-150 ${
                               isSelected
-                                ? 'bg-gradient-to-b from-amber-300 via-amber-400 to-amber-500 text-slate-950 font-black shadow-[0_0_24px_rgba(245,158,11,0.5),inset_0_1px_1px_rgba(255,255,255,0.8)] border-2 border-white scale-105 z-10'
-                                : 'bg-slate-900/70 hover:bg-slate-800/90 text-slate-300 border border-white/[0.08] hover:border-white/20 hover:-translate-y-0.5'
+                                ? 'bg-sky-500 text-slate-950 font-bold shadow-md shadow-sky-500/20 scale-[1.03] z-10'
+                                : 'bg-slate-800/50 hover:bg-slate-800 text-slate-300 border border-slate-700/60 hover:border-slate-600'
                             } ${isHost ? 'cursor-pointer' : 'cursor-default opacity-85'}`}
                           >
                             {/* Top Micro-Tag for High School / Bac II */}
-                            {isBac2 ? (
-                              <span className={`text-[7px] font-black tracking-tighter px-1 py-0.2 rounded-full mb-0.5 uppercase ${
+                            {isBac2 && (
+                              <span className={`text-[7px] font-black tracking-tighter px-1 rounded-sm mb-0.5 uppercase ${
                                 isSelected
-                                  ? 'bg-slate-950 text-amber-300'
-                                  : 'bg-amber-400/20 text-amber-300 border border-amber-400/30'
+                                  ? 'bg-slate-950 text-sky-300'
+                                  : 'text-amber-400/90 font-bold'
                               }`}>
-                                BAC2
-                              </span>
-                            ) : isSecondary ? (
-                              <span className={`text-[7px] font-semibold tracking-tighter px-1 rounded-full mb-0.5 ${
-                                isSelected ? 'text-slate-900' : 'text-indigo-300/70'
-                              }`}>
-                                SEC
-                              </span>
-                            ) : (
-                              <span className={`text-[7px] font-semibold tracking-tighter px-1 rounded-full mb-0.5 ${
-                                isSelected ? 'text-slate-900' : 'text-cyan-300/60'
-                              }`}>
-                                PRI
+                                BAC II
                               </span>
                             )}
 
                             {/* Khmer Numeral */}
-                            <span className={`text-base sm:text-lg font-black font-cinzel leading-none ${
-                              isSelected ? 'text-slate-950 drop-shadow-xs' : 'text-white group-hover:text-amber-200'
+                            <span className={`text-base sm:text-lg font-bold leading-none ${
+                              isSelected ? 'text-slate-950' : 'text-slate-200 group-hover:text-white'
                             }`}>
                               {KHMER_NUMS[g - 1]}
                             </span>
 
                             {/* English Subscript */}
-                            <span className={`text-[8.5px] mt-0.5 font-mono ${
-                              isSelected ? 'text-slate-900 font-bold' : 'text-slate-500 group-hover:text-slate-300'
+                            <span className={`text-[9px] mt-0.5 font-mono ${
+                              isSelected ? 'text-slate-900 font-semibold' : 'text-slate-500 group-hover:text-slate-400'
                             }`}>
                               G{g}
                             </span>
-
-                            {/* Subtle Active Indicator Dot underneath */}
-                            {isSelected && (
-                              <span className="absolute -bottom-1 w-1.5 h-1.5 rounded-full bg-amber-400 shadow-[0_0_8px_rgba(245,158,11,1)]" />
-                            )}
                           </button>
                         );
                       })}
                     </div>
                   </div>
 
-                  {/* ═══ 2. TRACK SELECTION (FACTION DECKS FOR 11-12) ═══ */}
+                  {/* ═══ 2. TRACK SELECTION (FOR GRADES 11-12) ═══ */}
                   {selectedGrade >= 11 ? (
-                    <div className="space-y-2.5 pt-4 border-t border-white/[0.08] relative z-10 animate-fade-in">
+                    <div className="space-y-2.5 pt-4 border-t border-slate-800 relative z-10 animate-fade-in">
                       <div className="flex items-center justify-between text-xs">
                         <div className="flex items-center gap-2">
-                          <Atom className="w-4 h-4 text-cyan-400" />
-                          <span className="font-black text-slate-200 tracking-wide">
-                            ផ្នែកប្រកួត (SPECIALIZATION TRACK)
+                          <Atom className="w-4 h-4 text-sky-400" />
+                          <span className="font-bold text-slate-200">
+                            ផ្នែកប្រកួត (Specialization Track)
                           </span>
                         </div>
-                        <span className="text-[10px] text-cyan-400 font-semibold">
-                          ថ្នាក់ទី {selectedGrade} មាន ២ ផ្នែកស្តង់ដារជាតិ
+                        <span className="text-[11px] text-slate-400">
+                          ជ្រើសរើសផ្នែកសម្រាប់ការប្រកួតថ្នាក់ទី {selectedGrade}
                         </span>
                       </div>
 
@@ -1954,37 +1925,36 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                           type="button"
                           disabled={!isHost}
                           onClick={() => handleSelectStream('science')}
-                          className={`relative rounded-2xl p-4 text-left transition-all duration-200 overflow-hidden ${
+                          className={`relative rounded-2xl p-4 text-left transition-all duration-150 ${
                             selectedStream === 'science'
-                              ? 'bg-gradient-to-br from-[#0c2242] via-[#091730] to-[#061122] border-2 border-cyan-400 shadow-[0_0_30px_rgba(6,182,212,0.35),inset_0_1px_0_rgba(255,255,255,0.2)] scale-[1.01]'
-                              : 'bg-[#0a1324]/80 hover:bg-[#0f1d38]/80 border border-slate-700/60 hover:border-slate-500'
+                              ? 'bg-slate-900 border-2 border-sky-500 shadow-lg shadow-sky-500/10'
+                              : 'bg-slate-900/40 hover:bg-slate-800/60 border border-slate-800 hover:border-slate-700'
                           } ${isHost ? 'cursor-pointer' : 'cursor-default opacity-85'}`}
                         >
                           <div className="flex items-center gap-3.5">
-                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all ${
+                            <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${
                               selectedStream === 'science'
-                                ? 'bg-cyan-500/25 border border-cyan-300/60 text-cyan-300 shadow-[0_0_20px_rgba(6,182,212,0.5)]'
-                                : 'bg-slate-800/80 border border-slate-700 text-slate-400'
+                                ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30'
+                                : 'bg-slate-800/80 text-slate-500 border border-slate-700/60'
                             }`}>
-                              <Atom className="w-6 h-6 animate-[spin_12s_linear_infinite]" />
+                              <Atom className="w-5 h-5" />
                             </div>
 
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center justify-between gap-2">
-                                <h5 className="text-sm font-black text-white flex items-center gap-2 truncate">
-                                  <span>វិទ្យាសាស្ត្រពិត</span>
-                                  {selectedStream === 'science' && (
-                                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-cyan-400 text-slate-950 font-black tracking-wider uppercase">
-                                      ACTIVE
-                                    </span>
-                                  )}
+                                <h5 className="text-sm font-bold text-white truncate">
+                                  វិទ្យាសាស្ត្រពិត
                                 </h5>
-                                {selectedStream === 'science' && (
-                                  <CheckCircle2 className="w-5 h-5 text-cyan-400 flex-shrink-0" />
-                                )}
+                                <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
+                                  selectedStream === 'science'
+                                    ? 'bg-sky-500 text-slate-950'
+                                    : 'border border-slate-700 bg-slate-800/50'
+                                }`}>
+                                  {selectedStream === 'science' && <Check className="w-3 h-3 stroke-[3]" />}
+                                </div>
                               </div>
-                              <p className="text-[10px] text-cyan-200/80 mt-1 truncate">
-                                គណិតវិទ្យា • រូបវិទ្យា • គីមីវិទ្យា • ជីវវិទ្យា • អង់គ្លេស
+                              <p className="text-[11px] text-slate-400 mt-1 truncate">
+                                គណិតវិទ្យា, រូបវិទ្យា, គីមីវិទ្យា, ជីវវិទ្យា, អង់គ្លេស
                               </p>
                             </div>
                           </div>
@@ -1995,37 +1965,36 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                           type="button"
                           disabled={!isHost}
                           onClick={() => handleSelectStream('social')}
-                          className={`relative rounded-2xl p-4 text-left transition-all duration-200 overflow-hidden ${
+                          className={`relative rounded-2xl p-4 text-left transition-all duration-150 ${
                             selectedStream === 'social'
-                              ? 'bg-gradient-to-br from-[#38260c] via-[#261908] to-[#170e04] border-2 border-amber-400 shadow-[0_0_30px_rgba(245,158,11,0.35),inset_0_1px_0_rgba(255,255,255,0.2)] scale-[1.01]'
-                              : 'bg-[#0a1324]/80 hover:bg-[#0f1d38]/80 border border-slate-700/60 hover:border-slate-500'
+                              ? 'bg-slate-900 border-2 border-amber-500 shadow-lg shadow-amber-500/10'
+                              : 'bg-slate-900/40 hover:bg-slate-800/60 border border-slate-800 hover:border-slate-700'
                           } ${isHost ? 'cursor-pointer' : 'cursor-default opacity-85'}`}
                         >
                           <div className="flex items-center gap-3.5">
-                            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all ${
+                            <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${
                               selectedStream === 'social'
-                                ? 'bg-amber-500/25 border border-amber-300/60 text-amber-300 shadow-[0_0_20px_rgba(245,158,11,0.5)]'
-                                : 'bg-slate-800/80 border border-slate-700 text-slate-400'
+                                ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
+                                : 'bg-slate-800/80 text-slate-500 border border-slate-700/60'
                             }`}>
-                              <BookOpen className="w-6 h-6" />
+                              <BookOpen className="w-5 h-5" />
                             </div>
 
                             <div className="min-w-0 flex-1">
                               <div className="flex items-center justify-between gap-2">
-                                <h5 className="text-sm font-black text-white flex items-center gap-2 truncate">
-                                  <span>ថ្នាក់វិទ្យាសាស្ត្រសង្គម</span>
-                                  {selectedStream === 'social' && (
-                                    <span className="text-[9px] px-2 py-0.5 rounded-full bg-amber-400 text-slate-950 font-black tracking-wider uppercase">
-                                      ACTIVE
-                                    </span>
-                                  )}
+                                <h5 className="text-sm font-bold text-white truncate">
+                                  ថ្នាក់វិទ្យាសាស្ត្រសង្គម
                                 </h5>
-                                {selectedStream === 'social' && (
-                                  <CheckCircle2 className="w-5 h-5 text-amber-400 flex-shrink-0" />
-                                )}
+                                <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
+                                  selectedStream === 'social'
+                                    ? 'bg-amber-500 text-slate-950'
+                                    : 'border border-slate-700 bg-slate-800/50'
+                                }`}>
+                                  {selectedStream === 'social' && <Check className="w-3 h-3 stroke-[3]" />}
+                                </div>
                               </div>
-                              <p className="text-[10px] text-amber-200/80 mt-1 truncate">
-                                ភាសាខ្មែរ • គណិត • ប្រវត្តិ • ភូមិ • សីលធម៌ • ផែនដី
+                              <p className="text-[11px] text-slate-400 mt-1 truncate">
+                                ភាសាខ្មែរ, គណិត, ប្រវត្តិ, ភូមិ, សីលធម៌, ផែនដី
                               </p>
                             </div>
                           </div>
@@ -2033,14 +2002,14 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                       </div>
                     </div>
                   ) : (
-                    /* For Grade 1-10: Elegant Foundation Level Banner */
-                    <div className="p-3.5 rounded-2xl bg-gradient-to-r from-emerald-950/40 via-[#0a1d24] to-cyan-950/40 border border-emerald-500/30 flex items-center justify-between text-xs relative z-10 animate-fade-in shadow-inner">
+                    /* For Grade 1-10: Clean Foundation Level Banner */
+                    <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center justify-between text-xs relative z-10 animate-fade-in">
                       <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-xl bg-emerald-500/20 border border-emerald-400/30 flex items-center justify-center text-emerald-300">
-                          <Sparkles className="w-4 h-4 text-emerald-400" />
+                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                          <Sparkles className="w-4 h-4" />
                         </div>
                         <div>
-                          <span className="text-emerald-200 font-bold block">
+                          <span className="text-slate-200 font-semibold block">
                             ថ្នាក់ទី {KHMER_NUMS[selectedGrade - 1]} — កម្មវិធីចំណេះទូទៅថ្នាក់ជាតិ
                           </span>
                           <span className="text-[10px] text-slate-400 block">
@@ -2048,30 +2017,30 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                           </span>
                         </div>
                       </div>
-                      <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-lg bg-emerald-400/10 text-emerald-300 border border-emerald-400/20 hidden sm:inline">
-                        Core Curriculum
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 hidden sm:inline">
+                        Standard
                       </span>
                     </div>
                   )}
 
                   {/* ═══ 3. SUBJECT SELECTION DECK ═══ */}
-                  <div className="space-y-2.5 pt-4 border-t border-white/[0.08] relative z-10">
+                  <div className="space-y-2.5 pt-4 border-t border-slate-800 relative z-10">
                     <div className="flex items-center justify-between text-xs">
                       <div className="flex items-center gap-2">
-                        <Layers className="w-4 h-4 text-emerald-400" />
-                        <span className="font-black text-slate-200 tracking-wide">
-                          មុខវិជ្ជាប្រកួត (BATTLE SUBJECT)
+                        <Layers className="w-4 h-4 text-slate-400" />
+                        <span className="font-bold text-slate-200">
+                          មុខវិជ្ជាប្រកួត (Battle Subject)
                         </span>
                       </div>
 
                       {isLoadingAI ? (
-                        <span className="text-[11px] text-amber-300 font-bold animate-pulse flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg bg-amber-500/10 border border-amber-400/20">
+                        <span className="text-[11px] text-amber-400 font-medium animate-pulse flex items-center gap-1.5">
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
                           <span>AI កំពុងបង្កើតសំណួរថ្នាក់ទី {selectedGrade}...</span>
                         </span>
                       ) : (
-                        <span className="text-[11px] text-emerald-300 font-semibold flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400" />
+                        <span className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
                           <span>សំណួររួចរាល់ភ្លាមៗ (Instant 0ms)</span>
                         </span>
                       )}
@@ -2088,41 +2057,32 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                             type="button"
                             disabled={!isHost}
                             onClick={() => handleSelectSubject(sub.key)}
-                            className={`group relative rounded-2xl p-3 flex flex-col items-center justify-center text-center transition-all duration-200 ${
+                            className={`group relative rounded-xl p-3 flex flex-col items-center justify-center text-center transition-all duration-150 ${
                               isActive
-                                ? 'bg-gradient-to-b from-indigo-900/60 via-slate-900/80 to-purple-950/70 border-2 border-indigo-400 shadow-[0_0_20px_rgba(99,102,241,0.4),inset_0_1px_0_rgba(255,255,255,0.2)] scale-[1.03] z-10'
-                                : 'bg-slate-900/60 hover:bg-slate-800/80 border border-white/[0.08] hover:border-white/20 hover:-translate-y-0.5'
-                            } ${isHost ? 'cursor-pointer active:scale-95' : 'cursor-default opacity-85'}`}
+                                ? 'bg-slate-800 border-2 border-sky-500 shadow-sm text-white'
+                                : 'bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 hover:border-slate-700 text-slate-300'
+                            } ${isHost ? 'cursor-pointer' : 'cursor-default opacity-85'}`}
                           >
-                            {/* Subject Icon in Glass Orb */}
-                            <div className={`w-9 h-9 rounded-xl flex items-center justify-center mb-1.5 transition-all ${
+                            {/* Subject Icon */}
+                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-1.5 transition-colors ${
                               isActive
-                                ? 'bg-indigo-500/30 border border-indigo-300/50 text-white shadow-sm'
-                                : 'bg-slate-800/80 border border-slate-700 text-slate-300 group-hover:text-white group-hover:bg-slate-700/80'
+                                ? 'bg-sky-500/20 text-sky-300'
+                                : 'bg-slate-800 text-slate-400 group-hover:text-slate-200'
                             }`}>
-                              <SubIcon className="w-4.5 h-4.5" />
+                              <SubIcon className="w-4 h-4" />
                             </div>
 
                             {/* Subject Khmer Label */}
-                            <span className={`text-xs font-black truncate max-w-full ${
-                              isActive ? 'text-white' : 'text-slate-200 group-hover:text-white'
-                            }`}>
+                            <span className="text-xs font-semibold truncate max-w-full">
                               {sub.label}
                             </span>
 
                             {/* Subject English Subtitle */}
                             <span className={`text-[8.5px] uppercase font-mono tracking-wider mt-0.5 ${
-                              isActive ? 'text-indigo-200 font-bold' : 'text-slate-500 group-hover:text-slate-400'
+                              isActive ? 'text-sky-300 font-medium' : 'text-slate-500'
                             }`}>
                               {sub.en || 'Subject'}
                             </span>
-
-                            {/* Active Checkmark Pin */}
-                            {isActive && (
-                              <span className="absolute top-1.5 right-1.5 w-4 h-4 rounded-full bg-emerald-500 text-slate-950 flex items-center justify-center shadow-xs">
-                                <Check className="w-2.5 h-2.5 stroke-[3]" />
-                              </span>
-                            )}
                           </button>
                         );
                       })}
