@@ -476,13 +476,25 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
         {/* ══════════ MOBILE COMPACT DEVELOPER HEADER (md:hidden) ══════════ */}
         <div className="md:hidden bg-gradient-to-r from-[#0D1424] to-[#0A0F1D] p-3.5 pr-12 border-b border-white/[0.08] flex items-center justify-between flex-shrink-0">
           <div className="flex items-center gap-2.5 min-w-0">
-            <div className="relative w-10 h-10 rounded-full p-0.5 bg-gradient-to-tr from-blue-500 to-cyan-400 shadow-md flex-shrink-0">
+            <div className="relative w-11 h-11 flex-shrink-0 flex items-center justify-center">
+              <div className="w-[78%] h-[78%] rounded-full overflow-hidden shadow bg-slate-950 ring-1.5 ring-rose-400/80">
+                <img
+                  src="/assets/developer-avatar.jpg"
+                  alt="chey_dev"
+                  className="w-full h-full object-cover object-top rounded-full"
+                />
+              </div>
               <img
-                src="/assets/developer-avatar.jpg"
-                alt="chey_dev"
-                className="w-full h-full object-cover object-top rounded-full"
+                src="/assets/frames/malefic_crown.webp"
+                alt="Malefic Crown (Mythic)"
+                className="absolute inset-0 w-full h-full object-contain pointer-events-none scale-125 -translate-y-1 z-10 drop-shadow-xs select-none"
+                onError={(e) => {
+                  if (e.currentTarget.src.endsWith('.webp')) {
+                    e.currentTarget.src = e.currentTarget.src.replace('.webp', '.png');
+                  }
+                }}
               />
-              <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-blue-500 text-white text-[8px] flex items-center justify-center font-black ring-1.5 ring-slate-950">
+              <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-blue-500 text-white text-[8px] flex items-center justify-center font-black ring-1.5 ring-slate-950 z-20">
                 ✓
               </div>
             </div>
@@ -547,20 +559,31 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
               {/* Subtle top card accent line */}
               <div className="absolute top-0 left-1/4 right-1/4 h-[1px] bg-gradient-to-r from-transparent via-cyan-400/40 to-transparent" />
 
-              {/* Refined Circular Avatar with Sleek Gradient Ring (NO GAMING CROWN) */}
-              <div className="relative mx-auto w-20 h-20 mb-3 flex items-center justify-center">
-                <div className="w-full h-full rounded-full p-[2.5px] bg-gradient-to-tr from-blue-600 via-sky-400 to-emerald-400 shadow-xl">
-                  <div className="w-full h-full rounded-full overflow-hidden bg-slate-950 ring-2 ring-slate-900">
-                    <img
-                      src="/assets/developer-avatar.jpg"
-                      alt="HUT SOKSITCHEY (chey_dev)"
-                      className="w-full h-full object-cover object-top"
-                    />
-                  </div>
+              {/* Mythic Avatar with Malefic Crown Frame */}
+              <div className="relative mx-auto w-24 h-24 mb-2 flex items-center justify-center">
+                {/* Circular Profile Photo */}
+                <div className="w-[74%] h-[74%] rounded-full overflow-hidden shadow-xl bg-slate-950 ring-2 ring-rose-400/80 shadow-[0_0_15px_rgba(244,63,94,0.35)]">
+                  <img
+                    src="/assets/developer-avatar.jpg"
+                    alt="HUT SOKSITCHEY (chey_dev)"
+                    className="w-full h-full object-cover object-top"
+                  />
                 </div>
 
+                {/* Animated Mythic Malefic Crown Frame */}
+                <img
+                  src="/assets/frames/malefic_crown.webp"
+                  alt="Malefic Crown (Mythic)"
+                  className="absolute inset-0 w-full h-full object-contain pointer-events-none scale-[1.3] -translate-y-1.5 z-10 drop-shadow-[0_0_12px_rgba(251,113,133,0.5)] select-none"
+                  onError={(e) => {
+                    if (e.currentTarget.src.endsWith('.webp')) {
+                      e.currentTarget.src = e.currentTarget.src.replace('.webp', '.png');
+                    }
+                  }}
+                />
+
                 {/* Verified Blue Checkmark Badge */}
-                <div className="absolute -bottom-1 -right-1 bg-blue-500 text-white p-1 rounded-full ring-2 ring-slate-950 shadow-md flex items-center justify-center">
+                <div className="absolute bottom-1 right-1 bg-blue-500 text-white p-1 rounded-full ring-2 ring-slate-950 shadow-md flex items-center justify-center z-20" title="Verified Creator">
                   <Check className="w-3 h-3 stroke-[3]" />
                 </div>
               </div>
@@ -703,9 +726,21 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                   
                   {/* Left Node: chey_dev */}
                   <div className="flex flex-col items-center text-center w-20">
-                    <div className="relative w-12 h-12 rounded-full p-0.5 bg-gradient-to-tr from-blue-500 to-cyan-400 shadow-md">
-                      <img src="/assets/developer-avatar.jpg" alt="chey_dev" className="w-full h-full object-cover object-top rounded-full" />
-                      <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-blue-500 text-white text-[8px] flex items-center justify-center font-bold ring-1 ring-slate-950">✓</div>
+                    <div className="relative w-12 h-12 flex items-center justify-center">
+                      <div className="w-[78%] h-[78%] rounded-full overflow-hidden bg-slate-950 ring-1.5 ring-rose-400/80 shadow-md">
+                        <img src="/assets/developer-avatar.jpg" alt="chey_dev" className="w-full h-full object-cover object-top rounded-full" />
+                      </div>
+                      <img
+                        src="/assets/frames/malefic_crown.webp"
+                        alt="Malefic Crown (Mythic)"
+                        className="absolute inset-0 w-full h-full object-contain pointer-events-none scale-125 -translate-y-1 z-10 select-none"
+                        onError={(e) => {
+                          if (e.currentTarget.src.endsWith('.webp')) {
+                            e.currentTarget.src = e.currentTarget.src.replace('.webp', '.png');
+                          }
+                        }}
+                      />
+                      <div className="absolute -bottom-0.5 -right-0.5 w-3.5 h-3.5 rounded-full bg-blue-500 text-white text-[8px] flex items-center justify-center font-bold ring-1 ring-slate-950 z-20">✓</div>
                     </div>
                     <span className="text-[11px] font-mono font-bold text-white mt-1.5">chey_dev</span>
                     <span className="text-[8.5px] text-slate-400 font-mono">Developer ID</span>
