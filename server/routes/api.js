@@ -135,6 +135,7 @@ import { generateBakongKhqr, checkBakongStatus } from '../controllers/bakongCont
 import { generateAbaQr, checkAbaPayment } from '../controllers/abaPaywayController.js';
 import { synthesizeSpeech, getVoiceProfiles } from '../controllers/ttsController.js';
 import { handleAIChat } from '../controllers/aiTutorController.js';
+import { generateAIQuizQuestions } from '../controllers/aiQuizController.js';
 
 // 10. Bakong KHQR Payment & Bypass Gateway (Merchant: hut_soksitchey1@aclb)
 router.post('/bakong/generate-khqr', generateBakongKhqr);
@@ -152,6 +153,9 @@ router.post('/tts', synthesizeSpeech);
 // 12. MoTDAR AI Tutor & Deep Khmer Academic Comprehension Engine
 router.post('/ai/chat', handleAIChat);
 router.get('/ai/chat', handleAIChat);
+
+// 12.1 AI-Powered Quiz Question Generator (Grade 1-12, All Subjects)
+router.post('/ai/quiz-generate', generateAIQuizQuestions);
 
 import { getQuestionBankStats, getQuestionsFromPool } from '../controllers/questionBankController.js';
 
