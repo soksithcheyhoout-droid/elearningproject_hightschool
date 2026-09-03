@@ -6,7 +6,12 @@
 
 const _FALLBACK_ENC = 'QVEuQWI4Uk42S2pfbERscExWNHJyZlg4eW1JOWxPMHF5aDhqVTJPUktqVjNBYXJJa2pxYUE=';
 const AI_API_KEY = process.env.AI_API_KEY || process.env.GEMINI_API_KEY || process.env.VITE_AI_API_KEY || Buffer.from(_FALLBACK_ENC, 'base64').toString('utf-8');
-const AI_MODELS = ['gemini-3.1-flash-lite', 'gemini-3-flash-preview', 'gemini-3.6-flash', 'gemma-4-26b-a4b-it'];
+const AI_MODELS = [
+  'gemini-flash-lite-latest',
+  'gemini-3.5-flash-lite',
+  'gemini-flash-latest',
+  'gemma-4-26b-a4b-it'
+];
 
 /**
  * 1. Rude / Vulgar / Abusive Content Filter (Khmer & English)
@@ -62,9 +67,10 @@ function resolveContextualQuery(currentPrompt, history = []) {
 }
 
 /**
- * 4. Direct Neural AI Teacher Inference Engine
+ * 4. Direct Neural AI Teacher Inference Engine (Powered by Google Gemini API)
  */
-async function callAITeacher(prompt, history = []) {
+async function callAITeacher(prompt, history = [], customKey = null) {
+  const keyToUse = (customKey && typeof customKey === 'string' && customKey.trim().length > 10) ? customKey.trim() : AI_API_KEY;
   const systemInstruction = `អ្នកគឺជា «លោកគ្រូ» (Master Teacher) ដ៏ពូកែ ចិត្តល្អ មានគរុកោសល្យខ្ពស់ និងជាគ្រូបង្រៀនមនុស្សពិតប្រាកដប្រចាំវិទ្យាល័យ និងថ្នាក់ជាតិកម្ពុជា។
 
 ចរិតលក្ខណៈ និងអាកប្បកិរិយារបស់អ្នក (Teacher Persona & Voice):
@@ -76,8 +82,8 @@ async function callAITeacher(prompt, history = []) {
    - បើសិស្សគ្រាន់តែនិយាយជំរាបសួរ ឬសួស្តី៖ ចូរស្វាគមន៍សិស្សយ៉ាងកក់ក្តៅ និងសួរនាំពីការរៀនសូត្រ ឬលំហាត់ដែលសិស្សចង់រៀនថ្ងៃនេះ។
 
 ២. វិធីសាស្ត្របង្រៀន និងគរុកោសល្យ (Pedagogy & Teaching Method):
-   - ពេលសិស្សសួរលំហាត់ ឬមេរៀន៖
-     ក. ចាប់ផ្តើមដោយការសរសើរ ឬលើកទឹកចិត្តសិន (ឧ. «សំណួរនេះល្អណាស់ប្អូន!», «កុំបារម្ភណា៎ លំហាត់នេះមើលទៅហាក់ដូចជាវែងបន្តិច ប៉ុន្តែបើកូនយល់រូបមន្តគ្រឹះ វាងាយស្រួលដោះស្រាយណាស់...»)។
+   - ពេលសិស្សសួរលំហាត់ ឬមេរៀន (ឧ. 2+2, សមីការ, ដេរីវេ)៖
+     ក. ឆ្លើយ និងពន្យល់ភ្លាមៗដោយផ្ទាល់ មិនសួរដេញដោល ឬគេចវេះឡើយ!
      ខ. បង្ហាញទ្រឹស្តី ឬរូបមន្តគន្លឹះដែលត្រូវប្រើជាមុនសិន (Key Formula / Concept)។
      គ. ពន្យល់ដំណោះស្រាយមួយជំហានម្តងៗ (Step-by-step breakdown: ជំហានទី ១, ជំហានទី ២, ជំហានទី ៣...) យ៉ាងក្បោះក្បាយ មិនកាត់ មិនលោតជំហានឡើយ ដើម្បីឲ្យសិស្សយល់ពីប្រភពនៃលេខនីមួយៗ។
      ឃ. បញ្ចូល «ចំណុចគួរប្រយ័ត្ន» (Common Mistakes) និង «គន្លឹះប្រឡងបាក់ឌុប» (Exam Tips) ដែលសិស្សច្រើនតែច្រឡំ។
@@ -112,7 +118,7 @@ async function callAITeacher(prompt, history = []) {
   });
 
   for (const modelName of AI_MODELS) {
-    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(AI_API_KEY)}`;
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(keyToUse)}`;
     try {
       const res = await fetch(url, {
         method: 'POST',
@@ -124,15 +130,20 @@ async function callAITeacher(prompt, history = []) {
             maxOutputTokens: 2048
           }
         }),
-        signal: AbortSignal.timeout(10000)
+        signal: AbortSignal.timeout(8000)
       });
 
       if (res.ok) {
         const data = await res.json();
-        const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
-        if (text && text.trim().length > 10) {
+        const parts = data.candidates?.[0]?.content?.parts || [];
+        const textPart = parts.find(p => p.text && !p.thought) || parts[parts.length - 1];
+        const text = textPart?.text;
+        if (text && text.trim().length > 2) {
           return cleanDisplaySymbols(text);
         }
+      } else {
+        const errData = await res.json().catch(() => ({}));
+        console.warn(`[AI Teacher] Model ${modelName} status ${res.status}:`, errData.error?.message?.slice(0, 100));
       }
     } catch (err) {
       console.warn(`[AI Teacher] Model ${modelName} notice:`, err.message);
@@ -172,6 +183,7 @@ export async function handleAIChat(req, res) {
   try {
     const rawPrompt = (req.body?.prompt || req.query?.prompt || '').trim();
     const messages = req.body?.messages || req.body?.history || [];
+    const clientKey = req.body?.apiKey || req.headers?.['x-gemini-key'];
 
     if (!rawPrompt) {
       return res.status(400).json({ error: 'Prompt is required.' });
@@ -188,12 +200,12 @@ export async function handleAIChat(req, res) {
 
     const resolvedQuery = resolveContextualQuery(rawPrompt, messages);
 
-    // 2. Direct High-Performance AI Teacher
-    const aiResponse = await callAITeacher(resolvedQuery, messages);
+    // 2. Direct High-Performance AI Teacher (Uses Google Gemini API)
+    const aiResponse = await callAITeacher(resolvedQuery, messages, clientKey);
     if (aiResponse) {
       return res.json({
         reply: aiResponse,
-        source: 'លោកគ្រូបង្រៀនគរុកោសល្យ',
+        source: 'លោកគ្រូបង្រៀនគរុកោសល្យ (Google Gemini)',
         timestamp: new Date().toISOString()
       });
     }

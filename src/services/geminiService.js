@@ -5,12 +5,10 @@
 
 const AI_API_KEY = import.meta.env.VITE_AI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY || '';
 const AI_MODELS = [
-  'gemini-2.5-flash',
-  'gemini-2.0-flash',
-  'gemini-1.5-flash',
-  'gemini-1.5-pro',
-  'gemini-2.0-flash-lite',
-  'gemini-flash-latest'
+  'gemini-flash-lite-latest',
+  'gemini-3.5-flash-lite',
+  'gemini-flash-latest',
+  'gemma-4-26b-a4b-it'
 ];
 
 const STORAGE_KEY = 'motdar_ai_key';
@@ -55,12 +53,21 @@ export async function askMinistryAI(userPrompt, chatHistory = []) {
     return '⚠️ សូមប្អូនប្រើប្រាស់ពាក្យសម្តីសមរម្យ និងថ្លៃថ្នូរក្នុងការសន្ទនាជាមួយលោកគ្រូ AI អប់រំជាតិណា៎! លោកគ្រូរីករាយនឹងជួយពន្យល់រាល់មេរៀន ចំណេះដឹងទូទៅ និងការដោះស្រាយលំហាត់ជូនប្អូនជានិច្ច។';
   }
 
-  // 1. First Priority: Query Backend API endpoint /api/ai/chat
+  const activeKey = getStoredGeminiKey() || AI_API_KEY;
+
+  // 1. First Priority: Query Backend API endpoint /api/ai/chat (with key forwarding)
   try {
     const apiRes = await fetch('/api/ai/chat', {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ prompt: userPrompt, messages: chatHistory })
+      headers: { 
+        'Content-Type': 'application/json',
+        'x-gemini-key': activeKey || ''
+      },
+      body: JSON.stringify({ 
+        prompt: userPrompt, 
+        messages: chatHistory, 
+        apiKey: activeKey 
+      })
     });
     if (apiRes.ok) {
       const data = await apiRes.json();
@@ -73,7 +80,6 @@ export async function askMinistryAI(userPrompt, chatHistory = []) {
   }
 
   // 2. Second Priority: Direct Client-Side AI Call with User API Key
-  const activeKey = getStoredGeminiKey() || AI_API_KEY;
   if (activeKey) {
     const systemPrompt = `អ្នកគឺជា «លោកគ្រូ» (Master Teacher) ដ៏ពូកែ ចិត្តល្អ មានគរុកោសល្យខ្ពស់ និងជាគ្រូបង្រៀនមនុស្សពិតប្រាកដប្រចាំវិទ្យាល័យ និងថ្នាក់ជាតិកម្ពុជា។
 
@@ -86,8 +92,8 @@ export async function askMinistryAI(userPrompt, chatHistory = []) {
    - បើសិស្សគ្រាន់តែនិយាយជំរាបសួរ ឬសួស្តី៖ ចូរស្វាគមន៍សិស្សយ៉ាងកក់ក្តៅ និងសួរនាំពីការរៀនសូត្រ ឬលំហាត់ដែលសិស្សចង់រៀនថ្ងៃនេះ។
 
 ២. វិធីសាស្ត្របង្រៀន និងគរុកោសល្យ (Pedagogy & Teaching Method):
-   - ពេលសិស្សសួរលំហាត់ ឬមេរៀន៖
-     ក. ចាប់ផ្តើមដោយការសរសើរ ឬលើកទឹកចិត្តសិន (ឧ. «សំណួរនេះល្អណាស់ប្អូន!», «កុំបារម្ភណា៎ លំហាត់នេះមើលទៅហាក់ដូចជាវែងបន្តិច ប៉ុន្តែបើកូនយល់រូបមន្តគ្រឹះ វាងាយស្រួលដោះស្រាយណាស់...»)។
+   - ពេលសិស្សសួរលំហាត់ ឬមេរៀន (ឧ. 2+2, សមីការ, ដេរីវេ)៖
+     ក. ឆ្លើយ និងពន្យល់ភ្លាមៗដោយផ្ទាល់ មិនសួរដេញដោល ឬគេចវេះឡើយ!
      ខ. បង្ហាញទ្រឹស្តី ឬរូបមន្តគន្លឹះដែលត្រូវប្រើជាមុនសិន (Key Formula / Concept)។
      គ. ពន្យល់ដំណោះស្រាយមួយជំហានម្តងៗ (Step-by-step breakdown: ជំហានទី ១, ជំហានទី ២, ជំហានទី ៣...) យ៉ាងក្បោះក្បាយ មិនកាត់ មិនលោតជំហានឡើយ ដើម្បីឲ្យសិស្សយល់ពីប្រភពនៃលេខនីមួយៗ។
      ឃ. បញ្ចូល «ចំណុចគួរប្រយ័ត្ន» (Common Mistakes) និង «គន្លឹះប្រឡងបាក់ឌុប» (Exam Tips) ដែលសិស្សច្រើនតែច្រឡំ។
@@ -103,10 +109,16 @@ export async function askMinistryAI(userPrompt, chatHistory = []) {
 
     const formattedContents = [];
     if (Array.isArray(chatHistory) && chatHistory.length > 0) {
-      for (const m of chatHistory.slice(-4)) {
+      const recent = chatHistory.slice(-6);
+      for (const m of recent) {
         const role = (m.sender === 'user' || m.role === 'user') ? 'user' : 'model';
         const text = m.text || m.content || '';
-        if (text) formattedContents.push({ role, parts: [{ text }] });
+        if (text.trim()) {
+          formattedContents.push({
+            role,
+            parts: [{ text: text.trim() }]
+          });
+        }
       }
     }
     formattedContents.push({
@@ -127,8 +139,10 @@ export async function askMinistryAI(userPrompt, chatHistory = []) {
         });
         if (res.ok) {
           const data = await res.json();
-          const reply = data.candidates?.[0]?.content?.parts?.[0]?.text;
-          if (reply && reply.trim().length > 10) {
+          const parts = data.candidates?.[0]?.content?.parts || [];
+          const textPart = parts.find(p => p.text && !p.thought) || parts[parts.length - 1];
+          const reply = textPart?.text;
+          if (reply && reply.trim().length > 2) {
             return cleanDisplaySymbols(reply);
           }
         }

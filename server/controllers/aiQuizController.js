@@ -6,7 +6,12 @@
 
 const _FALLBACK_ENC = 'QVEuQWI4Uk42S2pfbERscExWNHJyZlg4eW1JOWxPMHF5aDhqVTJPUktqVjNBYXJJa2pxYUE=';
 const AI_API_KEY = process.env.AI_API_KEY || process.env.GEMINI_API_KEY || process.env.VITE_AI_API_KEY || Buffer.from(_FALLBACK_ENC, 'base64').toString('utf-8');
-const AI_MODELS = ['gemini-3.1-flash-lite', 'gemini-3-flash-preview', 'gemini-3.6-flash', 'gemma-4-26b-a4b-it'];
+const AI_MODELS = [
+  'gemini-flash-lite-latest',
+  'gemini-3.5-flash-lite',
+  'gemini-flash-latest',
+  'gemma-4-26b-a4b-it'
+];
 
 /**
  * Clean raw markdown/formatting from AI response
@@ -217,7 +222,9 @@ async function callGeminiForQuiz(prompt) {
 
         if (res.ok) {
           const data = await res.json();
-          const text = data.candidates?.[0]?.content?.parts?.[0]?.text;
+          const parts = data.candidates?.[0]?.content?.parts || [];
+          const textPart = parts.find(p => p.text && !p.thought) || parts[parts.length - 1];
+          const text = textPart?.text;
           if (text && text.trim().length > 20) {
             const questions = parseAIQuizResponse(text);
             if (questions && questions.length > 0) {
