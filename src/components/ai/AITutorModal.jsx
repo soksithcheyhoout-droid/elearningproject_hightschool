@@ -23,7 +23,7 @@ import {
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
 import { askMinistryAI } from '../../services/geminiService';
-import { speakHumanText, stopHumanSpeech } from '../../utils/khmerVoice';
+import { speakHumanText, stopHumanSpeech, preloadTeacherSpeech } from '../../utils/khmerVoice';
 import HumanVoiceStudioModal from '../common/HumanVoiceStudioModal';
 
 export default function AITutorModal({ isOpen, onClose, initialPrompt = '' }) {
@@ -62,11 +62,15 @@ export default function AITutorModal({ isOpen, onClose, initialPrompt = '' }) {
   const [isTyping, setIsTyping] = useState(false);
   const [speakingMsgId, setSpeakingMsgId] = useState(null);
 
-  // Stop speaking immediately when modal closes
+  // Stop speaking immediately when modal closes or preload greeting on open
   useEffect(() => {
     if (!isOpen) {
       stopHumanSpeech();
       setSpeakingMsgId(null);
+    } else {
+      if (messages[0]?.text) {
+        preloadTeacherSpeech(messages[0].text);
+      }
     }
   }, [isOpen]);
 
@@ -158,6 +162,8 @@ export default function AITutorModal({ isOpen, onClose, initialPrompt = '' }) {
       };
 
       setMessages(prev => [...prev, aiMsg]);
+      // ⚡ Pre-buffer teacher audio in background for 0ms instant playback when clicked!
+      preloadTeacherSpeech(aiReplyText);
       addXP(15);
     } catch (err) {
       console.error(err);

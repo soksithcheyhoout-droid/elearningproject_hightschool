@@ -238,6 +238,11 @@ export function preloadKhmerAudio() {
 }
 
 /**
+ * In-memory cache for pre-loaded audio elements for 0ms instant playback
+ */
+const preloadedAudioCache = new Map();
+
+/**
  * Supercharged Native Cambodian Academic Teacher Phonetic Engine
  * Fully incorporates MoEYS classroom standards & French-derived variable nomenclature:
  * - Single variables (x -> អ៊ិច, y -> អុីក្រែក, u -> អ៊ុយ, v -> វេ, w -> ឌុប្លឺវេ, z -> ហ្សិត)
@@ -245,13 +250,16 @@ export function preloadKhmerAudio() {
  * - Fractions (u/v -> អ៊ុយ លើ វេ), Powers (x^2 -> អ៊ិច ការ៉េ), Radicals (√ -> ឬសការ៉េនៃ)
  * - Calculus (f'(x) -> អេហ្វ ព្រីម នៃ អ៊ិច, dy/dx -> ដេ អុីក្រែក លើ ដេ អ៊ិច, lim, int)
  * - Geometry & Vectors (vec{u} -> វ៉ិចទ័រ អ៊ុយ, perp -> កែងនឹង)
- * - Chemistry (H2O -> អាស ពីរ អូ, CO2 -> សេ អូ ពីរ, Fe -> ដែក)
+ * - Chemistry (4Fe + 3O2 -> 2Fe2O3: ៤ ដែក បូក ៣ អូ ពីរ បង្កើតបានជា ២ ដែក ពីរ អុកស៊ីត បី)
  */
 function normalizePhoneticsForSpeech(text, isKhmer) {
   if (!text) return '';
   let result = text;
 
-  // Clean Markdown, URLs, and LaTeX tags
+  // 1. Clean chemical & mathematical reaction arrows FIRST before any bracket/symbol stripping!
+  result = result.replace(/-->|->|→|=>/g, ' បង្កើតបានជា ');
+
+  // 2. Clean Markdown, URLs, and LaTeX tags
   result = result
     .replace(/https?:\/\/\S+/g, '')
     .replace(/\\mathbf\{([^}]+)\}/g, '$1')
@@ -268,9 +276,12 @@ function normalizePhoneticsForSpeech(text, isKhmer) {
     .replace(/#{1,6}\s*/g, '')
     .replace(/_{2,}/g, '');
 
+  // 3. Bullet points: lines starting with '-' or '•' should NOT be read as 'ដក' (minus)
+  result = result.replace(/(?:^|\n)\s*[-*•]\s+/g, '\n');
+
   if (isKhmer) {
     result = result
-      // 1. National & System Entities
+      // 4. National & System Entities
       .replace(/\bMoTDAR\b/gi, 'ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ')
       .replace(/\bMoEYS\b/gi, 'ក្រសួងអប់រំ យុវជន និងកីឡា')
       .replace(/\bKHQR\b/gi, 'ខេអេច ឃ្យូអរ')
@@ -284,7 +295,23 @@ function normalizePhoneticsForSpeech(text, isKhmer) {
       .replace(/\bXP\b/gi, 'ពិន្ទុ អិចភី')
       .replace(/\bSTEM\b/gi, 'ស្ទែម')
 
-      // 2. Calculus, Derivatives, Functions & Limits (Cambodian French Conventions)
+      // 5. Roman Numerals in Chemistry/Math (e.g., Fe(III) -> ដែក បី)
+      .replace(/\(V\)/gi, ' ប្រាំ ')
+      .replace(/\(IV\)/gi, ' បួន ')
+      .replace(/\(III\)/gi, ' បី ')
+      .replace(/\(II\)/gi, ' ពីរ ')
+      .replace(/\(I\)/gi, ' មួយ ')
+
+      // 6. English pedagogical terms in parentheses (localize to Khmer)
+      .replace(/\bSubscripts?\b/gi, 'សន្ទស្សន៍')
+      .replace(/\bCombination\s+Reaction\b/gi, 'ប្រតិកម្មផ្សំ')
+      .replace(/\bSynthesis\s+Reaction\b/gi, 'ប្រតិកម្មសំយោគ')
+      .replace(/\bRedox\s+Reaction\b/gi, 'ប្រតិកម្មរេដុក')
+      .replace(/\bReactants?\b/gi, 'អង្គធាតុប្រតិករ')
+      .replace(/\bProducts?\b/gi, 'អង្គធាតុកកើត')
+      .replace(/\bFree\s+Body\s+Diagram\b/gi, 'គំនូសបំព្រួញកម្លាំង')
+
+      // 7. Calculus, Derivatives, Functions & Limits (Cambodian French Conventions)
       .replace(/\bf''\s*\(\s*([^)]+)\s*\)/g, 'អេហ្វ សេកុង នៃ $1')
       .replace(/\bf'\s*\(\s*([^)]+)\s*\)/g, 'អេហ្វ ព្រីម នៃ $1')
       .replace(/\bf\s*\(\s*([^)]+)\s*\)/g, 'អេហ្វ នៃ $1')
@@ -301,7 +328,7 @@ function normalizePhoneticsForSpeech(text, isKhmer) {
       .replace(/\\int/g, 'អាំងតេក្រាល នៃ ')
       .replace(/∫/g, 'អាំងតេក្រាល នៃ ')
 
-      // 3. Trigonometry & Logarithms
+      // 8. Trigonometry & Logarithms
       .replace(/\bsin\b/gi, 'ស៊ីនុស')
       .replace(/\bcos\b/gi, 'កូស៊ីនុស')
       .replace(/\btan\b/gi, 'តង់ហ្សង់')
@@ -311,23 +338,23 @@ function normalizePhoneticsForSpeech(text, isKhmer) {
       .replace(/\blog\s*\(\s*([^)]+)\s*\)/gi, 'លោការីត នៃ $1')
       .replace(/\blog\b/gi, 'លោការីត')
 
-      // 4. Roots & Radicals
+      // 9. Roots & Radicals
       .replace(/\\sqrt\[3\]\{([^}]+)\}|∛\((.*?)\)/g, 'ឬសគូប នៃ $1$2')
       .replace(/\\sqrt\[(\w+)\]\{([^}]+)\}/g, 'ឬសទី $1 នៃ $2')
       .replace(/\\sqrt\{([^}]+)\}|√\((.*?)\)|√([a-zA-Z0-9]+)/g, 'ឬសការ៉េ នៃ $1$2$3')
 
-      // 5. Fractions & Division (u/v, a/b, (expression)/(expression))
+      // 10. Fractions & Division (u/v, a/b, (expression)/(expression))
       .replace(/\(([^)]+)\)\s*\/\s*\(([^)]+)\)/g, '$1 លើ $2')
       .replace(/([a-zA-Z0-9\u1780-\u17FF]+)\s*\/\s*([a-zA-Z0-9\u1780-\u17FF]+)/g, '$1 លើ $2')
 
-      // 6. Exponents & Powers
+      // 11. Exponents & Powers
       .replace(/([a-zA-Z\u1780-\u17FF0-9]+)\^2/g, '$1 ការ៉េ')
       .replace(/([a-zA-Z\u1780-\u17FF0-9]+)\^3/g, '$1 គូប')
       .replace(/([a-zA-Z\u1780-\u17FF0-9]+)\^([a-zA-Z0-9\u1780-\u17FF]+)/g, '$1 ស្វ័យគុណ $2')
       .replace(/e\^\{?2x\}?/g, 'អឺ ស្វ័យគុណ ពីរអ៊ិច')
       .replace(/e\^\{?x\}?/g, 'អឺ ស្វ័យគុណ អ៊ិច')
 
-      // 7. Vectors & Geometry
+      // 12. Vectors & Geometry
       .replace(/\\vec\{u\}|\b\\vec\s*u\b/g, 'វ៉ិចទ័រ អ៊ុយ')
       .replace(/\\vec\{v\}|\b\\vec\s*v\b/g, 'វ៉ិចទ័រ វេ')
       .replace(/\\vec\{([^}]+)\}/g, 'វ៉ិចទ័រ $1')
@@ -336,7 +363,7 @@ function normalizePhoneticsForSpeech(text, isKhmer) {
       .replace(/\\triangle\s*([A-Z]{3})/g, 'ត្រីកោណ $1')
       .replace(/\\angle\s*([A-Z]{3})/g, 'មុំ $1')
 
-      // 8. Sets & Logic
+      // 13. Sets & Logic
       .replace(/\\mathbb\{R\}|ℝ/g, 'សំណុំ អ៊ែរ')
       .replace(/\\mathbb\{N\}|ℕ/g, 'សំណុំ អិន')
       .replace(/\\mathbb\{Z\}|ℤ/g, 'សំណុំ ហ្សិត')
@@ -352,7 +379,7 @@ function normalizePhoneticsForSpeech(text, isKhmer) {
       .replace(/\\Rightarrow|=>|⇒/g, ' នាំឱ្យ ')
       .replace(/\\Leftrightarrow|<=>|⇔/g, ' សមមូលនឹង ')
 
-      // 9. Physics & Greek Symbols
+      // 14. Physics & Greek Symbols
       .replace(/ΣF|\\Sigma F/g, 'កម្លាំង ស៊ីកម៉ា អេហ្វ')
       .replace(/\\Sigma|Σ/g, 'ផលបូក ស៊ីកម៉ា')
       .replace(/\bF\s*=\s*m\s*[\*·]?\s*a\b/g, 'កម្លាំង អេហ្វ ស្មើ អឹម អា')
@@ -368,23 +395,25 @@ function normalizePhoneticsForSpeech(text, isKhmer) {
       .replace(/\\omega|ω/g, ' អូមេហ្គា ')
       .replace(/\\theta|θ/g, ' តេតា ')
 
-      // 10. Chemistry Formulas
-      .replace(/\bH2O\b|H_2O/g, 'អាស ពីរ អូ')
-      .replace(/\bCO2\b|CO_2/g, 'សេ អូ ពីរ')
-      .replace(/\bH2SO4\b|H_2SO_4/g, 'អាស ពីរ អេស អូ បួន')
+      // 15. Chemistry Formulas & Chemical Reactions
       .replace(/\bFe2O3\b|Fe_2O_3/g, 'ដែក ពីរ អុកស៊ីត បី')
       .replace(/(\d+)\s*Fe\b/g, '$1 ដែក')
       .replace(/\bFe\b/g, 'ដែក')
       .replace(/(\d+)\s*O2\b/g, '$1 អូ ពីរ')
       .replace(/\bO2\b|O_2/g, 'អូ ពីរ')
+      .replace(/\bH2O\b|H_2O/g, 'អាស ពីរ អូ')
+      .replace(/\bCO2\b|CO_2/g, 'សេ អូ ពីរ')
+      .replace(/\bH2SO4\b|H_2SO_4/g, 'អាស ពីរ អេស អូ បួន')
+      .replace(/(\d+)\s*Cu\b/g, '$1 ទង់ដែង')
       .replace(/\bCu\b/g, 'ទង់ដែង')
+      .replace(/(\d+)\s*Al\b/g, '$1 អាលុយមីញ៉ូម')
       .replace(/\bAl\b/g, 'អាលុយមីញ៉ូម')
       .replace(/\(aq\)/gi, 'សូលុយស្យុងទឹក')
       .replace(/\(s\)/gi, 'រឹង')
       .replace(/\(l\)/gi, 'រាវ')
       .replace(/\(g\)/gi, 'ឧស្ម័ន')
 
-      // 11. Math Operators
+      // 16. Math Operators (Now safe after reaction arrows & bullets)
       .replace(/\\pm|±/g, ' បូក ដក ')
       .replace(/\\approx|≈/g, ' ប្រហាក់ប្រហែល ')
       .replace(/\\neq|≠/g, ' មិនស្មើ ')
@@ -393,13 +422,14 @@ function normalizePhoneticsForSpeech(text, isKhmer) {
       .replace(/\\infty|∞/g, ' អនន្ត ')
       .replace(/\\cdot|\\times|×/g, ' គុណនឹង ')
       .replace(/\s*\+\s*/g, ' បូក ')
-      .replace(/\s*-\s*/g, ' ដក ')
+      .replace(/([0-9a-zA-Z\u1780-\u17FF]+)\s*-\s*([0-9a-zA-Z\u1780-\u17FF]+)/g, '$1 ដក $2')
+      .replace(/\s*-\s*(\d+)/g, ' ដក $1')
       .replace(/\s*[*]\s*/g, ' គុណនឹង ')
       .replace(/\s*[÷]\s*/g, ' ចែកនឹង ')
       .replace(/\s*=\s*/g, ' ស្មើនឹង ')
       .replace(/\s*%\s*/g, ' ភាគរយ ')
 
-      // 12. Standard Academic Alphabet & Variables (French-derived Cambodian conventions)
+      // 17. Standard Academic Alphabet & Variables (French-derived Cambodian conventions)
       .replace(/(\d+)\s*x\b/gi, '$1 អ៊ិច')
       .replace(/\bx\b/gi, 'អ៊ិច')
       .replace(/(\d+)\s*y\b/gi, '$1 អុីក្រែក')
@@ -409,13 +439,14 @@ function normalizePhoneticsForSpeech(text, isKhmer) {
       .replace(/\bw\b/gi, 'ឌុប្លឺវេ')
       .replace(/\bz\b/gi, 'ហ្សិត')
 
-      // 13. Conversational natural breathing at punctuation
-      .replace(/([!?:;។])/g, '$1 ')
+      // 18. Conversational natural breathing at punctuation
+      .replace(/([!?:;។៖])/g, '$1 ')
       .replace(/\s+/g, ' ')
       .trim();
   }
   return result;
 }
+
 
 /**
  * Play authentic human studio recorded notification voice (Khmer Human Voice)
@@ -514,10 +545,55 @@ export function stopHumanSpeech() {
 }
 
 /**
+ * Proactively pre-loads and pre-caches the teacher audio in the background
+ * Enables 0ms instant playback the millisecond the user clicks "🔊 ស្តាប់លោកគ្រូអាន"
+ */
+export function preloadTeacherSpeech(text, options = {}) {
+  if (!text || typeof window === 'undefined') return;
+
+  const hasKhmer = /[\u1780-\u17FF]/.test(text);
+  let cleanText = text
+    .replace(/https?:\/\/\S+/g, '')
+    .replace(/[*_#`~>\[\]\(\)\{\}\\]/g, ' ')
+    .replace(/\s+/g, ' ')
+    .trim();
+
+  cleanText = normalizePhoneticsForSpeech(cleanText, hasKhmer);
+  if (!cleanText) return;
+
+  if (cleanText.length > 1100) {
+    const cutPos = Math.max(
+      cleanText.lastIndexOf('។', 1100),
+      cleanText.lastIndexOf('.', 1100),
+      cleanText.lastIndexOf('!', 1100),
+      cleanText.lastIndexOf('?', 1100),
+      cleanText.lastIndexOf('\n', 1100)
+    );
+    cleanText = cutPos > 500 ? cleanText.slice(0, cutPos + 1) : cleanText.slice(0, 1100);
+  }
+
+  const activeVoiceId = options.voiceId || getStoredVoicePreference() || 'km-piseth';
+  const voiceGender = options.voiceGender || 'male';
+
+  if (preloadedAudioCache.has(cleanText)) return;
+
+  const backendVoiceUrl = `/api/tts?text=${encodeURIComponent(cleanText)}&voice=${encodeURIComponent(activeVoiceId)}&gender=${voiceGender}&t=${Date.now()}`;
+
+  const preAudio = new Audio();
+  preAudio.preload = 'auto';
+  preAudio.src = backendVoiceUrl;
+  preAudio.load();
+
+  preloadedAudioCache.set(cleanText, preAudio);
+  console.log('[TTS Preload] ⚡ Audio pre-buffered for 0ms instant play!');
+}
+
+/**
  * High-End Ultra-Realistic Human Voice Text-To-Speech (TTS)
- * 1. Direct Microsoft Neural Audio Streaming via HTML5 Audio (Instant sub-second playback)
- * 2. Instant Cancellation & Session tracking (Stops immediately on close or toggle)
- * 3. Browser Neural Synthesis Fallback
+ * 1. Instant 0ms Playback from Preloaded Buffer
+ * 2. Unrushed, Patient Classroom Teacher Cadence (speed = 0.90)
+ * 3. Instant Cancellation & Session tracking (Stops immediately on close or toggle)
+ * 4. Browser Neural Synthesis Fallback
  * 
  * @param {string} text - The text to speak
  * @param {Object} options - { onStart, onEnd, onError, lang, speed, voiceId, voiceGender }
@@ -533,7 +609,8 @@ export async function speakHumanText(text, options = {}) {
   const thisSessionId = ++activePlaybackSessionId;
   const storedVoice = getStoredVoicePreference();
   const activeVoiceId = options.voiceId || storedVoice || 'km-piseth';
-  const { onStart, onEnd, onError, speed = 1.0, voiceGender = 'male' } = options;
+  // Default speed 0.90 for an articulate, patient, pedagogical teacher tempo (never rushed)
+  const { onStart, onEnd, onError, speed = 0.90, voiceGender = 'male' } = options;
 
   const hasKhmer = /[\u1780-\u17FF]/.test(text);
 
@@ -562,14 +639,22 @@ export async function speakHumanText(text, options = {}) {
 
   const backendVoiceUrl = `/api/tts?text=${encodeURIComponent(cleanText)}&voice=${encodeURIComponent(activeVoiceId)}&gender=${voiceGender}&t=${Date.now()}`;
 
-  console.log('[TTS] 🎙️ Streaming teacher voice:', activeVoiceId, '| Text length:', cleanText.length);
+  console.log('[TTS] 🎙️ Speaking teacher voice:', activeVoiceId, '| Text length:', cleanText.length, '| Speed:', speed);
 
   try {
-    const audio = new Audio();
-    audio.preload = 'auto';
+    // 1. Check if audio was already preloaded into memory for 0ms instant start!
+    let audio = preloadedAudioCache.get(cleanText);
+    if (audio) {
+      preloadedAudioCache.delete(cleanText);
+      console.log('[TTS] ⚡ 0ms INSTANT PLAYBACK TRIGGERED!');
+    } else {
+      audio = new Audio();
+      audio.preload = 'auto';
+      audio.src = backendVoiceUrl;
+    }
+
     audio.playbackRate = speed;
     audio.volume = 1.0;
-    audio.src = backendVoiceUrl;
     currentHumanAudio = audio;
 
     audio.onplay = () => {
@@ -578,7 +663,7 @@ export async function speakHumanText(text, options = {}) {
         audio.removeAttribute('src');
         return;
       }
-      console.log('[TTS] ✅ Audio streaming live at 100% volume!');
+      console.log('[TTS] ✅ Audio playing at 100% volume!');
       if (onStart) onStart();
     };
 

@@ -132,7 +132,10 @@ function normalizePhoneticsForSpeech(text, isKhmer) {
   if (!text) return '';
   let result = text;
 
-  // Clean Markdown, URLs, and LaTeX tags
+  // 1. Clean chemical & mathematical reaction arrows FIRST before any bracket/symbol stripping!
+  result = result.replace(/-->|->|→|=>/g, ' បង្កើតបានជា ');
+
+  // 2. Clean Markdown, URLs, and LaTeX tags
   result = result
     .replace(/https?:\/\/\S+/g, '')
     .replace(/\\mathbf\{([^}]+)\}/g, '$1')
@@ -149,9 +152,12 @@ function normalizePhoneticsForSpeech(text, isKhmer) {
     .replace(/#{1,6}\s*/g, '')
     .replace(/_{2,}/g, '');
 
+  // 3. Bullet points: lines starting with '-' or '•' should NOT be read as 'ដក' (minus)
+  result = result.replace(/(?:^|\n)\s*[-*•]\s+/g, '\n');
+
   if (isKhmer) {
     result = result
-      // 1. National & System Entities
+      // 4. National & System Entities
       .replace(/\bMoTDAR\b/gi, 'ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ')
       .replace(/\bMoEYS\b/gi, 'ក្រសួងអប់រំ យុវជន និងកីឡា')
       .replace(/\bKHQR\b/gi, 'ខេអេច ឃ្យូអរ')
@@ -165,7 +171,23 @@ function normalizePhoneticsForSpeech(text, isKhmer) {
       .replace(/\bXP\b/gi, 'ពិន្ទុ អិចភី')
       .replace(/\bSTEM\b/gi, 'ស្ទែម')
 
-      // 2. Calculus, Derivatives, Functions & Limits (Cambodian French Conventions)
+      // 5. Roman Numerals in Chemistry/Math (e.g., Fe(III) -> ដែក បី)
+      .replace(/\(V\)/gi, ' ប្រាំ ')
+      .replace(/\(IV\)/gi, ' បួន ')
+      .replace(/\(III\)/gi, ' បី ')
+      .replace(/\(II\)/gi, ' ពីរ ')
+      .replace(/\(I\)/gi, ' មួយ ')
+
+      // 6. English pedagogical terms in parentheses (localize to Khmer)
+      .replace(/\bSubscripts?\b/gi, 'សន្ទស្សន៍')
+      .replace(/\bCombination\s+Reaction\b/gi, 'ប្រតិកម្មផ្សំ')
+      .replace(/\bSynthesis\s+Reaction\b/gi, 'ប្រតិកម្មសំយោគ')
+      .replace(/\bRedox\s+Reaction\b/gi, 'ប្រតិកម្មរេដុក')
+      .replace(/\bReactants?\b/gi, 'អង្គធាតុប្រតិករ')
+      .replace(/\bProducts?\b/gi, 'អង្គធាតុកកើត')
+      .replace(/\bFree\s+Body\s+Diagram\b/gi, 'គំនូសបំព្រួញកម្លាំង')
+
+      // 7. Calculus, Derivatives, Functions & Limits (Cambodian French Conventions)
       .replace(/\bf''\s*\(\s*([^)]+)\s*\)/g, 'អេហ្វ សេកុង នៃ $1')
       .replace(/\bf'\s*\(\s*([^)]+)\s*\)/g, 'អេហ្វ ព្រីម នៃ $1')
       .replace(/\bf\s*\(\s*([^)]+)\s*\)/g, 'អេហ្វ នៃ $1')
@@ -182,7 +204,7 @@ function normalizePhoneticsForSpeech(text, isKhmer) {
       .replace(/\\int/g, 'អាំងតេក្រាល នៃ ')
       .replace(/∫/g, 'អាំងតេក្រាល នៃ ')
 
-      // 3. Trigonometry & Logarithms
+      // 8. Trigonometry & Logarithms
       .replace(/\bsin\b/gi, 'ស៊ីនុស')
       .replace(/\bcos\b/gi, 'កូស៊ីនុស')
       .replace(/\btan\b/gi, 'តង់ហ្សង់')
@@ -192,23 +214,23 @@ function normalizePhoneticsForSpeech(text, isKhmer) {
       .replace(/\blog\s*\(\s*([^)]+)\s*\)/gi, 'លោការីត នៃ $1')
       .replace(/\blog\b/gi, 'លោការីត')
 
-      // 4. Roots & Radicals
+      // 9. Roots & Radicals
       .replace(/\\sqrt\[3\]\{([^}]+)\}|∛\((.*?)\)/g, 'ឬសគូប នៃ $1$2')
       .replace(/\\sqrt\[(\w+)\]\{([^}]+)\}/g, 'ឬសទី $1 នៃ $2')
       .replace(/\\sqrt\{([^}]+)\}|√\((.*?)\)|√([a-zA-Z0-9]+)/g, 'ឬសការ៉េ នៃ $1$2$3')
 
-      // 5. Fractions & Division (u/v, a/b, (expression)/(expression))
+      // 10. Fractions & Division (u/v, a/b, (expression)/(expression))
       .replace(/\(([^)]+)\)\s*\/\s*\(([^)]+)\)/g, '$1 លើ $2')
       .replace(/([a-zA-Z0-9\u1780-\u17FF]+)\s*\/\s*([a-zA-Z0-9\u1780-\u17FF]+)/g, '$1 លើ $2')
 
-      // 6. Exponents & Powers
+      // 11. Exponents & Powers
       .replace(/([a-zA-Z\u1780-\u17FF0-9]+)\^2/g, '$1 ការ៉េ')
       .replace(/([a-zA-Z\u1780-\u17FF0-9]+)\^3/g, '$1 គូប')
       .replace(/([a-zA-Z\u1780-\u17FF0-9]+)\^([a-zA-Z0-9\u1780-\u17FF]+)/g, '$1 ស្វ័យគុណ $2')
       .replace(/e\^\{?2x\}?/g, 'អឺ ស្វ័យគុណ ពីរអ៊ិច')
       .replace(/e\^\{?x\}?/g, 'អឺ ស្វ័យគុណ អ៊ិច')
 
-      // 7. Vectors & Geometry
+      // 12. Vectors & Geometry
       .replace(/\\vec\{u\}|\b\\vec\s*u\b/g, 'វ៉ិចទ័រ អ៊ុយ')
       .replace(/\\vec\{v\}|\b\\vec\s*v\b/g, 'វ៉ិចទ័រ វេ')
       .replace(/\\vec\{([^}]+)\}/g, 'វ៉ិចទ័រ $1')
@@ -217,7 +239,7 @@ function normalizePhoneticsForSpeech(text, isKhmer) {
       .replace(/\\triangle\s*([A-Z]{3})/g, 'ត្រីកោណ $1')
       .replace(/\\angle\s*([A-Z]{3})/g, 'មុំ $1')
 
-      // 8. Sets & Logic
+      // 13. Sets & Logic
       .replace(/\\mathbb\{R\}|ℝ/g, 'សំណុំ អ៊ែរ')
       .replace(/\\mathbb\{N\}|ℕ/g, 'សំណុំ អិន')
       .replace(/\\mathbb\{Z\}|ℤ/g, 'សំណុំ ហ្សិត')
@@ -233,7 +255,7 @@ function normalizePhoneticsForSpeech(text, isKhmer) {
       .replace(/\\Rightarrow|=>|⇒/g, ' នាំឱ្យ ')
       .replace(/\\Leftrightarrow|<=>|⇔/g, ' សមមូលនឹង ')
 
-      // 9. Physics & Greek Symbols
+      // 14. Physics & Greek Symbols
       .replace(/ΣF|\\Sigma F/g, 'កម្លាំង ស៊ីកម៉ា អេហ្វ')
       .replace(/\\Sigma|Σ/g, 'ផលបូក ស៊ីកម៉ា')
       .replace(/\bF\s*=\s*m\s*[\*·]?\s*a\b/g, 'កម្លាំង អេហ្វ ស្មើ អឹម អា')
@@ -249,23 +271,25 @@ function normalizePhoneticsForSpeech(text, isKhmer) {
       .replace(/\\omega|ω/g, ' អូមេហ្គា ')
       .replace(/\\theta|θ/g, ' តេតា ')
 
-      // 10. Chemistry Formulas
-      .replace(/\bH2O\b|H_2O/g, 'អាស ពីរ អូ')
-      .replace(/\bCO2\b|CO_2/g, 'សេ អូ ពីរ')
-      .replace(/\bH2SO4\b|H_2SO_4/g, 'អាស ពីរ អេស អូ បួន')
+      // 15. Chemistry Formulas & Chemical Reactions
       .replace(/\bFe2O3\b|Fe_2O_3/g, 'ដែក ពីរ អុកស៊ីត បី')
       .replace(/(\d+)\s*Fe\b/g, '$1 ដែក')
       .replace(/\bFe\b/g, 'ដែក')
       .replace(/(\d+)\s*O2\b/g, '$1 អូ ពីរ')
       .replace(/\bO2\b|O_2/g, 'អូ ពីរ')
+      .replace(/\bH2O\b|H_2O/g, 'អាស ពីរ អូ')
+      .replace(/\bCO2\b|CO_2/g, 'សេ អូ ពីរ')
+      .replace(/\bH2SO4\b|H_2SO_4/g, 'អាស ពីរ អេស អូ បួន')
+      .replace(/(\d+)\s*Cu\b/g, '$1 ទង់ដែង')
       .replace(/\bCu\b/g, 'ទង់ដែង')
+      .replace(/(\d+)\s*Al\b/g, '$1 អាលុយមីញ៉ូម')
       .replace(/\bAl\b/g, 'អាលុយមីញ៉ូម')
       .replace(/\(aq\)/gi, 'សូលុយស្យុងទឹក')
       .replace(/\(s\)/gi, 'រឹង')
       .replace(/\(l\)/gi, 'រាវ')
       .replace(/\(g\)/gi, 'ឧស្ម័ន')
 
-      // 11. Math Operators
+      // 16. Math Operators (Now safe after reaction arrows & bullets)
       .replace(/\\pm|±/g, ' បូក ដក ')
       .replace(/\\approx|≈/g, ' ប្រហាក់ប្រហែល ')
       .replace(/\\neq|≠/g, ' មិនស្មើ ')
@@ -274,13 +298,14 @@ function normalizePhoneticsForSpeech(text, isKhmer) {
       .replace(/\\infty|∞/g, ' អនន្ត ')
       .replace(/\\cdot|\\times|×/g, ' គុណនឹង ')
       .replace(/\s*\+\s*/g, ' បូក ')
-      .replace(/\s*-\s*/g, ' ដក ')
+      .replace(/([0-9a-zA-Z\u1780-\u17FF]+)\s*-\s*([0-9a-zA-Z\u1780-\u17FF]+)/g, '$1 ដក $2')
+      .replace(/\s*-\s*(\d+)/g, ' ដក $1')
       .replace(/\s*[*]\s*/g, ' គុណនឹង ')
       .replace(/\s*[÷]\s*/g, ' ចែកនឹង ')
       .replace(/\s*=\s*/g, ' ស្មើនឹង ')
       .replace(/\s*%\s*/g, ' ភាគរយ ')
 
-      // 12. Standard Academic Alphabet & Variables (French-derived Cambodian conventions)
+      // 17. Standard Academic Alphabet & Variables (French-derived Cambodian conventions)
       .replace(/(\d+)\s*x\b/gi, '$1 អ៊ិច')
       .replace(/\bx\b/gi, 'អ៊ិច')
       .replace(/(\d+)\s*y\b/gi, '$1 អុីក្រែក')
@@ -290,8 +315,8 @@ function normalizePhoneticsForSpeech(text, isKhmer) {
       .replace(/\bw\b/gi, 'ឌុប្លឺវេ')
       .replace(/\bz\b/gi, 'ហ្សិត')
 
-      // 13. Conversational natural breathing at punctuation
-      .replace(/([!?:;។])/g, '$1 ')
+      // 18. Conversational natural breathing at punctuation
+      .replace(/([!?:;។៖])/g, '$1 ')
       .replace(/\s+/g, ' ')
       .trim();
   }
@@ -359,7 +384,8 @@ export async function synthesizeSpeech(req, res) {
 
     tts = new MsEdgeTTS();
     await tts.setMetadata(selectedVoice, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3);
-    const { audioStream } = tts.toStream(cleanText);
+    // Rate -14% produces a calm, patient, pedagogical teacher speed so students understand 100%
+    const { audioStream } = tts.toStream(cleanText, { rate: '-14%' });
 
     // Stream directly to client so playback starts in <300ms
     res.set({
