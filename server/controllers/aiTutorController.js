@@ -5,7 +5,7 @@
 // ============================================================================
 
 const AI_API_KEY = process.env.AI_API_KEY || process.env.GEMINI_API_KEY || '';
-const AI_MODELS = ['gemini-3-flash-preview', 'gemini-3.1-flash-lite', 'gemini-flash-latest', 'gemma-4-26b-a4b-it'];
+const AI_MODELS = ['gemini-3.6-flash', 'gemini-3.1-flash-lite', 'gemini-3-flash-preview', 'gemma-4-26b-a4b-it'];
 
 /**
  * 1. Rude / Vulgar / Abusive Content Filter (Khmer & English)
