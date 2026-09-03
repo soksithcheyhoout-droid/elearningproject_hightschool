@@ -333,6 +333,7 @@ export async function synthesizeSpeech(req, res) {
     const text = req.query?.text || req.body?.text;
     const voiceOverride = req.query?.voice || req.body?.voice;
     const gender = req.query?.gender || req.body?.gender || 'male';
+    const rate = req.query?.rate || req.body?.rate || '+0%';
 
     if (!text || typeof text !== 'string' || !text.trim()) {
       return res.status(400).json({ error: 'Text parameter is required.' });
@@ -369,7 +370,7 @@ export async function synthesizeSpeech(req, res) {
     }
 
     // Check cache for instant 0ms response
-    const cacheKey = `${selectedVoice}::${cleanText}`;
+    const cacheKey = `${selectedVoice}::${rate}::${cleanText}`;
     if (audioCache.has(cacheKey)) {
       const cachedBuffer = audioCache.get(cacheKey);
       res.set({
@@ -384,8 +385,8 @@ export async function synthesizeSpeech(req, res) {
 
     tts = new MsEdgeTTS();
     await tts.setMetadata(selectedVoice, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3);
-    // Rate -14% produces a calm, patient, pedagogical teacher speed so students understand 100%
-    const { audioStream } = tts.toStream(cleanText, { rate: '-14%' });
+    // Natural human cadence +0% - crisp, fluent, lively, never dragged or slow
+    const { audioStream } = tts.toStream(cleanText, { rate: rate });
 
     // Stream directly to client so playback starts in <300ms
     res.set({

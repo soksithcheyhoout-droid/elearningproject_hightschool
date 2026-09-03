@@ -591,7 +591,7 @@ export function preloadTeacherSpeech(text, options = {}) {
 /**
  * High-End Ultra-Realistic Human Voice Text-To-Speech (TTS)
  * 1. Instant 0ms Playback from Preloaded Buffer
- * 2. Unrushed, Patient Classroom Teacher Cadence (speed = 0.90)
+ * 2. Natural, Fluent, Articulate Human Teacher Cadence (speed = 1.0, never slow or dragging)
  * 3. Instant Cancellation & Session tracking (Stops immediately on close or toggle)
  * 4. Browser Neural Synthesis Fallback
  * 
@@ -609,8 +609,8 @@ export async function speakHumanText(text, options = {}) {
   const thisSessionId = ++activePlaybackSessionId;
   const storedVoice = getStoredVoicePreference();
   const activeVoiceId = options.voiceId || storedVoice || 'km-piseth';
-  // Default speed 0.90 for an articulate, patient, pedagogical teacher tempo (never rushed)
-  const { onStart, onEnd, onError, speed = 0.90, voiceGender = 'male' } = options;
+  // Natural 1.0 speed - crisp, lively, fluent, completely natural and not slow
+  const { onStart, onEnd, onError, speed = 1.0, voiceGender = 'male' } = options;
 
   const hasKhmer = /[\u1780-\u17FF]/.test(text);
 
