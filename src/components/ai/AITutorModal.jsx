@@ -62,12 +62,27 @@ export default function AITutorModal({ isOpen, onClose, initialPrompt = '' }) {
   const [isTyping, setIsTyping] = useState(false);
   const [speakingMsgId, setSpeakingMsgId] = useState(null);
 
-  // Stop speaking when modal closes
+  // Stop speaking immediately when modal closes
+  useEffect(() => {
+    if (!isOpen) {
+      stopHumanSpeech();
+      setSpeakingMsgId(null);
+    }
+  }, [isOpen]);
+
+  // Stop speaking on unmount
   useEffect(() => {
     return () => {
       stopHumanSpeech();
+      setSpeakingMsgId(null);
     };
   }, []);
+
+  const handleClose = () => {
+    stopHumanSpeech();
+    setSpeakingMsgId(null);
+    onClose();
+  };
 
   const handleSpeak = (msgId, text) => {
     if (speakingMsgId === msgId) {
@@ -185,8 +200,9 @@ export default function AITutorModal({ isOpen, onClose, initialPrompt = '' }) {
             </button>
 
             <button
-              onClick={onClose}
-              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors"
+              onClick={handleClose}
+              className="w-8 h-8 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center transition-colors cursor-pointer"
+              title="បិទការសន្ទនា (Close)"
             >
               <X className="w-4 h-4" />
             </button>
@@ -220,15 +236,24 @@ export default function AITutorModal({ isOpen, onClose, initialPrompt = '' }) {
                     <button
                       type="button"
                       onClick={() => handleSpeak(msg.id, msg.text)}
-                      className={`px-2.5 py-1 rounded-lg font-bold text-[11px] transition-all cursor-pointer flex items-center gap-1.5 border shadow-2xs ${
+                      className={`px-3 py-1.5 rounded-lg font-bold text-[11px] transition-all cursor-pointer flex items-center gap-1.5 border shadow-2xs ${
                         speakingMsgId === msg.id 
-                          ? 'bg-[#005baa] text-white border-[#005baa] ring-2 ring-blue-200 animate-pulse' 
-                          : 'bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-[#005baa] border-slate-200'
+                          ? 'bg-rose-600 hover:bg-rose-700 text-white border-rose-600 ring-2 ring-rose-200 animate-pulse' 
+                          : 'bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-[#003366] border-slate-200'
                       }`}
-                      title={speakingMsgId === msg.id ? "បញ្ឈប់ការអាន (Stop Voice)" : "ស្តាប់សំឡេងអាន (Speak Voice)"}
+                      title={speakingMsgId === msg.id ? "ចុចដើម្បីបញ្ឈប់ការអាន (Click to Stop Voice)" : "ស្តាប់លោកគ្រូអាន (Speak Voice)"}
                     >
-                      <Volume2 className={`w-3.5 h-3.5 ${speakingMsgId === msg.id ? 'animate-bounce text-amber-300' : 'text-[#005baa]'}`} />
-                      <span>{speakingMsgId === msg.id ? 'កំពុងអាន... (Stop)' : '🔊 ស្តាប់លោកគ្រូអាន'}</span>
+                      {speakingMsgId === msg.id ? (
+                        <>
+                          <Square className="w-3 h-3 fill-white text-white" />
+                          <span>⏹️ បញ្ឈប់ការអាន (Stop)</span>
+                        </>
+                      ) : (
+                        <>
+                          <Volume2 className="w-3.5 h-3.5 text-[#005baa]" />
+                          <span>🔊 ស្តាប់លោកគ្រូអាន</span>
+                        </>
+                      )}
                     </button>
                   )}
                   <span className="ml-auto font-mono">{msg.time}</span>

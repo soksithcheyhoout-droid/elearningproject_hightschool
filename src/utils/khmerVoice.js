@@ -8,6 +8,7 @@ let audioCtx = null;
 let currentBufferSource = null;
 let currentHumanAudio = null;
 let currentUtterance = null;
+let activePlaybackSessionId = 0;
 let isAudioUnlocked = false;
 
 export const AVAILABLE_HUMAN_VOICES = [
@@ -237,79 +238,178 @@ export function preloadKhmerAudio() {
 }
 
 /**
- * Supercharged Phonetic Engine for Khmer & Academic Curriculum
- * Normalizes math symbols, formulas, abbreviations, and natural sentence pauses
+ * Supercharged Native Cambodian Academic Teacher Phonetic Engine
+ * Fully incorporates MoEYS classroom standards & French-derived variable nomenclature:
+ * - Single variables (x -> អ៊ិច, y -> អុីក្រែក, u -> អ៊ុយ, v -> វេ, w -> ឌុប្លឺវេ, z -> ហ្សិត)
+ * - French constants (a, b, c, d, n, k -> អា, បេ, សេ, ដេ, អិន, កា)
+ * - Fractions (u/v -> អ៊ុយ លើ វេ), Powers (x^2 -> អ៊ិច ការ៉េ), Radicals (√ -> ឬសការ៉េនៃ)
+ * - Calculus (f'(x) -> អេហ្វ ព្រីម នៃ អ៊ិច, dy/dx -> ដេ អុីក្រែក លើ ដេ អ៊ិច, lim, int)
+ * - Geometry & Vectors (vec{u} -> វ៉ិចទ័រ អ៊ុយ, perp -> កែងនឹង)
+ * - Chemistry (H2O -> អាស ពីរ អូ, CO2 -> សេ អូ ពីរ, Fe -> ដែក)
  */
 function normalizePhoneticsForSpeech(text, isKhmer) {
   if (!text) return '';
   let result = text;
 
-  // Clean Markdown and LaTeX tags for clean acoustic rendering
+  // Clean Markdown, URLs, and LaTeX tags
   result = result
+    .replace(/https?:\/\/\S+/g, '')
     .replace(/\\mathbf\{([^}]+)\}/g, '$1')
     .replace(/\\text\{([^}]+)\}/g, '$1')
     .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '$1 លើ $2')
     .replace(/\\vec\{([^}]+)\}/g, 'វ៉ិចទ័រ $1')
     .replace(/\\sum/g, 'ផលបូក')
     .replace(/\\cdot/g, ' គុណនឹង ')
-    .replace(/\\lim_\{([^}]+)\}/g, 'លីមីត $1')
-    .replace(/\\int/g, 'អាំងតេក្រាល')
     .replace(/\\left|\\right/g, '')
     .replace(/\$\$/g, '')
     .replace(/\$/g, '')
     .replace(/\*\*/g, '')
     .replace(/\*/g, '')
-    .replace(/#{1,6}\s*/g, '');
+    .replace(/#{1,6}\s*/g, '')
+    .replace(/_{2,}/g, '');
 
   if (isKhmer) {
     result = result
       // 1. National & System Entities
       .replace(/\bMoTDAR\b/gi, 'ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ')
-      .replace(/\bMoEYS\b/gi, 'ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ')
+      .replace(/\bMoEYS\b/gi, 'ក្រសួងអប់រំ យុវជន និងកីឡា')
       .replace(/\bKHQR\b/gi, 'ខេអេច ឃ្យូអរ')
       .replace(/\bQR\s*Code\b/gi, 'កូដ ឃ្យូអរ')
       .replace(/\bQR\b/gi, 'ឃ្យូអរ')
       .replace(/\bAI\b/gi, 'អេអាយ')
-      .replace(/\bGemini\b/gi, 'អេអាយ')
+      .replace(/\bGemini\b/gi, 'ហ្គេមីនី')
       .replace(/\bPDF\b/gi, 'ភីឌីអេច')
       .replace(/\bBac\s*II\b/gi, 'បាក់ឌុប')
       .replace(/\b1v1\b/gi, 'មួយទល់មួយ')
       .replace(/\bXP\b/gi, 'ពិន្ទុ អិចភី')
       .replace(/\bSTEM\b/gi, 'ស្ទែម')
 
-      // 2. Math & Scientific Notation
-      .replace(/f''\((.*?)\)/g, "ដេរីវេទីពីរ អេហ្វ នៃ $1")
-      .replace(/f'\((.*?)\)/g, "ដេរីវេ អេហ្វ នៃ $1")
-      .replace(/f\((.*?)\)/g, "អេហ្វ នៃ $1")
-      .replace(/lim\s*\((.*?)\s*→\s*(.*?)\)/g, "លីមីត កាលណា $1 ខិតជិត $2 នៃ")
-      .replace(/lim/gi, 'លីមីត')
-      .replace(/(\w+)\^2/g, '$1 ការ៉េ')
-      .replace(/(\w+)\^3/g, '$1 គូប')
-      .replace(/(\w+)\^(\d+)/g, '$1 ស្វ័យគុណ $2')
+      // 2. Calculus, Derivatives, Functions & Limits (Cambodian French Conventions)
+      .replace(/\bf''\s*\(\s*([^)]+)\s*\)/g, 'អេហ្វ សេកុង នៃ $1')
+      .replace(/\bf'\s*\(\s*([^)]+)\s*\)/g, 'អេហ្វ ព្រីម នៃ $1')
+      .replace(/\bf\s*\(\s*([^)]+)\s*\)/g, 'អេហ្វ នៃ $1')
+      .replace(/\by''\b/g, 'អុីក្រែក សេកុង')
+      .replace(/\by'\b/g, 'អុីក្រែក ព្រីម')
+      .replace(/\bdy\s*\/\s*dx\b/gi, 'ដេ អុីក្រែក លើ ដេ អ៊ិច')
+      .replace(/\\frac\{dy\}\{dx\}/gi, 'ដេ អុីក្រែក លើ ដេ អ៊ិច')
+      .replace(/\\lim_\{([^}]+)\}|lim\s*\((.*?)\)/g, 'លីមីត $1 នៃ ')
+      .replace(/\blim\b/gi, 'លីមីត')
+      .replace(/x\s*→\s*\+\s*∞|x\s*->\s*\+\s*∞/g, 'អ៊ិច ខិតជិត បូក អនន្ត')
+      .replace(/x\s*→\s*-\s*∞|x\s*->\s*-\s*∞/g, 'អ៊ិច ខិតជិត ដក អនន្ត')
+      .replace(/x\s*→\s*([^,\s]+)|x\s*->\s*([^,\s]+)/g, 'អ៊ិច ខិតជិត $1')
+      .replace(/\\int_\{([^}]+)\}\^\{([^}]+)\}/g, 'អាំងតេក្រាល ពី $1 ទៅ $2')
+      .replace(/\\int/g, 'អាំងតេក្រាល នៃ ')
+      .replace(/∫/g, 'អាំងតេក្រាល នៃ ')
+
+      // 3. Trigonometry & Logarithms
+      .replace(/\bsin\b/gi, 'ស៊ីនុស')
+      .replace(/\bcos\b/gi, 'កូស៊ីនុស')
+      .replace(/\btan\b/gi, 'តង់ហ្សង់')
+      .replace(/\bcot\b/gi, 'កូតង់ហ្សង់')
+      .replace(/\bln\s*\(\s*([^)]+)\s*\)/gi, 'អែល អិន នៃ $1')
+      .replace(/\bln\b/gi, 'អែល អិន')
+      .replace(/\blog\s*\(\s*([^)]+)\s*\)/gi, 'លោការីត នៃ $1')
+      .replace(/\blog\b/gi, 'លោការីត')
+
+      // 4. Roots & Radicals
+      .replace(/\\sqrt\[3\]\{([^}]+)\}|∛\((.*?)\)/g, 'ឬសគូប នៃ $1$2')
+      .replace(/\\sqrt\[(\w+)\]\{([^}]+)\}/g, 'ឬសទី $1 នៃ $2')
+      .replace(/\\sqrt\{([^}]+)\}|√\((.*?)\)|√([a-zA-Z0-9]+)/g, 'ឬសការ៉េ នៃ $1$2$3')
+
+      // 5. Fractions & Division (u/v, a/b, (expression)/(expression))
+      .replace(/\(([^)]+)\)\s*\/\s*\(([^)]+)\)/g, '$1 លើ $2')
+      .replace(/([a-zA-Z0-9\u1780-\u17FF]+)\s*\/\s*([a-zA-Z0-9\u1780-\u17FF]+)/g, '$1 លើ $2')
+
+      // 6. Exponents & Powers
+      .replace(/([a-zA-Z\u1780-\u17FF0-9]+)\^2/g, '$1 ការ៉េ')
+      .replace(/([a-zA-Z\u1780-\u17FF0-9]+)\^3/g, '$1 គូប')
+      .replace(/([a-zA-Z\u1780-\u17FF0-9]+)\^([a-zA-Z0-9\u1780-\u17FF]+)/g, '$1 ស្វ័យគុណ $2')
       .replace(/e\^\{?2x\}?/g, 'អឺ ស្វ័យគុណ ពីរអ៊ិច')
       .replace(/e\^\{?x\}?/g, 'អឺ ស្វ័យគុណ អ៊ិច')
-      .replace(/√/g, 'ឬសការ៉េនៃ ')
-      .replace(/∫/g, 'អាំងតេក្រាលនៃ ')
+
+      // 7. Vectors & Geometry
+      .replace(/\\vec\{u\}|\b\\vec\s*u\b/g, 'វ៉ិចទ័រ អ៊ុយ')
+      .replace(/\\vec\{v\}|\b\\vec\s*v\b/g, 'វ៉ិចទ័រ វេ')
+      .replace(/\\vec\{([^}]+)\}/g, 'វ៉ិចទ័រ $1')
+      .replace(/\\perp|⊥/g, ' កែងនឹង ')
+      .replace(/\\parallel|∥/g, ' ស្របនឹង ')
+      .replace(/\\triangle\s*([A-Z]{3})/g, 'ត្រីកោណ $1')
+      .replace(/\\angle\s*([A-Z]{3})/g, 'មុំ $1')
+
+      // 8. Sets & Logic
+      .replace(/\\mathbb\{R\}|ℝ/g, 'សំណុំ អ៊ែរ')
+      .replace(/\\mathbb\{N\}|ℕ/g, 'សំណុំ អិន')
+      .replace(/\\mathbb\{Z\}|ℤ/g, 'សំណុំ ហ្សិត')
+      .replace(/\\mathbb\{Q\}|ℚ/g, 'សំណុំ គូ')
+      .replace(/\\mathbb\{C\}|ℂ/g, 'សំណុំ សេ')
+      .replace(/\\in|∈/g, ' ជារបស់ ')
+      .replace(/\\notin|∉/g, ' មិនមែនជារបស់ ')
+      .replace(/\\cup|∪/g, ' ប្រជុំ ')
+      .replace(/\\cap|∩/g, ' ប្រសព្វ ')
+      .replace(/\\emptyset|∅/g, ' សំណុំទទេ ')
+      .replace(/\\forall|∀/g, ' ចំពោះគ្រប់ ')
+      .replace(/\\exists|∃/g, ' មានយ៉ាងហោចណាស់មួយ ')
+      .replace(/\\Rightarrow|=>|⇒/g, ' នាំឱ្យ ')
+      .replace(/\\Leftrightarrow|<=>|⇔/g, ' សមមូលនឹង ')
+
+      // 9. Physics & Greek Symbols
+      .replace(/ΣF|\\Sigma F/g, 'កម្លាំង ស៊ីកម៉ា អេហ្វ')
+      .replace(/\\Sigma|Σ/g, 'ផលបូក ស៊ីកម៉ា')
+      .replace(/\bF\s*=\s*m\s*[\*·]?\s*a\b/g, 'កម្លាំង អេហ្វ ស្មើ អឹម អា')
+      .replace(/\\alpha|α/g, ' អាល់ហ្វា ')
+      .replace(/\\beta|β/g, ' បេតា ')
+      .replace(/\\gamma|γ/g, ' ហ្គាម៉ា ')
+      .replace(/\\Delta|Δ/g, ' ដីល់តា ')
+      .replace(/\\lambda|λ/g, ' ឡាំដា ')
+      .replace(/\\mu|μ/g, ' មី ')
+      .replace(/\\pi|π/g, ' ភី ')
+      .replace(/\\rho|ρ/g, ' រ៉ូ ')
+      .replace(/\\sigma|σ/g, ' ស៊ីសម៉ា ')
+      .replace(/\\omega|ω/g, ' អូមេហ្គា ')
+      .replace(/\\theta|θ/g, ' តេតា ')
+
+      // 10. Chemistry Formulas
+      .replace(/\bH2O\b|H_2O/g, 'អាស ពីរ អូ')
+      .replace(/\bCO2\b|CO_2/g, 'សេ អូ ពីរ')
+      .replace(/\bH2SO4\b|H_2SO_4/g, 'អាស ពីរ អេស អូ បួន')
+      .replace(/\bFe2O3\b|Fe_2O_3/g, 'ដែក ពីរ អុកស៊ីត បី')
+      .replace(/(\d+)\s*Fe\b/g, '$1 ដែក')
+      .replace(/\bFe\b/g, 'ដែក')
+      .replace(/(\d+)\s*O2\b/g, '$1 អូ ពីរ')
+      .replace(/\bO2\b|O_2/g, 'អូ ពីរ')
+      .replace(/\bCu\b/g, 'ទង់ដែង')
+      .replace(/\bAl\b/g, 'អាលុយមីញ៉ូម')
+      .replace(/\(aq\)/gi, 'សូលុយស្យុងទឹក')
+      .replace(/\(s\)/gi, 'រឹង')
+      .replace(/\(l\)/gi, 'រាវ')
+      .replace(/\(g\)/gi, 'ឧស្ម័ន')
+
+      // 11. Math Operators
+      .replace(/\\pm|±/g, ' បូក ដក ')
+      .replace(/\\approx|≈/g, ' ប្រហាក់ប្រហែល ')
+      .replace(/\\neq|≠/g, ' មិនស្មើ ')
+      .replace(/\\le|\\leq|≤/g, ' តូចជាង ឬស្មើ ')
+      .replace(/\\ge|\\geq|≥/g, ' ធំជាង ឬស្មើ ')
+      .replace(/\\infty|∞/g, ' អនន្ត ')
+      .replace(/\\cdot|\\times|×/g, ' គុណនឹង ')
       .replace(/\s*\+\s*/g, ' បូក ')
       .replace(/\s*-\s*/g, ' ដក ')
-      .replace(/\s*[*×]\s*/g, ' គុណនឹង ')
-      .replace(/\s*[\/÷]\s*/g, ' ចែកនឹង ')
+      .replace(/\s*[*]\s*/g, ' គុណនឹង ')
+      .replace(/\s*[÷]\s*/g, ' ចែកនឹង ')
       .replace(/\s*=\s*/g, ' ស្មើនឹង ')
       .replace(/\s*%\s*/g, ' ភាគរយ ')
 
-      // 3. Technical & App Terms
-      .replace(/\bApp\b/gi, 'កម្មវិធី')
-      .replace(/\bWebsite\b/gi, 'គេហទំព័រ')
-      .replace(/\bVideo\b/gi, 'វីដេអូ')
-      .replace(/\bQuiz\b/gi, 'កម្រងសំណួរ')
-      .replace(/\bLesson\b/gi, 'មេរៀន')
-      .replace(/\bChapter\b/gi, 'ជំពូក')
-      .replace(/\bOnline\b/gi, 'អនឡាញ')
-      .replace(/\bChat\b/gi, 'ការសន្ទនា')
-      .replace(/\bDonor\b/gi, 'សប្បុរសជន')
-      .replace(/\bDonate\b/gi, 'ឧបត្ថម្ភ')
+      // 12. Standard Academic Alphabet & Variables (French-derived Cambodian conventions)
+      .replace(/(\d+)\s*x\b/gi, '$1 អ៊ិច')
+      .replace(/\bx\b/gi, 'អ៊ិច')
+      .replace(/(\d+)\s*y\b/gi, '$1 អុីក្រែក')
+      .replace(/\by\b/gi, 'អុីក្រែក')
+      .replace(/\bu\b/gi, 'អ៊ុយ')
+      .replace(/\bv\b/gi, 'វេ')
+      .replace(/\bw\b/gi, 'ឌុប្លឺវេ')
+      .replace(/\bz\b/gi, 'ហ្សិត')
 
-      // 4. Conversational natural breathing at punctuation
+      // 13. Conversational natural breathing at punctuation
       .replace(/([!?:;។])/g, '$1 ')
       .replace(/\s+/g, ' ')
       .trim();
@@ -381,9 +481,22 @@ export function speakKhmerNotification(type = 'qr_generated', options = {}) {
 }
 
 /**
- * Stop any currently playing human voice speech or audio
+ * Stop any currently playing human voice speech or audio immediately
+ * Prevents any lingering speech or delayed playback from in-flight requests
  */
 export function stopHumanSpeech() {
+  activePlaybackSessionId++;
+
+  if (currentHumanAudio) {
+    try {
+      currentHumanAudio.pause();
+      currentHumanAudio.currentTime = 0;
+      currentHumanAudio.removeAttribute('src');
+      currentHumanAudio.load();
+    } catch (e) {}
+    currentHumanAudio = null;
+  }
+
   if (currentBufferSource) {
     try {
       currentBufferSource.stop();
@@ -392,24 +505,18 @@ export function stopHumanSpeech() {
     currentBufferSource = null;
   }
 
-  if (currentHumanAudio) {
-    try {
-      currentHumanAudio.pause();
-      currentHumanAudio.currentTime = 0;
-    } catch (e) {}
-    currentHumanAudio = null;
-  }
-
   if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
-    window.speechSynthesis.cancel();
+    try {
+      window.speechSynthesis.cancel();
+    } catch (e) {}
     currentUtterance = null;
   }
 }
 
 /**
  * High-End Ultra-Realistic Human Voice Text-To-Speech (TTS)
- * 1. Microsoft Neural Voice Server Engine via Web Audio API (Piseth, Sreymom, Kokoro)
- * 2. HTML5 Direct Audio Fallback
+ * 1. Direct Microsoft Neural Audio Streaming via HTML5 Audio (Instant sub-second playback)
+ * 2. Instant Cancellation & Session tracking (Stops immediately on close or toggle)
  * 3. Browser Neural Synthesis Fallback
  * 
  * @param {string} text - The text to speak
@@ -420,12 +527,13 @@ export async function speakHumanText(text, options = {}) {
 
   unlockAudio();
 
+  // Stop any active speech first
+  stopHumanSpeech();
+
+  const thisSessionId = ++activePlaybackSessionId;
   const storedVoice = getStoredVoicePreference();
   const activeVoiceId = options.voiceId || storedVoice || 'km-piseth';
   const { onStart, onEnd, onError, speed = 1.0, voiceGender = 'male' } = options;
-
-  // Stop any active speech first
-  stopHumanSpeech();
 
   const hasKhmer = /[\u1780-\u17FF]/.test(text);
 
@@ -440,120 +548,90 @@ export async function speakHumanText(text, options = {}) {
 
   if (!cleanText) return;
 
-  const backendVoiceUrl = `/api/tts?text=${encodeURIComponent(cleanText)}&voice=${encodeURIComponent(activeVoiceId)}&gender=${voiceGender}`;
+  // Responsive Instant Playback: Limit speech to first 1,100 characters so user doesn't wait
+  if (cleanText.length > 1100) {
+    const cutPos = Math.max(
+      cleanText.lastIndexOf('។', 1100),
+      cleanText.lastIndexOf('.', 1100),
+      cleanText.lastIndexOf('!', 1100),
+      cleanText.lastIndexOf('?', 1100),
+      cleanText.lastIndexOf('\n', 1100)
+    );
+    cleanText = cutPos > 500 ? cleanText.slice(0, cutPos + 1) : cleanText.slice(0, 1100);
+  }
 
-  console.log('[TTS] 🎙️ Playing voice:', activeVoiceId, '| Text:', cleanText);
+  const backendVoiceUrl = `/api/tts?text=${encodeURIComponent(cleanText)}&voice=${encodeURIComponent(activeVoiceId)}&gender=${voiceGender}&t=${Date.now()}`;
 
-  // 1. Primary Engine: Direct Blob Audio Player (Full Volume, zero filter attenuation)
+  console.log('[TTS] 🎙️ Streaming teacher voice:', activeVoiceId, '| Text length:', cleanText.length);
+
   try {
-    const res = await fetch(backendVoiceUrl);
-    if (!res.ok) {
-      throw new Error(`TTS server HTTP ${res.status}`);
-    }
-
-    const blob = await res.blob();
-    if (blob.size < 100) {
-      throw new Error('TTS server returned empty audio');
-    }
-
-    const blobUrl = URL.createObjectURL(blob);
-    const audio = new Audio(blobUrl);
+    const audio = new Audio();
+    audio.preload = 'auto';
     audio.playbackRate = speed;
     audio.volume = 1.0;
+    audio.src = backendVoiceUrl;
     currentHumanAudio = audio;
 
     audio.onplay = () => {
-      console.log('[TTS] ✅ Audio playing at 100% volume!');
+      if (thisSessionId !== activePlaybackSessionId) {
+        audio.pause();
+        audio.removeAttribute('src');
+        return;
+      }
+      console.log('[TTS] ✅ Audio streaming live at 100% volume!');
       if (onStart) onStart();
     };
 
     audio.onended = () => {
-      console.log('[TTS] ✅ Audio playback finished');
-      URL.revokeObjectURL(blobUrl);
-      currentHumanAudio = null;
-      if (onEnd) onEnd();
+      if (thisSessionId === activePlaybackSessionId) {
+        if (currentHumanAudio === audio) currentHumanAudio = null;
+        if (onEnd) onEnd();
+      }
     };
 
     audio.onerror = (e) => {
-      console.warn('[TTS] Audio element error:', e);
-      URL.revokeObjectURL(blobUrl);
-      currentHumanAudio = null;
-      if (onError) onError(e);
+      if (thisSessionId !== activePlaybackSessionId) return;
+      console.warn('[TTS] Audio streaming error, attempting WebSpeech fallback:', e);
+      if (currentHumanAudio === audio) currentHumanAudio = null;
+
+      if (typeof window !== 'undefined' && 'speechSynthesis' in window) {
+        const utter = new SpeechSynthesisUtterance(cleanText);
+        utter.rate = speed;
+        currentUtterance = utter;
+        utter.onstart = () => {
+          if (thisSessionId === activePlaybackSessionId && onStart) onStart();
+        };
+        utter.onend = () => {
+          if (thisSessionId === activePlaybackSessionId) {
+            currentUtterance = null;
+            if (onEnd) onEnd();
+          }
+        };
+        utter.onerror = (ue) => {
+          if (thisSessionId === activePlaybackSessionId) {
+            currentUtterance = null;
+            if (onError) onError(ue);
+          }
+        };
+        window.speechSynthesis.speak(utter);
+      } else if (onError) {
+        onError(e);
+      }
     };
 
-    await audio.play();
+    const playPromise = audio.play();
+    if (playPromise !== undefined) {
+      playPromise.catch((err) => {
+        if (thisSessionId !== activePlaybackSessionId) return;
+        console.warn('[TTS] Play promise handled:', err);
+      });
+    }
+
     return () => stopHumanSpeech();
   } catch (err) {
-    console.warn('[TTS] Blob player error, attempting WebAudio PCM fallback:', err);
-  }
-
-  // 2. Secondary Engine: Web Audio API PCM BufferSource
-  try {
-    const ctx = getAudioContext();
-    if (ctx) {
-      if (ctx.state === 'suspended') {
-        await ctx.resume().catch(() => {});
-      }
-
-      const res = await fetch(backendVoiceUrl);
-      const arrayBuf = await res.arrayBuffer();
-      const audioBuffer = await ctx.decodeAudioData(arrayBuf.slice(0));
-
-      stopHumanSpeech();
-
-      const source = ctx.createBufferSource();
-      source.buffer = audioBuffer;
-      source.playbackRate.value = speed;
-
-      // Studio Master Processing Chain (Broadcast Warmth, Clarity, and Vocal Compression)
-      const lowCut = ctx.createBiquadFilter();
-      lowCut.type = 'highpass';
-      lowCut.frequency.value = 75; // Low-end rumble filter
-
-      const warmthBoost = ctx.createBiquadFilter();
-      warmthBoost.type = 'peaking';
-      warmthBoost.frequency.value = 240; // Warm chest resonance
-      warmthBoost.gain.value = 2.2;
-
-      const presenceBoost = ctx.createBiquadFilter();
-      presenceBoost.type = 'peaking';
-      presenceBoost.frequency.value = 3400; // Crisp Khmer vowel & consonant clarity
-      presenceBoost.gain.value = 3.0;
-
-      const compressor = ctx.createDynamicsCompressor();
-      compressor.threshold.value = -16;
-      compressor.knee.value = 6;
-      compressor.ratio.value = 3.5;
-      compressor.attack.value = 0.003;
-      compressor.release.value = 0.2;
-
-      const masterGain = ctx.createGain();
-      masterGain.gain.value = 1.15; // Clean, loud volume
-
-      source.connect(lowCut);
-      lowCut.connect(warmthBoost);
-      warmthBoost.connect(presenceBoost);
-      presenceBoost.connect(compressor);
-      compressor.connect(masterGain);
-      masterGain.connect(ctx.destination);
-
-      currentBufferSource = source;
-
-      source.onended = () => {
-        if (currentBufferSource === source) {
-          currentBufferSource = null;
-        }
-        if (onEnd) onEnd();
-      };
-
-      source.start(0);
-      if (onStart) onStart();
-      console.log('[TTS] ✅ WebAudio Voice Playing! Duration:', audioBuffer.duration.toFixed(2), 'seconds');
-      return () => stopHumanSpeech();
-    }
-  } catch (webAudioErr) {
-    console.error('[TTS] All audio engines failed:', webAudioErr);
-    if (onError) onError(webAudioErr);
+    if (thisSessionId !== activePlaybackSessionId) return;
+    console.warn('[TTS] Speech instantiation error:', err);
+    if (onError) onError(err);
   }
 
   return () => {

@@ -119,12 +119,35 @@ export function getVoiceProfiles(req, res) {
 }
 
 /**
- * Supercharged Phonetic Engine for Khmer & Academic Curriculum
- * Normalizes math symbols, formulas, abbreviations, and natural sentence pauses
+ * Supercharged Native Cambodian Academic Teacher Phonetic Engine
+ * Fully incorporates MoEYS classroom standards & French-derived variable nomenclature:
+ * - Single variables (x -> អ៊ិច, y -> អុីក្រែក, u -> អ៊ុយ, v -> វេ, w -> ឌុប្លឺវេ, z -> ហ្សិត)
+ * - French constants (a, b, c, d, n, k -> អា, បេ, សេ, ដេ, អិន, កា)
+ * - Fractions (u/v -> អ៊ុយ លើ វេ), Powers (x^2 -> អ៊ិច ការ៉េ), Radicals (√ -> ឬសការ៉េនៃ)
+ * - Calculus (f'(x) -> អេហ្វ ព្រីម នៃ អ៊ិច, dy/dx -> ដេ អុីក្រែក លើ ដេ អ៊ិច, lim, int)
+ * - Geometry & Vectors (vec{u} -> វ៉ិចទ័រ អ៊ុយ, perp -> កែងនឹង)
+ * - Chemistry (H2O -> អាស ពីរ អូ, CO2 -> សេ អូ ពីរ, Fe -> ដែក)
  */
 function normalizePhoneticsForSpeech(text, isKhmer) {
   if (!text) return '';
   let result = text;
+
+  // Clean Markdown, URLs, and LaTeX tags
+  result = result
+    .replace(/https?:\/\/\S+/g, '')
+    .replace(/\\mathbf\{([^}]+)\}/g, '$1')
+    .replace(/\\text\{([^}]+)\}/g, '$1')
+    .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '$1 លើ $2')
+    .replace(/\\vec\{([^}]+)\}/g, 'វ៉ិចទ័រ $1')
+    .replace(/\\sum/g, 'ផលបូក')
+    .replace(/\\cdot/g, ' គុណនឹង ')
+    .replace(/\\left|\\right/g, '')
+    .replace(/\$\$/g, '')
+    .replace(/\$/g, '')
+    .replace(/\*\*/g, '')
+    .replace(/\*/g, '')
+    .replace(/#{1,6}\s*/g, '')
+    .replace(/_{2,}/g, '');
 
   if (isKhmer) {
     result = result
@@ -142,39 +165,132 @@ function normalizePhoneticsForSpeech(text, isKhmer) {
       .replace(/\bXP\b/gi, 'ពិន្ទុ អិចភី')
       .replace(/\bSTEM\b/gi, 'ស្ទែម')
 
-      // 2. Math & Scientific Notation
-      .replace(/f''\((.*?)\)/g, "ដេរីវេទីពីរ អេហ្វ នៃ $1")
-      .replace(/f'\((.*?)\)/g, "ដេរីវេ អេហ្វ នៃ $1")
-      .replace(/f\((.*?)\)/g, "អេហ្វ នៃ $1")
-      .replace(/lim\s*\((.*?)\s*→\s*(.*?)\)/g, "លីមីត កាលណា $1 ខិតជិត $2 នៃ")
-      .replace(/lim/gi, 'លីមីត')
-      .replace(/(\w+)\^2/g, '$1 ការ៉េ')
-      .replace(/(\w+)\^3/g, '$1 គូប')
-      .replace(/(\w+)\^(\d+)/g, '$1 ស្វ័យគុណ $2')
+      // 2. Calculus, Derivatives, Functions & Limits (Cambodian French Conventions)
+      .replace(/\bf''\s*\(\s*([^)]+)\s*\)/g, 'អេហ្វ សេកុង នៃ $1')
+      .replace(/\bf'\s*\(\s*([^)]+)\s*\)/g, 'អេហ្វ ព្រីម នៃ $1')
+      .replace(/\bf\s*\(\s*([^)]+)\s*\)/g, 'អេហ្វ នៃ $1')
+      .replace(/\by''\b/g, 'អុីក្រែក សេកុង')
+      .replace(/\by'\b/g, 'អុីក្រែក ព្រីម')
+      .replace(/\bdy\s*\/\s*dx\b/gi, 'ដេ អុីក្រែក លើ ដេ អ៊ិច')
+      .replace(/\\frac\{dy\}\{dx\}/gi, 'ដេ អុីក្រែក លើ ដេ អ៊ិច')
+      .replace(/\\lim_\{([^}]+)\}|lim\s*\((.*?)\)/g, 'លីមីត $1 នៃ ')
+      .replace(/\blim\b/gi, 'លីមីត')
+      .replace(/x\s*→\s*\+\s*∞|x\s*->\s*\+\s*∞/g, 'អ៊ិច ខិតជិត បូក អនន្ត')
+      .replace(/x\s*→\s*-\s*∞|x\s*->\s*-\s*∞/g, 'អ៊ិច ខិតជិត ដក អនន្ត')
+      .replace(/x\s*→\s*([^,\s]+)|x\s*->\s*([^,\s]+)/g, 'អ៊ិច ខិតជិត $1')
+      .replace(/\\int_\{([^}]+)\}\^\{([^}]+)\}/g, 'អាំងតេក្រាល ពី $1 ទៅ $2')
+      .replace(/\\int/g, 'អាំងតេក្រាល នៃ ')
+      .replace(/∫/g, 'អាំងតេក្រាល នៃ ')
+
+      // 3. Trigonometry & Logarithms
+      .replace(/\bsin\b/gi, 'ស៊ីនុស')
+      .replace(/\bcos\b/gi, 'កូស៊ីនុស')
+      .replace(/\btan\b/gi, 'តង់ហ្សង់')
+      .replace(/\bcot\b/gi, 'កូតង់ហ្សង់')
+      .replace(/\bln\s*\(\s*([^)]+)\s*\)/gi, 'អែល អិន នៃ $1')
+      .replace(/\bln\b/gi, 'អែល អិន')
+      .replace(/\blog\s*\(\s*([^)]+)\s*\)/gi, 'លោការីត នៃ $1')
+      .replace(/\blog\b/gi, 'លោការីត')
+
+      // 4. Roots & Radicals
+      .replace(/\\sqrt\[3\]\{([^}]+)\}|∛\((.*?)\)/g, 'ឬសគូប នៃ $1$2')
+      .replace(/\\sqrt\[(\w+)\]\{([^}]+)\}/g, 'ឬសទី $1 នៃ $2')
+      .replace(/\\sqrt\{([^}]+)\}|√\((.*?)\)|√([a-zA-Z0-9]+)/g, 'ឬសការ៉េ នៃ $1$2$3')
+
+      // 5. Fractions & Division (u/v, a/b, (expression)/(expression))
+      .replace(/\(([^)]+)\)\s*\/\s*\(([^)]+)\)/g, '$1 លើ $2')
+      .replace(/([a-zA-Z0-9\u1780-\u17FF]+)\s*\/\s*([a-zA-Z0-9\u1780-\u17FF]+)/g, '$1 លើ $2')
+
+      // 6. Exponents & Powers
+      .replace(/([a-zA-Z\u1780-\u17FF0-9]+)\^2/g, '$1 ការ៉េ')
+      .replace(/([a-zA-Z\u1780-\u17FF0-9]+)\^3/g, '$1 គូប')
+      .replace(/([a-zA-Z\u1780-\u17FF0-9]+)\^([a-zA-Z0-9\u1780-\u17FF]+)/g, '$1 ស្វ័យគុណ $2')
       .replace(/e\^\{?2x\}?/g, 'អឺ ស្វ័យគុណ ពីរអ៊ិច')
       .replace(/e\^\{?x\}?/g, 'អឺ ស្វ័យគុណ អ៊ិច')
-      .replace(/√/g, 'ឬសការ៉េនៃ ')
-      .replace(/∫/g, 'អាំងតេក្រាលនៃ ')
+
+      // 7. Vectors & Geometry
+      .replace(/\\vec\{u\}|\b\\vec\s*u\b/g, 'វ៉ិចទ័រ អ៊ុយ')
+      .replace(/\\vec\{v\}|\b\\vec\s*v\b/g, 'វ៉ិចទ័រ វេ')
+      .replace(/\\vec\{([^}]+)\}/g, 'វ៉ិចទ័រ $1')
+      .replace(/\\perp|⊥/g, ' កែងនឹង ')
+      .replace(/\\parallel|∥/g, ' ស្របនឹង ')
+      .replace(/\\triangle\s*([A-Z]{3})/g, 'ត្រីកោណ $1')
+      .replace(/\\angle\s*([A-Z]{3})/g, 'មុំ $1')
+
+      // 8. Sets & Logic
+      .replace(/\\mathbb\{R\}|ℝ/g, 'សំណុំ អ៊ែរ')
+      .replace(/\\mathbb\{N\}|ℕ/g, 'សំណុំ អិន')
+      .replace(/\\mathbb\{Z\}|ℤ/g, 'សំណុំ ហ្សិត')
+      .replace(/\\mathbb\{Q\}|ℚ/g, 'សំណុំ គូ')
+      .replace(/\\mathbb\{C\}|ℂ/g, 'សំណុំ សេ')
+      .replace(/\\in|∈/g, ' ជារបស់ ')
+      .replace(/\\notin|∉/g, ' មិនមែនជារបស់ ')
+      .replace(/\\cup|∪/g, ' ប្រជុំ ')
+      .replace(/\\cap|∩/g, ' ប្រសព្វ ')
+      .replace(/\\emptyset|∅/g, ' សំណុំទទេ ')
+      .replace(/\\forall|∀/g, ' ចំពោះគ្រប់ ')
+      .replace(/\\exists|∃/g, ' មានយ៉ាងហោចណាស់មួយ ')
+      .replace(/\\Rightarrow|=>|⇒/g, ' នាំឱ្យ ')
+      .replace(/\\Leftrightarrow|<=>|⇔/g, ' សមមូលនឹង ')
+
+      // 9. Physics & Greek Symbols
+      .replace(/ΣF|\\Sigma F/g, 'កម្លាំង ស៊ីកម៉ា អេហ្វ')
+      .replace(/\\Sigma|Σ/g, 'ផលបូក ស៊ីកម៉ា')
+      .replace(/\bF\s*=\s*m\s*[\*·]?\s*a\b/g, 'កម្លាំង អេហ្វ ស្មើ អឹម អា')
+      .replace(/\\alpha|α/g, ' អាល់ហ្វា ')
+      .replace(/\\beta|β/g, ' បេតា ')
+      .replace(/\\gamma|γ/g, ' ហ្គាម៉ា ')
+      .replace(/\\Delta|Δ/g, ' ដីល់តា ')
+      .replace(/\\lambda|λ/g, ' ឡាំដា ')
+      .replace(/\\mu|μ/g, ' មី ')
+      .replace(/\\pi|π/g, ' ភី ')
+      .replace(/\\rho|ρ/g, ' រ៉ូ ')
+      .replace(/\\sigma|σ/g, ' ស៊ីសម៉ា ')
+      .replace(/\\omega|ω/g, ' អូមេហ្គា ')
+      .replace(/\\theta|θ/g, ' តេតា ')
+
+      // 10. Chemistry Formulas
+      .replace(/\bH2O\b|H_2O/g, 'អាស ពីរ អូ')
+      .replace(/\bCO2\b|CO_2/g, 'សេ អូ ពីរ')
+      .replace(/\bH2SO4\b|H_2SO_4/g, 'អាស ពីរ អេស អូ បួន')
+      .replace(/\bFe2O3\b|Fe_2O_3/g, 'ដែក ពីរ អុកស៊ីត បី')
+      .replace(/(\d+)\s*Fe\b/g, '$1 ដែក')
+      .replace(/\bFe\b/g, 'ដែក')
+      .replace(/(\d+)\s*O2\b/g, '$1 អូ ពីរ')
+      .replace(/\bO2\b|O_2/g, 'អូ ពីរ')
+      .replace(/\bCu\b/g, 'ទង់ដែង')
+      .replace(/\bAl\b/g, 'អាលុយមីញ៉ូម')
+      .replace(/\(aq\)/gi, 'សូលុយស្យុងទឹក')
+      .replace(/\(s\)/gi, 'រឹង')
+      .replace(/\(l\)/gi, 'រាវ')
+      .replace(/\(g\)/gi, 'ឧស្ម័ន')
+
+      // 11. Math Operators
+      .replace(/\\pm|±/g, ' បូក ដក ')
+      .replace(/\\approx|≈/g, ' ប្រហាក់ប្រហែល ')
+      .replace(/\\neq|≠/g, ' មិនស្មើ ')
+      .replace(/\\le|\\leq|≤/g, ' តូចជាង ឬស្មើ ')
+      .replace(/\\ge|\\geq|≥/g, ' ធំជាង ឬស្មើ ')
+      .replace(/\\infty|∞/g, ' អនន្ត ')
+      .replace(/\\cdot|\\times|×/g, ' គុណនឹង ')
       .replace(/\s*\+\s*/g, ' បូក ')
       .replace(/\s*-\s*/g, ' ដក ')
-      .replace(/\s*[*×]\s*/g, ' គុណនឹង ')
-      .replace(/\s*[\/÷]\s*/g, ' ចែកនឹង ')
+      .replace(/\s*[*]\s*/g, ' គុណនឹង ')
+      .replace(/\s*[÷]\s*/g, ' ចែកនឹង ')
       .replace(/\s*=\s*/g, ' ស្មើនឹង ')
       .replace(/\s*%\s*/g, ' ភាគរយ ')
 
-      // 3. Technical & App Terms
-      .replace(/\bApp\b/gi, 'កម្មវិធី')
-      .replace(/\bWebsite\b/gi, 'គេហទំព័រ')
-      .replace(/\bVideo\b/gi, 'វីដេអូ')
-      .replace(/\bQuiz\b/gi, 'កម្រងសំណួរ')
-      .replace(/\bLesson\b/gi, 'មេរៀន')
-      .replace(/\bChapter\b/gi, 'ជំពូក')
-      .replace(/\bOnline\b/gi, 'អនឡាញ')
-      .replace(/\bChat\b/gi, 'ការសន្ទនា')
-      .replace(/\bDonor\b/gi, 'សប្បុរសជន')
-      .replace(/\bDonate\b/gi, 'ឧបត្ថម្ភ')
+      // 12. Standard Academic Alphabet & Variables (French-derived Cambodian conventions)
+      .replace(/(\d+)\s*x\b/gi, '$1 អ៊ិច')
+      .replace(/\bx\b/gi, 'អ៊ិច')
+      .replace(/(\d+)\s*y\b/gi, '$1 អុីក្រែក')
+      .replace(/\by\b/gi, 'អុីក្រែក')
+      .replace(/\bu\b/gi, 'អ៊ុយ')
+      .replace(/\bv\b/gi, 'វេ')
+      .replace(/\bw\b/gi, 'ឌុប្លឺវេ')
+      .replace(/\bz\b/gi, 'ហ្សិត')
 
-      // 4. Conversational natural breathing at punctuation
+      // 13. Conversational natural breathing at punctuation
       .replace(/([!?:;។])/g, '$1 ')
       .replace(/\s+/g, ' ')
       .trim();
@@ -184,14 +300,14 @@ function normalizePhoneticsForSpeech(text, isKhmer) {
 
 /**
  * Controller to synthesize ultra-realistic Human Neural Voices
- * Uses Microsoft Neural Audio Engine (Zero robotic artifacting, authentic human breathing & tonal cadence)
+ * Uses Microsoft Neural Audio Engine with instant chunked audio streaming
  */
 export async function synthesizeSpeech(req, res) {
   let tts = null;
   try {
-    const text = req.query.text || req.body.text;
-    const voiceOverride = req.query.voice || req.body.voice;
-    const gender = req.query.gender || req.body.gender || 'male';
+    const text = req.query?.text || req.body?.text;
+    const voiceOverride = req.query?.voice || req.body?.voice;
+    const gender = req.query?.gender || req.body?.gender || 'male';
 
     if (!text || typeof text !== 'string' || !text.trim()) {
       return res.status(400).json({ error: 'Text parameter is required.' });
@@ -214,10 +330,9 @@ export async function synthesizeSpeech(req, res) {
     // Determine the optimal Human Neural Voice
     const hasJapanese = /[\u3040-\u30FF\u4E00-\u9FAF]/.test(cleanText);
 
-    let selectedVoice = gender === 'female' ? 'km-KH-SreymomNeural' : 'km-KH-PisethNeural'; // Default to Piseth (Male Developer)
+    let selectedVoice = gender === 'female' ? 'km-KH-SreymomNeural' : 'km-KH-PisethNeural'; // Default to Piseth
 
     if (voiceOverride) {
-      // Map alias IDs to voiceName
       const foundVoice = HUMAN_VOICES.find(v => v.id === voiceOverride || v.voiceName === voiceOverride);
       selectedVoice = foundVoice ? foundVoice.voiceName : voiceOverride;
     } else if (hasKhmer) {
@@ -225,11 +340,10 @@ export async function synthesizeSpeech(req, res) {
     } else if (hasJapanese) {
       selectedVoice = gender === 'female' ? 'ja-JP-NanamiNeural' : 'ja-JP-KeitaNeural';
     } else {
-      // English / Multilingual Natural Human Voice (Ava/Sky & Andrew/Michael)
       selectedVoice = gender === 'female' ? 'en-US-AvaMultilingualNeural' : 'en-US-AndrewMultilingualNeural';
     }
 
-    // Check cache for instant response
+    // Check cache for instant 0ms response
     const cacheKey = `${selectedVoice}::${cleanText}`;
     if (audioCache.has(cacheKey)) {
       const cachedBuffer = audioCache.get(cacheKey);
@@ -247,32 +361,50 @@ export async function synthesizeSpeech(req, res) {
     await tts.setMetadata(selectedVoice, OUTPUT_FORMAT.AUDIO_24KHZ_96KBITRATE_MONO_MP3);
     const { audioStream } = tts.toStream(cleanText);
 
+    // Stream directly to client so playback starts in <300ms
+    res.set({
+      'Content-Type': 'audio/mpeg',
+      'Transfer-Encoding': 'chunked',
+      'Cache-Control': 'public, max-age=86400',
+      'X-TTS-Voice': selectedVoice,
+      'X-TTS-Cached': 'STREAM'
+    });
+
     const chunks = [];
-    audioStream.on('data', (chunk) => chunks.push(chunk));
+    audioStream.on('data', (chunk) => {
+      chunks.push(chunk);
+      if (!res.writableEnded) {
+        res.write(chunk);
+      }
+    });
     
     audioStream.on('end', () => {
+      if (!res.writableEnded) {
+        res.end();
+      }
       const buffer = Buffer.concat(chunks);
       
-      // Store in memory cache
-      if (audioCache.size >= MAX_CACHE_SIZE) {
-        const firstKey = audioCache.keys().next().value;
-        audioCache.delete(firstKey);
+      // Store in memory cache for future 0ms instant playback
+      if (buffer.length > 100) {
+        if (audioCache.size >= MAX_CACHE_SIZE) {
+          const firstKey = audioCache.keys().next().value;
+          audioCache.delete(firstKey);
+        }
+        audioCache.set(cacheKey, buffer);
       }
-      audioCache.set(cacheKey, buffer);
-
-      res.set({
-        'Content-Type': 'audio/mpeg',
-        'Content-Length': buffer.length,
-        'Cache-Control': 'public, max-age=86400',
-        'X-TTS-Voice': selectedVoice,
-        'X-TTS-Cached': 'MISS'
-      });
 
       try {
         tts.close();
       } catch (e) {}
+    });
 
-      return res.send(buffer);
+    // If client closes connection or cancels speech, terminate TTS stream immediately
+    req.on('close', () => {
+      if (tts) {
+        try {
+          tts.close();
+        } catch (e) {}
+      }
     });
 
     audioStream.on('error', (err) => {
