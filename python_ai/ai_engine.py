@@ -319,7 +319,7 @@ def generate_ai_response(prompt: str, chat_history: List[Dict[str, Any]] = None)
 
     if not query:
         return {
-            "reply": "សួស្តីប្អូន! ខ្ញុំជាលោកគ្រូ AI ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ (MoTDAR)។ តើប្អូនមានចម្ងល់ ឬសំណួរអ្វីខ្លះដែលចង់ឱ្យលោកគ្រូជួយពន្យល់ និងដោះស្រាយជូនដែរ?",
+            "reply": "សួស្តីប្អូន! លោកគ្រូរីករាយណាស់ដែលបានជួបប្អូននៅថ្ងៃនេះ។ តើប្អូនមានចម្ងល់ ឬសំណួរលំហាត់អ្វីខ្លះដែលចង់ឱ្យលោកគ្រូជួយពន្យល់ និងដោះស្រាយជូនដែរ?",
             "sources": []
         }
 
@@ -341,9 +341,9 @@ def generate_ai_response(prompt: str, chat_history: List[Dict[str, Any]] = None)
                 break
         if last_ai_text:
             translated = translate_text_live(last_ai_text, 'en')
-            return {"reply": f"**🎓 MoTDAR Ministry AI Tutor (English):**\n\nSure! Here is the explanation in English:\n\n{translated}\n\n💡 *Feel free to continue asking any questions in English!*", "sources": []}
+            return {"reply": f"Sure! Here is the explanation in English:\n\n{translated}\n\n💡 *Feel free to ask your teacher any questions in English!*", "sources": []}
         else:
-            return {"reply": "**🎓 MoTDAR Ministry AI Tutor (English):**\n\nHello! I am now speaking in English with you. What subject, mathematics problem, or question would you like to explore today?", "sources": []}
+            return {"reply": "Hello! I am speaking in English with you now. What subject, mathematics problem, or question would you like to explore today?", "sources": []}
 
     if is_switch_khmer:
         last_ai_text = ""
@@ -355,9 +355,9 @@ def generate_ai_response(prompt: str, chat_history: List[Dict[str, Any]] = None)
                 break
         if last_ai_text:
             translated = translate_text_live(last_ai_text, 'km')
-            return {"reply": f"**🎓 លោកគ្រូ AI ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ (MoTDAR) ៖**\n\nបាទប្អូន! នេះជាការពន្យល់ជាភាសាខ្មែរ ៖\n\n{translated}\n\n💡 *ប្អូនអាចចុចប៊ូតុង «🔊 ស្តាប់លោកគ្រូអាន» ដើម្បីស្តាប់សំឡេងអានជាភាសាខ្មែរ!*", "sources": []}
+            return {"reply": f"បាទប្អូន! នេះជាការពន្យល់ជាភាសាខ្មែរ ៖\n\n{translated}\n\n💡 *ប្អូនអាចចុចប៊ូតុង «🔊 ស្តាប់លោកគ្រូអាន» ដើម្បីស្តាប់សំឡេងអានបានណា៎!*", "sources": []}
         else:
-            return {"reply": "**🎓 លោកគ្រូ AI ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ (MoTDAR) ៖**\n\nសួស្តីប្អូន! លោកគ្រូកំពុងនិយាយជាភាសាខ្មែរជាមួយប្អូន។ តើប្អូនមានចម្ងល់លើមេរៀន ឬលំហាត់អ្វីខ្លះដែលចង់ឱ្យលោកគ្រូជួយពន្យល់?", "sources": []}
+            return {"reply": "សួស្តីប្អូន! លោកគ្រូកំពុងនិយាយជាភាសាខ្មែរជាមួយប្អូន។ តើប្អូនមានចម្ងល់លើមេរៀន ឬលំហាត់អ្វីខ្លះដែលចង់ឱ្យលោកគ្រូជួយពន្យល់?", "sources": []}
 
     # 3. Contextual translation of previous message (e.g. 'can you translate into english' / 'បកប្រែជាភាសាខ្មែរ')
     is_translate_to_english = bool(re.search(r'\b(?:translate|convert|change)\s+(?:this\s+|it\s+)?(?:in|into|to)\s+english\b|^(?:translate\s+to\s+english|translate\s+into\s+english)$', q_lower))

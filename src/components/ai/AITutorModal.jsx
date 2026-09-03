@@ -17,7 +17,8 @@ import {
   Zap, 
   HelpCircle,
   Volume2,
-  Square
+  Square,
+  GraduationCap
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import { useAuth } from '../../context/AuthContext';
@@ -54,7 +55,7 @@ export default function AITutorModal({ isOpen, onClose, initialPrompt = '' }) {
     {
       id: 1,
       sender: 'ai',
-      text: "សួស្តីប្អូន " + student.name + "! ខ្ញុំជាលោកគ្រូ AI ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ (MoTDAR)។ តើប្អូនមានចម្ងល់លើមេរៀន ឬលំហាត់គណិត រូប គីមី ជីវវិទ្យា អក្សរសាស្ត្រខ្មែរ ប្រវត្តិវិទ្យា ឬសំណួរអ្វីខ្លះដែលចង់ឱ្យលោកគ្រូជួយពន្យល់ និងដោះស្រាយជូនដែរ?",
+      text: "សួស្តីប្អូន " + (student.name || '') + "! លោកគ្រូរីករាយណាស់ដែលបានជួបប្អូននៅថ្ងៃនេះ។ មិនថាលំហាត់គណិតវិទ្យា រូបវិទ្យា គីមីវិទ្យា ជីវវិទ្យា ឬសំណួរតែងសេចក្តីភាសាខ្មែរ ប្រវត្តិវិទ្យាទេ កូនអាចសួរលោកគ្រូបានទាំងអស់ណា៎! តើថ្ងៃនេះកូនចង់ឱ្យលោកគ្រូជួយពន្យល់ ឬបង្រៀនមេរៀនអ្វីដែរ?",
       time: "ឥឡូវនេះ"
     }
   ]);
@@ -158,14 +159,17 @@ export default function AITutorModal({ isOpen, onClose, initialPrompt = '' }) {
         <div className="px-6 py-4 bg-gradient-to-r from-[#003366] via-[#005baa] to-[#0284c7] text-white flex items-center justify-between shadow-md">
           <div className="flex items-center gap-3">
             <div className="w-10 h-10 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 flex items-center justify-center shadow-xs">
-              <Bot className="w-6 h-6 text-amber-300" />
+              <GraduationCap className="w-6 h-6 text-amber-300" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-extrabold text-white">
-                លោកគ្រូ AI ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ (MoTDAR)
+              <h2 className="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
+                <span>លោកគ្រូបង្រៀនគរុកោសល្យ</span>
+                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-300/30 font-sans font-bold uppercase">
+                  Master Teacher
+                </span>
               </h2>
               <p className="text-xs text-blue-100 mt-0.5">
-                ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ និងការស្រាវជ្រាវកម្រិតខ្ពស់ • ជំនួយការឆ្លាតវៃ ២៤/៧
+                គ្រូបង្រៀនពិតប្រាកដ • ជំនួយការដោះស្រាយលំហាត់ និងត្រៀមប្រឡងបាក់ឌុប
               </p>
             </div>
           </div>
@@ -199,7 +203,7 @@ export default function AITutorModal({ isOpen, onClose, initialPrompt = '' }) {
             >
               {msg.sender === 'ai' && (
                 <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-[#003366] to-[#005baa] text-white flex items-center justify-center flex-shrink-0 shadow-xs mt-1">
-                  <Bot className="w-4 h-4 text-amber-300" />
+                  <GraduationCap className="w-4.5 h-4.5 text-amber-300" />
                 </div>
               )}
 
@@ -242,11 +246,11 @@ export default function AITutorModal({ isOpen, onClose, initialPrompt = '' }) {
           {isTyping && (
             <div className="flex items-center gap-3">
               <div className="w-8 h-8 rounded-xl bg-[#005baa] text-white flex items-center justify-center shadow-xs">
-                <Bot className="w-4 h-4 text-amber-300 animate-spin" />
+                <GraduationCap className="w-4.5 h-4.5 text-amber-300 animate-bounce" />
               </div>
-              <div className="bg-white border border-slate-200 rounded-2xl p-3 shadow-xs flex items-center gap-2 text-xs text-slate-500">
+              <div className="bg-white border border-slate-200 rounded-2xl p-3 shadow-xs flex items-center gap-2 text-xs text-slate-600">
                 <Sparkles className="w-3.5 h-3.5 text-amber-500 animate-bounce" />
-                <span>លោកគ្រូ AI ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ (MoTDAR) កំពុងគិត និងវិភាគចម្លើយ...</span>
+                <span>លោកគ្រូកំពុងរៀបចំការពន្យល់ និងដំណោះស្រាយជូនប្អូន...</span>
               </div>
             </div>
           )}
@@ -282,7 +286,7 @@ export default function AITutorModal({ isOpen, onClose, initialPrompt = '' }) {
           >
             <input
               type="text"
-              placeholder="សួរលោកគ្រូ AI ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ (MoTDAR) អំពីលំហាត់ គណិត រូប គីមី ឬវិធីតែងសេចក្តី..."
+              placeholder="សួរសំណួរ ឬដាក់លំហាត់មកទីនេះ លោកគ្រូនឹងជួយបង្រៀនមួយជំហានម្តងៗ..."
               value={inputMessage}
               onChange={(e) => setInputMessage(e.target.value)}
               className="flex-1 bg-slate-50 border border-slate-300 rounded-xl px-4 py-3 text-xs sm:text-sm text-slate-900 placeholder:text-slate-400 focus:outline-none focus:bg-white focus:border-[#005baa] focus:ring-2 focus:ring-[#005baa]/20 font-sans"
