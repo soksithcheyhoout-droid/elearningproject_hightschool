@@ -45,7 +45,15 @@ import {
   Target,
   Compass,
   Rocket,
-  Bot
+  Bot,
+  Calculator,
+  Languages,
+  Beaker,
+  Globe,
+  Scale,
+  Leaf,
+  Brain,
+  ChevronDown
 } from 'lucide-react';
 import { useAuth, computeLevelData } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
@@ -155,6 +163,45 @@ const STREAM_THEMES = {
     cardInactive: 'bg-[#080f1e]/90 border-slate-800/90 hover:border-emerald-500/40 hover:bg-[#091a14] text-slate-400 hover:text-slate-200 group'
   }
 };
+
+// Grade & Subject Configs for AI Quiz
+const KHMER_NUMS = ['១','២','៣','៤','៥','៦','៧','៨','៩','១០','១១','១២'];
+const GRADE_COLORS_DUEL = [
+  'from-blue-400 to-blue-600','from-cyan-400 to-cyan-600','from-teal-400 to-teal-600',
+  'from-emerald-400 to-emerald-600','from-green-400 to-green-600','from-lime-500 to-green-600',
+  'from-yellow-400 to-amber-600','from-amber-400 to-orange-600','from-orange-400 to-red-600',
+  'from-rose-400 to-pink-600','from-purple-400 to-violet-600','from-indigo-400 to-blue-600'
+];
+
+const DUEL_SCIENCE_SUBJECTS = [
+  { key: 'គណិតវិទ្យា', label: 'គណិតវិទ្យា', en: 'Math', icon: Calculator, color: 'bg-blue-500/15 border-blue-400/30 text-blue-300' },
+  { key: 'ភាសាខ្មែរ', label: 'ភាសាខ្មែរ', en: 'Khmer', icon: BookOpen, color: 'bg-amber-500/15 border-amber-400/30 text-amber-300' },
+  { key: 'រូបវិទ្យា', label: 'រូបវិទ្យា', en: 'Physics', icon: Atom, color: 'bg-cyan-500/15 border-cyan-400/30 text-cyan-300' },
+  { key: 'គីមីវិទ្យា', label: 'គីមីវិទ្យា', en: 'Chemistry', icon: Beaker, color: 'bg-emerald-500/15 border-emerald-400/30 text-emerald-300' },
+  { key: 'ជីវវិទ្យា', label: 'ជីវវិទ្យា', en: 'Biology', icon: Brain, color: 'bg-pink-500/15 border-pink-400/30 text-pink-300' },
+  { key: 'ប្រវត្តិវិទ្យា', label: 'ប្រវត្តិវិទ្យា', en: 'History', icon: Target, color: 'bg-yellow-500/15 border-yellow-400/30 text-yellow-300' },
+  { key: 'ភាសាអង់គ្លេស', label: 'ភាសាអង់គ្លេស', en: 'English', icon: Languages, color: 'bg-violet-500/15 border-violet-400/30 text-violet-300' },
+];
+
+const DUEL_SOCIAL_SUBJECTS = [
+  { key: 'ភាសាខ្មែរ', label: 'ភាសាខ្មែរ', en: 'Khmer', icon: BookOpen, color: 'bg-amber-500/15 border-amber-400/30 text-amber-300' },
+  { key: 'គណិតវិទ្យា', label: 'គណិតវិទ្យា', en: 'Math', icon: Calculator, color: 'bg-blue-500/15 border-blue-400/30 text-blue-300' },
+  { key: 'ប្រវត្តិវិទ្យា', label: 'ប្រវត្តិវិទ្យា', en: 'History', icon: Target, color: 'bg-yellow-500/15 border-yellow-400/30 text-yellow-300' },
+  { key: 'ភូមិវិទ្យា', label: 'ភូមិវិទ្យា', en: 'Geography', icon: Globe, color: 'bg-teal-500/15 border-teal-400/30 text-teal-300' },
+  { key: 'សីលធម៌-ពលរដ្ឋវិជ្ជា', label: 'សីលធម៌-ពលរដ្ឋវិជ្ជា', en: 'Civics', icon: Scale, color: 'bg-slate-500/15 border-slate-400/30 text-slate-300' },
+  { key: 'ផែនដី និងបរិស្ថាន', label: 'ផែនដី និងបរិស្ថាន', en: 'Earth', icon: Leaf, color: 'bg-green-500/15 border-green-400/30 text-green-300' },
+  { key: 'ភាសាអង់គ្លេស', label: 'ភាសាអង់គ្លេស', en: 'English', icon: Languages, color: 'bg-violet-500/15 border-violet-400/30 text-violet-300' },
+];
+
+const DUEL_GENERAL_SUBJECTS = [
+  { key: 'គណិតវិទ្យា', label: 'គណិតវិទ្យា', en: 'Math', icon: Calculator, color: 'bg-blue-500/15 border-blue-400/30 text-blue-300' },
+  { key: 'ភាសាខ្មែរ', label: 'ភាសាខ្មែរ', en: 'Khmer', icon: BookOpen, color: 'bg-amber-500/15 border-amber-400/30 text-amber-300' },
+  { key: 'វិទ្យាសាស្ត្រ', label: 'វិទ្យាសាស្ត្រ', en: 'Science', icon: Atom, color: 'bg-cyan-500/15 border-cyan-400/30 text-cyan-300' },
+  { key: 'ប្រវត្តិវិទ្យា', label: 'ប្រវត្តិវិទ្យា', en: 'History', icon: Target, color: 'bg-yellow-500/15 border-yellow-400/30 text-yellow-300' },
+  { key: 'ភូមិវិទ្យា', label: 'ភូមិវិទ្យា', en: 'Geography', icon: Globe, color: 'bg-teal-500/15 border-teal-400/30 text-teal-300' },
+  { key: 'សីលធម៌-ពលរដ្ឋវិជ្ជា', label: 'សីលធម៌-ពលរដ្ឋវិជ្ជា', en: 'Civics', icon: Scale, color: 'bg-slate-500/15 border-slate-400/30 text-slate-300' },
+  { key: 'ភាសាអង់គ្លេស', label: 'ភាសាអង់គ្លេស', en: 'English', icon: Languages, color: 'bg-violet-500/15 border-violet-400/30 text-violet-300' },
+];
 
 const BUTTON_CONFIGS = [
   { num: 'A', badge: 'bg-indigo-600/30 border-indigo-400/60 text-indigo-200', icon: Triangle },
@@ -309,6 +356,13 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   const [selectedStream, setSelectedStream] = useState(() => (isSpecificGameCard ? (game?.stream || 'science') : (student?.stream || 'science')));
   const currentTheme = STREAM_THEMES[selectedStream] || STREAM_THEMES.science;
   const CurrentStreamIcon = currentTheme.icon || Atom;
+
+  // Grade & Subject Selection for AI Questions
+  const [selectedGrade, setSelectedGrade] = useState(() => parseInt(student?.grade, 10) || 12);
+  const [selectedSubjectKey, setSelectedSubjectKey] = useState(null);
+  const [showGradeDropdown, setShowGradeDropdown] = useState(false);
+  const [isLoadingAI, setIsLoadingAI] = useState(false);
+  const duelSubjects = selectedStream === 'science' ? DUEL_SCIENCE_SUBJECTS : selectedStream === 'social' ? DUEL_SOCIAL_SUBJECTS : DUEL_GENERAL_SUBJECTS;
 
   // Synchronized Questions Pool (24-question deep pool)
   const [questions, setQuestions] = useState(() => {
@@ -876,8 +930,14 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     if (soundEnabled) playSound.click();
     resetGameSessionQuestions();
     setSelectedStream(newStream);
+    setSelectedSubjectKey(null); // Reset subject when stream changes
 
-    const freshQuestions = expandQuestionsTo8Options(getRandomizedGameQuestions(null, 24, student?.grade || '12', newStream));
+    // If grade < 11 and switching to science/social, auto-reset to random
+    if (selectedGrade < 11 && (newStream === 'science' || newStream === 'social')) {
+      // Still allow it but questions will be general
+    }
+
+    const freshQuestions = expandQuestionsTo8Options(getRandomizedGameQuestions(null, 24, String(selectedGrade), newStream));
     setQuestions(freshQuestions);
 
     // Broadcast immediately across tabs
@@ -903,7 +963,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
       // Asynchronously enrich with authentic stream-specific questions from 70k bank
       fetchLiveExamQuestions({
         stream: newStream,
-        grade: student?.grade || '12',
+        grade: String(selectedGrade),
         limit: 30,
         random: true
       }).then((livePool) => {
@@ -929,6 +989,84 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
           } catch (e) {}
         }
       });
+    } catch (e) {}
+  };
+
+  // Host selects grade level
+  const handleSelectGrade = (grade) => {
+    if (!isHost) return;
+    if (soundEnabled) playSound.click();
+    setSelectedGrade(grade);
+    setShowGradeDropdown(false);
+    setSelectedSubjectKey(null);
+
+    // If grade < 11, hide science/social stream options (use random)
+    if (grade < 11 && selectedStream !== 'random') {
+      // Keep current stream but regenerate with new grade
+    }
+
+    // Regenerate questions for the new grade
+    resetGameSessionQuestions();
+    const freshQ = expandQuestionsTo8Options(getRandomizedGameQuestions(null, 24, String(grade), selectedStream));
+    setQuestions(freshQ);
+
+    try {
+      api.updateArenaRoom(roomCode, { questions: freshQ });
+    } catch (e) {}
+  };
+
+  // Host selects a specific subject — triggers AI question generation
+  const handleSelectSubject = async (subjectKey) => {
+    if (!isHost) return;
+    if (soundEnabled) playSound.click();
+    setSelectedSubjectKey(subjectKey);
+    setIsLoadingAI(true);
+
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || '/api';
+      const res = await fetch(`${API_URL}/ai/quiz-generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          grade: String(selectedGrade),
+          subject: subjectKey,
+          stream: selectedGrade >= 11 ? selectedStream : null,
+          count: 8
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.questions) && data.questions.length > 0) {
+          const expanded = expandQuestionsTo8Options(data.questions);
+          setQuestions(expanded);
+          setIsLoadingAI(false);
+
+          try {
+            await api.updateArenaRoom(roomCode, { questions: expanded });
+            if (typeof BroadcastChannel !== 'undefined') {
+              const roomBc = new BroadcastChannel('khmer_elearn_arena_room_sync');
+              roomBc.postMessage({ type: 'STREAM_CHANGED', roomCode, stream: selectedStream, questions: expanded });
+              roomBc.close();
+            }
+          } catch (e) {}
+          return;
+        }
+      }
+    } catch (err) {
+      console.warn('[Duel AI Quiz]:', err.message);
+    }
+
+    // Fallback to local pool
+    const fallback = expandQuestionsTo8Options(getRandomizedGameQuestions(
+      { subjectKey, subject: subjectKey, stream: selectedStream },
+      24, String(selectedGrade), selectedStream
+    ));
+    setQuestions(fallback);
+    setIsLoadingAI(false);
+
+    try {
+      await api.updateArenaRoom(roomCode, { questions: fallback });
     } catch (e) {}
   };
 
@@ -1597,6 +1735,101 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             {/* TAB: HOST / 1v1 MATCHUP CARDS */}
             {tab === 'host' && (
               <div className="space-y-6 my-auto">
+
+                {/* ═══ GRADE & SUBJECT SELECTION ═══ */}
+                <div className="bg-[#0a1324]/95 p-4 sm:p-5 rounded-2xl border border-purple-500/30 shadow-xl space-y-3.5 relative overflow-hidden">
+                  <div className="absolute -left-16 -top-16 w-48 h-48 rounded-full blur-[70px] pointer-events-none opacity-30 bg-purple-500/20" />
+
+                  {/* Grade Selector Row */}
+                  <div className="flex items-center justify-between gap-3 relative z-10">
+                    <div className="flex items-center gap-2">
+                      <GraduationCap className="w-4 h-4 text-purple-400" />
+                      <span className="text-xs font-bold text-slate-200">ថ្នាក់ទី (Grade Level):</span>
+                    </div>
+
+                    {/* Grade Dropdown */}
+                    <div className="relative">
+                      <button
+                        type="button"
+                        disabled={!isHost}
+                        onClick={() => setShowGradeDropdown(!showGradeDropdown)}
+                        className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl border text-xs font-black transition-all ${
+                          isHost ? 'cursor-pointer hover:bg-purple-500/10 border-purple-400/40 text-purple-300' : 'cursor-default border-slate-700 text-slate-400'
+                        }`}
+                      >
+                        <span className={`w-6 h-6 rounded-lg bg-gradient-to-br ${GRADE_COLORS_DUEL[selectedGrade - 1]} flex items-center justify-center text-white text-[10px] font-black`}>
+                          {KHMER_NUMS[selectedGrade - 1]}
+                        </span>
+                        <span>Grade {selectedGrade}</span>
+                        {isHost && <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
+                      </button>
+
+                      {/* Dropdown Grid */}
+                      {showGradeDropdown && isHost && (
+                        <div className="absolute right-0 top-full mt-1.5 z-50 bg-[#0d1829] border border-purple-500/30 rounded-2xl p-3 shadow-2xl grid grid-cols-4 gap-1.5 w-[220px] animate-fade-in">
+                          {Array.from({ length: 12 }, (_, i) => i + 1).map((g) => (
+                            <button
+                              key={g}
+                              type="button"
+                              onClick={() => handleSelectGrade(g)}
+                              className={`p-2 rounded-xl text-center font-black text-xs transition-all cursor-pointer ${
+                                selectedGrade === g
+                                  ? `bg-gradient-to-br ${GRADE_COLORS_DUEL[g - 1]} text-white shadow-lg scale-105 border-2 border-white/20`
+                                  : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 border border-slate-700'
+                              }`}
+                            >
+                              <span className="block text-base">{KHMER_NUMS[g - 1]}</span>
+                              <span className="text-[8px] opacity-70">G{g}</span>
+                            </button>
+                          ))}
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* Subject Pills */}
+                  <div className="relative z-10 space-y-2">
+                    <div className="flex items-center gap-2">
+                      <Layers className="w-3.5 h-3.5 text-emerald-400" />
+                      <span className="text-[11px] font-bold text-slate-300">មុខវិជ្ជា (Subject) — AI បង្កើតសំណួរ:</span>
+                      {isLoadingAI && (
+                        <span className="text-[10px] text-amber-400 animate-pulse flex items-center gap-1">
+                          <Loader2 className="w-3 h-3 animate-spin" /> AI Loading...
+                        </span>
+                      )}
+                    </div>
+                    <div className="flex flex-wrap gap-1.5">
+                      {duelSubjects.map((sub) => {
+                        const SubIcon = sub.icon;
+                        const isActive = selectedSubjectKey === sub.key;
+                        return (
+                          <button
+                            key={sub.key}
+                            type="button"
+                            disabled={!isHost || isLoadingAI}
+                            onClick={() => handleSelectSubject(sub.key)}
+                            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-[10px] sm:text-[11px] font-bold transition-all ${
+                              isActive
+                                ? `${sub.color} shadow-lg ring-1 ring-white/10 scale-[1.02]`
+                                : 'bg-slate-800/60 border-slate-700/60 text-slate-400 hover:text-slate-200 hover:bg-slate-700/60'
+                            } ${isHost && !isLoadingAI ? 'cursor-pointer' : 'cursor-default'}`}
+                          >
+                            <SubIcon className="w-3 h-3 flex-shrink-0" />
+                            <span>{sub.label}</span>
+                            {isActive && <CheckCircle2 className="w-3 h-3 flex-shrink-0" />}
+                          </button>
+                        );
+                      })}
+                    </div>
+                  </div>
+
+                  {/* Grade restriction notice */}
+                  {selectedGrade < 11 && (selectedStream === 'science' || selectedStream === 'social') && (
+                    <div className="text-[10px] text-amber-400/70 bg-amber-500/5 border border-amber-500/10 rounded-lg px-3 py-1.5 relative z-10">
+                      ⚠️ ថ្នាក់ទី {KHMER_NUMS[selectedGrade - 1]} មិនមានផ្នែកវិទ្យាសាស្ត្រពិត/សង្គម — សំណួរជាទូទៅ
+                    </div>
+                  )}
+                </div>
                 
                 {/* Stream Selection Box (3 Stream Modes: Science, Social, Random) */}
                 <div className={`p-4 sm:p-5 rounded-2xl border transition-all duration-300 shadow-xl relative overflow-hidden space-y-3.5 ${currentTheme.boxBg} ${currentTheme.boxBorder}`}>
