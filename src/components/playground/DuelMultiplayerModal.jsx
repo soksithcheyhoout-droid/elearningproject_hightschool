@@ -993,8 +993,62 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     } catch (e) {}
   };
 
+  // Live AI Question Generator for 1v1 Arena
+  const fetchDuelAIQuestions = async (targetGrade, targetSubject, targetStream) => {
+    setIsLoadingAI(true);
+    try {
+      const API_URL = import.meta.env.VITE_API_URL || '/api';
+      const streamParam = targetGrade >= 11 ? targetStream : null;
+      const res = await fetch(`${API_URL}/ai/quiz-generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          grade: String(targetGrade),
+          subject: targetSubject || 'គណិតវិទ្យា',
+          stream: streamParam,
+          count: 8
+        })
+      });
+
+      if (res.ok) {
+        const data = await res.json();
+        if (data.success && Array.isArray(data.questions) && data.questions.length > 0) {
+          const expanded = expandQuestionsTo8Options(data.questions);
+          setQuestions(expanded);
+          setCurrentQIndex(0);
+          setIsLoadingAI(false);
+
+          try {
+            await api.updateArenaRoom(roomCode, { 
+              grade: String(targetGrade),
+              subjectKey: targetSubject,
+              stream: streamParam || 'general',
+              questions: expanded 
+            });
+            if (typeof BroadcastChannel !== 'undefined') {
+              const roomBc = new BroadcastChannel('khmer_elearn_arena_room_sync');
+              roomBc.postMessage({ 
+                type: 'STREAM_CHANGED', 
+                roomCode, 
+                stream: streamParam || 'general', 
+                questions: expanded 
+              });
+              roomBc.close();
+            }
+          } catch (e) {}
+          return expanded;
+        }
+      }
+    } catch (err) {
+      console.warn('[Duel AI Quiz]:', err.message);
+    }
+
+    setIsLoadingAI(false);
+    return null;
+  };
+
   // Host selects grade level (1 - 12)
-  const handleSelectGrade = (grade) => {
+  const handleSelectGrade = async (grade) => {
     if (!isHost) return;
     if (soundEnabled) playSound.click();
     setSelectedGrade(grade);
@@ -1008,15 +1062,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
       nextStream = 'science';
     }
     setSelectedStream(nextStream);
-
-    // Regenerate questions for the new grade
     resetGameSessionQuestions();
-    const freshQ = expandQuestionsTo8Options(getRandomizedGameQuestions(null, 24, String(grade), nextStream));
-    setQuestions(freshQ);
 
-    try {
-      api.updateArenaRoom(roomCode, { grade: String(grade), stream: nextStream, questions: freshQ });
-    } catch (e) {}
+    // Immediately generate fresh AI questions matching this grade
+    await fetchDuelAIQuestions(grade, 'គណិតវិទ្យា', nextStream);
   };
 
   // Host selects a specific subject — triggers AI question generation
@@ -1024,54 +1073,8 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     if (!isHost) return;
     if (soundEnabled) playSound.click();
     setSelectedSubjectKey(subjectKey);
-    setIsLoadingAI(true);
-
-    try {
-      const API_URL = import.meta.env.VITE_API_URL || '/api';
-      const res = await fetch(`${API_URL}/ai/quiz-generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          grade: String(selectedGrade),
-          subject: subjectKey,
-          stream: selectedGrade >= 11 ? selectedStream : null,
-          count: 8
-        })
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success && Array.isArray(data.questions) && data.questions.length > 0) {
-          const expanded = expandQuestionsTo8Options(data.questions);
-          setQuestions(expanded);
-          setIsLoadingAI(false);
-
-          try {
-            await api.updateArenaRoom(roomCode, { questions: expanded });
-            if (typeof BroadcastChannel !== 'undefined') {
-              const roomBc = new BroadcastChannel('khmer_elearn_arena_room_sync');
-              roomBc.postMessage({ type: 'STREAM_CHANGED', roomCode, stream: selectedStream, questions: expanded });
-              roomBc.close();
-            }
-          } catch (e) {}
-          return;
-        }
-      }
-    } catch (err) {
-      console.warn('[Duel AI Quiz]:', err.message);
-    }
-
-    // Fallback to local pool
-    const fallback = expandQuestionsTo8Options(getRandomizedGameQuestions(
-      { subjectKey, subject: subjectKey, stream: selectedStream },
-      24, String(selectedGrade), selectedStream
-    ));
-    setQuestions(fallback);
-    setIsLoadingAI(false);
-
-    try {
-      await api.updateArenaRoom(roomCode, { questions: fallback });
-    } catch (e) {}
+    resetGameSessionQuestions();
+    await fetchDuelAIQuestions(selectedGrade, subjectKey, selectedStream);
   };
 
   // Join Existing Room
