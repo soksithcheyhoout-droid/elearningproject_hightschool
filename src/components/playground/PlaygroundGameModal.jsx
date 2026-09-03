@@ -35,6 +35,7 @@ import {
 import { useAuth, computeLevelData } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
 import { getRandomizedGameQuestions, fetchLiveExamQuestions, resetGameSessionQuestions } from '../../utils/gamePoolManager';
+import { getInstantGradeQuestions } from '../../utils/gradeQuestionBank';
 import VictoryRewardCelebration from './VictoryRewardCelebration';
 import AcademicTextRenderer from '../common/AcademicTextRenderer';
 
@@ -158,9 +159,15 @@ export default function PlaygroundGameModal({ game, onClose }) {
   const handleSubjectSelect = async (subject) => {
     setSelectedSubject(subject);
     if (soundEnabled) playSound.correct();
-    setStep('loading');
     setAiError(null);
 
+    // 1. INSTANT: Load authentic grade-matched questions in 0 milliseconds
+    const instantQuestions = getInstantGradeQuestions(selectedGrade, subject.key, 8);
+    setQuestions(instantQuestions);
+    setSecondsLeft(Math.max(60, instantQuestions.length * 15));
+    setStep('playing');
+
+    // 2. Fast background AI generation (non-blocking)
     try {
       const API_URL = import.meta.env.VITE_API_URL || '/api';
       const res = await fetch(`${API_URL}/ai/quiz-generate`, {
@@ -170,43 +177,20 @@ export default function PlaygroundGameModal({ game, onClose }) {
           grade: String(selectedGrade),
           subject: subject.key,
           stream: selectedStream,
-          count: 7
-        })
+          count: 6
+        }),
+        signal: AbortSignal.timeout(4000)
       });
 
       if (res.ok) {
         const data = await res.json();
         if (data.success && Array.isArray(data.questions) && data.questions.length > 0) {
-          setQuestions(data.questions);
-          setSecondsLeft(Math.max(60, data.questions.length * 15));
-          setStep('playing');
-          return;
+          setQuestions((prev) => (currentQIndex === 0 ? data.questions : prev));
         }
       }
     } catch (err) {
-      console.warn('[AI Quiz Fetch]:', err.message);
+      // Instant questions are already active
     }
-
-    // Fallback to local question pool
-    try {
-      const fallbackStream = selectedStream || (selectedGrade >= 11 ? 'science' : 'all');
-      const localQuestions = getRandomizedGameQuestions(
-        { ...game, subjectKey: subject.key, subject: subject.label, stream: fallbackStream },
-        8,
-        String(selectedGrade),
-        fallbackStream
-      );
-      if (localQuestions && localQuestions.length > 0) {
-        setQuestions(localQuestions);
-        setSecondsLeft(Math.max(60, localQuestions.length * 12));
-        setStep('playing');
-        return;
-      }
-    } catch (e) {}
-
-    // If both fail, retry with AI
-    setAiError('សំណួរមិនអាចបង្កើតបានទេ។ សូមសាកល្បងម្តងទៀត។');
-    setStep('subject');
   };
 
   const handleBack = () => {

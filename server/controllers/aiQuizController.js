@@ -212,7 +212,7 @@ async function callGeminiForQuiz(prompt) {
             }],
             generationConfig
           }),
-          signal: AbortSignal.timeout(15000)
+          signal: AbortSignal.timeout(5000)
         });
 
         if (res.ok) {
@@ -342,7 +342,7 @@ export async function generateAIQuizQuestions(req, res) {
   try {
     const { grade = '12', subject = 'គណិតវិទ្យា', stream = null, count = 8 } = req.body || {};
 
-    const safeCount = Math.min(Math.max(parseInt(count, 10) || 8, 3), 10);
+    const safeCount = Math.min(Math.max(parseInt(count, 10) || 6, 3), 6);
     const prompt = buildQuizPrompt(grade, subject, stream, safeCount);
     
     // 1. Try Gemini 3.6 Flash / Preview
