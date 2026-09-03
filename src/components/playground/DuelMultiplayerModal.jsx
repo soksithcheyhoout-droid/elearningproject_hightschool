@@ -360,9 +360,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   // Grade & Subject Selection for AI Questions
   const [selectedGrade, setSelectedGrade] = useState(() => parseInt(student?.grade, 10) || 12);
   const [selectedSubjectKey, setSelectedSubjectKey] = useState(null);
-  const [showGradeDropdown, setShowGradeDropdown] = useState(false);
   const [isLoadingAI, setIsLoadingAI] = useState(false);
-  const duelSubjects = selectedStream === 'science' ? DUEL_SCIENCE_SUBJECTS : selectedStream === 'social' ? DUEL_SOCIAL_SUBJECTS : DUEL_GENERAL_SUBJECTS;
+  const duelSubjects = selectedGrade >= 11
+    ? (selectedStream === 'social' ? DUEL_SOCIAL_SUBJECTS : DUEL_SCIENCE_SUBJECTS)
+    : DUEL_GENERAL_SUBJECTS;
 
   // Synchronized Questions Pool (24-question deep pool)
   const [questions, setQuestions] = useState(() => {
@@ -992,26 +993,29 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     } catch (e) {}
   };
 
-  // Host selects grade level
+  // Host selects grade level (1 - 12)
   const handleSelectGrade = (grade) => {
     if (!isHost) return;
     if (soundEnabled) playSound.click();
     setSelectedGrade(grade);
-    setShowGradeDropdown(false);
     setSelectedSubjectKey(null);
 
-    // If grade < 11, hide science/social stream options (use random)
-    if (grade < 11 && selectedStream !== 'random') {
-      // Keep current stream but regenerate with new grade
+    // If grade < 11, stream is 'random' (no science/social split); if >= 11, default to 'science'
+    let nextStream = selectedStream;
+    if (grade < 11) {
+      nextStream = 'random';
+    } else if (selectedStream === 'random') {
+      nextStream = 'science';
     }
+    setSelectedStream(nextStream);
 
     // Regenerate questions for the new grade
     resetGameSessionQuestions();
-    const freshQ = expandQuestionsTo8Options(getRandomizedGameQuestions(null, 24, String(grade), selectedStream));
+    const freshQ = expandQuestionsTo8Options(getRandomizedGameQuestions(null, 24, String(grade), nextStream));
     setQuestions(freshQ);
 
     try {
-      api.updateArenaRoom(roomCode, { questions: freshQ });
+      api.updateArenaRoom(roomCode, { grade: String(grade), stream: nextStream, questions: freshQ });
     } catch (e) {}
   };
 
@@ -1736,68 +1740,220 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             {tab === 'host' && (
               <div className="space-y-6 my-auto">
 
-                {/* ═══ GRADE & SUBJECT SELECTION ═══ */}
-                <div className="bg-[#0a1324]/95 p-4 sm:p-5 rounded-2xl border border-purple-500/30 shadow-xl space-y-3.5 relative overflow-hidden">
-                  <div className="absolute -left-16 -top-16 w-48 h-48 rounded-full blur-[70px] pointer-events-none opacity-30 bg-purple-500/20" />
+                {/* ═══ UNIFIED ARENA MATCH SETTINGS (Grade, Track & Subject) ═══ */}
+                <div className={`p-4 sm:p-5 rounded-3xl border transition-all duration-300 shadow-2xl space-y-4 relative overflow-visible ${currentTheme.boxBg} ${currentTheme.boxBorder}`}>
+                  
+                  {/* Dynamic Ambient Glow */}
+                  <div className={`absolute -right-16 -bottom-16 w-56 h-56 rounded-full blur-[80px] pointer-events-none opacity-40 transition-colors duration-500 ${currentTheme.glowBg}`} />
 
-                  {/* Grade Selector Row */}
-                  <div className="flex items-center justify-between gap-3 relative z-10">
-                    <div className="flex items-center gap-2">
-                      <GraduationCap className="w-4 h-4 text-purple-400" />
-                      <span className="text-xs font-bold text-slate-200">ថ្នាក់ទី (Grade Level):</span>
+                  {/* Header: Title + Active Status Badges + Host Indicator */}
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 relative z-10">
+                    <div className="flex items-center gap-2 flex-wrap">
+                      <Sparkles className="w-4 h-4 text-amber-400" />
+                      <span className="text-xs font-black text-white uppercase tracking-wider font-cinzel">
+                        ការកំណត់ការប្រកួត (Match Setup)
+                      </span>
+                      <span className="text-[11px] px-2.5 py-0.5 rounded-lg bg-indigo-500/20 text-indigo-300 border border-indigo-400/30 font-black flex items-center gap-1">
+                        <GraduationCap className="w-3 h-3 text-indigo-400" />
+                        <span>ថ្នាក់ទី {KHMER_NUMS[selectedGrade - 1]}</span>
+                      </span>
+                      {selectedGrade >= 11 ? (
+                        <span className={`text-[11px] px-2.5 py-0.5 rounded-lg font-black flex items-center gap-1 ${
+                          selectedStream === 'social'
+                            ? 'bg-amber-500/20 text-amber-300 border border-amber-400/30'
+                            : 'bg-cyan-500/20 text-cyan-300 border border-cyan-400/30'
+                        }`}>
+                          <CurrentStreamIcon className="w-3 h-3" />
+                          <span>{selectedStream === 'social' ? 'វិទ្យាសាស្ត្រសង្គម' : 'វិទ្យាសាស្ត្រពិត'}</span>
+                        </span>
+                      ) : (
+                        <span className="text-[11px] px-2.5 py-0.5 rounded-lg bg-emerald-500/20 text-emerald-300 border border-emerald-400/30 font-bold">
+                          ចំណេះទូទៅ (Grade 1-10)
+                        </span>
+                      )}
                     </div>
 
-                    {/* Grade Dropdown */}
-                    <div className="relative">
-                      <button
-                        type="button"
-                        disabled={!isHost}
-                        onClick={() => setShowGradeDropdown(!showGradeDropdown)}
-                        className={`flex items-center gap-2 px-3.5 py-1.5 rounded-xl border text-xs font-black transition-all ${
-                          isHost ? 'cursor-pointer hover:bg-purple-500/10 border-purple-400/40 text-purple-300' : 'cursor-default border-slate-700 text-slate-400'
-                        }`}
-                      >
-                        <span className={`w-6 h-6 rounded-lg bg-gradient-to-br ${GRADE_COLORS_DUEL[selectedGrade - 1]} flex items-center justify-center text-white text-[10px] font-black`}>
-                          {KHMER_NUMS[selectedGrade - 1]}
-                        </span>
-                        <span>Grade {selectedGrade}</span>
-                        {isHost && <ChevronDown className="w-3.5 h-3.5 text-slate-400" />}
-                      </button>
+                    {!isHost ? (
+                      <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-500/15 border border-amber-400/40 text-amber-300 text-[11px] font-bold">
+                        <Crown className="w-3.5 h-3.5 text-amber-400 fill-amber-400 flex-shrink-0" />
+                        <span>កំណត់ដោយម្ចាស់បន្ទប់ (Host Only)</span>
+                      </div>
+                    ) : (
+                      <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-indigo-500/20 border border-indigo-400/40 text-indigo-300 text-[11px] font-bold">
+                        <Sparkles className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" />
+                        <span>ម្ចាស់បន្ទប់អាចកំណត់បាន (Host Control)</span>
+                      </div>
+                    )}
+                  </div>
 
-                      {/* Dropdown Grid */}
-                      {showGradeDropdown && isHost && (
-                        <div className="absolute right-0 top-full mt-1.5 z-50 bg-[#0d1829] border border-purple-500/30 rounded-2xl p-3 shadow-2xl grid grid-cols-4 gap-1.5 w-[220px] animate-fade-in">
-                          {Array.from({ length: 12 }, (_, i) => i + 1).map((g) => (
-                            <button
-                              key={g}
-                              type="button"
-                              onClick={() => handleSelectGrade(g)}
-                              className={`p-2 rounded-xl text-center font-black text-xs transition-all cursor-pointer ${
-                                selectedGrade === g
-                                  ? `bg-gradient-to-br ${GRADE_COLORS_DUEL[g - 1]} text-white shadow-lg scale-105 border-2 border-white/20`
-                                  : 'bg-slate-800/80 text-slate-300 hover:bg-slate-700 border border-slate-700'
-                              }`}
-                            >
-                              <span className="block text-base">{KHMER_NUMS[g - 1]}</span>
-                              <span className="text-[8px] opacity-70">G{g}</span>
-                            </button>
-                          ))}
-                        </div>
-                      )}
+                  {/* 1. GRADE SELECTOR: FULL 1-12 NON-CLIPPING RESPONSIVE GRID */}
+                  <div className="space-y-1.5 relative z-10">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="font-bold text-slate-300 flex items-center gap-1.5">
+                        <GraduationCap className="w-4 h-4 text-purple-400" />
+                        <span>ជ្រើសរើសកម្រិតថ្នាក់ (Select Grade 1 - 12):</span>
+                      </span>
+                      <span className="text-[10px] text-slate-400 hidden sm:inline">
+                        AI Gemini នឹងបង្កើតសំណួរត្រូវតាមកម្រិតថ្នាក់នេះ
+                      </span>
+                    </div>
+
+                    <div className="grid grid-cols-6 sm:grid-cols-12 gap-1.5">
+                      {Array.from({ length: 12 }, (_, i) => i + 1).map((g) => {
+                        const isSelected = selectedGrade === g;
+                        return (
+                          <button
+                            key={g}
+                            type="button"
+                            disabled={!isHost}
+                            onClick={() => handleSelectGrade(g)}
+                            className={`py-2 px-1 rounded-xl font-bold transition-all relative flex flex-col items-center justify-center ${
+                              isSelected
+                                ? 'bg-gradient-to-br from-amber-400 via-amber-500 to-orange-500 text-slate-950 font-black shadow-[0_0_16px_rgba(251,191,36,0.5)] scale-105 ring-2 ring-white/40 z-10'
+                                : 'bg-slate-800/90 hover:bg-slate-700/90 text-slate-300 border border-slate-700 hover:border-slate-500'
+                            } ${isHost ? 'cursor-pointer hover:scale-102 active:scale-95' : 'cursor-default opacity-85'}`}
+                          >
+                            <span className="text-base sm:text-lg font-black font-cinzel leading-none">{KHMER_NUMS[g - 1]}</span>
+                            <span className="text-[8.5px] opacity-75 font-sans mt-0.5">G{g}</span>
+                            {g >= 11 && (
+                              <span className={`absolute -top-1.5 -right-1 text-[6.5px] px-1 py-0.2 rounded-full font-black ${
+                                isSelected ? 'bg-slate-950 text-amber-300 shadow-xs' : 'bg-amber-400 text-slate-950'
+                              }`}>
+                                BAC II
+                              </span>
+                            )}
+                          </button>
+                        );
+                      })}
                     </div>
                   </div>
 
-                  {/* Subject Pills */}
-                  <div className="relative z-10 space-y-2">
-                    <div className="flex items-center gap-2">
-                      <Layers className="w-3.5 h-3.5 text-emerald-400" />
-                      <span className="text-[11px] font-bold text-slate-300">មុខវិជ្ជា (Subject) — AI បង្កើតសំណួរ:</span>
-                      {isLoadingAI && (
-                        <span className="text-[10px] text-amber-400 animate-pulse flex items-center gap-1">
-                          <Loader2 className="w-3 h-3 animate-spin" /> AI Loading...
+                  {/* 2. TRACK SELECTION (ONLY SHOWN FOR GRADE 11 & 12) */}
+                  {selectedGrade >= 11 ? (
+                    <div className="space-y-2 pt-2 border-t border-slate-800 relative z-10 animate-fade-in">
+                      <div className="flex items-center justify-between text-[11px]">
+                        <span className="font-bold text-slate-300 flex items-center gap-1.5">
+                          <Atom className="w-4 h-4 text-cyan-400" />
+                          <span>ផ្នែកប្រកួត (Track for Grade {selectedGrade})៖</span>
+                        </span>
+                        <span className="text-[10px] text-cyan-400 font-semibold">
+                          ជ្រើសរើសវិទ្យាសាស្ត្រពិត ឬវិទ្យាសាស្ត្រសង្គម
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+                        {/* 1. Science Stream */}
+                        <button
+                          type="button"
+                          disabled={!isHost}
+                          onClick={() => handleSelectStream('science')}
+                          className={`p-3.5 rounded-2xl border text-left transition-all duration-200 flex items-center justify-between gap-2.5 ${
+                            selectedStream === 'science'
+                              ? STREAM_THEMES.science.cardActive
+                              : STREAM_THEMES.science.cardInactive
+                          } ${!isHost ? 'cursor-default opacity-90' : 'cursor-pointer hover:scale-[1.01]'}`}
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${
+                              selectedStream === 'science'
+                                ? 'bg-cyan-500/25 border border-cyan-300/60 text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.45)]'
+                                : 'bg-slate-800/80 border border-slate-700/80 text-slate-400'
+                            }`}>
+                              <Atom className="w-5 h-5" />
+                            </div>
+                            <div className="min-w-0">
+                              <h5 className="text-xs sm:text-sm font-black text-white truncate flex items-center gap-1.5">
+                                <span>វិទ្យាសាស្ត្រពិត</span>
+                                {selectedStream === 'science' && (
+                                  <span className="text-[8.5px] px-1.5 py-0.2 rounded-md bg-cyan-400 text-slate-950 font-black">
+                                    ជ្រើស
+                                  </span>
+                                )}
+                              </h5>
+                              <p className="text-[10px] text-slate-400 truncate mt-0.5">
+                                គណិត, ខ្មែរ, រូប, គីមី, ជីវៈ, ប្រវត្តិ, អង់គ្លេស
+                              </p>
+                            </div>
+                          </div>
+                          {selectedStream === 'science' && (
+                            <CheckCircle2 className="w-5 h-5 text-cyan-300 flex-shrink-0" />
+                          )}
+                        </button>
+
+                        {/* 2. Social Stream */}
+                        <button
+                          type="button"
+                          disabled={!isHost}
+                          onClick={() => handleSelectStream('social')}
+                          className={`p-3.5 rounded-2xl border text-left transition-all duration-200 flex items-center justify-between gap-2.5 ${
+                            selectedStream === 'social'
+                              ? STREAM_THEMES.social.cardActive
+                              : STREAM_THEMES.social.cardInactive
+                          } ${!isHost ? 'cursor-default opacity-90' : 'cursor-pointer hover:scale-[1.01]'}`}
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <div className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${
+                              selectedStream === 'social'
+                                ? 'bg-amber-500/25 border border-amber-300/60 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.45)]'
+                                : 'bg-slate-800/80 border border-slate-700/80 text-slate-400'
+                            }`}>
+                              <BookOpen className="w-5 h-5" />
+                            </div>
+                            <div className="min-w-0">
+                              <h5 className="text-xs sm:text-sm font-black text-white truncate flex items-center gap-1.5">
+                                <span>ថ្នាក់វិទ្យាសាស្ត្រសង្គម</span>
+                                {selectedStream === 'social' && (
+                                  <span className="text-[8.5px] px-1.5 py-0.2 rounded-md bg-amber-400 text-slate-950 font-black">
+                                    ជ្រើស
+                                  </span>
+                                )}
+                              </h5>
+                              <p className="text-[10px] text-slate-400 truncate mt-0.5">
+                                ខ្មែរ, គណិត, ប្រវត្តិ, ភូមិ, សីលធម៌, ផែនដី, អង់គ្លេស
+                              </p>
+                            </div>
+                          </div>
+                          {selectedStream === 'social' && (
+                            <CheckCircle2 className="w-5 h-5 text-amber-300 flex-shrink-0" />
+                          )}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    /* FOR GRADE 1 TO 10: NO SCIENCE/SOCIAL CHOICE */
+                    <div className="p-3 rounded-2xl bg-gradient-to-r from-emerald-500/10 to-teal-500/10 border border-emerald-500/25 flex items-center justify-between text-xs relative z-10 animate-fade-in">
+                      <div className="flex items-center gap-2">
+                        <Sparkles className="w-4 h-4 text-emerald-400 flex-shrink-0" />
+                        <span className="text-emerald-200 font-bold">
+                          ថ្នាក់ទី {KHMER_NUMS[selectedGrade - 1]} គឺជាកម្រិតចំណេះទូទៅ (មិនមានការបែងចែកវិទ្យាសាស្ត្រពិត/សង្គមឡើយ)
+                        </span>
+                      </div>
+                      <span className="text-[10px] text-emerald-400/80 hidden sm:inline font-mono">General Level</span>
+                    </div>
+                  )}
+
+                  {/* 3. SUBJECT SELECTION (AI GEMINI QUESTION ENGINE) */}
+                  <div className="space-y-2 pt-2 border-t border-slate-800 relative z-10">
+                    <div className="flex items-center justify-between text-[11px]">
+                      <span className="font-bold text-slate-300 flex items-center gap-1.5">
+                        <Layers className="w-4 h-4 text-emerald-400" />
+                        <span>ជ្រើសរើសមុខវិជ្ជា (Subject) — AI Gemini បង្កើតសំណួរ៖</span>
+                      </span>
+                      {isLoadingAI ? (
+                        <span className="text-[10px] text-amber-400 font-bold animate-pulse flex items-center gap-1">
+                          <Loader2 className="w-3 h-3 animate-spin" /> AI កំពុងបង្កើតសំណួរថ្នាក់ទី {selectedGrade}...
+                        </span>
+                      ) : selectedSubjectKey ? (
+                        <span className="text-[10px] text-emerald-400 font-bold flex items-center gap-1">
+                          <CheckCircle2 className="w-3 h-3" /> សំណួរ AI រួចរាល់
+                        </span>
+                      ) : (
+                        <span className="text-[10px] text-slate-400 hidden sm:inline">
+                          ចុចលើមុខវិជ្ជាដើម្បីឱ្យ AI បង្កើតសំណួរ
                         </span>
                       )}
                     </div>
+
                     <div className="flex flex-wrap gap-1.5">
                       {duelSubjects.map((sub) => {
                         const SubIcon = sub.icon;
@@ -1808,189 +1964,21 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                             type="button"
                             disabled={!isHost || isLoadingAI}
                             onClick={() => handleSelectSubject(sub.key)}
-                            className={`flex items-center gap-1.5 px-2.5 py-1.5 rounded-xl border text-[10px] sm:text-[11px] font-bold transition-all ${
+                            className={`flex items-center gap-1.5 px-3 py-1.5 rounded-xl border text-[11px] font-bold transition-all ${
                               isActive
-                                ? `${sub.color} shadow-lg ring-1 ring-white/10 scale-[1.02]`
-                                : 'bg-slate-800/60 border-slate-700/60 text-slate-400 hover:text-slate-200 hover:bg-slate-700/60'
-                            } ${isHost && !isLoadingAI ? 'cursor-pointer' : 'cursor-default'}`}
+                                ? `${sub.color} shadow-lg ring-2 ring-white/30 scale-[1.03] font-black`
+                                : 'bg-slate-800/90 border-slate-700/90 text-slate-300 hover:text-white hover:bg-slate-700/90 hover:border-slate-600'
+                            } ${isHost && !isLoadingAI ? 'cursor-pointer active:scale-95' : 'cursor-default'}`}
                           >
-                            <SubIcon className="w-3 h-3 flex-shrink-0" />
+                            <SubIcon className="w-3.5 h-3.5 flex-shrink-0" />
                             <span>{sub.label}</span>
-                            {isActive && <CheckCircle2 className="w-3 h-3 flex-shrink-0" />}
+                            {isActive && <CheckCircle2 className="w-3.5 h-3.5 flex-shrink-0 text-emerald-400" />}
                           </button>
                         );
                       })}
                     </div>
                   </div>
 
-                  {/* Grade restriction notice */}
-                  {selectedGrade < 11 && (selectedStream === 'science' || selectedStream === 'social') && (
-                    <div className="text-[10px] text-amber-400/70 bg-amber-500/5 border border-amber-500/10 rounded-lg px-3 py-1.5 relative z-10">
-                      ⚠️ ថ្នាក់ទី {KHMER_NUMS[selectedGrade - 1]} មិនមានផ្នែកវិទ្យាសាស្ត្រពិត/សង្គម — សំណួរជាទូទៅ
-                    </div>
-                  )}
-                </div>
-                
-                {/* Stream Selection Box (3 Stream Modes: Science, Social, Random) */}
-                <div className={`p-4 sm:p-5 rounded-2xl border transition-all duration-300 shadow-xl relative overflow-hidden space-y-3.5 ${currentTheme.boxBg} ${currentTheme.boxBorder}`}>
-                  
-                  {/* Dynamic Ambient Background Glow */}
-                  <div className={`absolute -right-16 -bottom-16 w-56 h-56 rounded-full blur-[80px] pointer-events-none opacity-40 transition-colors duration-500 ${currentTheme.glowBg}`} />
-
-                  {/* Top Title & Host vs Challenger Indicator Note */}
-                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-2.5 relative z-10">
-                    <div className="flex items-center gap-2 flex-wrap">
-                      <CurrentStreamIcon className={`w-4 h-4 transition-colors duration-300 ${currentTheme.accentText}`} />
-                      <span className="text-xs font-bold text-slate-200">
-                        ផ្នែកប្រកួត (Stream Mode):
-                      </span>
-                      <span className={`text-xs font-black px-2.5 py-1 rounded-xl border transition-all duration-300 flex items-center gap-1.5 shadow-sm ${currentTheme.badgeClass}`}>
-                        <CurrentStreamIcon className="w-3.5 h-3.5 flex-shrink-0" />
-                        <span>{currentTheme.nameKm}</span>
-                      </span>
-                    </div>
-
-                    {/* Prominent Badge for Host vs Challenger */}
-                    {!isHost ? (
-                      <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-amber-500/15 border border-amber-400/40 text-amber-300 text-[11px] font-bold shadow-xs">
-                        <Crown className="w-3.5 h-3.5 text-amber-400 fill-amber-400 flex-shrink-0" />
-                        <span>កំណត់ដោយម្ចាស់បន្ទប់ (Admin Only)</span>
-                      </div>
-                    ) : (
-                      <div className="flex items-center gap-1.5 px-3 py-1 rounded-xl bg-indigo-500/15 border border-indigo-400/40 text-indigo-300 text-[11px] font-bold shadow-xs">
-                        <Sparkles className="w-3.5 h-3.5 text-indigo-400 flex-shrink-0" />
-                        <span>ចុចដើម្បីប្តូរផ្នែកប្រកួត (Admin Control)</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* 3 Stream Selection Cards Grid */}
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-2.5 pt-1 relative z-10">
-                    
-                    {/* 1. Science Stream */}
-                    <button
-                      type="button"
-                      disabled={!isHost}
-                      onClick={() => handleSelectStream('science')}
-                      className={`p-3 sm:p-3.5 rounded-2xl border text-left transition-all duration-200 flex items-center justify-between gap-2.5 ${
-                        selectedStream === 'science'
-                          ? STREAM_THEMES.science.cardActive
-                          : STREAM_THEMES.science.cardInactive
-                      } ${!isHost ? 'cursor-default opacity-90' : 'cursor-pointer hover:scale-[1.01]'}`}
-                      title={!isHost ? 'ម្ចាស់បន្ទប់ (Admin) ជាអ្នកកំណត់ផ្នែកប្រកួត' : 'ជ្រើសរើសវិទ្យាសាស្ត្រពិត'}
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
-                          selectedStream === 'science'
-                            ? 'bg-cyan-500/25 border border-cyan-300/60 text-cyan-300 shadow-[0_0_12px_rgba(6,182,212,0.45)]'
-                            : 'bg-slate-800/80 border border-slate-700/80 text-slate-400 group-hover:text-cyan-300 group-hover:border-cyan-500/40'
-                        }`}>
-                          <Atom className="w-4.5 h-4.5" />
-                        </div>
-                        <div className="min-w-0">
-                          <h5 className="text-xs font-black text-white truncate flex items-center gap-1.5">
-                            <span>វិទ្យាសាស្ត្រពិត</span>
-                            {selectedStream === 'science' && (
-                              <span className="text-[8.5px] px-1.5 py-0.2 rounded-md bg-cyan-400 text-slate-950 font-black tracking-wide shadow-2xs">
-                                ជ្រើស
-                              </span>
-                            )}
-                          </h5>
-                          <p className={`text-[10px] truncate transition-colors ${
-                            selectedStream === 'science' ? 'text-cyan-100/80 font-medium' : 'text-slate-400 group-hover:text-slate-300'
-                          }`}>
-                            គណិត, រូប, គីមី, ជីវៈ
-                          </p>
-                        </div>
-                      </div>
-                      {selectedStream === 'science' && (
-                        <CheckCircle2 className="w-5 h-5 text-cyan-300 fill-cyan-400/20 flex-shrink-0 drop-shadow-[0_0_8px_rgba(6,182,212,0.6)]" />
-                      )}
-                    </button>
-
-                    {/* 2. Social Stream */}
-                    <button
-                      type="button"
-                      disabled={!isHost}
-                      onClick={() => handleSelectStream('social')}
-                      className={`p-3 sm:p-3.5 rounded-2xl border text-left transition-all duration-200 flex items-center justify-between gap-2.5 ${
-                        selectedStream === 'social'
-                          ? STREAM_THEMES.social.cardActive
-                          : STREAM_THEMES.social.cardInactive
-                      } ${!isHost ? 'cursor-default opacity-90' : 'cursor-pointer hover:scale-[1.01]'}`}
-                      title={!isHost ? 'ម្ចាស់បន្ទប់ (Admin) ជាអ្នកកំណត់ផ្នែកប្រកួត' : 'ជ្រើសរើសវិទ្យាសាស្ត្រសង្គម'}
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
-                          selectedStream === 'social'
-                            ? 'bg-amber-500/25 border border-amber-300/60 text-amber-300 shadow-[0_0_12px_rgba(245,158,11,0.45)]'
-                            : 'bg-slate-800/80 border border-slate-700/80 text-slate-400 group-hover:text-amber-300 group-hover:border-amber-500/40'
-                        }`}>
-                          <BookOpen className="w-4.5 h-4.5" />
-                        </div>
-                        <div className="min-w-0">
-                          <h5 className="text-xs font-black text-white truncate flex items-center gap-1.5">
-                            <span>វិទ្យាសាស្ត្រសង្គម</span>
-                            {selectedStream === 'social' && (
-                              <span className="text-[8.5px] px-1.5 py-0.2 rounded-md bg-amber-400 text-slate-950 font-black tracking-wide shadow-2xs">
-                                ជ្រើស
-                              </span>
-                            )}
-                          </h5>
-                          <p className={`text-[10px] truncate transition-colors ${
-                            selectedStream === 'social' ? 'text-amber-100/80 font-medium' : 'text-slate-400 group-hover:text-slate-300'
-                          }`}>
-                            ភាសាខ្មែរ, ប្រវត្តិ, ភូមិ, ពលរដ្ឋ
-                          </p>
-                        </div>
-                      </div>
-                      {selectedStream === 'social' && (
-                        <CheckCircle2 className="w-5 h-5 text-amber-300 fill-amber-400/20 flex-shrink-0 drop-shadow-[0_0_8px_rgba(245,158,11,0.6)]" />
-                      )}
-                    </button>
-
-                    {/* 3. Random / Mixed Stream */}
-                    <button
-                      type="button"
-                      disabled={!isHost}
-                      onClick={() => handleSelectStream('random')}
-                      className={`p-3 sm:p-3.5 rounded-2xl border text-left transition-all duration-200 flex items-center justify-between gap-2.5 ${
-                        selectedStream === 'random'
-                          ? STREAM_THEMES.random.cardActive
-                          : STREAM_THEMES.random.cardInactive
-                      } ${!isHost ? 'cursor-default opacity-90' : 'cursor-pointer hover:scale-[1.01]'}`}
-                      title={!isHost ? 'ម្ចាស់បន្ទប់ (Admin) ជាអ្នកកំណត់ផ្នែកប្រកួត' : 'ជ្រើសរើសសំណួរចម្រុះ'}
-                    >
-                      <div className="flex items-center gap-2.5 min-w-0">
-                        <div className={`w-9 h-9 rounded-xl flex items-center justify-center flex-shrink-0 transition-all duration-200 ${
-                          selectedStream === 'random'
-                            ? 'bg-emerald-500/25 border border-emerald-300/60 text-emerald-300 shadow-[0_0_12px_rgba(16,185,129,0.45)]'
-                            : 'bg-slate-800/80 border border-slate-700/80 text-slate-400 group-hover:text-emerald-300 group-hover:border-emerald-500/40'
-                        }`}>
-                          <Sparkles className="w-4.5 h-4.5" />
-                        </div>
-                        <div className="min-w-0">
-                          <h5 className="text-xs font-black text-white truncate flex items-center gap-1.5">
-                            <span>សំណួរចម្រុះ (Random)</span>
-                            {selectedStream === 'random' && (
-                              <span className="text-[8.5px] px-1.5 py-0.2 rounded-md bg-emerald-400 text-slate-950 font-black tracking-wide shadow-2xs">
-                                ជ្រើស
-                              </span>
-                            )}
-                          </h5>
-                          <p className={`text-[10px] truncate transition-colors ${
-                            selectedStream === 'random' ? 'text-emerald-100/80 font-medium' : 'text-slate-400 group-hover:text-slate-300'
-                          }`}>
-                            ចម្រុះវិទ្យាសាស្ត្រ & សង្គម
-                          </p>
-                        </div>
-                      </div>
-                      {selectedStream === 'random' && (
-                        <CheckCircle2 className="w-5 h-5 text-emerald-300 fill-emerald-400/20 flex-shrink-0 drop-shadow-[0_0_8px_rgba(16,185,129,0.6)]" />
-                      )}
-                    </button>
-
-                  </div>
                 </div>
 
                 {/* 2-Player Modern Matchup Cards */}
