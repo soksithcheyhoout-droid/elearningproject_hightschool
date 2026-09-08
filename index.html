@@ -14,6 +14,60 @@
     
     <!-- Google Identity Services (GSI) SDK for Google Sign-In -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
+    
+    <!-- Immediate Anti-Inspect Protection (Runs before bundle loads) -->
+    <script>
+      (function() {
+        var isInput = function(el) {
+          if (!el) return false;
+          var t = el.tagName ? el.tagName.toUpperCase() : '';
+          return t === 'INPUT' || t === 'TEXTAREA' || el.isContentEditable;
+        };
+        // 1. Context Menu & Mac Ctrl+Click
+        window.addEventListener('contextmenu', function(e) {
+          if (!isInput(e.target)) { e.preventDefault(); e.stopPropagation(); return false; }
+        }, true);
+        window.addEventListener('mousedown', function(e) {
+          if ((e.button === 2 || (e.ctrlKey && e.button === 0)) && !isInput(e.target)) {
+            e.preventDefault(); e.stopPropagation(); return false;
+          }
+        }, true);
+        // 2. DevTools Shortcuts (Mac Cmd+Option+I/J/C/U and Windows F12, Ctrl+Shift+I/J/C/U)
+        window.addEventListener('keydown', function(e) {
+          var k = (e.key || '').toUpperCase();
+          var c = e.code || '';
+          var code = e.keyCode || 0;
+          // F12
+          if (k === 'F12' || c === 'F12' || code === 123) { e.preventDefault(); e.stopPropagation(); return false; }
+          // Mac: Cmd + Option + I / J / C / U / K / S / E / R
+          if (e.metaKey && e.altKey) {
+            if (/^[IJCUKSER]$/.test(k) || /^Key[IJCUKSER]$/.test(c)) {
+              e.preventDefault(); e.stopPropagation(); return false;
+            }
+          }
+          // Mac: Cmd + Shift + I / J / C / M
+          if (e.metaKey && e.shiftKey) {
+            if (/^[IJCM]$/.test(k) || /^Key[IJCM]$/.test(c)) {
+              e.preventDefault(); e.stopPropagation(); return false;
+            }
+          }
+          // Cmd + U (Mac view source)
+          if (e.metaKey && (k === 'U' || c === 'KeyU' || code === 85)) {
+            e.preventDefault(); e.stopPropagation(); return false;
+          }
+          // Windows / Linux: Ctrl + Shift + I / J / C / K / S / E / M
+          if (e.ctrlKey && e.shiftKey) {
+            if (/^[IJCKS EM]$/.test(k) || /^Key[IJCKS EM]$/.test(c) || code === 73 || code === 74 || code === 67) {
+              e.preventDefault(); e.stopPropagation(); return false;
+            }
+          }
+          // Windows: Ctrl + U
+          if (e.ctrlKey && (k === 'U' || c === 'KeyU' || code === 85)) {
+            e.preventDefault(); e.stopPropagation(); return false;
+          }
+        }, true);
+      })();
+    </script>
   </head>
   <body>
     <div id="root"></div>

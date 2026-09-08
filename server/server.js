@@ -15,6 +15,16 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
+// Security Hardening: Hide server footprint & add protective HTTP headers
+app.disable('x-powered-by');
+app.use((req, res, next) => {
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  res.setHeader('Referrer-Policy', 'strict-origin-when-cross-origin');
+  next();
+});
+
 // 1. High-Performance Gzip Compression Middleware
 app.use(compression({
   threshold: 1024, // Only compress responses above 1KB

@@ -54,6 +54,30 @@
     overflow-x: hidden;
     touch-action: manipulation;
     -webkit-text-size-adjust: 100%;
+    -webkit-touch-callout: none !important;
+    -webkit-user-select: none !important;
+    -khtml-user-select: none !important;
+    -moz-user-select: none !important;
+    -ms-user-select: none !important;
+    user-select: none !important;
+  }
+
+  /* Essential student input exceptions: keep typing, editing, and selecting smooth */
+  input, textarea, [contenteditable="true"], .selectable-text {
+    -webkit-user-select: text !important;
+    -moz-user-select: text !important;
+    -ms-user-select: text !important;
+    user-select: text !important;
+    -webkit-touch-callout: default !important;
+  }
+
+  /* Asset & Media drag protection */
+  img, video, canvas {
+    -webkit-user-drag: none !important;
+    -khtml-user-drag: none !important;
+    -moz-user-drag: none !important;
+    -o-user-drag: none !important;
+    user-drag: none !important;
   }
 
   /* Prevent iOS Safari horizontal pan & auto-zoom on input focus */

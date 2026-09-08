@@ -6,6 +6,7 @@ export default defineConfig({
   plugins: [react()],
   build: {
     target: 'esnext',
+    sourcemap: false,
     cssCodeSplit: true,
     chunkSizeWarningLimit: 600,
     rollupOptions: {
