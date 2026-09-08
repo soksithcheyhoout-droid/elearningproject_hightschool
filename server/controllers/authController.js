@@ -353,8 +353,8 @@ export const sendOtp = async (req, res) => {
     // Generate 6-digit numeric OTP
     const otpCode = Math.floor(100000 + Math.random() * 900000).toString();
     
-    // Expires in 5 minutes (300 seconds)
-    const expiresAt = new Date(Date.now() + 5 * 60 * 1000).toISOString();
+    // Expires in 10 minutes (600 seconds) — extended for email delivery + copy-paste time
+    const expiresAt = new Date(Date.now() + 10 * 60 * 1000).toISOString();
 
     // Invalidate previous OTPs for both input and actual target
     db.run('UPDATE auth_otps SET is_used = 1 WHERE (target = ? OR target = ?) AND is_used = 0', [cleanInput, actualTarget]);
@@ -390,7 +390,7 @@ export const sendOtp = async (req, res) => {
     } else {
       console.log(`\n========================================`);
       console.log(`📱 [MoTDAR SMS OTP GATEWAY] Destination Phone: ${actualTarget}`);
-      console.log(`🔑 OTP CODE: >>> ${otpCode} <<< (Valid for 5 mins)`);
+      console.log(`🔑 OTP CODE: >>> ${otpCode} <<< (Valid for 10 mins)`);
       console.log(`========================================\n`);
     }
 
@@ -405,7 +405,7 @@ export const sendOtp = async (req, res) => {
       target: actualTarget,
       resolvedTarget: actualTarget,
       originalTarget: cleanInput,
-      expiresIn: 300,
+      expiresIn: 600,
       sentViaSmtp,
       previewCode
     });
@@ -445,10 +445,13 @@ export const verifyOtp = (req, res) => {
       return res.status(400).json({ error: 'លេខកូដ OTP មិនត្រឹមត្រូវ (Invalid OTP code).' });
     }
 
-    // Check expiry
-    const now = new Date();
-    const expiresAt = new Date(record.expires_at);
-    if (now > expiresAt) {
+    // Check expiry (with 30s grace period for copy-paste delay)
+    const now = Date.now();
+    const expiresAt = new Date(record.expires_at).getTime();
+    const GRACE_PERIOD_MS = 30 * 1000; // 30 seconds extra for copy-paste delays
+    if (now > expiresAt + GRACE_PERIOD_MS) {
+      // Mark expired OTP as used so it doesn't block future lookups
+      db.run('UPDATE auth_otps SET is_used = 1 WHERE id = ?', [record.id]);
       return res.status(400).json({ error: 'លេខកូដ OTP បានផុតកំណត់ហើយ សូមស្នើសុំលេខកូដថ្មី (OTP has expired).' });
     }
 

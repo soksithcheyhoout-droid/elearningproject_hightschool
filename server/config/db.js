@@ -278,6 +278,14 @@ export const db = {
           return params.some(p => String(o.target).toLowerCase() === String(p).toLowerCase());
         });
       }
+      // Support ORDER BY id DESC — return newest OTP first
+      if (cleanSql.includes('order by id desc')) {
+        list.sort((a, b) => (b.id || 0) - (a.id || 0));
+      }
+      // Support LIMIT 1
+      if (cleanSql.includes('limit 1')) {
+        list = list.slice(0, 1);
+      }
       return list;
     }
 
@@ -316,13 +324,13 @@ export const db = {
     // 0. INSERT INTO auth_otps
     if (cleanSql.startsWith('insert into auth_otps')) {
       if (!inMemoryData.auth_otps) inMemoryData.auth_otps = [];
-      const newId = inMemoryData.auth_otps.length + 1;
+      const newId = inMemoryData.auth_otps.length > 0 ? Math.max(...inMemoryData.auth_otps.map(o => o.id || 0)) + 1 : 1;
       inMemoryData.auth_otps.push({
         id: newId,
         target: params[0],
         otp_code: params[1],
         purpose: params[2] || 'login',
-        expires_at: params[3] || new Date(Date.now() + 5 * 60 * 1000).toISOString(),
+        expires_at: params[3] || new Date(Date.now() + 10 * 60 * 1000).toISOString(),
         is_used: 0,
         created_at: new Date().toISOString()
       });
@@ -334,11 +342,20 @@ export const db = {
     if (cleanSql.startsWith('update auth_otps')) {
       if (!inMemoryData.auth_otps) inMemoryData.auth_otps = [];
       if (cleanSql.includes('where id = ?')) {
-        const id = params[0];
-        inMemoryData.auth_otps = inMemoryData.auth_otps.map(o => o.id === id ? { ...o, is_used: 1 } : o);
+        const id = Number(params[0]);
+        inMemoryData.auth_otps = inMemoryData.auth_otps.map(o => Number(o.id) === id ? { ...o, is_used: 1 } : o);
       } else {
+        // Invalidate by target — only mark unused OTPs (is_used = 0)
         const targetList = params.map(p => String(p).toLowerCase().trim());
-        inMemoryData.auth_otps = inMemoryData.auth_otps.map(o => targetList.includes(String(o.target).toLowerCase().trim()) ? { ...o, is_used: 1 } : o);
+        const filterUnused = cleanSql.includes('is_used = 0');
+        inMemoryData.auth_otps = inMemoryData.auth_otps.map(o => {
+          const isTarget = targetList.includes(String(o.target).toLowerCase().trim());
+          const isUnused = o.is_used === 0 || o.is_used === false;
+          if (isTarget && (!filterUnused || isUnused)) {
+            return { ...o, is_used: 1 };
+          }
+          return o;
+        });
       }
       saveDatabase();
       return { changes: 1 };

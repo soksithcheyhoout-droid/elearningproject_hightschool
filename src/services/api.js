@@ -80,7 +80,11 @@ export const api = {
         body: JSON.stringify({ target, type, purpose })
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Failed to send OTP');
+      if (!res.ok) {
+        const err = new Error(data.error || 'Failed to send OTP');
+        err.data = data;
+        throw err;
+      }
       return data;
     } catch (err) {
       console.warn('[API Send OTP Warning]:', err.message);
@@ -96,7 +100,11 @@ export const api = {
         body: JSON.stringify({ target, otpCode })
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'OTP verification failed');
+      if (!res.ok) {
+        const err = new Error(data.error || 'OTP verification failed');
+        err.data = data;
+        throw err;
+      }
       return data;
     } catch (err) {
       console.warn('[API Verify OTP Warning]:', err.message);
@@ -112,7 +120,11 @@ export const api = {
         body: JSON.stringify(profilePayload)
       });
       const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Profile setup failed');
+      if (!res.ok) {
+        const err = new Error(data.error || 'Profile setup failed');
+        err.data = data;
+        throw err;
+      }
       return data;
     } catch (err) {
       console.warn('[API Complete OTP Profile Warning]:', err.message);

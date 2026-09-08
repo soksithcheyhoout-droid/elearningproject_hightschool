@@ -4,12 +4,18 @@ services:
     runtime: node
     plan: free
     region: singapore
-    buildCommand: npm install && pip install -r python_ai/requirements.txt && npm run build
+    buildCommand: npm install && npm run build
     startCommand: node start_production.js
     envVars:
       - key: NODE_ENV
         value: production
       - key: PORT
         value: 10000
+      - key: NODE_VERSION
+        value: 20.18.0
+      - key: VITE_GOOGLE_CLIENT_ID
+        sync: false
+      - key: VITE_AI_API_KEY
+        sync: false
       - key: GMAIL_WEBHOOK_URL
         value: https://script.google.com/macros/s/AKfycbxu8QZ0wiuVkWBIoWhjmEoi7-I2LvgdTKWf8mE1tK2odHGKVnifh2wblxEzc7tEeU8S5w/exec
