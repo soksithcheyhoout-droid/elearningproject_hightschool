@@ -7,6 +7,36 @@
  * - Android (Chrome, Samsung Internet)
  */
 
+// Helper to reliably detect mobile and tablet devices
+export const isMobileOrTabletDevice = () => {
+  if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
+
+  const ua = (navigator.userAgent || navigator.vendor || window.opera || '').toLowerCase();
+
+  // 1. Mobile & tablet user agent keywords (iPhone, iPad, Android, etc.)
+  const isMobileUA = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|silk|fennec|tablet/i.test(ua);
+  if (isMobileUA) return true;
+
+  // 2. iPadOS Safari (reports as Macintosh with touch points)
+  const isIPadOS = /macintosh/i.test(ua) && Boolean(navigator.maxTouchPoints && navigator.maxTouchPoints > 1);
+  if (isIPadOS) return true;
+
+  // 3. Touch device checks (coarse pointer, touch screen)
+  const hasTouchCapability = Boolean(
+    (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) ||
+    'ontouchstart' in window ||
+    (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ||
+    (window.matchMedia && window.matchMedia('(hover: none)').matches)
+  );
+
+  // If touch is enabled and screen width/height is in mobile/tablet range (<= 1024)
+  if (hasTouchCapability && (window.innerWidth <= 1024 || window.innerHeight <= 1024 || (window.screen && window.screen.width <= 1024))) {
+    return true;
+  }
+
+  return false;
+};
+
 export function initSecurityProtection() {
   if (typeof window === 'undefined') return;
 
@@ -250,6 +280,11 @@ export function initSecurityProtection() {
   };
 
   const setDevToolsLocked = (isLocked) => {
+    // If mobile or tablet device, NEVER lock screen
+    if (isMobileOrTabletDevice()) {
+      isLocked = false;
+    }
+
     const overlay = getOrCreateLockOverlay();
     const rootEl = document.getElementById('root');
     if (isLocked) {
@@ -261,19 +296,43 @@ export function initSecurityProtection() {
     }
   };
 
-  // Continuous DevTools Dimension & Timing Detector
-  const checkDevTools = () => {
-    // 1. Window threshold check (detects docked DevTools on side or bottom)
-    const threshold = 160;
-    const widthDiff = window.outerWidth - window.innerWidth > threshold;
-    const heightDiff = window.outerHeight - window.innerHeight > threshold;
+  // Continuous DevTools Dimension & Timing Detector (Desktop only)
+  let consecutiveHits = 0;
 
-    if (widthDiff || heightDiff) {
-      setDevToolsLocked(true);
+  const checkDevTools = () => {
+    // 1. Mobile & tablet devices NEVER have docked DevTools panes.
+    // Their window.outerHeight vs innerHeight differences are caused by Safari/Chrome URL bars and bottom toolbars.
+    if (isMobileOrTabletDevice()) {
+      consecutiveHits = 0;
+      setDevToolsLocked(false);
       return;
     }
 
-    // 2. Timing check with debugger
+    // Do not lock during local development
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+      consecutiveHits = 0;
+      setDevToolsLocked(false);
+      return;
+    }
+
+    // 2. Desktop Window Threshold Check
+    // Exclude cases where browser is zoomed in (devicePixelRatio changed)
+    const dpr = window.devicePixelRatio || 1;
+    const isStandardZoom = Math.abs(dpr - 1) < 0.2; // ~100% zoom (0.8x - 1.2x)
+
+    let dockedDetected = false;
+    if (isStandardZoom) {
+      // Normal desktop browser chrome (tabs + address bar + borders) is ~80-120px.
+      // Docked DevTools takes at least 220px.
+      const widthDiff = window.outerWidth - window.innerWidth > 220;
+      const heightDiff = window.outerHeight - window.innerHeight > 220;
+      if (widthDiff || heightDiff) {
+        dockedDetected = true;
+      }
+    }
+
+    // 3. Timing check with debugger
+    let timingDetected = false;
     const start = performance.now();
     try {
       (function() {
@@ -282,51 +341,66 @@ export function initSecurityProtection() {
     } catch (e) {}
     const end = performance.now();
 
-    if (end - start > 100) {
-      setDevToolsLocked(true);
+    if (end - start > 150) {
+      timingDetected = true;
+    }
+
+    if (dockedDetected || timingDetected) {
+      consecutiveHits++;
+      // Require at least 2 consecutive positive detections to prevent false positives from transient CPU hiccups
+      if (consecutiveHits >= 2) {
+        setDevToolsLocked(true);
+      }
     } else {
+      consecutiveHits = 0;
       setDevToolsLocked(false);
     }
   };
 
-  // Run DevTools detection continuously every 400ms everywhere
-  setInterval(checkDevTools, 400);
+  // Run DevTools detection check every 600ms
+  setInterval(checkDevTools, 600);
 
   // -------------------------------------------------------------
-  // 7. AGGRESSIVE BACKGROUND DEBUGGER FREEZE TRAP
-  // Freezes DevTools execution if someone keeps it open
+  // 7. BACKGROUND DEBUGGER FREEZE TRAP (Desktop production only)
+  // Freezes DevTools execution if someone keeps it open on desktop
   // -------------------------------------------------------------
   const launchDebuggerTrap = () => {
+    // Never run freeze trap on mobile/tablet devices (prevents battery drain & UI stutter)
+    if (isMobileOrTabletDevice()) return;
+
+    // Do not run in local development
+    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return;
+
     try {
       const debugFn = function() {
         (function() {
           return false;
         }['constructor']('debugger')['call']());
       };
-      setInterval(debugFn, 200);
+      setInterval(debugFn, 1000);
     } catch (e) {}
   };
   launchDebuggerTrap();
 
   // -------------------------------------------------------------
-  // 8. CONSOLE DESTRUCTION & DATA WIPEOUT
+  // 8. CONSOLE SECURITY & OBFUSCATION (Production only)
   // -------------------------------------------------------------
-  try {
-    const noop = () => {};
-    console.log = noop;
-    console.warn = noop;
-    console.error = noop;
-    console.info = noop;
-    console.debug = noop;
-    console.table = noop;
-    console.trace = noop;
-    console.dir = noop;
-    console.dirxml = noop;
+  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+    try {
+      const warningStyle = 'background: #0f172a; color: #ef4444; font-size: 16px; font-weight: bold; padding: 10px 16px; border-radius: 8px; border: 1px solid #ef4444;';
+      const infoStyle = 'color: #94a3b8; font-size: 12px; margin-top: 4px;';
 
-    setInterval(() => {
-      try {
-        console.clear();
-      } catch (e) {}
-    }, 500);
-  } catch (e) {}
+      console.clear();
+      console.log('%c⚠️ ប្រព័ន្ធសុវត្ថិភាព | MoTDAR Security System', warningStyle);
+      console.log('%cThis academic platform is protected. Developer inspection tools and unauthorized scripts are restricted.', infoStyle);
+
+      // Nullify detailed object inspection logs in production
+      const noop = () => {};
+      console.dir = noop;
+      console.dirxml = noop;
+      console.table = noop;
+      console.trace = noop;
+      console.debug = noop;
+    } catch (e) {}
+  }
 }

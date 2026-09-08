@@ -96,12 +96,19 @@
           }
         }, true);
 
-        // 3. Early DevTools Freeze Trap
-        setInterval(function() {
-          try {
-            (function() { return false; }['constructor']('debugger')['call']());
-          } catch(e) {}
-        }, 250);
+        // 3. Early DevTools Freeze Trap (Desktop production only)
+        var ua = (navigator.userAgent || '').toLowerCase();
+        var isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile/i.test(ua) ||
+                       (navigator.maxTouchPoints > 1 && /macintosh/i.test(ua)) ||
+                       (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+
+        if (!isMobile && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+          setInterval(function() {
+            try {
+              (function() { return false; }['constructor']('debugger')['call']());
+            } catch(e) {}
+          }, 1000);
+        }
       })();
     </script>
   </head>
