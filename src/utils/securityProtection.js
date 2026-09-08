@@ -1,9 +1,9 @@
 /**
- * MoTDAR National E-Learning Platform - Universal Anti-Inspect & Security Hardening
- * Defends against DevTools inspection across ALL devices:
+ * MoTDAR National E-Learning Platform - Maximum Anti-Inspect & DevTools Shield
+ * Absolute blocking of inspection across ALL devices:
  * - macOS (Safari, Chrome, Firefox, Edge, Brave, Opera)
- * - Windows / Linux (Chrome, Firefox, Edge, Brave, Opera)
- * - iOS / iPadOS (Safari, Chrome iOS)
+ * - Windows & Linux (Chrome, Firefox, Edge, Brave, Opera)
+ * - iOS & iPadOS (Safari, Chrome iOS, WebKit)
  * - Android (Chrome, Samsung Internet)
  */
 
@@ -22,83 +22,102 @@ export function initSecurityProtection() {
   };
 
   // -------------------------------------------------------------
-  // 1. UNIVERSAL CONTEXT MENU & RIGHT-CLICK BLOCKING (Mac & PC & Mobile)
+  // 1. UNIVERSAL CONTEXT MENU & RIGHT-CLICK SHIELD (Mac, PC, Mobile)
   // -------------------------------------------------------------
-  const preventContextMenu = (e) => {
-    if (isInputOrEditable(e.target)) {
-      return; // Allow students to right-click in text inputs (e.g. paste text)
-    }
+  const blockContextMenu = (e) => {
+    if (isInputOrEditable(e.target)) return;
     e.preventDefault();
     e.stopPropagation();
     return false;
   };
 
-  document.addEventListener('contextmenu', preventContextMenu, { capture: true, passive: false });
-  window.addEventListener('contextmenu', preventContextMenu, { capture: true, passive: false });
+  window.addEventListener('contextmenu', blockContextMenu, { capture: true, passive: false });
+  document.addEventListener('contextmenu', blockContextMenu, { capture: true, passive: false });
 
   // -------------------------------------------------------------
-  // 2. MAC TRACKPAD CONTROL+CLICK BLOCKING
-  // On macOS, holding Control while single clicking fires a right-click
+  // 2. MAC TRACKPAD CONTROL+CLICK & AUXCLICK BLOCKING
   // -------------------------------------------------------------
-  document.addEventListener('mousedown', (e) => {
-    // Button 2 is right-click; ctrlKey + button 0 is Mac Control+Click
-    if (e.button === 2 || (e.ctrlKey && e.button === 0)) {
+  const blockMouseClicks = (e) => {
+    // button 2 = right-click, button 1 = middle-click
+    // ctrlKey + button 0 = Mac trackpad Control+Click
+    if (e.button === 2 || e.button === 1 || (e.ctrlKey && e.button === 0)) {
       if (!isInputOrEditable(e.target)) {
         e.preventDefault();
         e.stopPropagation();
         return false;
       }
     }
+  };
+
+  window.addEventListener('mousedown', blockMouseClicks, { capture: true, passive: false });
+  window.addEventListener('mouseup', blockMouseClicks, { capture: true, passive: false });
+  window.addEventListener('auxclick', blockMouseClicks, { capture: true, passive: false });
+
+  // -------------------------------------------------------------
+  // 3. SELECTION & CLIPBOARD SHIELD OUTSIDE INPUTS
+  // -------------------------------------------------------------
+  document.addEventListener('selectstart', (e) => {
+    if (!isInputOrEditable(e.target)) {
+      e.preventDefault();
+      return false;
+    }
+  }, { capture: true, passive: false });
+
+  document.addEventListener('copy', (e) => {
+    if (!isInputOrEditable(e.target)) {
+      e.preventDefault();
+      return false;
+    }
+  }, { capture: true, passive: false });
+
+  document.addEventListener('cut', (e) => {
+    if (!isInputOrEditable(e.target)) {
+      e.preventDefault();
+      return false;
+    }
   }, { capture: true, passive: false });
 
   // -------------------------------------------------------------
-  // 3. ALL DEVICE DEVELOPER SHORTCUTS BLOCKING (Mac Cmd + PC Ctrl)
+  // 4. ALL SHORTCUT KEYS BLOCKING (Mac Cmd + PC Ctrl + Function Keys)
   // -------------------------------------------------------------
   window.addEventListener('keydown', (e) => {
-    const isMac = /Mac|iPod|iPhone|iPad/.test(navigator.platform || navigator.userAgent || '');
-    const meta = e.metaKey; // Command on Mac, Windows key on PC
-    const ctrl = e.ctrlKey;
-    const alt = e.altKey;   // Option on Mac
+    const meta = e.metaKey; // Command on Mac
+    const ctrl = e.ctrlKey; // Control on Windows/Mac
+    const alt = e.altKey;   // Option on Mac / Alt on PC
     const shift = e.shiftKey;
     const key = (e.key || '').toUpperCase();
     const code = e.code || '';
     const keyCode = e.keyCode || e.which || 0;
 
-    // F12 (All platforms)
+    // F12 key (Chrome, Edge, Firefox DevTools)
     if (key === 'F12' || code === 'F12' || keyCode === 123) {
       e.preventDefault();
       e.stopPropagation();
       return false;
     }
 
-    // --- MAC SHORTCUTS (Cmd + Option or Cmd + Shift) ---
-    // 1. Cmd + Option + I (Safari / Chrome / Firefox / Edge inspect)
-    // 2. Cmd + Option + J (Chrome / Edge console)
-    // 3. Cmd + Option + C (Safari / Chrome inspect element)
-    // 4. Cmd + Option + U (Safari / Chrome view source)
-    // 5. Cmd + Option + K (Firefox console)
-    // 6. Cmd + Option + S (Firefox debugger)
-    // 7. Cmd + Option + E (Firefox network inspector)
-    // 8. Cmd + Option + R (Safari responsive mode)
+    // F1 through F11 (often bound to browser dev / source features)
+    if (/^F([1-9]|1[0-1])$/.test(key) || /^F([1-9]|1[0-1])$/.test(code)) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+
+    // --- MAC SHORTCUTS (Cmd + Option + [Key]) ---
     if (meta && alt) {
-      if (
-        key === 'I' || key === 'J' || key === 'C' || key === 'U' ||
-        key === 'K' || key === 'S' || key === 'E' || key === 'R' ||
-        code === 'KeyI' || code === 'KeyJ' || code === 'KeyC' || code === 'KeyU' ||
-        code === 'KeyK' || code === 'KeyS' || code === 'KeyE' || code === 'KeyR'
-      ) {
+      // I: Web Inspector, J: Console, C: Inspect Element, U: View Source,
+      // K: Firefox Console, S: Debugger, E: Network, R: Responsive Mode, Z: Web Inspector
+      if (/^[IJCUKSERZV]$/.test(key) || /^Key[IJCUKSERZV]$/.test(code)) {
         e.preventDefault();
         e.stopPropagation();
         return false;
       }
     }
 
-    // Cmd + Shift + C, Cmd + Shift + I, Cmd + Shift + J, Cmd + Shift + M (Chrome/Edge on Mac)
+    // --- MAC SHORTCUTS (Cmd + Shift + [Key]) ---
     if (meta && shift) {
-      if (
-        key === 'C' || key === 'I' || key === 'J' || key === 'M' ||
-        code === 'KeyC' || code === 'KeyI' || code === 'KeyJ' || code === 'KeyM'
-      ) {
+      // C: Inspect Element, I: DevTools, J: Console, M: Device Mode, P: Command Palette
+      if (/^[CIJMP]$/.test(key) || /^Key[CIJMP]$/.test(code)) {
         e.preventDefault();
         e.stopPropagation();
         return false;
@@ -113,76 +132,169 @@ export function initSecurityProtection() {
     }
 
     // Cmd + S (Save Page on Mac)
-    if (meta && !shift && (key === 'S' || code === 'KeyS' || keyCode === 83)) {
+    if (meta && (key === 'S' || code === 'KeyS' || keyCode === 83)) {
       e.preventDefault();
       e.stopPropagation();
       return false;
     }
 
-    // --- WINDOWS / LINUX SHORTCUTS (Ctrl + Shift or Ctrl) ---
-    // Ctrl + Shift + I, J, C, K, S, E, M
-    if (ctrl && shift) {
-      if (
-        key === 'I' || key === 'J' || key === 'C' || key === 'K' ||
-        key === 'S' || key === 'E' || key === 'M' ||
-        code === 'KeyI' || code === 'KeyJ' || code === 'KeyC' || code === 'KeyK' ||
-        code === 'KeyS' || code === 'KeyE' || code === 'KeyM' ||
-        keyCode === 73 || keyCode === 74 || keyCode === 67 || keyCode === 75
-      ) {
+    // Cmd + P (Print / Save PDF on Mac)
+    if (meta && (key === 'P' || code === 'KeyP' || keyCode === 80)) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+
+    // Cmd + A (Select all DOM on Mac - allow only in inputs)
+    if (meta && (key === 'A' || code === 'KeyA' || keyCode === 65)) {
+      if (!isInputOrEditable(e.target)) {
         e.preventDefault();
         e.stopPropagation();
         return false;
       }
     }
 
-    // Ctrl + U (View Source on Windows/Linux)
+    // --- WINDOWS / LINUX SHORTCUTS (Ctrl + Shift + [Key]) ---
+    if (ctrl && shift) {
+      // I: DevTools, J: Console, C: Inspect, K: Firefox Console, S: Debugger, E: Network, M: Device, P: Palette
+      if (/^[IJCKS EMP]$/.test(key) || /^Key[IJCKS EMP]$/.test(code) || keyCode === 73 || keyCode === 74 || keyCode === 67) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+    }
+
+    // Ctrl + U (View Source)
     if (ctrl && (key === 'U' || code === 'KeyU' || keyCode === 85)) {
       e.preventDefault();
       e.stopPropagation();
       return false;
     }
 
-    // Ctrl + S (Save Page on Windows/Linux)
-    if (ctrl && !shift && (key === 'S' || code === 'KeyS' || keyCode === 83)) {
+    // Ctrl + S (Save Page)
+    if (ctrl && (key === 'S' || code === 'KeyS' || keyCode === 83)) {
       e.preventDefault();
       e.stopPropagation();
       return false;
     }
+
+    // Ctrl + P (Print)
+    if (ctrl && (key === 'P' || code === 'KeyP' || keyCode === 80)) {
+      e.preventDefault();
+      e.stopPropagation();
+      return false;
+    }
+
+    // Ctrl + A (Select all - allow only in inputs)
+    if (ctrl && (key === 'A' || code === 'KeyA' || keyCode === 65)) {
+      if (!isInputOrEditable(e.target)) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+    }
   }, { capture: true, passive: false });
 
   // -------------------------------------------------------------
-  // 4. MOBILE (iOS & Android) TOUCH & HOLD / CALLOUT PROTECTION
-  // -------------------------------------------------------------
-  let touchTimer = null;
-  document.addEventListener('touchstart', (e) => {
-    if (isInputOrEditable(e.target)) return;
-    touchTimer = setTimeout(() => {
-      // Prevent long-press contextual menus on iOS Safari & Android
-    }, 450);
-  }, { passive: true });
-
-  document.addEventListener('touchend', () => {
-    if (touchTimer) clearTimeout(touchTimer);
-  }, { passive: true });
-
-  document.addEventListener('touchcancel', () => {
-    if (touchTimer) clearTimeout(touchTimer);
-  }, { passive: true });
-
-  // -------------------------------------------------------------
-  // 5. ASSET & IMAGE DRAG PROTECTION
+  // 5. ASSET & MEDIA DRAG PROTECTION
   // -------------------------------------------------------------
   document.addEventListener('dragstart', (e) => {
-    const tag = e.target?.tagName?.toUpperCase();
-    if (tag === 'IMG' || tag === 'VIDEO' || tag === 'CANVAS' || tag === 'A') {
-      e.preventDefault();
-      return false;
-    }
-  }, { passive: false });
+    e.preventDefault();
+    return false;
+  }, { capture: true, passive: false });
 
   // -------------------------------------------------------------
-  // 6. DEVTOOLS ACTIVE DETECTION & DEBUGGER TRAP
-  // When DevTools is opened, dynamic debugger triggers pause loop
+  // 6. DEVTOOLS ACTIVE DETECTION & SECURITY LOCK SCREEN
+  // -------------------------------------------------------------
+  let lockOverlay = null;
+
+  const getOrCreateLockOverlay = () => {
+    if (lockOverlay && document.body.contains(lockOverlay)) return lockOverlay;
+    lockOverlay = document.getElementById('security-devtools-lock');
+    if (!lockOverlay) {
+      lockOverlay = document.createElement('div');
+      lockOverlay.id = 'security-devtools-lock';
+      lockOverlay.style.cssText = `
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 2147483647;
+        background: #090d16;
+        color: #ffffff;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-family: 'Kantumruy Pro', system-ui, -apple-system, sans-serif;
+        padding: 24px;
+        box-sizing: border-box;
+      `;
+      lockOverlay.innerHTML = `
+        <div style="width: 80px; height: 80px; border-radius: 24px; background: rgba(239, 68, 68, 0.15); border: 2px solid #ef4444; color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 38px; margin-bottom: 24px; box-shadow: 0 0 40px rgba(239, 68, 68, 0.3);">
+          🛡️
+        </div>
+        <h1 style="font-size: 26px; font-weight: 800; color: #f87171; margin: 0 0 12px 0; letter-spacing: -0.5px;">
+          ប្រព័ន្ធការពារសុវត្ថិភាពខ្ពស់ | SECURITY LOCK ACTIVE
+        </h1>
+        <p style="font-size: 14px; color: #94a3b8; max-width: 520px; line-height: 1.7; margin: 0 0 20px 0;">
+          ការពិនិត្យកូដ (Inspect Element) ឬ Developer Tools ត្រូវបានហាមឃាត់ដាច់ខាតនៅលើប្រព័ន្ធនេះ។<br/>
+          សូមបិទ Developer Tools ឬ Web Inspector ជាបន្ទាន់ដើម្បីបន្តការប្រើប្រាស់។
+        </p>
+        <div style="padding: 10px 20px; background: rgba(15, 23, 42, 0.8); border-radius: 12px; border: 1px solid #334155; font-size: 13px; color: #fbbf24; font-weight: 600;">
+          ⚠️ Developer Tools Detected • Inspection is Prohibited
+        </div>
+      `;
+      document.body.appendChild(lockOverlay);
+    }
+    return lockOverlay;
+  };
+
+  const setDevToolsLocked = (isLocked) => {
+    const overlay = getOrCreateLockOverlay();
+    const rootEl = document.getElementById('root');
+    if (isLocked) {
+      overlay.style.display = 'flex';
+      if (rootEl) rootEl.style.filter = 'blur(20px)';
+    } else {
+      overlay.style.display = 'none';
+      if (rootEl) rootEl.style.filter = 'none';
+    }
+  };
+
+  // Continuous DevTools Dimension & Timing Detector
+  const checkDevTools = () => {
+    // 1. Window threshold check (detects docked DevTools on side or bottom)
+    const threshold = 160;
+    const widthDiff = window.outerWidth - window.innerWidth > threshold;
+    const heightDiff = window.outerHeight - window.innerHeight > threshold;
+
+    if (widthDiff || heightDiff) {
+      setDevToolsLocked(true);
+      return;
+    }
+
+    // 2. Timing check with debugger
+    const start = performance.now();
+    try {
+      (function() {
+        return false;
+      }['constructor']('debugger')['call']());
+    } catch (e) {}
+    const end = performance.now();
+
+    if (end - start > 100) {
+      setDevToolsLocked(true);
+    } else {
+      setDevToolsLocked(false);
+    }
+  };
+
+  // Run DevTools detection continuously every 400ms everywhere
+  setInterval(checkDevTools, 400);
+
+  // -------------------------------------------------------------
+  // 7. AGGRESSIVE BACKGROUND DEBUGGER FREEZE TRAP
+  // Freezes DevTools execution if someone keeps it open
   // -------------------------------------------------------------
   const launchDebuggerTrap = () => {
     try {
@@ -191,34 +303,30 @@ export function initSecurityProtection() {
           return false;
         }['constructor']('debugger')['call']());
       };
-      // Run every 600ms; if DevTools is open, debugger will freeze the inspector
-      setInterval(debugFn, 600);
+      setInterval(debugFn, 200);
     } catch (e) {}
   };
-
-  // Only run debugger trap in non-local environments or production
-  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-    launchDebuggerTrap();
-  }
+  launchDebuggerTrap();
 
   // -------------------------------------------------------------
-  // 7. CONSOLE LOCKDOWN & OBFUSCATION
-  // Hide internal API logs, token outputs, and credentials
+  // 8. CONSOLE DESTRUCTION & DATA WIPEOUT
   // -------------------------------------------------------------
-  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost') {
-    try {
-      const warningStyle = 'background: #0f172a; color: #f59e0b; font-size: 16px; font-weight: bold; padding: 10px 16px; border-radius: 8px; border: 1px solid #f59e0b;';
-      const infoStyle = 'color: #94a3b8; font-size: 12px; margin-top: 4px;';
-      
-      console.clear();
-      console.log('%c⚠️ ការពារសុវត្ថិភាព | MoTDAR Security System', warningStyle);
-      console.log('%cThis academic platform is protected. Developer inspection tools and scripts are strictly restricted.', infoStyle);
+  try {
+    const noop = () => {};
+    console.log = noop;
+    console.warn = noop;
+    console.error = noop;
+    console.info = noop;
+    console.debug = noop;
+    console.table = noop;
+    console.trace = noop;
+    console.dir = noop;
+    console.dirxml = noop;
 
-      // Nullify detailed logging in production so no sensitive data leaks
-      const noop = () => {};
-      console.dir = noop;
-      console.table = noop;
-      console.trace = noop;
-    } catch (e) {}
-  }
+    setInterval(() => {
+      try {
+        console.clear();
+      } catch (e) {}
+    }, 500);
+  } catch (e) {}
 }

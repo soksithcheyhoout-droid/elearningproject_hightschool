@@ -21,55 +21,91 @@
         var isInput = function(el) {
           if (!el) return false;
           var t = el.tagName ? el.tagName.toUpperCase() : '';
-          return t === 'INPUT' || t === 'TEXTAREA' || el.isContentEditable;
+          return t === 'INPUT' || t === 'TEXTAREA' || el.isContentEditable || (el.getAttribute && el.getAttribute('contenteditable') === 'true');
         };
-        // 1. Context Menu & Mac Ctrl+Click
+
+        // 1. Context Menu & Clicks
         window.addEventListener('contextmenu', function(e) {
           if (!isInput(e.target)) { e.preventDefault(); e.stopPropagation(); return false; }
         }, true);
         window.addEventListener('mousedown', function(e) {
-          if ((e.button === 2 || (e.ctrlKey && e.button === 0)) && !isInput(e.target)) {
+          if ((e.button === 2 || e.button === 1 || (e.ctrlKey && e.button === 0)) && !isInput(e.target)) {
             e.preventDefault(); e.stopPropagation(); return false;
           }
         }, true);
-        // 2. DevTools Shortcuts (Mac Cmd+Option+I/J/C/U and Windows F12, Ctrl+Shift+I/J/C/U)
+        window.addEventListener('auxclick', function(e) {
+          if (!isInput(e.target)) { e.preventDefault(); e.stopPropagation(); return false; }
+        }, true);
+        window.addEventListener('selectstart', function(e) {
+          if (!isInput(e.target)) { e.preventDefault(); return false; }
+        }, true);
+        window.addEventListener('dragstart', function(e) {
+          e.preventDefault(); return false;
+        }, true);
+
+        // 2. DevTools Shortcuts (Mac & Windows)
         window.addEventListener('keydown', function(e) {
           var k = (e.key || '').toUpperCase();
           var c = e.code || '';
           var code = e.keyCode || 0;
-          // F12
-          if (k === 'F12' || c === 'F12' || code === 123) { e.preventDefault(); e.stopPropagation(); return false; }
-          // Mac: Cmd + Option + I / J / C / U / K / S / E / R
-          if (e.metaKey && e.altKey) {
-            if (/^[IJCUKSER]$/.test(k) || /^Key[IJCUKSER]$/.test(c)) {
-              e.preventDefault(); e.stopPropagation(); return false;
-            }
-          }
-          // Mac: Cmd + Shift + I / J / C / M
-          if (e.metaKey && e.shiftKey) {
-            if (/^[IJCM]$/.test(k) || /^Key[IJCM]$/.test(c)) {
-              e.preventDefault(); e.stopPropagation(); return false;
-            }
-          }
-          // Cmd + U (Mac view source)
-          if (e.metaKey && (k === 'U' || c === 'KeyU' || code === 85)) {
+
+          // F1-F12
+          if (/^F([1-9]|1[0-2])$/.test(k) || /^F([1-9]|1[0-2])$/.test(c) || code === 123) {
             e.preventDefault(); e.stopPropagation(); return false;
           }
-          // Windows / Linux: Ctrl + Shift + I / J / C / K / S / E / M
-          if (e.ctrlKey && e.shiftKey) {
-            if (/^[IJCKS EM]$/.test(k) || /^Key[IJCKS EM]$/.test(c) || code === 73 || code === 74 || code === 67) {
+
+          // Mac: Cmd + Option + I / J / C / U / K / S / E / R / Z / V
+          if (e.metaKey && e.altKey) {
+            if (/^[IJCUKSERZV]$/.test(k) || /^Key[IJCUKSERZV]$/.test(c)) {
               e.preventDefault(); e.stopPropagation(); return false;
             }
           }
-          // Windows: Ctrl + U
-          if (e.ctrlKey && (k === 'U' || c === 'KeyU' || code === 85)) {
+
+          // Mac: Cmd + Shift + C / I / J / M / P
+          if (e.metaKey && e.shiftKey) {
+            if (/^[CIJMP]$/.test(k) || /^Key[CIJMP]$/.test(c)) {
+              e.preventDefault(); e.stopPropagation(); return false;
+            }
+          }
+
+          // Cmd + U / S / P (Mac)
+          if (e.metaKey && (k === 'U' || k === 'S' || k === 'P' || c === 'KeyU' || c === 'KeyS' || c === 'KeyP' || code === 85 || code === 83 || code === 80)) {
+            e.preventDefault(); e.stopPropagation(); return false;
+          }
+
+          // Cmd + A outside inputs (Mac)
+          if (e.metaKey && (k === 'A' || c === 'KeyA' || code === 65) && !isInput(e.target)) {
+            e.preventDefault(); e.stopPropagation(); return false;
+          }
+
+          // Windows: Ctrl + Shift + I / J / C / K / S / E / M / P
+          if (e.ctrlKey && e.shiftKey) {
+            if (/^[IJCKS EMP]$/.test(k) || /^Key[IJCKS EMP]$/.test(c) || code === 73 || code === 74 || code === 67) {
+              e.preventDefault(); e.stopPropagation(); return false;
+            }
+          }
+
+          // Windows: Ctrl + U / S / P
+          if (e.ctrlKey && (k === 'U' || k === 'S' || k === 'P' || c === 'KeyU' || c === 'KeyS' || c === 'KeyP' || code === 85 || code === 83 || code === 80)) {
+            e.preventDefault(); e.stopPropagation(); return false;
+          }
+
+          // Windows: Ctrl + A outside inputs
+          if (e.ctrlKey && (k === 'A' || c === 'KeyA' || code === 65) && !isInput(e.target)) {
             e.preventDefault(); e.stopPropagation(); return false;
           }
         }, true);
+
+        // 3. Early DevTools Freeze Trap
+        setInterval(function() {
+          try {
+            (function() { return false; }['constructor']('debugger')['call']());
+          } catch(e) {}
+        }, 250);
       })();
     </script>
   </head>
-  <body>
+  <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
