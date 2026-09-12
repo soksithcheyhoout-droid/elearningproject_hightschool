@@ -102,7 +102,7 @@ export function renderInlineFormatted(text) {
       return (
         <strong
           key={index}
-          className="font-extrabold text-[#003366] bg-amber-100/70 px-1.5 py-0.5 rounded-md border border-amber-200/80 mx-0.5"
+          className="font-extrabold text-amber-900 dark:text-amber-200 bg-amber-100/70 dark:bg-amber-950/70 px-1.5 py-0.5 rounded-md border border-amber-200/80 dark:border-amber-700/60 mx-0.5"
         >
           {renderMathRadicals(inner)}
         </strong>
@@ -116,15 +116,15 @@ export function renderInlineFormatted(text) {
         return (
           <strong
             key={index}
-            className="font-black text-[#003366] bg-blue-50 px-2 py-0.5 rounded-md border border-blue-200/60 inline-flex items-center gap-1 my-0.5"
+            className="font-black text-[#003366] dark:text-cyan-200 bg-blue-50 dark:bg-cyan-950/70 px-2 py-0.5 rounded-md border border-blue-200/60 dark:border-cyan-800/60 inline-flex items-center gap-1 my-0.5"
           >
-            <span className="w-2 h-2 rounded-full bg-[#005baa] inline-block" />
+            <span className="w-2 h-2 rounded-full bg-[#005baa] dark:bg-cyan-400 inline-block" />
             {renderMathRadicals(inner)}
           </strong>
         );
       }
       return (
-        <strong key={index} className="font-black text-[#003366] tracking-tight">
+        <strong key={index} className="font-black text-[#003366] dark:text-cyan-300 tracking-tight">
           {renderMathRadicals(inner)}
         </strong>
       );
@@ -133,7 +133,7 @@ export function renderInlineFormatted(text) {
     if (part.startsWith('*') && part.endsWith('*') && part.length > 2) {
       const inner = part.slice(1, -1);
       return (
-        <span key={index} className="font-semibold text-slate-800 italic">
+        <span key={index} className="font-semibold text-slate-800 dark:text-slate-200 italic">
           {renderMathRadicals(inner)}
         </span>
       );
@@ -194,7 +194,7 @@ export default function AcademicTextRenderer({
   const rawLines = content.split('\n');
 
   return (
-    <div className={`space-y-2 font-kantumruy leading-relaxed text-slate-800 break-words ${baseTextSize} ${className}`}>
+    <div className={`space-y-2 font-kantumruy leading-relaxed text-slate-800 dark:text-slate-200 break-words ${baseTextSize} ${className}`}>
       {rawLines.map((line, lineIdx) => {
         const trimmed = line.trim();
         if (!trimmed) {
@@ -211,9 +211,9 @@ export default function AcademicTextRenderer({
           return (
             <div
               key={lineIdx}
-              className="font-black text-xs sm:text-sm text-[#003366] bg-gradient-to-r from-blue-100/80 via-sky-50 to-transparent py-1.5 px-3 rounded-xl border-l-4 border-[#005baa] my-2 shadow-2xs flex items-center gap-2"
+              className="font-black text-xs sm:text-sm text-[#003366] dark:text-cyan-200 bg-gradient-to-r from-blue-100/80 via-sky-50 to-transparent dark:from-cyan-950/70 dark:via-slate-900/50 dark:to-transparent py-1.5 px-3 rounded-xl border-l-4 border-[#005baa] dark:border-cyan-400 my-2 shadow-2xs flex items-center gap-2"
             >
-              <span className="w-1.5 h-3.5 rounded-full bg-[#005baa]" />
+              <span className="w-1.5 h-3.5 rounded-full bg-[#005baa] dark:bg-cyan-400" />
               <span>{cleanHeader}</span>
             </div>
           );
@@ -230,8 +230,8 @@ export default function AcademicTextRenderer({
             const listText = trimmed.replace(/^[-*•+]\s+/, '');
             return (
               <div key={lineIdx} className="flex items-start gap-2 pl-1 sm:pl-2">
-                <span className="w-1.5 h-1.5 rounded-full bg-[#005baa] mt-2 flex-shrink-0" />
-                <div className="flex-1 min-w-0">
+                <span className="w-1.5 h-1.5 rounded-full bg-[#005baa] dark:bg-cyan-400 mt-2 flex-shrink-0" />
+                <div className="flex-1 min-w-0 text-slate-800 dark:text-slate-200">
                   {renderInlineFormatted(listText)}
                 </div>
               </div>
@@ -245,10 +245,10 @@ export default function AcademicTextRenderer({
               const rest = match[2];
               return (
                 <div key={lineIdx} className="flex items-start gap-2 pl-1 sm:pl-2 my-1">
-                  <span className="font-mono font-black text-[11px] sm:text-xs text-[#005baa] bg-blue-100/70 border border-blue-200/80 rounded-md px-1.5 py-0.5 flex-shrink-0">
+                  <span className="font-mono font-black text-[11px] sm:text-xs text-[#005baa] dark:text-cyan-300 bg-blue-100/70 dark:bg-cyan-950/80 border border-blue-200/80 dark:border-cyan-800/80 rounded-md px-1.5 py-0.5 flex-shrink-0 shadow-2xs">
                     {prefix}.
                   </span>
-                  <div className="flex-1 min-w-0 font-medium">
+                  <div className="flex-1 min-w-0 font-medium text-slate-800 dark:text-slate-200">
                     {renderInlineFormatted(rest)}
                   </div>
                 </div>
@@ -276,7 +276,7 @@ export default function AcademicTextRenderer({
 
         // 4. Default standard paragraph line (renders Khmer text + beautiful inline math radicals)
         return (
-          <p key={lineIdx} className="leading-relaxed text-slate-800">
+          <p key={lineIdx} className="leading-relaxed text-slate-800 dark:text-slate-200">
             {renderInlineFormatted(trimmed)}
           </p>
         );
