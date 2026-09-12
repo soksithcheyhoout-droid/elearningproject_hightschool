@@ -672,29 +672,29 @@ export default function BacIIHubView() {
       {/* Official Solution Key Modal */}
       {activeSolutionModal && createPortal(
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2.5 sm:p-4 bg-slate-950/80 backdrop-blur-sm overflow-y-auto font-kantumruy animate-fadeIn">
-          <div className="moeys-card w-full max-w-3xl bg-white border-slate-300 p-4 sm:p-7 space-y-4 sm:space-y-5 shadow-2xl my-auto max-h-[94vh] flex flex-col rounded-2xl sm:rounded-3xl">
+          <div className="moeys-card w-full max-w-3xl bg-white dark:bg-[#0f172a] border-slate-300 dark:border-slate-800 p-4 sm:p-7 space-y-4 sm:space-y-5 shadow-2xl my-auto max-h-[94vh] flex flex-col rounded-2xl sm:rounded-3xl">
             
-            <div className="flex items-start justify-between border-b border-slate-200 pb-3 sm:pb-4 flex-shrink-0 gap-2">
+            <div className="flex items-start justify-between border-b border-slate-200 dark:border-slate-800 pb-3 sm:pb-4 flex-shrink-0 gap-2">
               <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-1.5 sm:gap-2 mb-1 flex-wrap">
                   <span className="badge-moeys-gold text-xs font-cinzel">{activeSolutionModal.year}</span>
                   <span className={`text-[10px] font-bold px-2 py-0.5 rounded-full flex items-center gap-1 ${
                     activeSolutionModal.stream === 'social' 
-                      ? 'bg-amber-100 text-amber-900 border border-amber-300' 
-                      : 'bg-blue-100 text-blue-900 border border-blue-300'
+                      ? 'bg-amber-100 dark:bg-amber-950/60 text-amber-900 dark:text-amber-200 border border-amber-300 dark:border-amber-700' 
+                      : 'bg-blue-100 dark:bg-blue-950/60 text-blue-900 dark:text-cyan-200 border border-blue-300 dark:border-cyan-700'
                   }`}>
-                    {activeSolutionModal.stream === 'social' ? <Landmark className="w-3 h-3 text-amber-600" /> : <Atom className="w-3 h-3 text-[#005baa]" />}
+                    {activeSolutionModal.stream === 'social' ? <Landmark className="w-3 h-3 text-amber-600 dark:text-amber-400" /> : <Atom className="w-3 h-3 text-[#005baa] dark:text-cyan-400" />}
                     <span>{activeSolutionModal.stream === 'social' ? 'ថ្នាក់វិទ្យាសាស្ត្រសង្គម' : 'ថ្នាក់វិទ្យាសាស្ត្រពិត'}</span>
                   </span>
                 </div>
-                <h3 className="font-bold text-xs sm:text-base text-[#003366] font-kantumruy leading-snug sm:leading-[1.6]">
+                <h3 className="font-bold text-xs sm:text-base text-[#003366] dark:text-white font-kantumruy leading-snug sm:leading-[1.6]">
                   ដំណោះស្រាយលម្អិតរបស់ក្រសួង៖ {activeSolutionModal.paperTitleKm}
                 </h3>
               </div>
               <button
                 type="button"
                 onClick={() => setActiveSolutionModal(null)}
-                className="w-8 h-8 rounded-full bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
+                className="w-8 h-8 rounded-full bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 text-slate-600 dark:text-slate-300 flex items-center justify-center transition-colors cursor-pointer flex-shrink-0"
               >
                 ✕
               </button>
@@ -702,29 +702,29 @@ export default function BacIIHubView() {
 
             <div className="space-y-4 overflow-y-auto pr-1 text-xs sm:text-sm leading-relaxed flex-1">
               {activeSolutionModal.exercises && activeSolutionModal.exercises.map((ex, idx) => (
-                <div key={idx} className="space-y-3 bg-slate-50/80 p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 shadow-2xs">
-                  <div className="font-black text-[#003366] text-xs sm:text-base border-b border-slate-200 pb-2.5 flex items-center justify-between gap-2">
+                <div key={idx} className="space-y-3 bg-slate-50/80 dark:bg-slate-900/80 p-3.5 sm:p-5 rounded-xl sm:rounded-2xl border border-slate-200 dark:border-slate-800 shadow-2xs">
+                  <div className="font-black text-[#003366] dark:text-white text-xs sm:text-base border-b border-slate-200 dark:border-slate-800 pb-2.5 flex items-center justify-between gap-2">
                     <span>{ex.titleKm}</span>
-                    <span className="text-[10px] sm:text-xs font-bold text-slate-400 font-cinzel">EXERCISE #{idx + 1}</span>
+                    <span className="text-[10px] sm:text-xs font-bold text-slate-400 dark:text-slate-500 font-cinzel">EXERCISE #{idx + 1}</span>
                   </div>
                   
                   {/* Problem Question */}
-                  <div className="bg-white p-3.5 sm:p-4 rounded-xl border border-slate-200 shadow-xs space-y-1.5">
-                    <span className="font-black text-xs sm:text-sm text-[#003366] flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-[#005baa]" />
+                  <div className="bg-white dark:bg-slate-950/80 p-3.5 sm:p-4 rounded-xl border border-slate-200 dark:border-slate-800 shadow-xs space-y-1.5">
+                    <span className="font-black text-xs sm:text-sm text-[#003366] dark:text-cyan-400 flex items-center gap-1.5">
+                      <span className="w-2 h-2 rounded-full bg-[#005baa] dark:bg-cyan-500" />
                       ប្រធានលំហាត់ / សំណួរ៖
                     </span>
                     <AcademicTextRenderer content={ex.problemText} baseTextSize="text-xs sm:text-sm" />
                   </div>
 
                   {/* Solution Key */}
-                  <div className="bg-[#f0f9ff] p-3.5 sm:p-4 rounded-xl border border-[#bae6fd] shadow-xs space-y-2">
-                    <div className="flex items-center justify-between border-b border-sky-200/80 pb-1.5">
-                      <span className="font-black text-xs sm:text-sm text-[#003366] flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-[#005baa]" />
+                  <div className="bg-[#f0f9ff] dark:bg-cyan-950/30 p-3.5 sm:p-4 rounded-xl border border-[#bae6fd] dark:border-cyan-800/50 shadow-xs space-y-2">
+                    <div className="flex items-center justify-between border-b border-sky-200/80 dark:border-cyan-800/40 pb-1.5">
+                      <span className="font-black text-xs sm:text-sm text-[#003366] dark:text-cyan-300 flex items-center gap-1.5">
+                        <Sparkles className="w-3.5 h-3.5 text-[#005baa] dark:text-cyan-400" />
                         ដំណោះស្រាយផ្លូវការ និងគន្លឹះគណនា៖
                       </span>
-                      <span className="text-[10px] font-bold text-sky-600 bg-sky-100 px-2 py-0.5 rounded-full">Official Curriculum</span>
+                      <span className="text-[10px] font-bold text-sky-600 dark:text-cyan-300 bg-sky-100 dark:bg-cyan-900/60 px-2 py-0.5 rounded-full">Official Curriculum</span>
                     </div>
                     <AcademicTextRenderer content={ex.solutionText} baseTextSize="text-xs sm:text-sm" />
                   </div>
@@ -732,7 +732,7 @@ export default function BacIIHubView() {
               ))}
             </div>
 
-            <div className="flex items-center justify-end pt-3 border-t border-slate-200 flex-shrink-0">
+            <div className="flex items-center justify-end pt-3 border-t border-slate-200 dark:border-slate-800 flex-shrink-0">
               <button
                 type="button"
                 onClick={() => setActiveSolutionModal(null)}

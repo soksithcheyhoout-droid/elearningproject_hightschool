@@ -1205,10 +1205,9 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                 </div>
               </div>
 
-              {/* Direct Deep Link Action Controls (Official abamobilebank:// & bakong://) */}
-              <div className="w-full max-w-[310px] sm:max-w-[330px] flex flex-col gap-2">
-                {paymentGateway === 'aba' ? (
-                  /* Primary Official ABA Mobile Deep Link Button */
+              {/* Direct Deep Link Action Controls (Official abamobilebank:// only) */}
+              {paymentGateway === 'aba' && (
+                <div className="w-full max-w-[310px] sm:max-w-[330px]">
                   <a
                     href={
                       abaData?.deepLink ||
@@ -1223,19 +1222,8 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                     <span>បើកក្នុង ABA Mobile (Deep Link)</span>
                     <ExternalLink className="w-3.5 h-3.5 text-cyan-200" />
                   </a>
-                ) : (
-                  /* Bakong Deep Link Button */
-                  <a
-                    href={`bakong://qr?payload=${encodeURIComponent(khqrData?.qrString || '')}`}
-                    onClick={handleOpenDeepLink}
-                    className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-red-700 to-rose-600 hover:brightness-110 text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all border border-red-400/40 shadow-md active:scale-98 cursor-pointer select-none text-center"
-                  >
-                    <Smartphone className="w-4 h-4 text-white" />
-                    <span>បើកក្នុង Bakong App (Deep Link)</span>
-                    <ExternalLink className="w-3.5 h-3.5 text-white/80" />
-                  </a>
-                )}
-              </div>
+                </div>
+              )}
 
               {/* Action Buttons: Back & Save QR */}
               <div className="flex items-center justify-between gap-2.5 w-full max-w-[310px] sm:max-w-[330px] pt-0.5">
