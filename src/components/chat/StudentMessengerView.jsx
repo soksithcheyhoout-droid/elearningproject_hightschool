@@ -1300,29 +1300,36 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                         }`}
                       >
                         {/* Real Avatar with Animated Frame Overlay */}
-                        <div className="relative w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center flex-shrink-0 select-none">
-                          <div className="w-[82%] h-[82%] rounded-full overflow-hidden bg-slate-900 shadow-xs border border-slate-300 dark:border-slate-700">
-                            <img 
-                              src={api.formatAvatarUrl(contact.avatar)} 
-                              alt={contact.full_name} 
-                              onError={(e) => { e.currentTarget.src = '/assets/anime/boys/boy_1.png'; }}
-                              className="w-full h-full object-cover" 
-                            />
-                          </div>
-                          {(contact.avatar_frame || contact.avatarFrame) && (
-                            <img
-                              src={contact.avatar_frame || contact.avatarFrame}
-                              alt="Frame"
-                              className="absolute inset-0 w-full h-full object-contain pointer-events-none scale-110 drop-shadow-md z-10"
-                              onError={(e) => {
-                                const cur = e.currentTarget.src;
-                                if (cur.endsWith('.png')) e.currentTarget.src = cur.replace('.png', '.webp');
-                                else if (cur.endsWith('.webp')) e.currentTarget.src = cur.replace('.webp', '.png');
-                              }}
-                            />
-                          )}
-                          <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-slate-900 bg-emerald-500 z-20" />
-                        </div>
+                        {(() => {
+                          const contactFrame = contact.avatar_frame || contact.avatarFrame;
+                          return (
+                            <div className="relative w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center flex-shrink-0 select-none">
+                              <div className={`w-[80%] h-[80%] rounded-full overflow-hidden bg-slate-900 flex items-center justify-center ${
+                                contactFrame ? '' : 'border border-slate-300 dark:border-slate-700 shadow-2xs'
+                              }`}>
+                                <img 
+                                  src={api.formatAvatarUrl(contact.avatar)} 
+                                  alt={contact.full_name} 
+                                  onError={(e) => { e.currentTarget.src = '/assets/anime/boys/boy_1.png'; }}
+                                  className="w-full h-full object-cover rounded-full" 
+                                />
+                              </div>
+                              {contactFrame && (
+                                <img
+                                  src={contactFrame}
+                                  alt="Frame"
+                                  className="absolute inset-0 w-full h-full object-contain pointer-events-none scale-125 drop-shadow-md z-10 select-none"
+                                  onError={(e) => {
+                                    const cur = e.currentTarget.src;
+                                    if (cur.endsWith('.png')) e.currentTarget.src = cur.replace('.png', '.webp');
+                                    else if (cur.endsWith('.webp')) e.currentTarget.src = cur.replace('.webp', '.png');
+                                  }}
+                                />
+                              )}
+                              <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-slate-900 bg-emerald-500 z-20" />
+                            </div>
+                          );
+                        })()}
 
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-1">
@@ -1365,23 +1372,35 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
           {/* Current User Profile Footer */}
           <div className="p-3.5 bg-white dark:bg-[#0f172a] border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="relative w-10 h-10 flex items-center justify-center flex-shrink-0">
-                <div className="w-[82%] h-[82%] rounded-full overflow-hidden bg-slate-900 border border-[#005baa]/30 shadow-xs">
-                  <img 
-                    src={api.formatAvatarUrl(student?.avatar)} 
-                    alt="You" 
-                    onError={(e) => { e.currentTarget.src = '/assets/anime/boys/boy_1.png'; }}
-                    className="w-full h-full object-cover" 
-                  />
-                </div>
-                {(student?.avatarFrame || student?.avatar_frame) && (
-                  <img
-                    src={student.avatarFrame || student.avatar_frame}
-                    alt="Frame"
-                    className="absolute inset-0 w-full h-full object-contain pointer-events-none scale-110 drop-shadow-md z-10"
-                  />
-                )}
-              </div>
+              {(() => {
+                const myFrame = student?.avatarFrame || student?.avatar_frame;
+                return (
+                  <div className="relative w-10 h-10 flex items-center justify-center flex-shrink-0 select-none">
+                    <div className={`w-[80%] h-[80%] rounded-full overflow-hidden bg-slate-900 flex items-center justify-center ${
+                      myFrame ? '' : 'border border-[#005baa]/30 shadow-xs'
+                    }`}>
+                      <img 
+                        src={api.formatAvatarUrl(student?.avatar)} 
+                        alt="You" 
+                        onError={(e) => { e.currentTarget.src = '/assets/anime/boys/boy_1.png'; }}
+                        className="w-full h-full object-cover rounded-full" 
+                      />
+                    </div>
+                    {myFrame && (
+                      <img
+                        src={myFrame}
+                        alt="Frame"
+                        className="absolute inset-0 w-full h-full object-contain pointer-events-none scale-125 drop-shadow-md z-10 select-none"
+                        onError={(e) => {
+                          const cur = e.currentTarget.src;
+                          if (cur.endsWith('.png')) e.currentTarget.src = cur.replace('.png', '.webp');
+                          else if (cur.endsWith('.webp')) e.currentTarget.src = cur.replace('.webp', '.png');
+                        }}
+                      />
+                    )}
+                  </div>
+                );
+              })()}
               <div className="min-w-0">
                 <span className="font-black text-xs text-[#003366] dark:text-white truncate block">{student?.name || student?.username || 'riki.dev'}</span>
                 <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold block">🟢 Lv.{levelInfo.level} • Live DB</span>
@@ -1419,23 +1438,35 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                 </>
               ) : (
                 <>
-                  <div className="relative w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center flex-shrink-0">
-                    <div className="w-[82%] h-[82%] rounded-full overflow-hidden bg-slate-900 border border-blue-200 dark:border-slate-700 shadow-xs">
-                      <img 
-                        src={api.formatAvatarUrl(activeContact.avatar)} 
-                        alt={activeContact.full_name} 
-                        onError={(e) => { e.currentTarget.src = '/assets/anime/boys/boy_1.png'; }}
-                        className="w-full h-full object-cover" 
-                      />
-                    </div>
-                    {(activeContact.avatar_frame || activeContact.avatarFrame) && (
-                      <img
-                        src={activeContact.avatar_frame || activeContact.avatarFrame}
-                        alt="Frame"
-                        className="absolute inset-0 w-full h-full object-contain pointer-events-none scale-110 drop-shadow-md z-10"
-                      />
-                    )}
-                  </div>
+                  {(() => {
+                    const headerFrame = activeContact.avatar_frame || activeContact.avatarFrame;
+                    return (
+                      <div className="relative w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center flex-shrink-0 select-none">
+                        <div className={`w-[80%] h-[80%] rounded-full overflow-hidden bg-slate-900 flex items-center justify-center ${
+                          headerFrame ? '' : 'border border-blue-200 dark:border-slate-700 shadow-xs'
+                        }`}>
+                          <img 
+                            src={api.formatAvatarUrl(activeContact.avatar)} 
+                            alt={activeContact.full_name} 
+                            onError={(e) => { e.currentTarget.src = '/assets/anime/boys/boy_1.png'; }}
+                            className="w-full h-full object-cover rounded-full" 
+                          />
+                        </div>
+                        {headerFrame && (
+                          <img
+                            src={headerFrame}
+                            alt="Frame"
+                            className="absolute inset-0 w-full h-full object-contain pointer-events-none scale-125 drop-shadow-md z-10 select-none"
+                            onError={(e) => {
+                              const cur = e.currentTarget.src;
+                              if (cur.endsWith('.png')) e.currentTarget.src = cur.replace('.png', '.webp');
+                              else if (cur.endsWith('.webp')) e.currentTarget.src = cur.replace('.webp', '.png');
+                            }}
+                          />
+                        )}
+                      </div>
+                    );
+                  })()}
                   <div className="min-w-0 flex-1">
                     <h3 className="font-extrabold text-xs sm:text-sm text-[#003366] dark:text-white truncate">{activeContact.full_name || activeContact.username}</h3>
                     <p className="text-[9.5px] sm:text-[11px] text-emerald-600 dark:text-emerald-400 flex items-center gap-1 font-bold truncate">
@@ -1490,28 +1521,35 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                   <div key={msg.id ? `msg-${msg.id}` : `msg-${index}-${Date.now()}`} className="flex items-start gap-2.5 sm:gap-3.5 group animate-fade-in relative">
                     
                     {/* Sender Avatar with Animated Frame Overlay */}
-                    <div className="relative w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center flex-shrink-0 select-none mt-0.5">
-                      <div className="w-[82%] h-[82%] rounded-full overflow-hidden bg-slate-900 shadow-xs border border-amber-400">
-                        <img 
-                          src={api.formatAvatarUrl(msg.sender_avatar || (isMe ? student?.avatar : '/assets/anime/boys/boy_1.png'))} 
-                          alt={msg.sender_name || 'Student'} 
-                          onError={(e) => { e.currentTarget.src = '/assets/anime/boys/boy_1.png'; }}
-                          className="w-full h-full object-cover" 
-                        />
-                      </div>
-                      {(msg.sender_frame || (isMe && (student?.avatarFrame || student?.avatar_frame))) && (
-                        <img
-                          src={msg.sender_frame || (isMe && (student?.avatarFrame || student?.avatar_frame))}
-                          alt="Frame"
-                          className="absolute inset-0 w-full h-full object-contain pointer-events-none scale-120 sm:scale-125 drop-shadow-md z-10"
-                          onError={(e) => {
-                            const cur = e.currentTarget.src;
-                            if (cur.endsWith('.png')) e.currentTarget.src = cur.replace('.png', '.webp');
-                            else if (cur.endsWith('.webp')) e.currentTarget.src = cur.replace('.webp', '.png');
-                          }}
-                        />
-                      )}
-                    </div>
+                    {(() => {
+                      const msgFrame = msg.sender_frame || (isMe && (student?.avatarFrame || student?.avatar_frame));
+                      return (
+                        <div className="relative w-9 h-9 sm:w-11 sm:h-11 flex items-center justify-center flex-shrink-0 select-none mt-0.5">
+                          <div className={`w-[80%] h-[80%] rounded-full overflow-hidden bg-slate-900 flex items-center justify-center ${
+                            msgFrame ? '' : 'border border-amber-400 shadow-xs'
+                          }`}>
+                            <img 
+                              src={api.formatAvatarUrl(msg.sender_avatar || (isMe ? student?.avatar : '/assets/anime/boys/boy_1.png'))} 
+                              alt={msg.sender_name || 'Student'} 
+                              onError={(e) => { e.currentTarget.src = '/assets/anime/boys/boy_1.png'; }}
+                              className="w-full h-full object-cover rounded-full" 
+                            />
+                          </div>
+                          {msgFrame && (
+                            <img
+                              src={msgFrame}
+                              alt="Frame"
+                              className="absolute inset-0 w-full h-full object-contain pointer-events-none scale-125 drop-shadow-md z-10 select-none"
+                              onError={(e) => {
+                                const cur = e.currentTarget.src;
+                                if (cur.endsWith('.png')) e.currentTarget.src = cur.replace('.png', '.webp');
+                                else if (cur.endsWith('.webp')) e.currentTarget.src = cur.replace('.webp', '.png');
+                              }}
+                            />
+                          )}
+                        </div>
+                      );
+                    })()}
 
                     <div className="flex-1 min-w-0 max-w-2xl relative">
 
@@ -1844,23 +1882,36 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
             ) : (
               /* Clean Direct Message (DM) Empty State */
               <div className="h-full min-h-[320px] flex flex-col items-center justify-center text-center p-8 space-y-4 max-w-md mx-auto my-auto animate-fade-in">
-                <div className="relative w-20 h-20 flex items-center justify-center flex-shrink-0 select-none shadow-md rounded-full bg-slate-900 border-2 border-blue-300">
-                  <div className="w-[82%] h-[82%] rounded-full overflow-hidden bg-slate-900 shadow-xs border border-slate-300">
-                    <img 
-                      src={api.formatAvatarUrl(activeContact.avatar)} 
-                      alt={activeContact.full_name} 
-                      onError={(e) => { e.currentTarget.src = '/assets/anime/boys/boy_1.png'; }}
-                      className="w-full h-full object-cover" 
-                    />
-                  </div>
-                  {(activeContact.avatar_frame || activeContact.avatarFrame) && (
-                    <img
-                      src={activeContact.avatar_frame || activeContact.avatarFrame}
-                      alt="Frame"
-                      className="absolute inset-0 w-full h-full object-contain pointer-events-none scale-120 drop-shadow-md z-10"
-                    />
-                  )}
-                </div>
+                {/* Clean Direct Message (DM) Empty State Hero Avatar */}
+                {(() => {
+                  const frameUrl = activeContact.avatar_frame || activeContact.avatarFrame;
+                  return (
+                    <div className="relative w-20 h-20 sm:w-22 sm:h-22 flex items-center justify-center flex-shrink-0 select-none">
+                      <div className={`w-[80%] h-[80%] rounded-full overflow-hidden bg-slate-900 flex items-center justify-center ${
+                        frameUrl ? '' : 'border-2 border-slate-300 dark:border-slate-700 shadow-md'
+                      }`}>
+                        <img 
+                          src={api.formatAvatarUrl(activeContact.avatar)} 
+                          alt={activeContact.full_name} 
+                          onError={(e) => { e.currentTarget.src = '/assets/anime/boys/boy_1.png'; }}
+                          className="w-full h-full object-cover rounded-full" 
+                        />
+                      </div>
+                      {frameUrl && (
+                        <img
+                          src={frameUrl}
+                          alt="Frame"
+                          className="absolute inset-0 w-full h-full object-contain pointer-events-none scale-125 drop-shadow-md z-10 select-none"
+                          onError={(e) => {
+                            const cur = e.currentTarget.src;
+                            if (cur.endsWith('.png')) e.currentTarget.src = cur.replace('.png', '.webp');
+                            else if (cur.endsWith('.webp')) e.currentTarget.src = cur.replace('.webp', '.png');
+                          }}
+                        />
+                      )}
+                    </div>
+                  );
+                })()}
 
                 <div className="space-y-1.5">
                   <h3 className="text-base font-extrabold text-[#003366] dark:text-white flex items-center justify-center gap-2">
