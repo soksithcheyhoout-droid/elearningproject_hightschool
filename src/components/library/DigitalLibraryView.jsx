@@ -15,14 +15,13 @@ import {
   Building2, 
   ShieldCheck,
   Bookmark,
-  Sun,
-  Moon,
   GraduationCap,
   Layers,
   Award
 } from 'lucide-react';
 import { libraryBooks } from '../../data/libraryBooks';
 import { useLanguage } from '../../context/LanguageContext';
+import { useTheme } from '../../context/ThemeContext';
 
 // Helper to determine authentic MoEYS cover styling & vector illustrations
 function getBookCoverDesign(cat = '', title = '') {
@@ -381,13 +380,13 @@ function OfficialVectorIllustration({ type, accentColor }) {
 
 export default function DigitalLibraryView() {
   const { t, lang } = useLanguage();
+  const { isDark } = useTheme();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedCategory, setSelectedCategory] = useState('all');
   const [selectedGrade, setSelectedGrade] = useState('all');
   const [activeReadingBook, setActiveReadingBook] = useState(null);
   const [currentPage, setCurrentPage] = useState(1);
   const [fontSize, setFontSize] = useState(15);
-  const [readingTheme, setReadingTheme] = useState('sepia'); // 'sepia' | 'light' | 'dark'
 
   // Prevent background scrolling when reader modal is open
   useEffect(() => {
@@ -747,52 +746,50 @@ export default function DigitalLibraryView() {
       {activeReadingBook && createPortal(
         <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto font-kantumruy animate-fadeIn">
           <div className={`w-full max-w-4xl max-h-[94vh] flex flex-col justify-between shadow-2xl rounded-3xl overflow-hidden my-auto border transition-colors duration-200 ${
-            readingTheme === 'dark'
-              ? 'bg-slate-900 text-slate-100 border-slate-700'
-              : readingTheme === 'sepia'
-                ? 'bg-[#fcf8f2] text-slate-900 border-amber-200'
-                : 'bg-white text-slate-900 border-slate-200'
+            isDark
+              ? 'bg-slate-900 text-slate-100 border-slate-700 shadow-[0_25px_60px_rgba(0,0,0,0.9)]'
+              : 'bg-white text-slate-900 border-slate-200'
           }`}>
             
             {/* Top Reader Toolbar */}
             <div className={`p-3.5 sm:p-4 border-b flex items-center justify-between gap-2 sm:gap-4 flex-shrink-0 ${
-              readingTheme === 'dark' ? 'bg-slate-950 border-slate-800' : 'bg-blue-50/80 border-slate-200'
+              isDark ? 'bg-slate-950/95 border-slate-800' : 'bg-blue-50/80 border-slate-200'
             }`}>
               <div className="flex items-center gap-2.5 min-w-0">
-                <BookOpen className="w-4 h-4 sm:w-5 sm:h-5 text-[#005baa] flex-shrink-0" />
+                <BookOpen className={`w-4 h-4 sm:w-5 sm:h-5 flex-shrink-0 ${isDark ? 'text-sky-400' : 'text-[#005baa]'}`} />
                 <div className="min-w-0">
-                  <h3 className="font-bold text-xs sm:text-sm text-[#003366] truncate">
+                  <h3 className={`font-bold text-xs sm:text-sm truncate ${isDark ? 'text-white' : 'text-[#003366]'}`}>
                     {lang === 'km' ? activeReadingBook.titleKm : activeReadingBook.titleEn}
                   </h3>
-                  <p className="text-[10px] text-slate-500 truncate">
+                  <p className={`text-[10px] truncate ${isDark ? 'text-slate-400' : 'text-slate-500'}`}>
                     {activeReadingBook.author} • ទំព័រទី {currentPage} នៃ {activeReadingBook.pages}
                   </p>
                 </div>
               </div>
 
-              {/* Reader Controls */}
+              {/* Reader Controls (Font Zoom & Close) */}
               <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-                {/* Theme Selector */}
-                <button
-                  type="button"
-                  onClick={() => setReadingTheme(readingTheme === 'sepia' ? 'light' : readingTheme === 'light' ? 'dark' : 'sepia')}
-                  className="p-1.5 rounded-lg border border-slate-300 bg-white text-slate-700 hover:text-[#005baa] cursor-pointer text-xs flex items-center gap-1 shadow-2xs"
-                  title="ប្តូរផ្ទាំងអាន (Theme)"
-                >
-                  {readingTheme === 'dark' ? <Moon className="w-3.5 h-3.5 text-blue-400" /> : <Sun className="w-3.5 h-3.5 text-amber-500" />}
-                </button>
-
                 {/* Font Size Zoom */}
                 <button 
+                  type="button"
                   onClick={() => setFontSize(prev => Math.max(12, prev - 1))}
-                  className="p-1.5 rounded-lg border border-slate-300 bg-white text-slate-700 hover:text-[#005baa] cursor-pointer shadow-2xs"
+                  className={`p-1.5 rounded-lg border cursor-pointer shadow-2xs transition-colors ${
+                    isDark 
+                      ? 'border-slate-700 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700' 
+                      : 'border-slate-300 bg-white text-slate-700 hover:text-[#005baa]'
+                  }`}
                   title="បង្រួមអក្សរ"
                 >
                   <ZoomOut className="w-3.5 h-3.5" />
                 </button>
                 <button 
+                  type="button"
                   onClick={() => setFontSize(prev => Math.min(24, prev + 1))}
-                  className="p-1.5 rounded-lg border border-slate-300 bg-white text-slate-700 hover:text-[#005baa] cursor-pointer shadow-2xs"
+                  className={`p-1.5 rounded-lg border cursor-pointer shadow-2xs transition-colors ${
+                    isDark 
+                      ? 'border-slate-700 bg-slate-800 text-slate-300 hover:text-white hover:bg-slate-700' 
+                      : 'border-slate-300 bg-white text-slate-700 hover:text-[#005baa]'
+                  }`}
                   title="ពង្រីកអក្សរ"
                 >
                   <ZoomIn className="w-3.5 h-3.5" />
@@ -800,8 +797,13 @@ export default function DigitalLibraryView() {
 
                 {/* Close Modal */}
                 <button 
+                  type="button"
                   onClick={() => setActiveReadingBook(null)}
-                  className="p-1.5 rounded-lg border border-slate-300 bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-600 cursor-pointer shadow-2xs ml-1"
+                  className={`p-1.5 rounded-lg border cursor-pointer shadow-2xs ml-1 transition-colors ${
+                    isDark 
+                      ? 'border-slate-700 bg-slate-800 hover:bg-rose-950/60 text-slate-300 hover:text-rose-400 hover:border-rose-500/40' 
+                      : 'border-slate-300 bg-white hover:bg-rose-50 text-slate-700 hover:text-rose-600'
+                  }`}
                   title="បិទផ្ទាំងអាន"
                 >
                   <X className="w-4 h-4" />
@@ -811,37 +813,58 @@ export default function DigitalLibraryView() {
 
             {/* Reading Content Area (Unique per page) */}
             <div 
-              className="p-5 sm:p-8 md:p-10 overflow-y-auto flex-1 space-y-6 leading-relaxed" 
+              className={`p-5 sm:p-8 md:p-10 overflow-y-auto flex-1 space-y-6 leading-relaxed ${
+                isDark ? 'bg-[#090d16] text-slate-200' : 'bg-white text-slate-800'
+              }`} 
               style={{ fontSize: `${fontSize}px` }}
             >
               <div className="max-w-2xl mx-auto space-y-5">
                 
                 {/* Page Title & Chapter Badge */}
-                <div className="text-center pb-4 border-b border-slate-200/60">
-                  <span className="badge-moeys-gold text-[10.5px] font-bold">
+                <div className={`text-center pb-4 border-b ${isDark ? 'border-slate-800' : 'border-slate-200/60'}`}>
+                  <span className={`inline-block px-3 py-1 rounded-full text-[10.5px] font-bold ${
+                    isDark 
+                      ? 'bg-amber-500/15 border border-amber-400/30 text-amber-300' 
+                      : 'badge-moeys-gold'
+                  }`}>
                     ទំព័រទី {currentPage} នៃ {activeReadingBook.pages} (ជំពូកទី {currentPageData?.chapterIdx})
                   </span>
-                  <h2 className="text-base sm:text-xl font-black text-[#003366] mt-2 font-kantumruy leading-snug">
+                  <h2 className={`text-base sm:text-xl font-black mt-2 font-kantumruy leading-snug ${
+                    isDark ? 'text-white' : 'text-[#003366]'
+                  }`}>
                     {currentPageData?.pageTitle}
                   </h2>
                 </div>
 
                 {/* Detailed Dynamic Content */}
-                <div className="space-y-4 leading-relaxed font-medium">
+                <div className={`space-y-4 leading-relaxed font-medium ${isDark ? 'text-slate-200' : 'text-slate-800'}`}>
                   <div className="whitespace-pre-line text-justify">
                     {currentPageData?.bodyText}
                   </div>
 
                   {/* Key Formulas Section if available */}
                   {currentPageData?.formulas && currentPageData.formulas.length > 0 && (
-                    <div className="p-4 rounded-2xl border bg-blue-50/70 border-blue-200 space-y-2 shadow-2xs">
-                      <h4 className="font-bold text-[#003366] text-xs flex items-center gap-1.5">
-                        <Sparkles className="w-3.5 h-3.5 text-[#005baa]" />
+                    <div className={`p-4 rounded-2xl border space-y-2 shadow-2xs ${
+                      isDark 
+                        ? 'bg-blue-950/40 border-blue-500/30 text-blue-200' 
+                        : 'bg-blue-50/70 border-blue-200 text-blue-950'
+                    }`}>
+                      <h4 className={`font-bold text-xs flex items-center gap-1.5 ${
+                        isDark ? 'text-sky-300' : 'text-[#003366]'
+                      }`}>
+                        <Sparkles className="w-3.5 h-3.5 text-[#005baa] dark:text-sky-400" />
                         <span>រូបមន្ត និងច្បាប់គន្លឹះត្រូវចាំ (Key Formulas & Laws):</span>
                       </h4>
                       <div className="space-y-1.5">
                         {currentPageData.formulas.map((f, fIdx) => (
-                          <div key={fIdx} className="bg-white p-2 rounded-xl border border-blue-200 text-[#003366] font-mono text-xs font-bold shadow-2xs">
+                          <div 
+                            key={fIdx} 
+                            className={`p-2 rounded-xl border font-mono text-xs font-bold shadow-2xs ${
+                              isDark 
+                                ? 'bg-slate-950/80 border-blue-400/30 text-sky-200' 
+                                : 'bg-white border-blue-200 text-[#003366]'
+                            }`}
+                          >
                             <code>{f}</code>
                           </div>
                         ))}
@@ -851,14 +874,22 @@ export default function DigitalLibraryView() {
 
                   {/* Key Points Bullet List */}
                   {currentPageData?.keyPoints && currentPageData.keyPoints.length > 0 && (
-                    <div className="p-4 rounded-2xl border bg-amber-50/70 border-amber-200 space-y-2 shadow-2xs text-amber-950">
-                      <h4 className="font-bold text-[#003366] text-xs flex items-center gap-1.5">
-                        <Bookmark className="w-3.5 h-3.5 text-amber-600" />
+                    <div className={`p-4 rounded-2xl border space-y-2 shadow-2xs ${
+                      isDark 
+                        ? 'bg-amber-950/30 border-amber-500/30 text-amber-200' 
+                        : 'bg-amber-50/70 border-amber-200 text-amber-950'
+                    }`}>
+                      <h4 className={`font-bold text-xs flex items-center gap-1.5 ${
+                        isDark ? 'text-amber-300' : 'text-[#003366]'
+                      }`}>
+                        <Bookmark className={`w-3.5 h-3.5 ${isDark ? 'text-amber-400' : 'text-amber-600'}`} />
                         <span>ចំណុចគន្លឹះសំខាន់ៗក្នុងទំព័រនេះ (Key Takeaways):</span>
                       </h4>
                       <ul className="list-disc list-inside space-y-1 text-xs">
                         {currentPageData.keyPoints.map((pt, pIdx) => (
-                          <li key={pIdx}>{pt}</li>
+                          <li key={pIdx} className={isDark ? 'text-amber-100/90' : 'text-amber-950'}>
+                            {pt}
+                          </li>
                         ))}
                       </ul>
                     </div>
@@ -870,13 +901,17 @@ export default function DigitalLibraryView() {
 
             {/* Bottom Page Navigation Controls */}
             <div className={`p-3.5 sm:p-4 border-t flex items-center justify-between gap-2 text-xs flex-shrink-0 ${
-              readingTheme === 'dark' ? 'bg-slate-950 border-slate-800' : 'bg-slate-50 border-slate-200'
+              isDark ? 'bg-slate-950/95 border-slate-800 text-slate-300' : 'bg-slate-50 border-slate-200 text-slate-700'
             }`}>
               <button
                 type="button"
                 onClick={() => setCurrentPage(prev => Math.max(1, prev - 1))}
                 disabled={currentPage === 1}
-                className="btn-moeys-secondary py-1.5 px-3 disabled:opacity-40 cursor-pointer flex items-center gap-1 font-bold text-xs"
+                className={`py-1.5 px-3 rounded-xl disabled:opacity-40 cursor-pointer flex items-center gap-1 font-bold text-xs transition-all ${
+                  isDark 
+                    ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700' 
+                    : 'btn-moeys-secondary'
+                }`}
               >
                 <ChevronLeft className="w-4 h-4" />
                 <span>ទំព័រមុន</span>
@@ -884,7 +919,7 @@ export default function DigitalLibraryView() {
 
               {/* Direct Page Jump */}
               <div className="flex items-center gap-2">
-                <span className="text-slate-600 font-bold hidden sm:inline text-[11px]">ទំព័រ</span>
+                <span className={`font-bold hidden sm:inline text-[11px] ${isDark ? 'text-slate-400' : 'text-slate-600'}`}>ទំព័រ</span>
                 <input
                   type="number"
                   min={1}
@@ -896,9 +931,13 @@ export default function DigitalLibraryView() {
                       setCurrentPage(Math.min(Math.max(1, val), activeReadingBook.pages));
                     }
                   }}
-                  className="w-12 sm:w-14 text-center py-1 px-1 rounded-lg border border-slate-300 bg-white font-cinzel font-bold text-xs focus:outline-none focus:border-[#005baa]"
+                  className={`w-12 sm:w-14 text-center py-1 px-1 rounded-lg border font-cinzel font-bold text-xs focus:outline-none ${
+                    isDark 
+                      ? 'bg-slate-800 border-slate-700 text-white focus:border-sky-400' 
+                      : 'bg-white border-slate-300 text-slate-900 focus:border-[#005baa]'
+                  }`}
                 />
-                <span className="font-cinzel text-slate-700 font-bold text-xs">
+                <span className={`font-cinzel font-bold text-xs ${isDark ? 'text-slate-400' : 'text-slate-700'}`}>
                   / {activeReadingBook.pages}
                 </span>
               </div>
@@ -907,7 +946,11 @@ export default function DigitalLibraryView() {
                 type="button"
                 onClick={() => setCurrentPage(prev => Math.min(activeReadingBook.pages, prev + 1))}
                 disabled={currentPage === activeReadingBook.pages}
-                className="btn-moeys-secondary py-1.5 px-3 disabled:opacity-40 cursor-pointer flex items-center gap-1 font-bold text-xs"
+                className={`py-1.5 px-3 rounded-xl disabled:opacity-40 cursor-pointer flex items-center gap-1 font-bold text-xs transition-all ${
+                  isDark 
+                    ? 'bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700' 
+                    : 'btn-moeys-secondary'
+                }`}
               >
                 <span>ទំព័របន្ទាប់</span>
                 <ChevronRight className="w-4 h-4" />
