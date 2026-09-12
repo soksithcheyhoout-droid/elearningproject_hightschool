@@ -364,6 +364,13 @@ body.dark-theme .certificate-print-area .border-\[\#003876\],
   color-scheme: light !important;
 }
 
+/* Prevent hover:bg-white from turning dark mode items bright white */
+html.dark .hover\:bg-white:hover,
+html[data-theme="dark"] .hover\:bg-white:hover,
+body.dark-theme .hover\:bg-white:hover {
+  background-color: rgba(30, 41, 59, 0.8) !important;
+}
+
 
 /* 1. Navbar Active Tab Pill ([ក្រសួង ▾]) */
 html.dark .bg-\[\#e0f0ff\],

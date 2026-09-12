@@ -1295,13 +1295,13 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                         onClick={() => { setActiveContactId(contact.id); setMobileChatView('chat'); }}
                         className={`w-full p-2.5 sm:p-3 rounded-2xl text-left transition-all cursor-pointer flex items-center gap-2.5 sm:gap-3 group relative ${
                           isActive
-                            ? 'bg-blue-50/90 border border-blue-200 text-[#005baa] shadow-xs'
-                            : 'hover:bg-white text-slate-700 hover:text-[#005baa] border border-transparent'
+                            ? 'bg-blue-50/90 dark:bg-cyan-500/20 border border-blue-200 dark:border-cyan-500/40 text-[#005baa] dark:text-cyan-300 shadow-xs'
+                            : 'hover:bg-white dark:hover:bg-slate-800/80 text-slate-700 dark:text-slate-300 hover:text-[#005baa] dark:hover:text-cyan-300 border border-transparent'
                         }`}
                       >
                         {/* Real Avatar with Animated Frame Overlay */}
                         <div className="relative w-10 h-10 sm:w-11 sm:h-11 flex items-center justify-center flex-shrink-0 select-none">
-                          <div className="w-[82%] h-[82%] rounded-full overflow-hidden bg-slate-900 shadow-xs border border-slate-300">
+                          <div className="w-[82%] h-[82%] rounded-full overflow-hidden bg-slate-900 shadow-xs border border-slate-300 dark:border-slate-700">
                             <img 
                               src={api.formatAvatarUrl(contact.avatar)} 
                               alt={contact.full_name} 
@@ -1321,24 +1321,26 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                               }}
                             />
                           )}
-                          <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white bg-emerald-500 z-20" />
+                          <span className="absolute bottom-0 right-0 w-2.5 h-2.5 rounded-full border-2 border-white dark:border-slate-900 bg-emerald-500 z-20" />
                         </div>
 
                         <div className="min-w-0 flex-1">
                           <div className="flex items-center justify-between gap-1">
-                            <h4 className="font-bold text-xs truncate text-slate-900">{contact.full_name || contact.username}</h4>
+                            <h4 className="font-bold text-xs truncate text-slate-900 dark:text-white group-hover:text-[#005baa] dark:group-hover:text-cyan-300 transition-colors">
+                              {contact.full_name || contact.username}
+                            </h4>
                             {latest?.created_at ? (
-                              <span className="text-[9px] text-slate-400 font-mono font-bold flex-shrink-0">
+                              <span className="text-[9px] text-slate-400 dark:text-slate-500 font-mono font-bold flex-shrink-0">
                                 {formatTimeShort(latest.created_at)}
                               </span>
                             ) : (
-                              <span className="text-[9px] text-emerald-600 font-cinzel font-bold">Online</span>
+                              <span className="text-[9px] text-emerald-600 dark:text-emerald-400 font-cinzel font-bold">Online</span>
                             )}
                           </div>
-                          <p className={`text-[10.5px] truncate mt-0.5 ${latest ? 'text-slate-700 font-medium' : 'text-slate-400'}`}>
+                          <p className={`text-[10.5px] truncate mt-0.5 ${latest ? 'text-slate-700 dark:text-slate-300 font-medium' : 'text-slate-400 dark:text-slate-500'}`}>
                             {latest ? (
                               <span>
-                                {String(latest.sender_id) === String(student?.id) ? <span className="text-slate-400">អ្នក: </span> : ''}
+                                {String(latest.sender_id) === String(student?.id) ? <span className="text-slate-400 dark:text-slate-500">អ្នក: </span> : ''}
                                 {latest.content}
                               </span>
                             ) : (
@@ -1361,7 +1363,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
           </div>
 
           {/* Current User Profile Footer */}
-          <div className="p-3.5 bg-white border-t border-slate-200 flex items-center justify-between">
+          <div className="p-3.5 bg-white dark:bg-[#0f172a] border-t border-slate-200 dark:border-slate-800 flex items-center justify-between">
             <div className="flex items-center gap-2.5 min-w-0">
               <div className="relative w-10 h-10 flex items-center justify-center flex-shrink-0">
                 <div className="w-[82%] h-[82%] rounded-full overflow-hidden bg-slate-900 border border-[#005baa]/30 shadow-xs">
@@ -1381,8 +1383,8 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                 )}
               </div>
               <div className="min-w-0">
-                <span className="font-black text-xs text-[#003366] truncate block">{student?.name || student?.username || 'riki.dev'}</span>
-                <span className="text-[10px] text-emerald-600 font-bold block">🟢 Lv.{levelInfo.level} • Live DB</span>
+                <span className="font-black text-xs text-[#003366] dark:text-white truncate block">{student?.name || student?.username || 'riki.dev'}</span>
+                <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-bold block">🟢 Lv.{levelInfo.level} • Live DB</span>
               </div>
             </div>
           </div>
@@ -1861,10 +1863,10 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <h3 className="text-base font-extrabold text-[#003366] flex items-center justify-center gap-2">
+                  <h3 className="text-base font-extrabold text-[#003366] dark:text-white flex items-center justify-center gap-2">
                     <span>ការសន្ទនាផ្ទាល់ជាមួយ {activeContact.full_name || activeContact.username}</span>
                   </h3>
-                  <p className="text-xs text-slate-500 leading-relaxed">
+                  <p className="text-xs text-slate-500 dark:text-slate-400 leading-relaxed">
                     {activeContact.school || 'វិទ្យាល័យ ព្រះស៊ីសុវត្ថិ'} • ផ្ញើសារដំបូងរបស់អ្នកទៅកាន់ {activeContact.full_name || activeContact.username}!
                   </p>
                 </div>
@@ -1873,7 +1875,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                   <button
                     type="button"
                     onClick={() => setInputMessage(`សួស្តី ${activeContact.full_name || activeContact.username}! 👋`)}
-                    className="px-4 py-2 rounded-2xl bg-white hover:bg-blue-50 text-slate-700 hover:text-[#005baa] text-xs font-bold border border-slate-200 hover:border-blue-300 transition-all shadow-2xs hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2"
+                    className="px-4 py-2 rounded-2xl bg-white dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-[#005baa] dark:hover:text-cyan-300 text-xs font-bold border border-slate-200 dark:border-slate-700 hover:border-blue-300 transition-all shadow-2xs hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2"
                   >
                     <span className="text-base">👋</span>
                     <span>សួស្តី!</span>
@@ -1881,7 +1883,7 @@ export default function StudentMessengerView({ onLaunchDuelGame, onBack }) {
                   <button
                     type="button"
                     onClick={() => setInputMessage('តោះជជែកគ្នាពីមេរៀនបន្តិច! 📚 💡')}
-                    className="px-4 py-2 rounded-2xl bg-white hover:bg-blue-50 text-slate-700 hover:text-[#005baa] text-xs font-bold border border-slate-200 hover:border-blue-300 transition-all shadow-2xs hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2"
+                    className="px-4 py-2 rounded-2xl bg-white dark:bg-slate-800 hover:bg-blue-50 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 hover:text-[#005baa] dark:hover:text-cyan-300 text-xs font-bold border border-slate-200 dark:border-slate-700 hover:border-blue-300 transition-all shadow-2xs hover:scale-105 active:scale-95 cursor-pointer flex items-center gap-2"
                   >
                     <span className="text-base">📚</span>
                     <span>ជជែកមេរៀន</span>
