@@ -12,6 +12,7 @@ import {
 import { toPng } from 'html-to-image';
 import { jsPDF } from 'jspdf';
 import confetti from 'canvas-confetti';
+import api from '../../services/api';
 
 // Helper to compute individual subject grade (A, B, C, D, E, F)
 const computeSubjectGrade = (score, max) => {
@@ -225,15 +226,22 @@ export default function BacIICertificateModal({
           {/* 📜 1:1 EXACT AUTHENTIC CAMBODIAN BAC II CERTIFICATE (PORTRAIT) */}
           <div 
             ref={certificateRef}
-            className="certificate-print-area relative w-full max-w-[620px] aspect-[1/1.414] bg-[#ffffff] text-slate-900 rounded-sm p-6 sm:p-8 border-[2.5px] border-[#003876] shadow-2xl select-none flex flex-col justify-between overflow-hidden font-kantumruy"
+            className="certificate-print-area relative w-full max-w-[620px] aspect-[1/1.414] rounded-sm p-6 sm:p-8 shadow-2xl select-none flex flex-col justify-between overflow-hidden font-kantumruy"
             style={{
+              backgroundColor: '#ffffff',
+              color: '#0f172a',
+              colorScheme: 'light',
+              border: '2.5px solid #003876',
               boxShadow: '0 20px 60px rgba(0,0,0,0.6)',
               minHeight: '840px'
             }}
           >
             
             {/* Subtle Blue Inner Border Frame */}
-            <div className="absolute inset-1.5 border border-[#005baa]/40 pointer-events-none" />
+            <div 
+              className="absolute inset-1.5 pointer-events-none" 
+              style={{ border: '1px solid rgba(0, 91, 170, 0.4)' }}
+            />
 
             {/* Center Authentic Ministry Watermark - Clearly Visible Background Logo */}
             <div className="absolute inset-0 flex items-center justify-center opacity-[0.22] pointer-events-none select-none z-0">
@@ -251,27 +259,27 @@ export default function BacIICertificateModal({
               <div className="flex items-start justify-between text-[11px] sm:text-xs">
                 
                 {/* Top Left Ministry Info */}
-                <div className="text-left space-y-0.5 text-[#003876] font-bold leading-tight">
-                  <p>ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ និងការស្រាវជ្រាវកម្រិតខ្ពស់</p>
-                  <p className="text-[10.5px]">នាយកដ្ឋានមធ្យមសិក្សាចំណេះទូទៅ</p>
-                  <p className="text-[10px] text-slate-700 font-mono mt-1">
-                    លេខ <strong className="text-slate-900 font-bold">{registrationNo}</strong>
+                <div className="text-left space-y-0.5 font-bold leading-tight" style={{ color: '#003876' }}>
+                  <p style={{ color: '#003876' }}>ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ និងការស្រាវជ្រាវកម្រិតខ្ពស់</p>
+                  <p className="text-[10.5px]" style={{ color: '#003876' }}>នាយកដ្ឋានមធ្យមសិក្សាចំណេះទូទៅ</p>
+                  <p className="text-[10px] font-mono mt-1" style={{ color: '#334155' }}>
+                    លេខ <strong className="font-bold font-mono" style={{ color: '#0f172a' }}>{registrationNo}</strong>
                   </p>
                 </div>
 
                 {/* Top Center Kingdom Motto */}
-                <div className="text-center space-y-0.5 text-[#003876] leading-tight flex-1 px-2">
-                  <h2 className="text-xs sm:text-[13px] font-black tracking-wide">
+                <div className="text-center space-y-0.5 leading-tight flex-1 px-2" style={{ color: '#003876' }}>
+                  <h2 className="text-xs sm:text-[13px] font-black tracking-wide" style={{ color: '#003876' }}>
                     ព្រះរាជាណាចក្រកម្ពុជា
                   </h2>
-                  <h3 className="text-xs sm:text-[13px] font-black">
+                  <h3 className="text-xs sm:text-[13px] font-black" style={{ color: '#003876' }}>
                     ជាតិ  សាសនា  ព្រះមហាក្សត្រ
                   </h3>
                   {/* Decorative flourish line */}
-                  <div className="flex items-center justify-center gap-1 text-[#003876] text-xs pt-0.5">
-                    <span>❖</span>
-                    <span className="w-12 h-[1px] bg-[#003876]"></span>
-                    <span>❖</span>
+                  <div className="flex items-center justify-center gap-1 text-xs pt-0.5" style={{ color: '#003876' }}>
+                    <span style={{ color: '#003876' }}>❖</span>
+                    <span className="w-12 h-[1px]" style={{ backgroundColor: '#003876' }}></span>
+                    <span style={{ color: '#003876' }}>❖</span>
                   </div>
                 </div>
 
@@ -279,17 +287,17 @@ export default function BacIICertificateModal({
 
               {/* Main Certificate Title */}
               <div className="text-center my-4 sm:my-5">
-                <h1 className="text-base sm:text-[19px] font-black text-[#003876] tracking-wide font-kantumruy">
+                <h1 className="text-base sm:text-[19px] font-black tracking-wide font-kantumruy" style={{ color: '#003876' }}>
                   វិញ្ញាបនបត្របណ្ដោះអាសន្នមធ្យមសិក្សាទុតិយភូមិ
                 </h1>
                 {/* Small ornamental dash */}
-                <div className="flex items-center justify-center gap-1 text-[#003876] text-xs mt-1">
-                  <span>~ ❖ ~</span>
+                <div className="flex items-center justify-center gap-1 text-xs mt-1" style={{ color: '#003876' }}>
+                  <span style={{ color: '#003876' }}>~ ❖ ~</span>
                 </div>
               </div>
 
               {/* Authority Statement */}
-              <div className="text-center font-black text-xs sm:text-[13px] text-[#003876] mb-3">
+              <div className="text-center font-black text-xs sm:text-[13px] mb-3" style={{ color: '#003876' }}>
                 ប្រធាននាយកដ្ឋានមធ្យមសិក្សាចំណេះទូទៅ  បញ្ជាក់ថា ៖
               </div>
 
@@ -300,86 +308,96 @@ export default function BacIICertificateModal({
               
               {/* Left: Student Passport Photo (4x6 Blue Backdrop) */}
               <div className="flex-shrink-0 flex flex-col items-center">
-                <div className="w-24 h-32 sm:w-28 sm:h-36 bg-[#2563eb] border-2 border-slate-300 rounded-xs overflow-hidden shadow-xs relative flex items-center justify-center">
+                <div 
+                  className="w-24 h-32 sm:w-28 sm:h-36 rounded-xs overflow-hidden shadow-xs relative flex items-center justify-center"
+                  style={{ backgroundColor: '#2563eb', border: '2px solid #cbd5e1' }}
+                >
                   <img 
-                    src={student?.avatar || '/assets/anime/boys/boy_1.png'} 
+                    src={api.formatAvatarUrl(student?.avatar) || '/assets/anime/boys/boy_1.png'} 
                     alt="Student Photo" 
                     className="w-full h-full object-cover"
+                    onError={(e) => {
+                      e.currentTarget.src = '/assets/anime/boys/boy_1.png';
+                    }}
                   />
                   {/* Subtle photo stamp line */}
-                  <div className="absolute bottom-0 inset-x-0 bg-black/20 text-[8px] text-white text-center font-mono py-0.5">
+                  <div className="absolute bottom-0 inset-x-0 bg-black/30 text-[8px] text-white text-center font-mono py-0.5">
                     4 x 6 cm
                   </div>
                 </div>
               </div>
 
               {/* Right: Detailed Candidate Fields */}
-              <div className="flex-1 space-y-1.5 text-slate-800">
+              <div className="flex-1 space-y-1.5" style={{ color: '#1e293b' }}>
                 
                 {/* Name & Gender */}
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-1.5">
-                    <span className="text-slate-700">ឈ្មោះ ៖</span>
-                    <strong className="text-sm sm:text-base font-black text-[#dc2626] font-kantumruy">
+                    <span style={{ color: '#334155' }}>ឈ្មោះ ៖</span>
+                    <strong className="text-sm sm:text-base font-black font-kantumruy" style={{ color: '#dc2626' }}>
                       {studentDisplayName}
                     </strong>
                   </div>
                   <div className="flex items-center gap-1 pr-2">
-                    <span className="text-slate-700">ភេទ ៖</span>
-                    <strong className="font-bold text-slate-900">ប្រុស</strong>
+                    <span style={{ color: '#334155' }}>ភេទ ៖</span>
+                    <strong className="font-bold" style={{ color: '#0f172a' }}>ប្រុស</strong>
                   </div>
                 </div>
 
                 {/* Date of Birth & Place */}
                 <div className="flex flex-wrap items-center gap-x-2 text-[11.5px] sm:text-xs">
-                  <span className="text-slate-700">កើតនៅថ្ងៃទី</span>
-                  <strong className="font-bold text-slate-900">១៦ កញ្ញា ២០០៨</strong>
-                  <span className="text-slate-700">នៅក្រុង</span>
-                  <strong className="font-bold text-slate-900">ភ្នំពេញ</strong>
+                  <span style={{ color: '#334155' }}>កើតនៅថ្ងៃទី</span>
+                  <strong className="font-bold" style={{ color: '#0f172a' }}>១៦ កញ្ញា ២០០៨</strong>
+                  <span style={{ color: '#334155' }}>នៅក្រុង</span>
+                  <strong className="font-bold" style={{ color: '#0f172a' }}>ភ្នំពេញ</strong>
                 </div>
 
                 {/* Parents Name */}
                 <div className="flex flex-wrap items-center gap-x-3 text-[11.5px] sm:text-xs">
                   <div>
-                    <span className="text-slate-700">ឪពុកឈ្មោះ ៖</span>
-                    <strong className="font-bold text-slate-800 ml-1 font-mono text-[11px]">
+                    <span style={{ color: '#334155' }}>ឪពុកឈ្មោះ ៖</span>
+                    <strong className="font-bold ml-1 font-mono text-[11px]" style={{ color: '#1e293b' }}>
                       {student?.fatherName ? student.fatherName : '.......................'}
                     </strong>
                   </div>
                   <div>
-                    <span className="text-slate-700">ម្តាយឈ្មោះ ៖</span>
-                    <strong className="font-bold text-slate-800 ml-1 font-mono text-[11px]">
+                    <span style={{ color: '#334155' }}>ម្តាយឈ្មោះ ៖</span>
+                    <strong className="font-bold ml-1 font-mono text-[11px]" style={{ color: '#1e293b' }}>
                       {student?.motherName ? student.motherName : '.......................'}
                     </strong>
                   </div>
                 </div>
 
                 {/* Exam Qualification Line */}
-                <div className="font-black text-[#003876] text-xs sm:text-[13px] pt-1">
+                <div className="font-black text-xs sm:text-[13px] pt-1" style={{ color: '#003876' }}>
                   បានប្រឡងជាប់សញ្ញាបត្រមធ្យមសិក្សាទុតិយភូមិ
                 </div>
 
                 {/* Exam Session & Center */}
                 <div className="space-y-0.5 text-[11.5px] sm:text-xs">
                   <div className="flex flex-wrap items-center gap-x-2">
-                    <span className="text-slate-700">សម័យប្រឡង ៖</span>
-                    <strong className="font-bold text-slate-900">២៧ កក្កដា ២០២៦</strong>
+                    <span style={{ color: '#334155' }}>សម័យប្រឡង ៖</span>
+                    <strong className="font-bold" style={{ color: '#0f172a' }}>២៧ កក្កដា ២០២៦</strong>
                   </div>
                   <div className="flex flex-wrap items-center gap-x-2">
-                    <span className="text-slate-700">នៅមណ្ឌល ៖</span>
-                    <strong className="font-bold text-slate-900">{examCenter}</strong>
+                    <span style={{ color: '#334155' }}>នៅមណ្ឌល ៖</span>
+                    <strong className="font-bold" style={{ color: '#0f172a' }}>{examCenter}</strong>
                   </div>
                 </div>
 
                 {/* Room, Desk, Overall Grade, Total Score in Red */}
                 <div className="flex flex-wrap items-center gap-x-2 pt-1 text-[11.5px] sm:text-xs">
-                  <span>លេខបន្ទប់ ៖ <strong className="font-bold text-slate-900 font-mono">{roomNo}</strong></span>
-                  <span>លេខតុ ៖ <strong className="font-bold text-slate-900 font-mono">{tableNo}</strong></span>
                   <span>
-                    និទ្ទេសរួម ៖ <strong className="text-sm font-black text-[#dc2626] font-mono">{gradeResult?.grade || 'A'}</strong>
+                    <span style={{ color: '#334155' }}>លេខបន្ទប់ ៖</span> <strong className="font-bold font-mono" style={{ color: '#0f172a' }}>{roomNo}</strong>
                   </span>
                   <span>
-                    លំដាប់ពិន្ទុសរុប ៖ <strong className="text-sm font-black text-[#dc2626] font-mono">{totalScore}.00</strong>
+                    <span style={{ color: '#334155' }}>លេខតុ ៖</span> <strong className="font-bold font-mono" style={{ color: '#0f172a' }}>{tableNo}</strong>
+                  </span>
+                  <span>
+                    <span style={{ color: '#334155' }}>និទ្ទេសរួម ៖</span> <strong className="text-sm font-black font-mono" style={{ color: '#dc2626' }}>{gradeResult?.grade || 'A'}</strong>
+                  </span>
+                  <span>
+                    <span style={{ color: '#334155' }}>លំដាប់ពិន្ទុសរុប ៖</span> <strong className="text-sm font-black font-mono" style={{ color: '#dc2626' }}>{totalScore}.00</strong>
                   </span>
                 </div>
 
@@ -388,17 +406,21 @@ export default function BacIICertificateModal({
             </div>
 
             {/* SUBJECT SCORES & GRADES LIST (EXACT REAL FORMAT) */}
-            <div className="relative z-10 my-2 pt-2 border-t border-slate-200">
-              <div className="font-black text-[#003876] text-xs mb-1.5">
+            <div className="relative z-10 my-2 pt-2" style={{ borderTop: '1px solid #e2e8f0' }}>
+              <div className="font-black text-xs mb-1.5" style={{ color: '#003876' }}>
                 និទ្ទេសតាមមុខវិជ្ជា ៖
               </div>
 
               {/* 3-Column Compact Grid of Subject Grades */}
-              <div className="grid grid-cols-3 gap-x-4 gap-y-1 text-xs text-slate-800">
+              <div className="grid grid-cols-3 gap-x-4 gap-y-1 text-xs">
                 {subjectList.map((sub, idx) => (
-                  <div key={idx} className="flex items-center justify-between border-b border-dotted border-slate-300 pb-0.5">
-                    <span className="font-bold text-slate-800">{sub.nameKm}</span>
-                    <span className="font-black text-xs font-mono text-[#dc2626] pl-2">
+                  <div 
+                    key={idx} 
+                    className="flex items-center justify-between pb-0.5"
+                    style={{ borderBottom: '1px dotted #cbd5e1' }}
+                  >
+                    <span className="font-bold" style={{ color: '#1e293b' }}>{sub.nameKm}</span>
+                    <span className="font-black text-xs font-mono pl-2" style={{ color: '#dc2626' }}>
                       {sub.grade}
                     </span>
                   </div>
@@ -406,7 +428,7 @@ export default function BacIICertificateModal({
               </div>
 
               {/* Official Usage Sentence */}
-              <p className="text-[10px] sm:text-[10.5px] text-slate-700 italic text-center mt-2.5">
+              <p className="text-[10px] sm:text-[10.5px] italic text-center mt-2.5" style={{ color: '#475569' }}>
                 វិញ្ញាបនបត្រនេះ បានចេញជូនសាមីខ្លួន ដើម្បីយកទៅប្រើប្រាស់តាមការដែលអាចប្រើបាន។
               </p>
             </div>
@@ -415,32 +437,32 @@ export default function BacIICertificateModal({
             <div className="relative z-10 flex items-end justify-between pt-1">
               
               {/* Left Side Note & Legend */}
-              <div className="space-y-0.5 text-[9px] sm:text-[9.5px] text-slate-600 max-w-[250px] leading-tight">
-                <p className="font-bold text-slate-800">សំគាល់ ៖</p>
-                <p className="font-mono">
+              <div className="space-y-0.5 text-[9px] sm:text-[9.5px] max-w-[250px] leading-tight" style={{ color: '#475569' }}>
+                <p className="font-bold" style={{ color: '#1e293b' }}>សំគាល់ ៖</p>
+                <p className="font-mono" style={{ color: '#334155' }}>
                   A ល្អប្រសើរ   B ល្អណាស់   C ល្អ<br/>
                   D ល្អបង្គួរ    E មធ្យម    F ធ្លាក់
                 </p>
-                <p className="text-[8px] text-slate-500 pt-0.5">
+                <p className="text-[8px] pt-0.5" style={{ color: '#64748b' }}>
                   - វិញ្ញាបនបត្រនេះប្រើប្រាស់បណ្ដោះអាសន្នរង់ចាំសញ្ញាបត្រជាស្ថាពរ។<br/>
                   - វិញ្ញាបនបត្រនេះពុំមានការកែប្រែដោយដៃ ឬលុបសរសេរជាន់ឡើយ។
                 </p>
                 {/* Barcode Stamp */}
                 <div className="pt-1">
-                  <div className="font-mono text-[9px] tracking-tighter text-slate-800">
+                  <div className="font-mono text-[9px] tracking-tighter" style={{ color: '#0f172a' }}>
                     |||||| | |||||||| ||||||||||| | |||||
                   </div>
-                  <span className="text-[7.5px] text-slate-400 font-mono">MOTDAR-2026-BACII-VERIFIED</span>
+                  <span className="text-[7.5px] font-mono" style={{ color: '#94a3b8' }}>MOTDAR-2026-BACII-VERIFIED</span>
                 </div>
               </div>
 
               {/* Right Side Signature & Red Seal Stamp */}
               <div className="relative text-center min-w-[220px] flex flex-col items-center">
                 
-                <p className="text-[10.5px] text-slate-800 font-kantumruy">
+                <p className="text-[10.5px] font-kantumruy" style={{ color: '#1e293b' }}>
                   ធ្វើនៅរាជធានីភ្នំពេញ, ថ្ងៃទី ១៨ ខែ សីហា ឆ្នាំ ២០២៦
                 </p>
-                <p className="text-xs font-bold text-[#003876] mt-0.5 font-kantumruy">
+                <p className="text-xs font-bold mt-0.5 font-kantumruy" style={{ color: '#003876' }}>
                   ប្រធាននាយកដ្ឋានមធ្យមសិក្សាចំណេះទូទៅ
                 </p>
 
@@ -448,15 +470,21 @@ export default function BacIICertificateModal({
                 <div className="relative w-48 h-20 flex items-center justify-center my-0.5">
                   
                   {/* Authentic Red Round Ministry Seal Stamp (Contained within signature area) */}
-                  <div className="absolute left-4 top-0 w-20 h-20 rounded-full border-[2.5px] border-[#dc2626] p-1 flex items-center justify-center text-[#dc2626] font-kantumruy rotate-[-8deg] opacity-85 pointer-events-none select-none z-0">
-                    <div className="w-full h-full rounded-full border border-[#dc2626] flex flex-col items-center justify-center text-center p-0.5 leading-none bg-rose-50/15">
-                      <span className="text-[6.5px] font-black uppercase tracking-tight">
+                  <div 
+                    className="absolute left-4 top-0 w-20 h-20 rounded-full p-1 flex items-center justify-center font-kantumruy rotate-[-8deg] opacity-85 pointer-events-none select-none z-0"
+                    style={{ border: '2.5px solid #dc2626', color: '#dc2626' }}
+                  >
+                    <div 
+                      className="w-full h-full rounded-full flex flex-col items-center justify-center text-center p-0.5 leading-none"
+                      style={{ border: '1px solid #dc2626', backgroundColor: 'rgba(255, 241, 242, 0.25)', color: '#dc2626' }}
+                    >
+                      <span className="text-[6.5px] font-black uppercase tracking-tight" style={{ color: '#dc2626' }}>
                         ព្រះរាជាណាចក្រកម្ពុជា
                       </span>
-                      <span className="text-[9.5px] font-black my-0.5">
+                      <span className="text-[9.5px] font-black my-0.5" style={{ color: '#dc2626' }}>
                         ★ ត្រាផ្លូវការ ★
                       </span>
-                      <span className="text-[6px] font-bold">
+                      <span className="text-[6px] font-bold" style={{ color: '#dc2626' }}>
                         ក្រសួងអភិវឌ្ឍន៍ទេពកោសល្យ
                       </span>
                     </div>
@@ -464,10 +492,11 @@ export default function BacIICertificateModal({
 
                   {/* Authentic Flowing Blue Ink Signature */}
                   <svg 
-                    className="w-38 h-14 text-[#0047ab] z-10 select-none pointer-events-none filter drop-shadow-xs" 
+                    className="w-38 h-14 z-10 select-none pointer-events-none filter drop-shadow-xs" 
                     viewBox="0 0 160 50" 
                     fill="none" 
                     xmlns="http://www.w3.org/2000/svg"
+                    style={{ color: '#0047ab' }}
                   >
                     {/* Natural Penmanship Flow */}
                     <path 
@@ -488,7 +517,7 @@ export default function BacIICertificateModal({
                 </div>
 
                 {/* Signatory Name in Bold Red Khmer Font: សិទ្ធិជ័យ */}
-                <p className="text-sm font-black text-[#dc2626] font-kantumruy tracking-wide">
+                <p className="text-sm font-black font-kantumruy tracking-wide" style={{ color: '#dc2626' }}>
                   សិទ្ធិជ័យ
                 </p>
 

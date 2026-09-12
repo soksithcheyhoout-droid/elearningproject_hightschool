@@ -229,6 +229,142 @@ html[data-theme="dark"] .text-slate-400 {
   color: #94a3b8 !important;
 }
 
+/* ==========================================================================
+   OFFICIAL CERTIFICATE & DOCUMENT PRINT AREA IMMUNITY (LIGHT & DARK THEMES)
+   The National Bac II Certificate is an authentic official physical state diploma.
+   In BOTH White and Black background themes, it MUST retain its authentic white 
+   paper background, official MoEYS deep navy headers, and ultra-crisp slate/black
+   text so all content is 100% visible and readable everywhere.
+   ========================================================================== */
+.certificate-print-area,
+html.dark .certificate-print-area,
+html[data-theme="dark"] .certificate-print-area,
+body.dark-theme .certificate-print-area,
+.dark .certificate-print-area {
+  background-color: #ffffff !important;
+  color: #0f172a !important;
+  color-scheme: light !important;
+  forced-color-adjust: none !important;
+  -webkit-font-smoothing: antialiased !important;
+}
+
+/* Force Ministry Royal Blue Text across all dark/light modes */
+.certificate-print-area .text-\[\#003876\],
+html.dark .certificate-print-area .text-\[\#003876\],
+html[data-theme="dark"] .certificate-print-area .text-\[\#003876\],
+body.dark-theme .certificate-print-area .text-\[\#003876\],
+.dark .certificate-print-area .text-\[\#003876\],
+.certificate-print-area .cert-moeys-blue {
+  color: #003876 !important;
+}
+
+/* Force Ministry Blue Flourish Background lines */
+.certificate-print-area .bg-\[\#003876\],
+html.dark .certificate-print-area .bg-\[\#003876\],
+html[data-theme="dark"] .certificate-print-area .bg-\[\#003876\],
+body.dark-theme .certificate-print-area .bg-\[\#003876\],
+.dark .certificate-print-area .bg-\[\#003876\] {
+  background-color: #003876 !important;
+}
+
+/* Force High-Contrast Black/Slate Text for Candidate details, headings & table */
+.certificate-print-area .text-slate-900,
+html.dark .certificate-print-area .text-slate-900,
+html[data-theme="dark"] .certificate-print-area .text-slate-900,
+body.dark-theme .certificate-print-area .text-slate-900,
+.dark .certificate-print-area .text-slate-900,
+.certificate-print-area .cert-text-dark {
+  color: #0f172a !important;
+}
+
+.certificate-print-area .text-slate-800,
+html.dark .certificate-print-area .text-slate-800,
+html[data-theme="dark"] .certificate-print-area .text-slate-800,
+body.dark-theme .certificate-print-area .text-slate-800,
+.dark .certificate-print-area .text-slate-800 {
+  color: #1e293b !important;
+}
+
+.certificate-print-area .text-slate-700,
+html.dark .certificate-print-area .text-slate-700,
+html[data-theme="dark"] .certificate-print-area .text-slate-700,
+body.dark-theme .certificate-print-area .text-slate-700,
+.dark .certificate-print-area .text-slate-700,
+.certificate-print-area .cert-text-medium {
+  color: #334155 !important;
+}
+
+.certificate-print-area .text-slate-600,
+html.dark .certificate-print-area .text-slate-600,
+html[data-theme="dark"] .certificate-print-area .text-slate-600,
+body.dark-theme .certificate-print-area .text-slate-600,
+.dark .certificate-print-area .text-slate-600 {
+  color: #475569 !important;
+}
+
+.certificate-print-area .text-slate-500,
+html.dark .certificate-print-area .text-slate-500,
+html[data-theme="dark"] .certificate-print-area .text-slate-500,
+body.dark-theme .certificate-print-area .text-slate-500,
+.dark .certificate-print-area .text-slate-500 {
+  color: #64748b !important;
+}
+
+.certificate-print-area .text-slate-400,
+html.dark .certificate-print-area .text-slate-400,
+html[data-theme="dark"] .certificate-print-area .text-slate-400,
+body.dark-theme .certificate-print-area .text-slate-400,
+.dark .certificate-print-area .text-slate-400 {
+  color: #94a3b8 !important;
+}
+
+/* Force Official Red text (Grades, Student Name, Seal, Signatory) */
+.certificate-print-area .text-\[\#dc2626\],
+html.dark .certificate-print-area .text-\[\#dc2626\],
+html[data-theme="dark"] .certificate-print-area .text-\[\#dc2626\],
+body.dark-theme .certificate-print-area .text-\[\#dc2626\],
+.dark .certificate-print-area .text-\[\#dc2626\],
+.certificate-print-area .cert-text-red {
+  color: #dc2626 !important;
+}
+
+/* Force Crisp Borders inside certificate */
+.certificate-print-area .border-slate-200,
+html.dark .certificate-print-area .border-slate-200,
+html[data-theme="dark"] .certificate-print-area .border-slate-200,
+body.dark-theme .certificate-print-area .border-slate-200,
+.dark .certificate-print-area .border-slate-200 {
+  border-color: #e2e8f0 !important;
+}
+
+.certificate-print-area .border-slate-300,
+html.dark .certificate-print-area .border-slate-300,
+html[data-theme="dark"] .certificate-print-area .border-slate-300,
+body.dark-theme .certificate-print-area .border-slate-300,
+.dark .certificate-print-area .border-slate-300 {
+  border-color: #cbd5e1 !important;
+}
+
+.certificate-print-area .border-\[\#003876\],
+html.dark .certificate-print-area .border-\[\#003876\],
+html[data-theme="dark"] .certificate-print-area .border-\[\#003876\],
+body.dark-theme .certificate-print-area .border-\[\#003876\],
+.dark .certificate-print-area .border-\[\#003876\] {
+  border-color: #003876 !important;
+}
+
+/* Also ensure any generic text inside .certificate-print-area defaults to dark */
+.certificate-print-area p,
+.certificate-print-area span,
+.certificate-print-area strong,
+.certificate-print-area h1,
+.certificate-print-area h2,
+.certificate-print-area h3,
+.certificate-print-area div {
+  color-scheme: light !important;
+}
+
+
 /* 1. Navbar Active Tab Pill ([ក្រសួង ▾]) */
 html.dark .bg-\[\#e0f0ff\],
 html[data-theme="dark"] .bg-\[\#e0f0ff\] {
