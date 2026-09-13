@@ -332,8 +332,8 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     setShowUrlInput(false);
   };
 
-  // Construct iframe embed URL with controls=0 (removes all native YouTube vertical popups/clutter) and playsinline=1
-  const embedUrl = `https://www.youtube.com/embed/${activeVideoId}?enablejsapi=1&autoplay=1&controls=0&playsinline=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}&rel=0&iv_load_policy=3&modestbranding=1&disablekb=1&fs=0`;
+  // Construct iframe embed URL with playsinline=1 for smooth mobile iOS Safari playback
+  const embedUrl = `https://www.youtube.com/embed/${activeVideoId}?enablejsapi=1&autoplay=1&playsinline=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}&rel=0&iv_load_policy=3&modestbranding=1`;
 
   return (
     <>
@@ -426,41 +426,21 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
           <div className="p-3 sm:p-5 md:p-6 overflow-y-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-5 lg:gap-6 [scrollbar-width:thin] [-webkit-overflow-scrolling:touch]">
             
             {/* ================================================================= */}
-            {/* COLUMN 1: THE PLAYER & SOUND CONTROLLER (Left 6 Cols on Desktop)  */}
+            {/* COLUMN 1: THE PLAYER (Left 6 Cols on Desktop)                     */}
             {/* ================================================================= */}
             <div className="lg:col-span-6 flex flex-col space-y-2.5 sm:space-y-3">
               
               {/* THE SINGLE YOUTUBE IFRAME CANVAS */}
-              <div className="relative w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl flex-shrink-0 group">
+              <div className="relative w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl flex-shrink-0">
                 <iframe
                   ref={iframeRef}
                   key={activeVideoId}
                   src={embedUrl}
-                  onLoad={handleIframeLoad}
                   title="YouTube Player"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   className={showVideo ? "w-full h-full border-0" : "w-1 h-1 opacity-0 absolute pointer-events-none"}
                 />
-
-                {/* Clean Custom Click-to-Play Overlay (Zero native YouTube vertical popup sliders) */}
-                {showVideo && (
-                  <div 
-                    onClick={handleTogglePlay}
-                    className={`absolute inset-0 flex items-center justify-center transition-all cursor-pointer ${
-                      !isPlaying 
-                        ? 'bg-black/35 opacity-100' 
-                        : 'bg-transparent opacity-0 hover:bg-black/20 hover:opacity-100'
-                    }`}
-                    title={isPlaying ? "Click to Pause" : "Click to Play"}
-                  >
-                    {!isPlaying && (
-                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-red-600/95 text-white flex items-center justify-center shadow-2xl shadow-red-600/50 backdrop-blur-xs transform hover:scale-110 active:scale-95 transition-transform">
-                        <Play className="w-7 h-7 fill-white ml-1" />
-                      </div>
-                    )}
-                  </div>
-                )}
 
                 {/* Audio-Only Visualizer Mode */}
                 {!showVideo && (
@@ -499,137 +479,6 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                     </div>
                   </div>
                 )}
-              </div>
-
-              {/* DEDICATED HIGH-END SOUND & PLAYBACK CONTROLLER SUITE */}
-              <div className="bg-slate-900/90 border border-white/10 rounded-xl sm:rounded-2xl p-2.5 sm:p-3 shadow-xl backdrop-blur-sm space-y-2 flex-shrink-0">
-                
-                {/* Now Playing Title & Status Header */}
-                <div className="flex items-center justify-between gap-2 px-1">
-                  <div className="min-w-0 flex-1 flex items-center gap-2">
-                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isPlaying ? 'bg-red-500 animate-ping' : 'bg-slate-600'}`} />
-                    <div className="min-w-0 flex-1">
-                      <p className="text-xs sm:text-sm font-bold text-white truncate leading-tight">
-                        {currentTrack?.title || 'YouTube Track'}
-                      </p>
-                      <p className="text-[10px] text-slate-400 truncate">
-                        {currentTrack?.channel || 'YouTube Music'}
-                      </p>
-                    </div>
-                  </div>
-
-                  {/* Playing Indicator */}
-                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1.5 flex-shrink-0 ${
-                    isPlaying 
-                      ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' 
-                      : 'bg-slate-800 text-slate-400 border border-white/5'
-                  }`}>
-                    {isPlaying && (
-                      <span className="flex items-center gap-0.5">
-                        <span className="w-0.5 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                        <span className="w-0.5 h-3 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                        <span className="w-0.5 h-1.5 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                      </span>
-                    )}
-                    <span>{isPlaying ? 'Playing' : 'Paused'}</span>
-                  </span>
-                </div>
-
-                {/* Master Playback & Sound Control Row */}
-                <div className="flex items-center justify-between gap-1.5 sm:gap-3 pt-1 border-t border-white/5">
-                  
-                  {/* Left: Playback Action Buttons */}
-                  <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
-                    <button
-                      type="button"
-                      onClick={handlePrevTrack}
-                      className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/15 active:scale-95 text-slate-300 hover:text-white flex items-center justify-center transition-all cursor-pointer"
-                      title="Previous Track"
-                    >
-                      <SkipBack className="w-4 h-4 fill-current" />
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleTogglePlay}
-                      className="w-10 h-10 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 active:scale-95 text-white shadow-md shadow-red-600/30 flex items-center justify-center transition-all cursor-pointer flex-shrink-0"
-                      title={isPlaying ? "Pause" : "Play"}
-                    >
-                      {isPlaying ? (
-                        <Pause className="w-5 h-5 fill-white text-white" />
-                      ) : (
-                        <Play className="w-5 h-5 fill-white text-white ml-0.5" />
-                      )}
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleNextTrack}
-                      className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/15 active:scale-95 text-slate-300 hover:text-white flex items-center justify-center transition-all cursor-pointer"
-                      title="Next Track"
-                    >
-                      <SkipForward className="w-4 h-4 fill-current" />
-                    </button>
-
-                    <button
-                      type="button"
-                      onClick={handleStop}
-                      className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/15 active:scale-95 text-slate-400 hover:text-rose-400 hidden min-[440px]:flex items-center justify-center transition-all cursor-pointer"
-                      title="Stop & Reset"
-                    >
-                      <Square className="w-3.5 h-3.5 fill-current" />
-                    </button>
-                  </div>
-
-                  {/* Vertical Divider */}
-                  <div className="h-6 w-px bg-white/10 flex-shrink-0" />
-
-                  {/* Right: Perfect Dedicated Sound & Volume Controller */}
-                  <div className="flex-1 flex items-center gap-1.5 sm:gap-2 min-w-0">
-                    
-                    {/* Interactive Mute / Unmute Button */}
-                    <button
-                      type="button"
-                      onClick={handleToggleMute}
-                      className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all active:scale-95 cursor-pointer flex-shrink-0 ${
-                        isMuted || volume === 0
-                          ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 hover:bg-rose-500/30 shadow-xs'
-                          : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25 shadow-xs'
-                      }`}
-                      title={isMuted ? "Unmute Sound" : "Mute Sound"}
-                    >
-                      {isMuted || volume === 0 ? (
-                        <VolumeX className="w-4 h-4" />
-                      ) : (
-                        <Volume2 className="w-4 h-4" />
-                      )}
-                    </button>
-
-                    {/* Smooth Horizontal Volume Range Slider */}
-                    <div className="flex-1 relative flex items-center min-w-[65px] sm:min-w-[100px]">
-                      <input
-                        type="range"
-                        min="0"
-                        max="100"
-                        value={isMuted ? 0 : volume}
-                        onChange={(e) => handleVolumeChange(e.target.value)}
-                        onInput={(e) => handleVolumeChange(e.target.value)}
-                        aria-label="Volume Slider"
-                        className="w-full h-1.5 rounded-lg appearance-none cursor-pointer accent-red-500 focus:outline-none touch-none"
-                        style={{
-                          background: `linear-gradient(to right, #ef4444 0%, #ef4444 ${isMuted ? 0 : volume}%, #334155 ${isMuted ? 0 : volume}%, #334155 100%)`
-                        }}
-                      />
-                    </div>
-
-                    {/* Volume Percentage Indicator */}
-                    <span className="text-[10px] sm:text-[11px] font-mono font-bold text-slate-300 w-7 sm:w-9 text-right flex-shrink-0 select-none">
-                      {isMuted || volume === 0 ? '0%' : `${volume}%`}
-                    </span>
-                  </div>
-
-                </div>
-
               </div>
 
             </div>
