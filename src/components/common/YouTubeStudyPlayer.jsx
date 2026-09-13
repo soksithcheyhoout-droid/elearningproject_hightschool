@@ -514,7 +514,7 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     }
   };
 
-  // Perform Live YouTube Search with Local Instant Results & Debounce
+  // Perform Live YouTube Search with Direct URL & Video ID Support + InnerTube Backend
   const executeSearch = useCallback(async (queryToSearch) => {
     const q = (queryToSearch !== undefined ? queryToSearch : searchQuery).trim();
     if (!q) {
@@ -524,9 +524,44 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
       return;
     }
 
+    // Direct YouTube Link or 11-char Video ID auto-detection
+    const directId = extractYouTubeId(q);
+    if (directId) {
+      setIsSearching(true);
+      try {
+        const oembedRes = await fetch(`https://www.youtube.com/oembed?url=https://www.youtube.com/watch?v=${directId}&format=json`);
+        const oembedData = await oembedRes.json();
+        const directTrack = {
+          id: directId,
+          title: oembedData.title || `YouTube Video (${directId})`,
+          channel: oembedData.author_name || 'YouTube Video',
+          duration: 'YouTube',
+          thumbnail: oembedData.thumbnail_url || `https://i.ytimg.com/vi/${directId}/hqdefault.jpg`
+        };
+        setSearchResults([directTrack]);
+        handleTrackClick(directTrack);
+        setSearchError('');
+        setIsSearching(false);
+        return;
+      } catch (e) {
+        const directTrack = {
+          id: directId,
+          title: `YouTube Video (${directId})`,
+          channel: 'YouTube Video',
+          duration: 'YouTube',
+          thumbnail: `https://i.ytimg.com/vi/${directId}/hqdefault.jpg`
+        };
+        setSearchResults([directTrack]);
+        handleTrackClick(directTrack);
+        setSearchError('');
+        setIsSearching(false);
+        return;
+      }
+    }
+
     const trimmed = q.toLowerCase();
 
-    // 1. Instant match in curated catalog
+    // 1. Instant match in curated catalog for 0ms initial response
     const localMatches = DEFAULT_STUDY_TRACKS.filter(t => 
       t.title.toLowerCase().includes(trimmed) ||
       t.channel.toLowerCase().includes(trimmed) ||
@@ -542,23 +577,28 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
 
     try {
       const response = await fetch(`/api/youtube/search?q=${encodeURIComponent(q)}`);
-      const data = await response.json();
+      if (response.ok) {
+        const data = await response.json();
+        if (data && data.results && data.results.length > 0) {
+          setSearchResults(data.results);
+          setSearchError('');
+          return;
+        }
+      }
 
-      if (data && data.results && data.results.length > 0) {
-        setSearchResults(data.results);
-        setSearchError('');
-      } else if (localMatches.length === 0) {
+      if (localMatches.length === 0) {
         setSearchResults([]);
-        setSearchError(`No tracks found for "${q}"`);
+        setSearchError(`No tracks found for "${q}". Please try a different song or artist.`);
       }
     } catch (err) {
+      console.warn('Backend YouTube search notice:', err);
       if (localMatches.length === 0) {
-        setSearchError('Search service unavailable. Please try again.');
+        setSearchError(`Unable to search for "${q}". Please check connection or paste a YouTube URL directly.`);
       }
     } finally {
       setIsSearching(false);
     }
-  }, [searchQuery]);
+  }, [searchQuery, handleTrackClick]);
 
   // Real-time as-you-type search: triggers instantly from 1 letter or full name
   const handleSearchInputChange = (e) => {
@@ -605,8 +645,15 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
   const handleQuickTagClick = (tag) => {
     if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
     setActiveTag(tag.label);
-    setSearchQuery(tag.query);
-    executeSearch(tag.query);
+    if (tag.label === 'All') {
+      setSearchQuery('');
+      setSearchResults(DEFAULT_STUDY_TRACKS);
+      setIsSearching(false);
+      setSearchError('');
+    } else {
+      setSearchQuery(tag.query);
+      executeSearch(tag.query);
+    }
   };
 
   // Handle direct custom URL paste
@@ -876,7 +923,7 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                   <input
                     ref={searchInputRef}
                     type="text"
-                    placeholder="Search any song or artist (e.g. VannDa, Doung Virakseth, Lofi...)"
+                    placeholder="Search any YouTube video, song, artist, or paste link..."
                     value={searchQuery}
                     onChange={handleSearchInputChange}
                     className="w-full bg-slate-950/90 border border-white/15 rounded-xl pl-9 sm:pl-10 pr-9 py-2 sm:py-2.5 text-xs sm:text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/25 transition-all"
@@ -957,8 +1004,13 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
 
               {/* Header Title & Direct URL Toggle */}
               <div className="flex items-center justify-between text-xs text-slate-400 px-0.5 flex-shrink-0 pt-0.5">
-                <span className="font-semibold text-white/90 text-xs">
-                  {searchResults.length > 0 ? `Results (${searchResults.length})` : 'Results'}
+                <span className="font-semibold text-white/90 text-xs flex items-center gap-1.5">
+                  <span>{searchQuery ? `YouTube Results (${searchResults.length})` : `Featured Study Tracks (${searchResults.length})`}</span>
+                  {isSearching && (
+                    <span className="text-[10.5px] text-red-400 font-normal animate-pulse">
+                      (Searching YouTube...)
+                    </span>
+                  )}
                 </span>
                 
                 <button
