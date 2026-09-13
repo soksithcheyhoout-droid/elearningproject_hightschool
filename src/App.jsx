@@ -354,7 +354,7 @@ function MainApp() {
       />
 
       {/* Spacer to offset the fixed top navbar permanently */}
-      <div className="h-[106px] sm:h-[116px] flex-shrink-0 w-full" aria-hidden="true" />
+      <div className="h-[64px] md:h-[116px] flex-shrink-0 w-full" aria-hidden="true" />
 
       {/* Main Content Body */}
       <div className={`flex-1 flex w-full xl:pl-72 ${activeTab === 'chat' ? 'min-h-0 overflow-hidden' : ''}`}>
