@@ -94,6 +94,7 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
   const [currentTrack, setCurrentTrack] = useState(DEFAULT_STUDY_TRACKS[0]);
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const [volume, setVolume] = useState(100);
   const [showVideo, setShowVideo] = useState(true);
 
   // Search State
@@ -160,6 +161,18 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     }
   }, []);
 
+  // Synchronize audio volume on new video load
+  const handleIframeLoad = useCallback(() => {
+    setTimeout(() => {
+      if (isMuted) {
+        sendIframeCommand('mute');
+      } else {
+        sendIframeCommand('unMute');
+        sendIframeCommand('setVolume', [volume]);
+      }
+    }, 450);
+  }, [isMuted, volume, sendIframeCommand]);
+
   // Toggle Play / Pause
   const handleTogglePlay = useCallback(() => {
     if (isPlaying) {
@@ -182,10 +195,29 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
   const handleToggleMute = useCallback(() => {
     if (isMuted) {
       sendIframeCommand('unMute');
+      const restoreVol = volume > 0 ? volume : 80;
+      setVolume(restoreVol);
+      sendIframeCommand('setVolume', [restoreVol]);
       setIsMuted(false);
     } else {
       sendIframeCommand('mute');
       setIsMuted(true);
+    }
+  }, [isMuted, volume, sendIframeCommand]);
+
+  // Handle Smooth Volume Slider Change
+  const handleVolumeChange = useCallback((newVal) => {
+    const val = Math.max(0, Math.min(100, Number(newVal)));
+    setVolume(val);
+    if (val === 0) {
+      setIsMuted(true);
+      sendIframeCommand('mute');
+    } else {
+      if (isMuted) {
+        setIsMuted(false);
+        sendIframeCommand('unMute');
+      }
+      sendIframeCommand('setVolume', [val]);
     }
   }, [isMuted, sendIframeCommand]);
 
@@ -290,8 +322,8 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     setShowUrlInput(false);
   };
 
-  // Construct iframe embed URL
-  const embedUrl = `https://www.youtube.com/embed/${activeVideoId}?enablejsapi=1&autoplay=1&origin=${typeof window !== 'undefined' ? encodeURIComponent(window.location.origin) : ''}&rel=0&iv_load_policy=3&modestbranding=1`;
+  // Construct iframe embed URL with playsinline=1 for smooth mobile iOS Safari playback
+  const embedUrl = `https://www.youtube.com/embed/${activeVideoId}?enablejsapi=1&autoplay=1&playsinline=1&origin=${typeof window !== 'undefined' ? encodeURIComponent(window.location.origin) : ''}&rel=0&iv_load_policy=3&modestbranding=1`;
 
   return (
     <>
@@ -307,30 +339,32 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
         }`}
       >
         <div 
-          className={`relative bg-[#0b1220] border border-white/15 rounded-2xl sm:rounded-3xl shadow-[0_25px_80px_rgba(0,0,0,0.85)] w-full max-w-5xl h-[94dvh] sm:h-auto sm:max-h-[88vh] flex flex-col overflow-hidden text-white ring-1 ring-white/10 transition-transform duration-300 ${
+          className={`relative bg-[#0b1220] border border-white/15 rounded-2xl sm:rounded-3xl shadow-[0_25px_80px_rgba(0,0,0,0.85)] w-full max-w-5xl h-[95dvh] sm:h-auto sm:max-h-[88vh] flex flex-col overflow-hidden text-white ring-1 ring-white/10 transition-transform duration-300 ${
             isOpen ? 'scale-100' : 'scale-95'
           }`}
         >
           
-          {/* Header Bar */}
-          <div className="px-4 sm:px-6 py-3 bg-slate-900/90 border-b border-white/10 flex items-center justify-between flex-shrink-0">
+          {/* Header Bar - Clean & Non-crowded on Mobile */}
+          <div className="px-3.5 sm:px-6 py-2.5 sm:py-3 bg-slate-900/95 border-b border-white/10 flex items-center justify-between flex-shrink-0">
             
             {/* Title & Clean Status Indicator */}
-            <div className="flex items-center gap-2.5 sm:gap-3">
+            <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
               <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-xl bg-red-600 flex items-center justify-center text-white shadow-md shadow-red-600/40 flex-shrink-0">
                 <svg className="w-4 h-4 sm:w-5 sm:h-5 fill-current" viewBox="0 0 24 24">
                   <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
                 </svg>
               </div>
-              <div className="leading-tight">
+              <div className="leading-tight min-w-0">
                 <div className="flex items-center gap-2">
-                  <h3 className="text-sm sm:text-base font-extrabold text-white tracking-wide">
+                  <h3 className="text-sm sm:text-base font-extrabold text-white tracking-wide truncate">
                     YouTube Music
                   </h3>
-                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold flex items-center gap-1.5">
+                  {/* Long badge on desktop; simple live pulse on mobile to avoid overcrowding */}
+                  <span className="hidden sm:inline-flex items-center gap-1.5 text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-semibold">
                     <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
                     <span>Background Audio</span>
                   </span>
+                  <span className="sm:hidden w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" title="Background Audio Active" />
                 </div>
                 <p className="text-[11px] text-slate-400 hidden sm:block mt-0.5">
                   Play songs while studying • Closes cleanly while audio keeps playing
@@ -344,7 +378,7 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
               <button
                 type="button"
                 onClick={() => setShowVideo(!showVideo)}
-                className={`px-2.5 py-1.5 rounded-xl border text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
+                className={`h-8 px-2.5 rounded-xl border text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer ${
                   showVideo 
                     ? 'bg-white/10 text-white border-white/15 hover:bg-white/15' 
                     : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
@@ -355,11 +389,11 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                 <span className="hidden sm:inline">{showVideo ? 'Video' : 'Audio Mode'}</span>
               </button>
 
-              {/* Minimize (Close to background) */}
+              {/* Minimize (Desktop only to prevent redundant buttons on mobile) */}
               <button
                 type="button"
                 onClick={() => onClose && onClose(false)}
-                className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center cursor-pointer transition-colors"
+                className="hidden sm:flex w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white items-center justify-center cursor-pointer transition-colors"
                 title="Minimize (Audio continues)"
               >
                 <Minus className="w-4 h-4" />
@@ -379,12 +413,12 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
           </div>
 
           {/* Clean Responsive Body: Two columns on desktop, stacked on mobile */}
-          <div className="p-3 sm:p-5 md:p-6 overflow-y-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 lg:gap-6 [scrollbar-width:thin] [-webkit-overflow-scrolling:touch]">
+          <div className="p-3 sm:p-5 md:p-6 overflow-y-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-3 sm:gap-5 lg:gap-6 [scrollbar-width:thin] [-webkit-overflow-scrolling:touch]">
             
             {/* ================================================================= */}
-            {/* COLUMN 1: THE PLAYER (Left 6 Cols on Desktop)                     */}
+            {/* COLUMN 1: THE PLAYER & SOUND CONTROLLER (Left 6 Cols on Desktop)  */}
             {/* ================================================================= */}
-            <div className="lg:col-span-6 flex flex-col space-y-3 sm:space-y-4">
+            <div className="lg:col-span-6 flex flex-col space-y-2.5 sm:space-y-3">
               
               {/* THE SINGLE YOUTUBE IFRAME CANVAS */}
               <div className="relative w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl flex-shrink-0">
@@ -392,6 +426,7 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                   ref={iframeRef}
                   key={activeVideoId}
                   src={embedUrl}
+                  onLoad={handleIframeLoad}
                   title="YouTube Player"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
@@ -407,16 +442,16 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                       className="absolute inset-0 w-full h-full object-cover opacity-15 blur-xl pointer-events-none"
                     />
                     
-                    <div className="relative z-10 space-y-2.5">
-                      <div className="w-16 h-16 sm:w-20 sm:h-20 mx-auto rounded-full bg-red-600/20 border-2 border-red-500/40 flex items-center justify-center shadow-lg">
-                        <Headphones className="w-8 h-8 sm:w-9 sm:h-9 text-red-400 animate-pulse" />
+                    <div className="relative z-10 space-y-2">
+                      <div className="w-14 h-14 sm:w-20 sm:h-20 mx-auto rounded-full bg-red-600/20 border-2 border-red-500/40 flex items-center justify-center shadow-lg">
+                        <Headphones className="w-7 h-7 sm:w-9 sm:h-9 text-red-400 animate-pulse" />
                       </div>
 
-                      <div className="space-y-1 max-w-[220px] mx-auto">
+                      <div className="space-y-1 max-w-[240px] mx-auto">
                         <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">
                           Audio Only Mode
                         </span>
-                        <h4 className="text-xs sm:text-sm font-bold text-white truncate pt-1">
+                        <h4 className="text-xs sm:text-sm font-bold text-white truncate pt-0.5">
                           {currentTrack.title}
                         </h4>
                         <p className="text-[10px] text-slate-400 truncate">{currentTrack.channel}</p>
@@ -437,12 +472,142 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                 )}
               </div>
 
+              {/* DEDICATED HIGH-END SOUND & PLAYBACK CONTROLLER SUITE */}
+              <div className="bg-slate-900/90 border border-white/10 rounded-xl sm:rounded-2xl p-2.5 sm:p-3 shadow-xl backdrop-blur-sm space-y-2 flex-shrink-0">
+                
+                {/* Now Playing Title & Status Header */}
+                <div className="flex items-center justify-between gap-2 px-1">
+                  <div className="min-w-0 flex-1 flex items-center gap-2">
+                    <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isPlaying ? 'bg-red-500 animate-ping' : 'bg-slate-600'}`} />
+                    <div className="min-w-0 flex-1">
+                      <p className="text-xs sm:text-sm font-bold text-white truncate leading-tight">
+                        {currentTrack?.title || 'YouTube Track'}
+                      </p>
+                      <p className="text-[10px] text-slate-400 truncate">
+                        {currentTrack?.channel || 'YouTube Music'}
+                      </p>
+                    </div>
+                  </div>
+
+                  {/* Playing Indicator */}
+                  <span className={`text-[10px] font-semibold px-2 py-0.5 rounded-full flex items-center gap-1.5 flex-shrink-0 ${
+                    isPlaying 
+                      ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30' 
+                      : 'bg-slate-800 text-slate-400 border border-white/5'
+                  }`}>
+                    {isPlaying && (
+                      <span className="flex items-center gap-0.5">
+                        <span className="w-0.5 h-2 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                        <span className="w-0.5 h-3 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                        <span className="w-0.5 h-1.5 bg-emerald-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                      </span>
+                    )}
+                    <span>{isPlaying ? 'Playing' : 'Paused'}</span>
+                  </span>
+                </div>
+
+                {/* Master Playback & Sound Control Row */}
+                <div className="flex items-center justify-between gap-1.5 sm:gap-3 pt-1 border-t border-white/5">
+                  
+                  {/* Left: Playback Action Buttons */}
+                  <div className="flex items-center gap-1 sm:gap-1.5 flex-shrink-0">
+                    <button
+                      type="button"
+                      onClick={handlePrevTrack}
+                      className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/15 active:scale-95 text-slate-300 hover:text-white flex items-center justify-center transition-all cursor-pointer"
+                      title="Previous Track"
+                    >
+                      <SkipBack className="w-4 h-4 fill-current" />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleTogglePlay}
+                      className="w-10 h-10 rounded-xl bg-gradient-to-r from-red-600 to-rose-600 hover:from-red-500 hover:to-rose-500 active:scale-95 text-white shadow-md shadow-red-600/30 flex items-center justify-center transition-all cursor-pointer flex-shrink-0"
+                      title={isPlaying ? "Pause" : "Play"}
+                    >
+                      {isPlaying ? (
+                        <Pause className="w-5 h-5 fill-white text-white" />
+                      ) : (
+                        <Play className="w-5 h-5 fill-white text-white ml-0.5" />
+                      )}
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleNextTrack}
+                      className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/15 active:scale-95 text-slate-300 hover:text-white flex items-center justify-center transition-all cursor-pointer"
+                      title="Next Track"
+                    >
+                      <SkipForward className="w-4 h-4 fill-current" />
+                    </button>
+
+                    <button
+                      type="button"
+                      onClick={handleStop}
+                      className="w-8 h-8 rounded-lg bg-white/5 hover:bg-white/15 active:scale-95 text-slate-400 hover:text-rose-400 hidden min-[440px]:flex items-center justify-center transition-all cursor-pointer"
+                      title="Stop & Reset"
+                    >
+                      <Square className="w-3.5 h-3.5 fill-current" />
+                    </button>
+                  </div>
+
+                  {/* Vertical Divider */}
+                  <div className="h-6 w-px bg-white/10 flex-shrink-0" />
+
+                  {/* Right: Perfect Dedicated Sound & Volume Controller */}
+                  <div className="flex-1 flex items-center gap-1.5 sm:gap-2 min-w-0">
+                    
+                    {/* Interactive Mute / Unmute Button */}
+                    <button
+                      type="button"
+                      onClick={handleToggleMute}
+                      className={`w-8 h-8 rounded-lg flex items-center justify-center transition-all active:scale-95 cursor-pointer flex-shrink-0 ${
+                        isMuted || volume === 0
+                          ? 'bg-rose-500/20 text-rose-400 border border-rose-500/40 hover:bg-rose-500/30 shadow-xs'
+                          : 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 hover:bg-emerald-500/25 shadow-xs'
+                      }`}
+                      title={isMuted ? "Unmute Sound" : "Mute Sound"}
+                    >
+                      {isMuted || volume === 0 ? (
+                        <VolumeX className="w-4 h-4" />
+                      ) : (
+                        <Volume2 className="w-4 h-4" />
+                      )}
+                    </button>
+
+                    {/* Smooth Horizontal Volume Range Slider */}
+                    <div className="flex-1 relative flex items-center min-w-[65px] sm:min-w-[100px]">
+                      <input
+                        type="range"
+                        min="0"
+                        max="100"
+                        value={isMuted ? 0 : volume}
+                        onChange={(e) => handleVolumeChange(e.target.value)}
+                        aria-label="Volume Slider"
+                        className="w-full h-1.5 rounded-lg appearance-none cursor-pointer accent-red-500 focus:outline-none"
+                        style={{
+                          background: `linear-gradient(to right, #ef4444 0%, #ef4444 ${isMuted ? 0 : volume}%, #334155 ${isMuted ? 0 : volume}%, #334155 100%)`
+                        }}
+                      />
+                    </div>
+
+                    {/* Volume Percentage Indicator */}
+                    <span className="text-[10px] sm:text-[11px] font-mono font-bold text-slate-300 w-7 sm:w-9 text-right flex-shrink-0 select-none">
+                      {isMuted || volume === 0 ? '0%' : `${volume}%`}
+                    </span>
+                  </div>
+
+                </div>
+
+              </div>
+
             </div>
 
             {/* ================================================================= */}
             {/* COLUMN 2: SEARCH & TRACKLIST (Right 6 Cols on Desktop)            */}
             {/* ================================================================= */}
-            <div className="lg:col-span-6 flex flex-col space-y-3 min-h-[340px]">
+            <div className="lg:col-span-6 flex flex-col space-y-3 min-h-[320px]">
               
               {/* Search Bar Input */}
               <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 flex-shrink-0">
@@ -450,17 +615,17 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                   <input
                     ref={searchInputRef}
                     type="text"
-                    placeholder="Search any song or artist (VannDa, Doung Virakseth, Taylor Swift, Lofi...)"
+                    placeholder="Search any song or artist (VannDa, Doung Virakseth, Lofi...)"
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-slate-950/90 border border-white/15 rounded-xl pl-10 pr-9 py-2.5 text-xs sm:text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                    className="w-full bg-slate-950/90 border border-white/15 rounded-xl pl-9 sm:pl-10 pr-9 py-2 sm:py-2.5 text-xs sm:text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
                   />
-                  <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
+                  <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 absolute left-3 sm:left-3.5 top-2.5 sm:top-3 pointer-events-none" />
                   {searchQuery && (
                     <button
                       type="button"
                       onClick={() => setSearchQuery('')}
-                      className="p-1 rounded-lg text-slate-400 hover:text-white absolute right-2.5 top-2.5 cursor-pointer"
+                      className="p-1 rounded-lg text-slate-400 hover:text-white absolute right-2.5 top-2 cursor-pointer"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
@@ -470,7 +635,7 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                 <button
                   type="submit"
                   disabled={isSearching}
-                  className="px-4 sm:px-5 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-md transition-transform active:scale-95 cursor-pointer flex-shrink-0"
+                  className="px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-md transition-transform active:scale-95 cursor-pointer flex-shrink-0"
                 >
                   {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                   <span className="hidden sm:inline">Search</span>
@@ -539,7 +704,7 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
 
               {/* Direct URL Input */}
               {showUrlInput && (
-                <form onSubmit={handleLoadCustomUrl} className="p-3 bg-white/5 border border-white/10 rounded-xl space-y-2 flex-shrink-0 animate-fadeIn">
+                <form onSubmit={handleLoadCustomUrl} className="p-2.5 sm:p-3 bg-white/5 border border-white/10 rounded-xl space-y-2 flex-shrink-0 animate-fadeIn">
                   <div className="flex items-center gap-2">
                     <input
                       type="text"
@@ -549,12 +714,12 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                         setCustomUrl(e.target.value);
                         setUrlError('');
                       }}
-                      className="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-red-500 font-mono"
+                      className="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-1.5 sm:py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-red-500 font-mono"
                     />
                     <button
                       type="submit"
                       disabled={!customUrl.trim()}
-                      className="px-3.5 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                      className="px-3.5 py-1.5 sm:py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center gap-1 cursor-pointer disabled:opacity-50"
                     >
                       <Play className="w-3 h-3 fill-white" />
                       <span>Play</span>
@@ -570,7 +735,7 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
               )}
 
               {/* Scrollable Track Rows List */}
-              <div className="flex-1 overflow-y-auto pr-1 space-y-1.5 max-h-[360px] sm:max-h-[380px] [scrollbar-width:thin] [-webkit-overflow-scrolling:touch]">
+              <div className="flex-1 overflow-y-auto pr-1 space-y-1.5 max-h-[340px] sm:max-h-[380px] [scrollbar-width:thin] [-webkit-overflow-scrolling:touch]">
                 {isSearching ? (
                   <div className="py-12 text-center space-y-2">
                     <Loader2 className="w-6 h-6 text-red-500 animate-spin mx-auto" />
@@ -587,14 +752,14 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                     <div
                       key={track.id}
                       onClick={() => handleTrackClick(track)}
-                      className={`p-2 sm:p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 group ${
+                      className={`p-2 sm:p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2.5 sm:gap-3 group ${
                         isCurrent
                           ? 'bg-red-600/15 border-red-500/50 text-white shadow-xs'
                           : 'bg-white/5 hover:bg-white/10 border-white/5 hover:border-white/15 text-slate-300'
                       }`}
                     >
                       {/* Thumbnail & Title */}
-                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
                         <div className="relative w-12 h-10 sm:w-14 sm:h-11 rounded-lg overflow-hidden flex-shrink-0 bg-black shadow-xs">
                           <img 
                             src={track.thumbnail || `https://i.ytimg.com/vi/${track.id}/hqdefault.jpg`} 
@@ -625,8 +790,8 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                         </div>
                       </div>
 
-                      {/* Duration & Play/Pause Button */}
-                      <div className="flex items-center gap-2 flex-shrink-0">
+                      {/* Duration & Play/Pause Action */}
+                      <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
                         {track.duration && (
                           <span className="text-[10px] text-slate-400 font-mono hidden min-[400px]:inline">
                             {track.duration}
@@ -663,7 +828,7 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
           </div>
 
           {/* Clean Bottom Footer Bar */}
-          <div className="px-4 sm:px-6 py-2.5 bg-slate-900/90 border-t border-white/10 flex items-center justify-between text-xs text-slate-400 flex-shrink-0">
+          <div className="px-4 sm:px-6 py-2 sm:py-2.5 bg-slate-900/95 border-t border-white/10 flex items-center justify-between text-xs text-slate-400 flex-shrink-0 pb-[max(0.5rem,env(safe-area-inset-bottom))]">
             <div className="flex items-center gap-2">
               <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isPlaying ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`} />
               <span className="text-[11px] sm:text-xs text-slate-300 font-medium">
@@ -674,7 +839,7 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
             <button
               type="button"
               onClick={() => onClose && onClose(false)}
-              className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-semibold text-xs transition-colors cursor-pointer flex-shrink-0"
+              className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-white font-semibold text-xs transition-all cursor-pointer flex-shrink-0"
             >
               Close & Listen
             </button>
