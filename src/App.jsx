@@ -731,9 +731,7 @@ function MainApp() {
           <nav 
             className="fixed bottom-0 left-0 right-0 z-50 md:hidden select-none font-kantumruy bg-white dark:bg-[#0c1427] border-t border-slate-200/80 dark:border-slate-800 shadow-[0_-4px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_-4px_25px_rgba(0,0,0,0.5)]"
             style={{
-              paddingBottom: 'env(safe-area-inset-bottom, 0px)',
-              transform: 'translate3d(0, 0, 0)',
-              WebkitTransform: 'translate3d(0, 0, 0)'
+              paddingBottom: 'env(safe-area-inset-bottom, 0px)'
             }}
           >
             {/* Main Bar Container (Light & Dark Mode Support) */}
