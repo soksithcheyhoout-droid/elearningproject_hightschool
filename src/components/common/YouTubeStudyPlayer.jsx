@@ -93,6 +93,8 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
   const [activeVideoId, setActiveVideoId] = useState(DEFAULT_STUDY_TRACKS[0].id);
   const [currentTrack, setCurrentTrack] = useState(DEFAULT_STUDY_TRACKS[0]);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [hasUserStarted, setHasUserStarted] = useState(false);
+  const hasUserStartedRef = useRef(false);
   const [isMuted, setIsMuted] = useState(false);
   const [volume, setVolume] = useState(100);
   const [showVideo, setShowVideo] = useState(true);
@@ -176,6 +178,8 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
         if (data.event === 'onStateChange' || (data.event === 'infoDelivery' && data.info?.playerState !== undefined)) {
           const state = data.info?.playerState !== undefined ? data.info.playerState : data.info;
           if (state === 1) {
+            setHasUserStarted(true);
+            hasUserStartedRef.current = true;
             setIsPlaying(true);
           } else if (state === 2 || state === 0) {
             setIsPlaying(false);
@@ -249,13 +253,20 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
             events: {
               onReady: (event) => {
                 try {
-                  event.target.unMute();
                   event.target.setVolume(volumeRef.current);
+                  if (hasUserStartedRef.current) {
+                    event.target.unMute();
+                  }
                 } catch (e) {}
               },
               onStateChange: (event) => {
-                if (event.data === 1) setIsPlaying(true);
-                else if (event.data === 2 || event.data === 0) setIsPlaying(false);
+                if (event.data === 1) {
+                  setHasUserStarted(true);
+                  hasUserStartedRef.current = true;
+                  setIsPlaying(true);
+                } else if (event.data === 2 || event.data === 0) {
+                  setIsPlaying(false);
+                }
               }
             }
           });
@@ -281,6 +292,8 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
 
   // Toggle Play / Pause
   const handleTogglePlay = useCallback(() => {
+    setHasUserStarted(true);
+    hasUserStartedRef.current = true;
     if (isPlaying) {
       sendIframeCommand('pauseVideo');
       setIsPlaying(false);
@@ -299,6 +312,8 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
 
   // Proactively unmute and activate sound reliably (never stay on "close" / VolumeX)
   const handleUnmuteAndPlay = useCallback(() => {
+    setHasUserStarted(true);
+    hasUserStartedRef.current = true;
     const targetVol = volumeRef.current > 0 ? volumeRef.current : 100;
     setIsMuted(false);
     setVolume(targetVol);
@@ -438,6 +453,8 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
 
   // Handle track selection from list: if already active, toggle play/pause; otherwise play new
   const handleTrackClick = useCallback((track) => {
+    setHasUserStarted(true);
+    hasUserStartedRef.current = true;
     if (activeVideoId === track.id) {
       handleTogglePlay();
     } else {
@@ -537,8 +554,12 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     setShowUrlInput(false);
   };
 
+  // Only mount player iframe if modal has been opened or user has initiated playback
+  const shouldMountPlayer = isOpen || hasUserStarted;
+
   // Construct iframe embed URL with native YouTube controls visible (play, volume, progress, fullscreen)
-  const embedUrl = `https://www.youtube.com/embed/${activeVideoId}?enablejsapi=1&autoplay=1&playsinline=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}&rel=0&iv_load_policy=3&modestbranding=1`;
+  // Disable autoplay until the student explicitly clicks play
+  const embedUrl = `https://www.youtube.com/embed/${activeVideoId}?enablejsapi=1&autoplay=${hasUserStarted ? 1 : 0}&playsinline=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}&rel=0&iv_load_policy=3&modestbranding=1`;
 
   return (
     <>
@@ -637,17 +658,24 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
               
               {/* THE SINGLE YOUTUBE IFRAME CANVAS */}
               <div className="relative w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl flex-shrink-0 group">
-                <iframe
-                  ref={iframeRef}
-                  id="youtube-study-player-iframe"
-                  key={activeVideoId}
-                  src={embedUrl}
-                  onLoad={handleIframeLoad}
-                  title="YouTube Player"
-                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                  allowFullScreen
-                  className={showVideo ? "w-full h-full border-0" : "w-1 h-1 opacity-0 absolute pointer-events-none"}
-                />
+                {shouldMountPlayer ? (
+                  <iframe
+                    ref={iframeRef}
+                    id="youtube-study-player-iframe"
+                    key={activeVideoId}
+                    src={embedUrl}
+                    onLoad={handleIframeLoad}
+                    title="YouTube Player"
+                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                    allowFullScreen
+                    className={showVideo ? "w-full h-full border-0" : "w-1 h-1 opacity-0 absolute pointer-events-none"}
+                  />
+                ) : (
+                  <div className="w-full h-full flex flex-col items-center justify-center bg-slate-950 text-slate-500 gap-2">
+                    <Headphones className="w-10 h-10 opacity-40 animate-pulse text-red-500" />
+                    <span className="text-xs text-slate-400 font-medium">YouTube Study Player</span>
+                  </div>
+                )}
 
                 {/* Custom Volume Button - shown ONLY on mobile (hidden on PC/desktop) */}
                 <div 
@@ -997,17 +1025,41 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
             <div className="flex items-center gap-2">
               <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isPlaying ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`} />
               <span className="text-[11px] sm:text-xs text-slate-300 font-medium">
-                {isPlaying ? 'Audio Playing in Background' : 'Audio Paused'}
+                {isPlaying ? 'Audio Playing in Background' : 'Audio Paused (Click Play to Start)'}
               </span>
             </div>
 
-            <button
-              type="button"
-              onClick={() => onClose && onClose(false)}
-              className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-white font-semibold text-xs transition-all cursor-pointer flex-shrink-0"
-            >
-              Close & Listen
-            </button>
+            <div className="flex items-center gap-2 sm:gap-3">
+              <button
+                type="button"
+                onClick={handleTogglePlay}
+                className={`px-3 sm:px-4 py-1.5 rounded-xl font-bold text-xs flex items-center gap-1.5 transition-all cursor-pointer shadow-md active:scale-95 ${
+                  isPlaying
+                    ? 'bg-amber-500 hover:bg-amber-600 text-slate-950'
+                    : 'bg-red-600 hover:bg-red-700 text-white'
+                }`}
+              >
+                {isPlaying ? (
+                  <>
+                    <Pause className="w-3.5 h-3.5 fill-current" />
+                    <span>Pause</span>
+                  </>
+                ) : (
+                  <>
+                    <Play className="w-3.5 h-3.5 fill-current ml-0.5" />
+                    <span>Play</span>
+                  </>
+                )}
+              </button>
+
+              <button
+                type="button"
+                onClick={() => onClose && onClose(false)}
+                className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-white font-semibold text-xs transition-all cursor-pointer flex-shrink-0"
+              >
+                Close & Listen
+              </button>
+            </div>
           </div>
 
         </div>
