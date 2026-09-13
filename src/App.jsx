@@ -756,23 +756,28 @@ function MainApp() {
         const navItems = [
           { id: 'home', icon: Home, labelKm: 'ទំព័រដើម', labelEn: 'Home', action: () => { setTabAndUrl('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); } },
           { id: 'courses', icon: BookOpen, labelKm: 'មេរៀន', labelEn: 'Lessons', action: () => { setTabAndUrl('courses'); window.scrollTo({ top: 0, behavior: 'smooth' }); } },
-          { id: 'playground', icon: Gamepad2, labelKm: 'ហ្គេម', labelEn: 'Games', action: () => { setTabAndUrl('playground'); window.scrollTo({ top: 0, behavior: 'smooth' }); }, badge: true },
+          { id: 'playground', icon: Gamepad2, labelKm: 'ហ្គេម', labelEn: 'Games', action: () => { setTabAndUrl('playground'); window.scrollTo({ top: 0, behavior: 'smooth' }); } },
           { id: 'bacii', icon: GraduationCap, labelKm: 'បាក់ឌុប', labelEn: 'Bac II', action: () => { setTabAndUrl('bacii'); window.scrollTo({ top: 0, behavior: 'smooth' }); } },
           { id: 'chat', icon: MessageSquare, labelKm: 'ជជែក', labelEn: 'Chat', action: () => { setTabAndUrl('chat'); window.scrollTo({ top: 0, behavior: 'smooth' }); }, badgeDot: true },
           { id: 'ai', icon: Bot, labelKm: 'គ្រូ AI', labelEn: 'AI Tutor', action: () => setIsAITutorOpen(true) }
         ];
 
+
         return (
           <nav 
-            className="fixed bottom-0 left-0 right-0 w-full z-50 md:hidden select-none font-kantumruy bg-white dark:bg-[#0c1427] border-t border-slate-200/80 dark:border-slate-800 shadow-[0_-4px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_-4px_25px_rgba(0,0,0,0.5)]"
+            className="fixed bottom-0 left-0 right-0 w-full z-50 md:hidden select-none font-kantumruy"
             style={{
-              paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 0.5rem)',
+              background: '#ffffff',
+              borderTop: '1px solid rgba(226, 232, 240, 0.9)',
+              boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.05)',
+              paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)',
+              paddingTop: '8px',
               transform: isBottomNavHidden ? 'translateY(100%)' : 'translateY(0)',
               transition: 'none'
             }}
           >
-            {/* Main Bar Container (Light & Dark Mode Support) */}
-            <div className="relative h-[62px] flex items-center px-1 overflow-visible">
+            {/* Main Bar Container */}
+            <div className="relative h-[56px] flex items-stretch px-1 overflow-visible">
               
               {/* Dynamic Curved Cutout Scoop (Smooth S-curve Notch) */}
               <svg
@@ -785,11 +790,11 @@ function MainApp() {
               >
                 <path
                   d="M0 0 C 16 0, 22 26, 40 26 C 58 26, 64 0, 80 0 L 80 0 L 0 0 Z"
-                  className="fill-[#f4f7fb] dark:fill-[#090d16]"
+                  fill="#f4f7fb"
                 />
                 <path
                   d="M0 0 C 16 0, 22 26, 40 26 C 58 26, 64 0, 80 0"
-                  className="stroke-slate-200 dark:stroke-slate-800"
+                  stroke="#e2e8f0"
                   strokeWidth="1.5"
                   strokeLinecap="round"
                   fill="none"
@@ -804,7 +809,7 @@ function MainApp() {
                   transform: 'translateX(-50%)'
                 }}
               >
-                <div className="w-[48px] h-[48px] rounded-full bg-gradient-to-tr from-[#005baa] via-[#006bbd] to-[#008fe3] text-white flex items-center justify-center shadow-[0_6px_20px_rgba(0,91,170,0.45)] border-[3.5px] border-white dark:border-[#0c1427]">
+                <div className="w-[48px] h-[48px] rounded-full bg-gradient-to-tr from-[#005baa] via-[#006bbd] to-[#008fe3] text-white flex items-center justify-center shadow-[0_6px_20px_rgba(0,91,170,0.45)] border-[3.5px] border-white">
                   {activeIndex === 0 && <Home className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
                   {activeIndex === 1 && <BookOpen className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
                   {activeIndex === 2 && <Gamepad2 className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
@@ -824,31 +829,29 @@ function MainApp() {
                     key={item.id}
                     type="button"
                     onClick={item.action}
-                    className="flex-1 flex flex-col items-center justify-center h-full relative z-10 cursor-pointer active:scale-95 transition-all group"
+                    className="flex-1 flex flex-col items-center justify-end pb-1 h-full relative z-10 cursor-pointer active:scale-95 transition-all group"
                   >
-                    {/* Inactive Icon or Spacing Placeholder */}
-                    <div className="relative flex items-center justify-center h-6">
+                    {/* Icon area — uniform height for all items */}
+                    <div className="relative flex items-center justify-center h-5 mb-1">
                       {!isActive ? (
-                        <IconComponent className={`w-5 h-5 text-slate-500 dark:text-slate-400 group-hover:text-slate-900 dark:group-hover:text-white transition-colors stroke-[1.8] ${item.id === 'playground' ? 'text-amber-500' : ''}`} />
+                        <IconComponent className={`w-[20px] h-[20px] text-slate-400 group-hover:text-slate-700 transition-colors stroke-[1.8]`} />
                       ) : (
-                        <div className="h-2" />
+                        /* Empty spacer for active item (icon is in the floating bubble above) */
+                        <div className="h-5" />
                       )}
 
-                      {/* Small badge / dots for inactive items */}
-                      {!isActive && item.badge && (
-                        <span className="absolute -top-1 -right-1.5 w-2 h-2 rounded-full bg-amber-500 animate-ping" />
-                      )}
+                      {/* Notification dot for chat — small, non-distracting */}
                       {!isActive && item.badgeDot && (
-                        <span className="absolute -top-1 -right-1 w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
+                        <span className="absolute -top-0.5 -right-1 w-1.5 h-1.5 rounded-full bg-emerald-500" />
                       )}
                     </div>
 
-                    {/* Label */}
+                    {/* Label — consistent positioning for all items */}
                     <span
-                      className={`text-[9.5px] font-bold transition-all ${
+                      className={`text-[9.5px] leading-tight transition-colors ${
                         isActive
-                          ? 'text-[#005baa] dark:text-cyan-400 font-black scale-105 mt-2'
-                          : 'text-slate-500 dark:text-slate-400 group-hover:text-slate-800 dark:group-hover:text-slate-200'
+                          ? 'text-[#005baa] font-black mt-1'
+                          : 'text-slate-400 font-semibold group-hover:text-slate-700'
                       }`}
                     >
                       {lang === 'km' ? item.labelKm : item.labelEn}
@@ -858,6 +861,7 @@ function MainApp() {
               })}
             </div>
           </nav>
+
         );
       })()}
 
