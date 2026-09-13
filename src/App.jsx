@@ -735,29 +735,51 @@ function MainApp() {
             style={{
               background: '#ffffff',
               borderTop: '1px solid rgba(226, 232, 240, 0.9)',
-              boxShadow: '0 -2px 12px rgba(0, 0, 0, 0.05)',
-              paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)',
-              paddingTop: '6px'
+              boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.05)',
+              paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)',
+              paddingTop: '8px'
             }}
           >
             {/* Main Bar Container */}
-            <div className="relative h-[52px] flex items-stretch px-1 overflow-visible">
+            <div className="relative h-[56px] flex items-stretch px-1 overflow-visible">
+              
+              {/* Dynamic Curved Cutout Scoop (Smooth S-curve Notch) */}
+              <svg
+                className="absolute -top-[1px] w-[80px] h-[30px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-10"
+                style={{
+                  left: `calc(${activeIndex * (100 / 6)}% + ${(100 / 6) / 2}% - 40px)`
+                }}
+                viewBox="0 0 80 30"
+                fill="none"
+              >
+                <path
+                  d="M0 0 C 16 0, 22 26, 40 26 C 58 26, 64 0, 80 0 L 80 0 L 0 0 Z"
+                  fill="#f4f7fb"
+                />
+                <path
+                  d="M0 0 C 16 0, 22 26, 40 26 C 58 26, 64 0, 80 0"
+                  stroke="#e2e8f0"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                  fill="none"
+                />
+              </svg>
 
-              {/* Active Circular Bubble - nested cleanly and smoothly into the bar */}
+              {/* Floating Active Circular Bubble with Signature MoEYS Royal Blue Gradient */}
               <div
-                className="absolute top-[2px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-20"
+                className="absolute -top-[18px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-20"
                 style={{
                   left: `calc(${activeIndex * (100 / 6)}% + ${(100 / 6) / 2}%)`,
                   transform: 'translateX(-50%)'
                 }}
               >
-                <div className="w-[38px] h-[38px] rounded-full bg-gradient-to-tr from-[#005baa] via-[#006bbd] to-[#008fe3] text-white flex items-center justify-center shadow-[0_3px_10px_rgba(0,91,170,0.35)] border-[2px] border-white">
-                  {activeIndex === 0 && <Home className="w-[19px] h-[19px] animate-scaleIn stroke-[2.2]" />}
-                  {activeIndex === 1 && <BookOpen className="w-[19px] h-[19px] animate-scaleIn stroke-[2.2]" />}
-                  {activeIndex === 2 && <Gamepad2 className="w-[19px] h-[19px] animate-scaleIn stroke-[2.2]" />}
-                  {activeIndex === 3 && <GraduationCap className="w-[19px] h-[19px] animate-scaleIn stroke-[2.2]" />}
-                  {activeIndex === 4 && <MessageSquare className="w-[19px] h-[19px] animate-scaleIn stroke-[2.2]" />}
-                  {activeIndex === 5 && <Bot className="w-[19px] h-[19px] animate-scaleIn stroke-[2.2]" />}
+                <div className="w-[48px] h-[48px] rounded-full bg-gradient-to-tr from-[#005baa] via-[#006bbd] to-[#008fe3] text-white flex items-center justify-center shadow-[0_6px_20px_rgba(0,91,170,0.45)] border-[3.5px] border-white">
+                  {activeIndex === 0 && <Home className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
+                  {activeIndex === 1 && <BookOpen className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
+                  {activeIndex === 2 && <Gamepad2 className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
+                  {activeIndex === 3 && <GraduationCap className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
+                  {activeIndex === 4 && <MessageSquare className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
+                  {activeIndex === 5 && <Bot className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
                 </div>
               </div>
 
@@ -774,15 +796,15 @@ function MainApp() {
                     className="flex-1 flex flex-col items-center justify-end pb-1 h-full relative z-10 cursor-pointer active:scale-95 transition-all group"
                   >
                     {/* Icon area — uniform height for all items */}
-                    <div className="relative flex items-center justify-center h-[22px] mb-1">
+                    <div className="relative flex items-center justify-center h-5 mb-1">
                       {!isActive ? (
-                        <IconComponent className={`w-[20px] h-[20px] text-slate-400 group-hover:text-[#005baa] transition-colors stroke-[1.8]`} />
+                        <IconComponent className={`w-[20px] h-[20px] text-slate-400 group-hover:text-slate-700 transition-colors stroke-[1.8]`} />
                       ) : (
-                        /* Empty spacer for active item (icon is in the circular bubble above) */
-                        <div className="h-[22px]" />
+                        /* Empty spacer for active item (icon is in the floating bubble above) */
+                        <div className="h-5" />
                       )}
 
-                      {/* Notification dot for chat */}
+                      {/* Notification dot for chat — small, non-distracting */}
                       {!isActive && item.badgeDot && (
                         <span className="absolute -top-0.5 -right-1 w-1.5 h-1.5 rounded-full bg-emerald-500" />
                       )}
@@ -792,7 +814,7 @@ function MainApp() {
                     <span
                       className={`text-[9.5px] leading-tight transition-colors ${
                         isActive
-                          ? 'text-[#005baa] font-black'
+                          ? 'text-[#005baa] font-black mt-1'
                           : 'text-slate-400 font-semibold group-hover:text-slate-700'
                       }`}
                     >
