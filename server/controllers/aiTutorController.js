@@ -72,7 +72,7 @@ function cleanDisplaySymbols(text) {
  */
 async function callAITeacher(prompt, history = [], customKey = null) {
   const keyToUse = (customKey && typeof customKey === 'string' && customKey.trim().length > 10) ? customKey.trim() : AI_API_KEY;
-  const systemInstruction = `អ្នកគឺជា «លោកគ្រូបង្រៀនគរុកោសល្យ» (Master Teacher) ដ៏ពូកែ ចិត្តល្អ និងមានគរុកោសល្យខ្ពស់បំផុតប្រចាំកម្ពុជា នៃប្រព័ន្ធបញ្ញាសិប្បនិម្មិតអប់រំជាតិ MoEYS រួមបញ្ចូលជាមួយកម្មវិធីសិក្សាជាតិរបស់ក្រសួងអប់រំ យុវជន និងកីឡា (MoEYS)។
+  const systemInstruction = `អ្នកគឺជា «លោកគ្រូបង្រៀន Motdar» (Motdar Teacher / Motdar Master Teacher) ដ៏ពូកែ ចិត្តល្អ និងមានគរុកោសល្យខ្ពស់បំផុតនៃប្រព័ន្ធអប់រំ Motdar (Motdar E-Learning) ដែលស្របតាមកម្មវិធីសិក្សាជាតិរបស់ក្រសួងអប់រំ យុវជន និងកីឡា (MoEYS)។
 
 ច្បាប់សំខាន់បំផុតនៃការបង្រៀន (Core Pedagogical Directives):
 ១. ត្រូវឆ្លើយ បកស្រាយ ពន្យល់ និងដោះស្រាយសំណួររបស់សិស្សភ្លាមៗ ដោយផ្ទាល់ ច្បាស់លាស់ និងក្បោះក្បាយជាភាសាខ្មែរ!
@@ -84,7 +84,7 @@ async function callAITeacher(prompt, history = [], customKey = null) {
    - ៣. ឧទាហរណ៍ជាក់ស្តែងជាមួយដំណោះស្រាយមួយជំហានម្តងៗ (Step-by-Step Example: ជំហានទី ១, ជំហានទី ២, ...)
    - ៤. គន្លឹះប្រឡងបាក់ឌុប និងចំណុចគួរប្រយ័ត្ន (Bac II Exam Tips & Common Mistakes)
    - លើកទឹកចិត្តសិស្ស និងអញ្ជើញសួរបន្ត
-៤. អត្តសញ្ញាណរបស់គ្រូ៖ បើសិស្សសួរថាអ្នកជាអ្វី ឬបង្កើតដោយអ្នកណា ចូរឆ្លើយថា លោកគ្រូជា «លោកគ្រូបង្រៀនគរុកោសល្យ AI» នៃប្រព័ន្ធអប់រំជាតិ MoEYS ដែលបង្កើតឡើងដើម្បីជួយពន្យល់មេរៀន និងដោះស្រាយលំហាត់ជូនកូនសិស្សកម្ពុជាទូទាំងប្រទេស! ហាមដាច់ខាតកុំលើកឡើងពីឈ្មោះ Gemini ឬ Google ឬម៉ាកយីហោក្រុមហ៊ុនបច្ចេកវិទ្យាណាមួយឡើយ ត្រូវរក្សាអត្តសញ្ញាណជាលោកគ្រូបង្រៀនគរុកោសល្យជាតិខ្មែរជានិច្ច!
+៤. អត្តសញ្ញាណរបស់គ្រូ៖ បើសិស្សសួរថាអ្នកជាអ្វី ឬឈ្មោះអ្វី ចូរឆ្លើយថា លោកគ្រូជា «លោកគ្រូបង្រៀន Motdar» (Motdar Teacher) នៃប្រព័ន្ធអប់រំ Motdar ដែលបង្កើតឡើងដើម្បីជួយពន្យល់មេរៀន ដោះស្រាយលំហាត់ និងចែករំលែកចំណេះដឹងដល់ប្អូនៗសិស្សានុសិស្សទាំងអស់គ្នា! ហាមដាច់ខាតកុំលើកឡើងពីឈ្មោះ Gemini ឬ Google ឬក្រុមហ៊ុនបច្ចេកវិទ្យាណាមួយឡើយ!
 
 របៀបសរសេរ និងទម្រង់អត្ថបទ (Clean Formatting):
 - សរសេររូបមន្តគណិតវិទ្យា និងវិទ្យាសាស្ត្រជាអក្សរធម្មតាស្រួលអាន (ឧទាហរណ៍៖ lim(x -> a) f(x) = L, រាង 0/0, f'(x) = (u'v - uv') / v^2, x^2 + 2x + 1 = 0) មិនបាច់ប្រើ syntax LaTeX ស្មុគស្មាញឡើយ។
@@ -200,17 +200,17 @@ export async function handleAIChat(req, res) {
     if (checkRudeContent(rawPrompt)) {
       return res.json({
         reply: '⚠️ ប្អូនសម្លាញ់! ក្នុងនាមជាសិស្សល្អ ចូរយើងប្រើប្រាស់ពាក្យសម្តីសមរម្យ និងថ្លៃថ្នូរណា៎! លោកគ្រូរីករាយនឹងជួយពន្យល់រាល់មេរៀន ចំណេះដឹងទូទៅ និងការដោះស្រាយលំហាត់ជូនប្អូនជានិច្ច។',
-        source: 'លោកគ្រូបង្រៀនគរុកោសល្យ',
+        source: 'លោកគ្រូបង្រៀន Motdar',
         timestamp: new Date().toISOString()
       });
     }
 
-    // 2. Direct High-Performance AI Teacher (Uses Google Gemini API)
+    // 2. Direct High-Performance AI Teacher
     const aiResponse = await callAITeacher(rawPrompt, messages, clientKey);
     if (aiResponse) {
       return res.json({
         reply: aiResponse,
-        source: 'លោកគ្រូបង្រៀនគរុកោសល្យ',
+        source: 'លោកគ្រូបង្រៀន Motdar',
         timestamp: new Date().toISOString()
       });
     }
@@ -219,7 +219,7 @@ export async function handleAIChat(req, res) {
     const kmTopic = await translateLive(rawPrompt, 'km');
     return res.json({
       reply: `សំណួរអំពី «${cleanDisplaySymbols(kmTopic || rawPrompt)}» នេះល្អណាស់ប្អូន! ដើម្បីឱ្យលោកគ្រូអាចពន្យល់ និងដោះស្រាយជូនកូនបានចំគោលដៅបំផុត សូមប្អូនជួយបញ្ជាក់បន្ថែមបន្តិច ឬសរសេរប្រធានលំហាត់ពេញលេញមកណា៎ គ្រូរីករាយនឹងជួយពន្យល់ជូន!`,
-      source: 'លោកគ្រូបង្រៀនគរុកោសល្យ',
+      source: 'លោកគ្រូបង្រៀន Motdar',
       timestamp: new Date().toISOString()
     });
   } catch (error) {

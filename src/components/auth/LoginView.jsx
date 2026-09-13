@@ -1534,7 +1534,7 @@ export default function LoginView() {
 
             <div className="space-y-1.5">
               <label className="text-[11px] font-bold text-slate-300 flex items-center justify-between">
-                <span>AI Master Teacher API Key (`AIzaSy...`):</span>
+                <span>Motdar AI API Key (`AIzaSy...`):</span>
                 <span className="text-cyan-400 text-[10px]">Active</span>
               </label>
               <input
