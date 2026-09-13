@@ -71,7 +71,9 @@ const PlayerAvatarWithFrame = ({ avatar, frame, name = '', size = 'md', classNam
     sm: 'w-11 h-11',
     md: 'w-14 h-14 sm:w-16 sm:h-16',
     lg: 'w-20 h-20 sm:w-24 sm:h-24',
-    xl: 'w-24 h-24 sm:w-28 sm:h-28'
+    xl: 'w-24 h-24 sm:w-28 sm:h-28',
+    '2xl': 'w-28 h-28 sm:w-32 sm:h-32',
+    hero: 'w-28 h-28 sm:w-32 sm:h-32 md:w-36 md:h-36'
   };
 
   const dim = sizeClasses[size] || sizeClasses.md;
@@ -363,6 +365,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   const [selectedGrade, setSelectedGrade] = useState(() => parseInt(student?.grade, 10) || 12);
   const [selectedSubjectKey, setSelectedSubjectKey] = useState(null);
   const [isLoadingAI, setIsLoadingAI] = useState(false);
+  const [showGradeSettings, setShowGradeSettings] = useState(false);
   const duelSubjects = selectedGrade >= 11
     ? (selectedStream === 'social' ? DUEL_SOCIAL_SUBJECTS : DUEL_SCIENCE_SUBJECTS)
     : DUEL_GENERAL_SUBJECTS;
@@ -1521,32 +1524,37 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     <div className="fixed inset-0 z-[99999] flex items-center justify-center p-1 sm:p-4 bg-black/90 backdrop-blur-lg animate-fade-in font-kantumruy overflow-y-auto">
       
       {/* ARENA CONTAINER BOX */}
-      <div className={`relative w-full max-w-4xl h-[98dvh] sm:h-auto sm:max-h-[92vh] rounded-2xl sm:rounded-3xl overflow-hidden border flex flex-col shadow-2xl transition-all duration-300 ${currentTheme.boxBg} ${currentTheme.boxBorder}`}>
+      <div className={`relative w-full ${currentStep === 'lobby' ? 'max-w-5xl xl:max-w-6xl' : 'max-w-4xl'} h-[98dvh] sm:h-auto sm:max-h-[92vh] rounded-2xl sm:rounded-3xl overflow-hidden border flex flex-col shadow-2xl transition-all duration-300 ${currentStep === 'lobby' ? 'valorant-grid-bg border-cyan-500/30 shadow-[0_0_50px_rgba(0,0,0,0.9),0_0_30px_rgba(0,245,212,0.1)]' : `${currentTheme.boxBg} ${currentTheme.boxBorder}`}`}>
         
         {/* TOP STATUS HEADER */}
-        <header className="px-3 sm:px-6 py-2.5 sm:py-3.5 border-b border-slate-800 flex items-center justify-between gap-2 sm:gap-3 bg-[#080f1e]/95 backdrop-blur-md relative z-20 flex-shrink-0">
-          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
-            <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center border flex-shrink-0 shadow-sm transition-colors duration-300 ${currentTheme.badgeClass}`}>
+        <header className="px-3 sm:px-6 py-2.5 sm:py-3.5 border-b border-white/10 flex items-center justify-between gap-2 sm:gap-3 bg-[#080d16]/95 backdrop-blur-md relative z-20 flex-shrink-0">
+          <div className="flex items-center gap-2.5 sm:gap-3 min-w-0">
+            <div className={`w-8 h-8 sm:w-10 sm:h-10 valorant-tag flex items-center justify-center border flex-shrink-0 transition-colors duration-300 ${
+              currentStep === 'lobby'
+                ? 'bg-[#00f5d4]/15 border-[#00f5d4]/40 text-[#00f5d4] shadow-[0_0_15px_rgba(0,245,212,0.3)]'
+                : currentTheme.badgeClass
+            }`}>
               <Swords className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
             </div>
 
             <div className="min-w-0">
               <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
-                <span className={`text-[10px] sm:text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 transition-colors duration-300 ${currentTheme.accentText}`}>
-                  <span className="hidden sm:inline">1v1 Arena • First to 6 Correct</span>
-                  <span className="sm:hidden">1v1 Arena</span>
+                <span className="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-widest text-[#00f5d4] flex items-center gap-1">
+                  <span>// 1V1 ARENA</span>
+                  <span className="text-slate-600">•</span>
+                  <span className="text-slate-300">FIRST TO 6 CORRECT</span>
                 </span>
-                <span className={`text-[9px] sm:text-[10px] px-2 sm:px-2.5 py-0.5 rounded-full font-bold border transition-all duration-300 flex items-center gap-1 sm:gap-1.5 shadow-xs ${currentTheme.headerBadge}`}>
+                <span className="text-[9px] sm:text-[10px] px-2 sm:px-2.5 py-0.5 font-mono font-bold border flex items-center gap-1 sm:gap-1.5 shadow-xs valorant-tag bg-cyan-500/10 text-cyan-300 border-cyan-400/30">
                   <CurrentStreamIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
                   <span className="truncate">{currentTheme.shortName}</span>
                 </span>
                 {isOvertime && (
-                  <span className="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/40 animate-pulse flex items-center gap-1">
-                    OT
+                  <span className="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 bg-rose-500/20 text-rose-300 font-mono font-bold border border-rose-500/40 animate-pulse flex items-center gap-1 valorant-tag">
+                    OT // OVERTIME
                   </span>
                 )}
               </div>
-              <h2 className="text-xs sm:text-base md:text-lg font-black text-white leading-tight truncate mt-0.5">
+              <h2 className="text-xs sm:text-base md:text-lg font-black text-white leading-tight truncate mt-0.5 tracking-tight">
                 <span className="hidden sm:inline">
                   {selectedStream === 'social'
                     ? 'សង្វៀនប្រឡងវិទ្យាសាស្ត្រសង្គម (Social Science Arena)'
@@ -1579,16 +1587,16 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             <button
               type="button"
               onClick={() => setSoundEnabled(!soundEnabled)}
-              className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/80 flex items-center justify-center transition-all cursor-pointer shadow-xs"
+              className="w-8 h-8 sm:w-9 sm:h-9 valorant-tag bg-slate-800/90 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700 flex items-center justify-center transition-all cursor-pointer shadow-xs"
               title="Toggle Audio"
             >
-              {soundEnabled ? <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-400" /> : <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-500" />}
+              {soundEnabled ? <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-[#00f5d4]" /> : <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-500" />}
             </button>
 
             <button
               type="button"
               onClick={handleCloseModal}
-              className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-slate-800/80 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 border border-slate-700/80 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer shadow-xs"
+              className="w-8 h-8 sm:w-9 sm:h-9 valorant-tag bg-slate-800/90 hover:bg-rose-600/30 text-slate-400 hover:text-rose-300 border border-slate-700 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer shadow-xs"
               title="Leave Room & Close"
             >
               <X className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
@@ -1600,13 +1608,16 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
         {/* STEP 1: MATCH LOBBY & STAGING */}
         {/* ========================================================================= */}
         {currentStep === 'lobby' && (
-          <div className="p-4 sm:p-7 md:p-8 flex-1 flex flex-col justify-between overflow-y-auto space-y-6 animate-fade-in relative z-10">
+          <div className="p-3 sm:p-6 md:p-8 flex-1 flex flex-col justify-between overflow-y-auto space-y-4 sm:space-y-6 animate-fade-in relative z-10">
             
-            {/* Unified Control Bar: PIN + Share Actions + Tab Toggle */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#0e1628] p-3 sm:p-3.5 rounded-2xl border border-slate-800 shadow-sm">
-              
-              {/* PIN Code Pill & Copy Actions */}
-              <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap sm:flex-nowrap">
+            {/* ═══ VALORANT TACTICAL TOP HUD STRIP ═══ */}
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-3 bg-[#0a111a]/95 p-3 sm:p-3.5 rounded-xl border border-white/10 shadow-lg relative overflow-hidden backdrop-blur-md">
+              {/* Tactical Corner Accents */}
+              <div className="absolute top-0 left-0 w-2 h-2 border-t-2 border-l-2 border-[#00f5d4]" />
+              <div className="absolute bottom-0 right-0 w-2 h-2 border-b-2 border-r-2 border-[#ff4655]" />
+
+              {/* PIN Code & Social Share Controls */}
+              <div className="flex items-center gap-2 w-full lg:w-auto flex-wrap sm:flex-nowrap">
                 <button
                   type="button"
                   onClick={() => {
@@ -1614,39 +1625,38 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                     setCopied(true);
                     setTimeout(() => setCopied(false), 2000);
                   }}
-                  className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-400/30 hover:border-amber-400/60 text-xs font-mono transition-all cursor-pointer group shadow-xs"
+                  className="valorant-tag flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-1.5 bg-gradient-to-r from-amber-500/15 to-amber-600/20 hover:from-amber-500/25 hover:to-amber-600/30 border border-amber-400/40 text-xs font-mono transition-all cursor-pointer group shadow-sm"
                   title="ចុចដើម្បីចម្លងលេខកូដ"
                 >
-                  <span className="text-slate-400 font-sans text-xs font-semibold">PIN:</span>
-                  <strong className="text-amber-300 font-black tracking-wider text-sm">#{roomCode}</strong>
-                  <span className="text-[10px] text-amber-400/80 bg-amber-400/10 px-1.5 py-0.5 rounded border border-amber-400/20 group-hover:bg-amber-400/20 font-sans">
-                    {copied ? 'បានចម្លង' : 'Copy'}
+                  <span className="text-slate-400 text-[10px] sm:text-[11px] uppercase tracking-wider font-bold">LOBBY PIN //</span>
+                  <strong className="text-amber-300 font-black tracking-widest text-sm font-mono">#{roomCode}</strong>
+                  <span className="text-[10px] text-amber-300 bg-amber-400/20 px-1.5 py-0.5 rounded font-mono">
+                    {copied ? 'COPIED' : 'COPY'}
                   </span>
                 </button>
 
                 <button
                   type="button"
                   onClick={handleCopyLink}
-                  className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                  className="valorant-tag px-3 py-1.5 bg-slate-800/90 hover:bg-slate-700 text-slate-200 text-xs font-mono font-bold border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer"
                 >
                   {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
-                  <span>{copied ? 'បានចម្លង' : 'Copy Link'}</span>
+                  <span>{copied ? 'COPIED' : 'COPY LINK'}</span>
                 </button>
 
                 <div className="flex items-center gap-1.5">
                   <button
                     type="button"
                     onClick={handleShareTelegram}
-                    className="p-1.5 rounded-xl bg-[#229ED9]/15 hover:bg-[#229ED9]/25 text-[#229ED9] border border-[#229ED9]/30 transition-all cursor-pointer hover:scale-105 shadow-xs"
+                    className="p-1.5 rounded-lg bg-[#229ED9]/15 hover:bg-[#229ED9]/30 text-[#229ED9] border border-[#229ED9]/40 transition-all cursor-pointer hover:scale-105"
                     title="Share to Telegram"
                   >
                     <Send className="w-3.5 h-3.5" />
                   </button>
-
                   <button
                     type="button"
                     onClick={handleShareFacebook}
-                    className="p-1.5 rounded-xl bg-[#1877F2]/15 hover:bg-[#1877F2]/25 text-[#1877F2] border border-[#1877F2]/30 transition-all cursor-pointer hover:scale-105 shadow-xs"
+                    className="p-1.5 rounded-lg bg-[#1877F2]/15 hover:bg-[#1877F2]/30 text-[#1877F2] border border-[#1877F2]/40 transition-all cursor-pointer hover:scale-105"
                     title="Share to Facebook"
                   >
                     <Share2 className="w-3.5 h-3.5" />
@@ -1654,44 +1664,76 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                 </div>
               </div>
 
-              {/* Tab Switcher: Host vs Join */}
-              <div className="flex items-center p-1 rounded-xl bg-[#080d1a] border border-slate-800 w-full sm:w-auto shadow-inner">
-                <button
-                  type="button"
-                  onClick={() => setTab('host')}
-                  className={`flex-1 sm:flex-initial px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    tab === 'host'
-                      ? 'bg-indigo-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  បន្ទប់ប្រកួត (Lobby)
-                </button>
+              {/* Center Telemetry Strip */}
+              <div className="hidden xl:flex items-center gap-2.5 text-[11px] font-mono text-slate-400">
+                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-white/5 border border-white/10">
+                  <span className="w-2 h-2 rounded-full bg-[#00f5d4] animate-pulse" />
+                  <span className="text-slate-300 font-bold">128 TICK</span>
+                  <span className="text-slate-600">//</span>
+                  <span>TACTICAL HUD</span>
+                </span>
 
-                <button
-                  type="button"
-                  onClick={() => setTab('join')}
-                  className={`flex-1 sm:flex-initial px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
-                    tab === 'join'
-                      ? 'bg-indigo-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-slate-200'
-                  }`}
-                >
-                  ចូលរួម (Join PIN)
-                </button>
+                <span className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-white/5 border border-white/10 text-cyan-300">
+                  <span>ថ្នាក់ទី {KHMER_NUMS[selectedGrade - 1]}</span>
+                  <span className="text-slate-600">•</span>
+                  <span className="uppercase text-[10px] text-amber-300 font-bold">{selectedStream}</span>
+                </span>
               </div>
 
+              {/* Right: Grade Settings & Tab Switcher */}
+              <div className="flex items-center gap-2 w-full lg:w-auto justify-end">
+                {isHost && (
+                  <button
+                    type="button"
+                    onClick={() => setShowGradeSettings(!showGradeSettings)}
+                    className={`px-3 py-1.5 rounded-lg text-xs font-mono font-bold border transition-all cursor-pointer flex items-center gap-1.5 ${
+                      showGradeSettings
+                        ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 shadow-sm'
+                        : 'bg-slate-800/80 hover:bg-slate-800 text-slate-300 hover:text-white border-slate-700'
+                    }`}
+                    title="កំណត់កម្រិតថ្នាក់ & ផ្នែក"
+                  >
+                    <GraduationCap className="w-3.5 h-3.5 text-amber-400" />
+                    <span>G{selectedGrade} {showGradeSettings ? '▲ បិទ' : '⚙️ កំណត់ថ្នាក់'}</span>
+                  </button>
+                )}
+
+                <div className="flex items-center p-0.5 rounded-lg bg-[#070c14] border border-slate-800 shadow-inner">
+                  <button
+                    type="button"
+                    onClick={() => setTab('host')}
+                    className={`px-3.5 py-1.5 rounded text-xs font-mono font-bold transition-all cursor-pointer ${
+                      tab === 'host'
+                        ? 'bg-[#ff4655] text-white shadow-[0_0_12px_rgba(255,70,85,0.4)]'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    LOBBY
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => setTab('join')}
+                    className={`px-3.5 py-1.5 rounded text-xs font-mono font-bold transition-all cursor-pointer ${
+                      tab === 'join'
+                        ? 'bg-[#ff4655] text-white shadow-[0_0_12px_rgba(255,70,85,0.4)]'
+                        : 'text-slate-400 hover:text-white'
+                    }`}
+                  >
+                    JOIN PIN
+                  </button>
+                </div>
+              </div>
             </div>
 
             {/* TAB: JOIN BY PIN */}
             {tab === 'join' && (
-              <div className="bg-[#0e1628] p-6 sm:p-8 rounded-3xl border border-slate-800 max-w-md mx-auto w-full space-y-4 shadow-lg my-auto">
+              <div className="bg-[#0b121c] p-6 sm:p-8 rounded-2xl border border-slate-800 max-w-md mx-auto w-full space-y-4 shadow-2xl my-auto valorant-tactical-card">
                 <div className="text-center space-y-1">
-                  <div className="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center mx-auto mb-2">
+                  <div className="w-12 h-12 rounded-xl bg-[#ff4655]/15 border border-[#ff4655]/30 text-[#ff4655] flex items-center justify-center mx-auto mb-2 shadow-[0_0_15px_rgba(255,70,85,0.25)]">
                     <KeyRound className="w-6 h-6" />
                   </div>
-                  <h3 className="text-base font-black text-white">ចូលរួមបន្ទប់ប្រកួត (Join Game)</h3>
-                  <p className="text-xs text-slate-400">បញ្ចូលលេខកូដសម្ងាត់ ៦ ខ្ទង់ដែលបានចែករំលែកដោយមិត្តភក្តិ</p>
+                  <h3 className="text-base font-black text-white font-mono tracking-wide">ENTER ACCESS CODE // ចូលរួមបន្ទប់</h3>
+                  <p className="text-xs text-slate-400">បញ្ចូលលេខកូដ ៦ ខ្ទង់ដែលបានចែករំលែកដោយមិត្តភក្តិ</p>
                 </div>
 
                 <div className="space-y-3">
@@ -1704,13 +1746,13 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                         setJoinCodeInput(e.target.value.trim());
                         setJoinError('');
                       }}
-                      placeholder="ឧ. 123456"
-                      className="w-full bg-[#080d1a] border-2 border-slate-700 focus:border-indigo-500 rounded-2xl px-4 py-3.5 text-center text-xl font-mono font-black text-amber-300 placeholder:text-slate-600 tracking-widest outline-none shadow-inner"
+                      placeholder="000000"
+                      className="w-full bg-[#070b12] border-2 border-slate-700 focus:border-[#00f5d4] rounded-xl px-4 py-3 text-center text-2xl font-mono font-black text-amber-300 placeholder:text-slate-700 tracking-widest outline-none shadow-inner"
                     />
                   </div>
 
                   {joinError && (
-                    <div className="p-2.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-semibold text-center flex items-center justify-center gap-1.5 animate-fade-in">
+                    <div className="p-2.5 rounded-lg bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-semibold text-center flex items-center justify-center gap-1.5 animate-fade-in font-mono">
                       <AlertTriangle className="w-3.5 h-3.5" />
                       <span>{joinError}</span>
                     </div>
@@ -1728,9 +1770,9 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                           }
                         } catch (e) { }
                       }}
-                      className="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition-colors cursor-pointer"
+                      className="w-full py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono font-bold border border-slate-700 transition-colors cursor-pointer"
                     >
-                      បិទភ្ជាប់កូដពី Clipboard (Paste Code)
+                      PASTE CODE FROM CLIPBOARD
                     </button>
                   </div>
                 </div>
@@ -1739,21 +1781,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                   <button
                     type="button"
                     onClick={handleJoinWithCode}
-                    className="cyber-start-btn active:scale-98"
-                    title="Join Match"
+                    className="valorant-cta-btn w-full py-3 flex items-center justify-center gap-2 text-sm font-black"
                   >
-                    <div className="cyber-clip">
-                      <div className="cyber-corner cyber-leftTop" />
-                      <div className="cyber-corner cyber-rightTop" />
-                      <div className="cyber-corner cyber-leftBottom" />
-                      <div className="cyber-corner cyber-rightBottom" />
-                    </div>
-                    <div className="cyber-arrow cyber-leftArrow" />
-                    <div className="cyber-arrow cyber-rightArrow" />
-                    <span className="relative z-10 flex items-center justify-center gap-2 font-black text-sm tracking-wider">
-                      <LogIn className="w-4 h-4 text-cyan-300" />
-                      <span>ចូលរួមការប្រកួត (JOIN MATCH)</span>
-                    </span>
+                    <LogIn className="w-4 h-4 text-white" />
+                    <span>CONNECT TO MATCH (JOIN)</span>
                   </button>
                 </div>
               </div>
@@ -1761,99 +1792,25 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
             {/* TAB: HOST / 1v1 MATCHUP CARDS */}
             {tab === 'host' && (
-              <div className="space-y-6 my-auto">
+              <div className="space-y-4 sm:space-y-6 my-auto">
 
-                {/* ═══ ARENA COMMAND CENTER: MODERN REFINED MATCH CONFIGURATION ═══ */}
-                <div className="relative rounded-2xl p-5 sm:p-6 bg-slate-900/80 backdrop-blur-xl border border-slate-800 shadow-xl space-y-5">
-                  
-                  {/* Header: Title, Active Status, and Host Permission */}
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-4 border-b border-slate-800">
-                    <div className="flex items-center gap-3">
-                      <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-200 flex-shrink-0">
-                        <Swords className="w-5 h-5 text-sky-400" />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-2">
-                          <h4 className="text-sm sm:text-base font-bold text-white tracking-wide">
-                            ការកំណត់សង្វៀនប្រកួត
-                          </h4>
-                          <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase">
-                            Match Setup
-                          </span>
-                        </div>
-                        <p className="text-[11px] text-slate-400">
-                          ជ្រើសរើសកម្រិតថ្នាក់ ផ្នែក និងមុខវិជ្ជាសម្រាប់ការប្រកួត 1v1
-                        </p>
-                      </div>
-                    </div>
-
-                    {/* Right Header Status */}
-                    <div className="flex items-center gap-2 flex-wrap">
-                      {/* Active Summary Pill */}
-                      <div className="px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-xs text-slate-300 flex items-center gap-2">
-                        <span className="w-2 h-2 rounded-full bg-emerald-400" />
-                        <span>ថ្នាក់ទី {KHMER_NUMS[selectedGrade - 1]}</span>
-                        {selectedGrade >= 11 && (
-                          <>
-                            <span className="text-slate-600">•</span>
-                            <span className={selectedStream === 'social' ? 'text-amber-400' : 'text-sky-400'}>
-                              {selectedStream === 'social' ? 'សង្គម' : 'ពិត'}
-                            </span>
-                          </>
-                        )}
-                        {selectedSubjectKey && (
-                          <>
-                            <span className="text-slate-600">•</span>
-                            <span className="text-emerald-400">{selectedSubjectKey}</span>
-                          </>
-                        )}
-                      </div>
-
-                      {/* Host Control Badge */}
-                      {!isHost ? (
-                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-slate-400 text-xs font-medium">
-                          <Lock className="w-3.5 h-3.5 text-slate-400" />
-                          <span>មេបន្ទប់ជាអ្នកកំណត់</span>
-                        </div>
-                      ) : (
-                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-200 text-xs font-medium">
-                          <Crown className="w-3.5 h-3.5 text-amber-400" />
-                          <span>មេបន្ទប់ (Host)</span>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-
-                  {/* ═══ 1. GRADE SELECTOR (CYCLES: PRIMARY • SECONDARY • HIGH SCHOOL) ═══ */}
-                  <div className="space-y-2">
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                {/* ═══ OPTIONAL EXPANDABLE GRADE & STREAM CONFIGURATION ═══ */}
+                {showGradeSettings && (
+                  <div className="relative rounded-xl p-4 sm:p-5 bg-[#0a111a]/95 border border-amber-500/30 shadow-xl space-y-4 animate-fade-in">
+                    <div className="flex items-center justify-between border-b border-white/10 pb-3">
                       <div className="flex items-center gap-2">
-                        <GraduationCap className="w-4 h-4 text-slate-400" />
-                        <span className="text-xs font-bold text-slate-200">
-                          កម្រិតថ្នាក់ (Grade Level)
-                        </span>
-                        <span className="text-[11px] text-slate-500 hidden sm:inline">
-                          — ជ្រើសរើសថ្នាក់ទី ១ ដល់ ១២
-                        </span>
+                        <GraduationCap className="w-4 h-4 text-amber-400" />
+                        <h4 className="text-xs sm:text-sm font-mono font-bold text-white uppercase tracking-wider">
+                          ACADEMY LEVEL & STREAM // កម្រិតថ្នាក់ & ផ្នែកប្រកួត
+                        </h4>
                       </div>
-                      
-                      {/* Tier Indicators */}
-                      <div className="flex items-center gap-2 text-[10px] font-medium text-slate-400">
-                        <span className="flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
-                          <span>បឋម (1-6)</span>
-                        </span>
-                        <span className="text-slate-600">•</span>
-                        <span className="flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
-                          <span>អនុវិទ្យាល័យ (7-9)</span>
-                        </span>
-                        <span className="text-slate-600">•</span>
-                        <span className="flex items-center gap-1">
-                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
-                          <span>វិទ្យាល័យ (10-12)</span>
-                        </span>
-                      </div>
+                      <button
+                        type="button"
+                        onClick={() => setShowGradeSettings(false)}
+                        className="text-slate-400 hover:text-white text-xs font-mono px-2 py-0.5 rounded bg-slate-800"
+                      >
+                        ✕ CLOSE
+                      </button>
                     </div>
 
                     {/* 12-Slot Tactical Grade Cards */}
@@ -1861,40 +1818,30 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                       {Array.from({ length: 12 }, (_, i) => i + 1).map((g) => {
                         const isSelected = selectedGrade === g;
                         const isBac2 = g >= 11;
-                        
                         return (
                           <button
                             key={g}
                             type="button"
                             disabled={!isHost}
                             onClick={() => handleSelectGrade(g)}
-                            className={`group relative rounded-xl py-2 px-1 flex flex-col items-center justify-center transition-all duration-150 ${
+                            className={`valorant-tag py-2 px-1 flex flex-col items-center justify-center transition-all ${
                               isSelected
-                                ? 'bg-sky-500 text-slate-950 font-bold shadow-md shadow-sky-500/20 scale-[1.03] z-10'
-                                : 'bg-slate-800/50 hover:bg-slate-800 text-slate-300 border border-slate-700/60 hover:border-slate-600'
+                                ? 'bg-[#00f5d4] text-slate-950 font-black shadow-[0_0_12px_rgba(0,245,212,0.4)] scale-105 z-10'
+                                : 'bg-slate-800/60 hover:bg-slate-800 text-slate-300 border border-slate-700'
                             } ${isHost ? 'cursor-pointer' : 'cursor-default opacity-85'}`}
                           >
-                            {/* Top Micro-Tag for High School / Bac II */}
                             {isBac2 && (
-                              <span className={`text-[7px] font-black tracking-tighter px-1 rounded-sm mb-0.5 uppercase ${
-                                isSelected
-                                  ? 'bg-slate-950 text-sky-300'
-                                  : 'text-amber-400/90 font-bold'
+                              <span className={`text-[7px] font-black px-1 rounded-sm mb-0.5 uppercase ${
+                                isSelected ? 'bg-slate-950 text-[#00f5d4]' : 'text-amber-400'
                               }`}>
                                 BAC II
                               </span>
                             )}
-
-                            {/* Khmer Numeral */}
-                            <span className={`text-base sm:text-lg font-bold leading-none ${
-                              isSelected ? 'text-slate-950' : 'text-slate-200 group-hover:text-white'
-                            }`}>
+                            <span className="text-sm sm:text-base font-black leading-none font-mono">
                               {KHMER_NUMS[g - 1]}
                             </span>
-
-                            {/* English Subscript */}
-                            <span className={`text-[9px] mt-0.5 font-mono ${
-                              isSelected ? 'text-slate-900 font-semibold' : 'text-slate-500 group-hover:text-slate-400'
+                            <span className={`text-[8px] mt-0.5 font-mono ${
+                              isSelected ? 'text-slate-900 font-bold' : 'text-slate-500'
                             }`}>
                               G{g}
                             </span>
@@ -1902,269 +1849,211 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                         );
                       })}
                     </div>
-                  </div>
 
-                  {/* ═══ 2. TRACK SELECTION (FOR GRADES 11-12) ═══ */}
-                  {selectedGrade >= 11 ? (
-                    <div className="space-y-2.5 pt-4 border-t border-slate-800 relative z-10 animate-fade-in">
-                      <div className="flex items-center justify-between text-xs">
-                        <div className="flex items-center gap-2">
-                          <Atom className="w-4 h-4 text-sky-400" />
-                          <span className="font-bold text-slate-200">
-                            ផ្នែកប្រកួត (Specialization Track)
-                          </span>
-                        </div>
-                        <span className="text-[11px] text-slate-400">
-                          ជ្រើសរើសផ្នែកសម្រាប់ការប្រកួតថ្នាក់ទី {selectedGrade}
-                        </span>
-                      </div>
-
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {/* Real Science Track Card */}
+                    {/* Track Selection (Grades 11-12) */}
+                    {selectedGrade >= 11 && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-white/10">
                         <button
                           type="button"
                           disabled={!isHost}
                           onClick={() => handleSelectStream('science')}
-                          className={`relative rounded-2xl p-4 text-left transition-all duration-150 ${
+                          className={`p-3 rounded-lg text-left transition-all border ${
                             selectedStream === 'science'
-                              ? 'bg-slate-900 border-2 border-sky-500 shadow-lg shadow-sky-500/10'
-                              : 'bg-slate-900/40 hover:bg-slate-800/60 border border-slate-800 hover:border-slate-700'
-                          } ${isHost ? 'cursor-pointer' : 'cursor-default opacity-85'}`}
+                              ? 'bg-cyan-950/40 border-[#00f5d4] shadow-[0_0_15px_rgba(0,245,212,0.2)]'
+                              : 'bg-slate-900/40 border-slate-800 hover:border-slate-700'
+                          }`}
                         >
-                          <div className="flex items-center gap-3.5">
-                            <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${
-                              selectedStream === 'science'
-                                ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30'
-                                : 'bg-slate-800/80 text-slate-500 border border-slate-700/60'
-                            }`}>
-                              <Atom className="w-5 h-5" />
-                            </div>
-
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between gap-2">
-                                <h5 className="text-sm font-bold text-white truncate">
-                                  វិទ្យាសាស្ត្រពិត
-                                </h5>
-                                <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
-                                  selectedStream === 'science'
-                                    ? 'bg-sky-500 text-slate-950'
-                                    : 'border border-slate-700 bg-slate-800/50'
-                                }`}>
-                                  {selectedStream === 'science' && <Check className="w-3 h-3 stroke-[3]" />}
-                                </div>
-                              </div>
-                              <p className="text-[11px] text-slate-400 mt-1 truncate">
-                                គណិតវិទ្យា, រូបវិទ្យា, គីមីវិទ្យា, ជីវវិទ្យា, អង់គ្លេស
-                              </p>
+                          <div className="flex items-center gap-2.5">
+                            <Atom className="w-4 h-4 text-[#00f5d4]" />
+                            <div>
+                              <div className="text-xs font-bold text-white">ថ្នាក់វិទ្យាសាស្ត្រពិត (Natural Science)</div>
+                              <div className="text-[10px] text-slate-400">គណិត, រូប, គីមី, ជីវ, អង់គ្លេស</div>
                             </div>
                           </div>
                         </button>
 
-                        {/* Social Sciences Track Card */}
                         <button
                           type="button"
                           disabled={!isHost}
                           onClick={() => handleSelectStream('social')}
-                          className={`relative rounded-2xl p-4 text-left transition-all duration-150 ${
+                          className={`p-3 rounded-lg text-left transition-all border ${
                             selectedStream === 'social'
-                              ? 'bg-slate-900 border-2 border-amber-500 shadow-lg shadow-amber-500/10'
-                              : 'bg-slate-900/40 hover:bg-slate-800/60 border border-slate-800 hover:border-slate-700'
-                          } ${isHost ? 'cursor-pointer' : 'cursor-default opacity-85'}`}
+                              ? 'bg-amber-950/40 border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
+                              : 'bg-slate-900/40 border-slate-800 hover:border-slate-700'
+                          }`}
                         >
-                          <div className="flex items-center gap-3.5">
-                            <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${
-                              selectedStream === 'social'
-                                ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
-                                : 'bg-slate-800/80 text-slate-500 border border-slate-700/60'
-                            }`}>
-                              <BookOpen className="w-5 h-5" />
-                            </div>
-
-                            <div className="min-w-0 flex-1">
-                              <div className="flex items-center justify-between gap-2">
-                                <h5 className="text-sm font-bold text-white truncate">
-                                  ថ្នាក់វិទ្យាសាស្ត្រសង្គម
-                                </h5>
-                                <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
-                                  selectedStream === 'social'
-                                    ? 'bg-amber-500 text-slate-950'
-                                    : 'border border-slate-700 bg-slate-800/50'
-                                }`}>
-                                  {selectedStream === 'social' && <Check className="w-3 h-3 stroke-[3]" />}
-                                </div>
-                              </div>
-                              <p className="text-[11px] text-slate-400 mt-1 truncate">
-                                ភាសាខ្មែរ, គណិត, ប្រវត្តិ, ភូមិ, សីលធម៌, ផែនដី
-                              </p>
+                          <div className="flex items-center gap-2.5">
+                            <BookOpen className="w-4 h-4 text-amber-400" />
+                            <div>
+                              <div className="text-xs font-bold text-white">ថ្នាក់វិទ្យាសាស្ត្រសង្គម (Social Science)</div>
+                              <div className="text-[10px] text-slate-400">ខ្មែរ, គណិត, ប្រវត្តិ, ភូមិ, សីលធម៌, ផែនដី</div>
                             </div>
                           </div>
                         </button>
                       </div>
-                    </div>
-                  ) : (
-                    /* For Grade 1-10: Clean Foundation Level Banner */
-                    <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center justify-between text-xs relative z-10 animate-fade-in">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
-                          <Sparkles className="w-4 h-4" />
-                        </div>
-                        <div>
-                          <span className="text-slate-200 font-semibold block">
-                            ថ្នាក់ទី {KHMER_NUMS[selectedGrade - 1]} — កម្មវិធីចំណេះទូទៅថ្នាក់ជាតិ
-                          </span>
-                          <span className="text-[10px] text-slate-400 block">
-                            កម្រិតមូលដ្ឋានរួម គ្មានការបែងចែកផ្នែកពិត ឬសង្គមឡើយ
-                          </span>
-                        </div>
-                      </div>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 hidden sm:inline">
-                        Standard
+                    )}
+                  </div>
+                )}
+
+                {/* ═══ 1. VALORANT TACTICAL SUBJECT LOADOUT DECK ═══ */}
+                <div className="space-y-2">
+                  <div className="flex items-center justify-between text-xs px-1">
+                    <div className="flex items-center gap-2">
+                      <span className="text-[#00f5d4] font-mono font-black">//</span>
+                      <span className="font-mono font-bold text-white uppercase tracking-wider text-xs sm:text-sm">
+                        SELECT BATTLE SUBJECT // ជ្រើសរើសមុខវិជ្ជាប្រកួត
                       </span>
                     </div>
-                  )}
 
-                  {/* ═══ 3. SUBJECT SELECTION DECK ═══ */}
-                  <div className="space-y-2.5 pt-4 border-t border-slate-800 relative z-10">
-                    <div className="flex items-center justify-between text-xs">
-                      <div className="flex items-center gap-2">
-                        <Layers className="w-4 h-4 text-slate-400" />
-                        <span className="font-bold text-slate-200">
-                          មុខវិជ្ជាប្រកួត (Battle Subject)
-                        </span>
-                      </div>
+                    {isLoadingAI ? (
+                      <span className="text-[11px] text-amber-400 font-mono font-medium animate-pulse flex items-center gap-1.5">
+                        <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                        <span>PREPARING QUESTIONS G{selectedGrade}...</span>
+                      </span>
+                    ) : (
+                      <span className="text-[11px] font-mono text-emerald-400 font-medium flex items-center gap-1">
+                        <CheckCircle2 className="w-3.5 h-3.5" />
+                        <span className="hidden sm:inline">INSTANT POOL READY (0ms)</span>
+                        <span className="sm:hidden">READY</span>
+                      </span>
+                    )}
+                  </div>
 
-                      {isLoadingAI ? (
-                        <span className="text-[11px] text-amber-400 font-medium animate-pulse flex items-center gap-1.5">
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          <span>AI កំពុងបង្កើតសំណួរថ្នាក់ទី {selectedGrade}...</span>
-                        </span>
-                      ) : (
-                        <span className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
-                          <CheckCircle2 className="w-3.5 h-3.5" />
-                          <span>សំណួររួចរាល់ភ្លាមៗ (Instant 0ms)</span>
-                        </span>
-                      )}
-                    </div>
+                  {/* 7-Subject Loadout Grid */}
+                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+                    {duelSubjects.map((sub) => {
+                      const SubIcon = sub.icon;
+                      const isActive = selectedSubjectKey === sub.key;
+                      return (
+                        <button
+                          key={sub.key}
+                          type="button"
+                          disabled={!isHost}
+                          onClick={() => handleSelectSubject(sub.key)}
+                          className={`valorant-loadout-tile p-3 flex flex-col items-center justify-center text-center cursor-pointer group ${
+                            isActive
+                              ? 'valorant-loadout-tile-active text-white'
+                              : 'valorant-loadout-tile-inactive text-slate-300'
+                          } ${!isHost ? 'opacity-85 cursor-default' : ''}`}
+                        >
+                          {/* Active Accent Tag */}
+                          {isActive && (
+                            <div className="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-[#00f5d4] shadow-[0_0_8px_#00f5d4]" />
+                          )}
 
-                    {/* Responsive Grid of Subject Battle Tiles */}
-                    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
-                      {duelSubjects.map((sub) => {
-                        const SubIcon = sub.icon;
-                        const isActive = selectedSubjectKey === sub.key;
-                        return (
-                          <button
-                            key={sub.key}
-                            type="button"
-                            disabled={!isHost}
-                            onClick={() => handleSelectSubject(sub.key)}
-                            className={`group relative rounded-xl p-3 flex flex-col items-center justify-center text-center transition-all duration-150 ${
-                              isActive
-                                ? 'bg-slate-800 border-2 border-sky-500 shadow-sm text-white'
-                                : 'bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 hover:border-slate-700 text-slate-300'
-                            } ${isHost ? 'cursor-pointer' : 'cursor-default opacity-85'}`}
-                          >
-                            {/* Subject Icon */}
-                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-1.5 transition-colors ${
-                              isActive
-                                ? 'bg-sky-500/20 text-sky-300'
-                                : 'bg-slate-800 text-slate-400 group-hover:text-slate-200'
-                            }`}>
-                              <SubIcon className="w-4 h-4" />
-                            </div>
+                          {/* Subject Icon */}
+                          <div className={`w-9 h-9 rounded-lg flex items-center justify-center mb-1.5 transition-all ${
+                            isActive
+                              ? 'bg-[#00f5d4]/20 text-[#00f5d4] shadow-[0_0_12px_rgba(0,245,212,0.3)]'
+                              : 'bg-slate-800/80 text-slate-400 group-hover:text-slate-200 group-hover:bg-slate-800'
+                          }`}>
+                            <SubIcon className="w-4 h-4" />
+                          </div>
 
-                            {/* Subject Khmer Label */}
-                            <span className="text-xs font-semibold truncate max-w-full">
-                              {sub.label}
-                            </span>
+                          {/* Subject Khmer Label */}
+                          <span className="text-xs font-bold truncate max-w-full leading-snug">
+                            {sub.label}
+                          </span>
 
-                            {/* Subject English Subtitle */}
-                            <span className={`text-[8.5px] uppercase font-mono tracking-wider mt-0.5 ${
-                              isActive ? 'text-sky-300 font-medium' : 'text-slate-500'
-                            }`}>
-                              {sub.en || 'Subject'}
-                            </span>
-                          </button>
-                        );
-                      })}
-                    </div>
+                          {/* Subject English Subtitle */}
+                          <span className={`text-[8.5px] uppercase font-mono tracking-widest mt-0.5 ${
+                            isActive ? 'text-[#00f5d4] font-semibold' : 'text-slate-500'
+                          }`}>
+                            {sub.en || 'Subject'}
+                          </span>
+                        </button>
+                      );
+                    })}
                   </div>
                 </div>
 
-                {/* 2-Player Modern Matchup Cards */}
+                {/* ═══ 2. VALORANT 2-PLAYER VERSUS MATCHUP STAGE ═══ */}
                 <div className="grid grid-cols-1 md:grid-cols-11 gap-4 sm:gap-6 items-stretch relative">
                   
-                  {/* Left Player Card: Host */}
-                  <div className="md:col-span-5 bg-gradient-to-b from-[#101b38] to-[#0a1226] p-5 sm:p-6 rounded-3xl border border-cyan-500/30 shadow-xl shadow-cyan-950/20 relative flex flex-col items-center justify-between text-center min-h-[300px] sm:min-h-[320px] group transition-all">
-                    
+                  {/* Left Player Card: Host (Defender / Blue Side) */}
+                  <div className="md:col-span-5 valorant-tactical-card valorant-tactical-card-host p-5 sm:p-6 relative flex flex-col items-center justify-between text-center min-h-[340px] sm:min-h-[360px] group">
+                    {/* Corner Crosshairs */}
+                    <div className="absolute top-1.5 left-1.5 text-[9px] font-mono text-cyan-400/40 pointer-events-none select-none">+ DEF // 01</div>
+                    <div className="absolute bottom-1.5 right-1.5 text-[9px] font-mono text-cyan-400/40 pointer-events-none select-none">LOC // BLUE +</div>
+
                     {/* Top Status Bar */}
-                    <div className="w-full flex items-center justify-between pb-3 border-b border-slate-700/50">
-                      <span className="text-xs font-bold text-cyan-300 flex items-center gap-1.5">
+                    <div className="w-full flex items-center justify-between pb-3 border-b border-cyan-500/20">
+                      <span className="text-xs font-mono font-black text-cyan-300 flex items-center gap-1.5 uppercase tracking-wider">
                         <Crown className="w-4 h-4 text-amber-400 fill-amber-400" />
-                        ម្ចាស់បន្ទប់ (Host)
+                        <span>DEF // HOST (ម្ចាស់បន្ទប់)</span>
                       </span>
-                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-                        <Check className="w-3.5 h-3.5 text-emerald-400" /> រួចរាល់
+                      <span className="valorant-tag text-[10px] font-mono font-black px-3 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 flex items-center gap-1 shadow-[0_0_10px_rgba(16,185,129,0.3)]">
+                        <Check className="w-3.5 h-3.5 text-emerald-400" />
+                        <span>LOCKED IN</span>
                       </span>
                     </div>
 
-                    {/* Center Hero Avatar */}
+                    {/* Center Hero Avatar Showcase */}
                     {hostPlayer ? (
-                      <div className="my-auto py-2 flex flex-col items-center w-full">
-                        {/* Avatar */}
-                        <div className="relative mb-2.5">
+                      <div className="my-auto py-3 flex flex-col items-center w-full">
+                        {/* Avatar Pedestal with Concentric Valorant Reticle */}
+                        <div className="valorant-pedestal valorant-pedestal-host mb-3 relative">
                           <PlayerAvatarWithFrame
                             avatar={hostPlayer.avatar}
                             frame={hostPlayer.avatarFrame || hostPlayer.avatar_frame}
                             name={hostPlayer.name}
-                            size="lg"
-                            className="scale-105 drop-shadow-lg"
+                            size="hero"
+                            className="scale-105 drop-shadow-[0_12px_24px_rgba(0,0,0,0.7)] relative z-10"
                           />
-                          {/* Level Badge */}
-                          <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 border border-cyan-300 text-[10px] font-black text-white shadow-md z-20 whitespace-nowrap">
-                            Lv.{hostPlayer.level || 1}
+
+                          {/* Tactical Rank / Level Diamond */}
+                          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-[#081320] border border-[#00f5d4] text-[10px] sm:text-[11px] font-mono font-black text-[#00f5d4] shadow-[0_0_15px_rgba(0,245,212,0.4)] valorant-tag flex items-center gap-1 z-20 whitespace-nowrap">
+                            <span>LVL</span>
+                            <span className="text-white">//</span>
+                            <span>{hostPlayer.level || 1}</span>
                           </div>
                         </div>
 
                         {/* Player Name & School */}
-                        <h3 className="text-base sm:text-lg font-black text-white tracking-tight truncate max-w-[220px] mt-1">
+                        <h3 className="text-lg sm:text-xl font-black text-white font-mono tracking-wider truncate max-w-[240px] mt-2 drop-shadow-md">
                           {hostPlayer.name || 'សុខ វិបុល'}
                         </h3>
-                        <p className="text-xs text-slate-300 font-medium flex items-center gap-1 mt-0.5 truncate max-w-[220px]">
-                          <Building2 className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
+                        <p className="text-xs text-slate-300 font-medium flex items-center gap-1.5 mt-1 truncate max-w-[240px] px-2.5 py-0.5 rounded bg-white/5 border border-white/10">
+                          <Building2 className="w-3.5 h-3.5 text-[#00f5d4] flex-shrink-0" />
                           <span className="truncate">{hostPlayer.school || 'វិទ្យាល័យជាតិ'}</span>
                         </p>
 
-                        {/* XP Badge */}
-                        <div className="mt-3">
-                          <span className="px-3 py-1 rounded-xl bg-indigo-500/15 border border-indigo-400/30 text-indigo-300 text-xs font-bold flex items-center gap-1 shadow-xs font-mono">
-                            {(hostPlayer.xp || 500).toLocaleString()} XP
-                          </span>
+                        {/* Tactical Combat Rating (XP) Bar */}
+                        <div className="w-full max-w-[220px] mt-4 pt-3 border-t border-cyan-500/20 flex flex-col gap-1.5">
+                          <div className="flex items-center justify-between text-[10px] font-mono tracking-wider text-slate-400">
+                            <span>RATING (XP)</span>
+                            <span className="text-[#00f5d4] font-black font-mono text-xs">{(hostPlayer.xp || 500).toLocaleString()} XP</span>
+                          </div>
+                          <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden p-0.5 border border-cyan-500/30">
+                            <div
+                              className="h-full bg-gradient-to-r from-[#00f5d4] to-blue-500 rounded-full shadow-[0_0_8px_#00f5d4]"
+                              style={{ width: `${Math.min(100, Math.max(20, ((hostPlayer.xp || 500) % 1000) / 10))}%` }}
+                            />
+                          </div>
                         </div>
                       </div>
                     ) : (
-                      <div className="my-auto py-8 text-center text-slate-400 text-xs flex flex-col items-center justify-center gap-2">
+                      <div className="my-auto py-8 text-center text-slate-400 text-xs flex flex-col items-center justify-center gap-2 font-mono">
                         <Loader2 className="w-6 h-6 animate-spin text-cyan-400" />
-                        <span>កំពុងទាញយកទិន្នន័យ...</span>
+                        <span>SYNCING AGENT DATA...</span>
                       </div>
                     )}
                   </div>
 
-                  {/* Center: VS Circle Badge */}
+                  {/* Center: Valorant "VS" Collision Nexus */}
                   <div className="md:col-span-1 flex flex-row md:flex-col items-center justify-center py-2 relative my-auto">
-                    <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 p-0.5 shadow-lg shadow-indigo-600/40 animate-pulse">
-                      <div className="w-full h-full bg-[#0a1226] rounded-2xl flex flex-col items-center justify-center">
-                        <span className="font-black text-base sm:text-lg text-white">
-                          VS
-                        </span>
-                      </div>
+                    <div className="valorant-vs-nexus w-14 h-14 sm:w-16 sm:h-16 flex items-center justify-center animate-pulse">
+                      <span className="font-black text-lg sm:text-xl text-white tracking-widest font-mono">VS</span>
+                    </div>
+                    <div className="hidden md:flex flex-col items-center mt-2.5">
+                      <span className="text-[8px] font-mono tracking-widest text-slate-500 uppercase">MATCH POINT</span>
+                      <span className="text-[9px] font-mono font-black text-amber-400">FIRST TO 6</span>
                     </div>
                   </div>
 
-                  {/* Right Player Card: Challenger */}
-                  <div className={`md:col-span-5 p-5 sm:p-6 rounded-3xl border transition-all flex flex-col items-center justify-between text-center min-h-[300px] sm:min-h-[320px] ${
-                    challengerPlayer
-                      ? 'bg-gradient-to-b from-[#2a1226] to-[#150713] border-rose-500/30 shadow-xl shadow-rose-950/20'
-                      : 'bg-gradient-to-b from-[#181128] to-[#0c0818] border-rose-500/30 shadow-xl shadow-rose-950/10 hover:border-rose-400/60 cursor-pointer'
+                  {/* Right Player Card: Challenger (Attacker / Red Side) */}
+                  <div className={`md:col-span-5 valorant-tactical-card valorant-tactical-card-challenger p-5 sm:p-6 relative flex flex-col items-center justify-between text-center min-h-[340px] sm:min-h-[360px] group ${
+                    !challengerPlayer ? 'cursor-pointer' : ''
                   }`}
                   onClick={() => {
                     if (!challengerPlayer) {
@@ -2173,22 +2062,28 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                     }
                   }}
                   >
+                    {/* Corner Crosshairs */}
+                    <div className="absolute top-1.5 right-1.5 text-[9px] font-mono text-rose-400/40 pointer-events-none select-none">ATK // 02 +</div>
+                    <div className="absolute bottom-1.5 left-1.5 text-[9px] font-mono text-rose-400/40 pointer-events-none select-none">+ LOC // RED</div>
+
                     {/* Top Status Bar */}
-                    <div className="w-full flex items-center justify-between pb-3 border-b border-slate-700/50">
-                      <span className="text-xs font-bold text-rose-300 flex items-center gap-1.5">
-                        <Swords className="w-4 h-4 text-rose-400" /> 
-                        គូប្រជែង (Challenger)
+                    <div className="w-full flex items-center justify-between pb-3 border-b border-rose-500/20">
+                      <span className="text-xs font-mono font-black text-rose-300 flex items-center gap-1.5 uppercase tracking-wider">
+                        <Swords className="w-4 h-4 text-rose-400" />
+                        <span>ATK // CHALLENGER (គូប្រជែង)</span>
                       </span>
 
                       {challengerPlayer ? (
                         <div className="flex items-center gap-2">
                           {isChallengerReady ? (
-                            <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
-                              <Check className="w-3.5 h-3.5 text-emerald-400" /> រួចរាល់
+                            <span className="valorant-tag text-[10px] font-mono font-black px-3 py-0.5 bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 flex items-center gap-1 shadow-[0_0_10px_rgba(16,185,129,0.3)]">
+                              <Check className="w-3.5 h-3.5 text-emerald-400" />
+                              <span>LOCKED IN</span>
                             </span>
                           ) : (
-                            <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1 animate-pulse">
-                              <Clock className="w-3.5 h-3.5" /> កំពុងរៀបចំ...
+                            <span className="valorant-tag text-[10px] font-mono font-black px-2.5 py-0.5 bg-amber-500/20 text-amber-300 border border-amber-400/40 flex items-center gap-1 animate-pulse">
+                              <Clock className="w-3.5 h-3.5" />
+                              <span>PREPARING...</span>
                             </span>
                           )}
 
@@ -2200,7 +2095,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                                 e.stopPropagation();
                                 handleKickChallenger();
                               }}
-                              className="px-2 py-0.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 hover:text-white border border-rose-500/30 text-[10px] font-bold transition-all cursor-pointer"
+                              className="px-2 py-0.5 rounded bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 hover:text-white border border-rose-500/40 text-[10px] font-bold font-mono transition-all cursor-pointer"
                               title="បណ្តេញចេញ"
                             >
                               <UserX className="w-3.5 h-3.5" />
@@ -2208,62 +2103,73 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                           )}
                         </div>
                       ) : (
-                        <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
-                          រង់ចាំ
+                        <span className="valorant-tag text-[9px] font-mono font-bold px-2.5 py-0.5 bg-rose-500/15 text-rose-400 border border-rose-500/30">
+                          AWAITING
                         </span>
                       )}
                     </div>
 
                     {/* Center Content */}
                     {challengerPlayer ? (
-                      <div className="my-auto py-2 flex flex-col items-center w-full">
-                        {/* Avatar */}
-                        <div className="relative mb-2.5">
+                      <div className="my-auto py-3 flex flex-col items-center w-full">
+                        {/* Avatar Pedestal with Concentric Valorant Reticle */}
+                        <div className="valorant-pedestal valorant-pedestal-challenger mb-3 relative">
                           <PlayerAvatarWithFrame
                             avatar={challengerPlayer.avatar}
                             frame={challengerPlayer.avatarFrame || challengerPlayer.avatar_frame}
                             name={challengerPlayer.name}
-                            size="lg"
-                            className="scale-105 drop-shadow-lg"
+                            size="hero"
+                            className="scale-105 drop-shadow-[0_12px_24px_rgba(0,0,0,0.7)] relative z-10"
                           />
-                          {/* Level Badge */}
-                          <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-rose-600 to-pink-600 border border-rose-300 text-[10px] font-black text-white shadow-md z-20 whitespace-nowrap">
-                            Lv.{challengerPlayer.level || 1}
+
+                          {/* Tactical Rank / Level Diamond */}
+                          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-3 py-0.5 bg-[#1d0912] border border-[#ff4655] text-[10px] sm:text-[11px] font-mono font-black text-[#ff4655] shadow-[0_0_15px_rgba(255,70,85,0.4)] valorant-tag flex items-center gap-1 z-20 whitespace-nowrap">
+                            <span>LVL</span>
+                            <span className="text-white">//</span>
+                            <span>{challengerPlayer.level || 1}</span>
                           </div>
                         </div>
 
                         {/* Player Name & School */}
-                        <h3 className="text-base sm:text-lg font-black text-white tracking-tight truncate max-w-[220px] mt-1">
+                        <h3 className="text-lg sm:text-xl font-black text-white font-mono tracking-wider truncate max-w-[240px] mt-2 drop-shadow-md">
                           {challengerPlayer.name}
                         </h3>
-                        <p className="text-xs text-slate-300 font-medium flex items-center gap-1 mt-0.5 truncate max-w-[220px]">
+                        <p className="text-xs text-slate-300 font-medium flex items-center gap-1.5 mt-1 truncate max-w-[240px] px-2.5 py-0.5 rounded bg-white/5 border border-white/10">
                           <Building2 className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
                           <span className="truncate">{challengerPlayer.school}</span>
                         </p>
 
-                        {/* XP Badge */}
-                        <div className="mt-3">
-                          <span className="px-3 py-1 rounded-xl bg-indigo-500/15 border border-indigo-400/30 text-indigo-300 text-xs font-bold flex items-center gap-1 shadow-xs font-mono">
-                            {(challengerPlayer.xp || 500).toLocaleString()} XP
-                          </span>
+                        {/* Tactical Combat Rating (XP) Bar */}
+                        <div className="w-full max-w-[220px] mt-4 pt-3 border-t border-rose-500/20 flex flex-col gap-1.5">
+                          <div className="flex items-center justify-between text-[10px] font-mono tracking-wider text-slate-400">
+                            <span>RATING (XP)</span>
+                            <span className="text-rose-400 font-black font-mono text-xs">{(challengerPlayer.xp || 500).toLocaleString()} XP</span>
+                          </div>
+                          <div className="w-full h-1.5 bg-slate-950 rounded-full overflow-hidden p-0.5 border border-rose-500/30">
+                            <div
+                              className="h-full bg-gradient-to-r from-rose-500 to-pink-500 rounded-full shadow-[0_0_8px_#ff4655]"
+                              style={{ width: `${Math.min(100, Math.max(20, ((challengerPlayer.xp || 500) % 1000) / 10))}%` }}
+                            />
+                          </div>
                         </div>
                       </div>
                     ) : (
-                      /* Empty Slot */
+                      /* Empty Slot Tactical Searching View */
                       <div className="my-auto py-6 flex flex-col items-center justify-center text-center w-full">
-                        <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-slate-900/80 border-2 border-dashed border-rose-400/40 flex items-center justify-center mb-3 shadow-inner group-hover:scale-105 group-hover:border-rose-400 transition-all">
-                          <UserPlus className="w-8 h-8 text-rose-400/80" />
+                        <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full border border-dashed border-rose-500/40 flex items-center justify-center mb-3.5 bg-slate-950/80 shadow-inner group-hover:border-rose-400 transition-all">
+                          <div className="absolute inset-1.5 rounded-full border border-rose-500/20 animate-ping opacity-30 pointer-events-none" />
+                          <UserPlus className="w-8 h-8 text-rose-400 group-hover:scale-110 transition-transform" />
                         </div>
 
-                        <span className="text-sm font-black text-white block">
-                          រង់ចាំគូប្រជែងចូលរួម
+                        <span className="text-sm sm:text-base font-black text-white font-mono tracking-wider block uppercase">
+                          // AWAITING AGENT...
                         </span>
-                        <span className="text-[11px] text-slate-400 block mt-0.5 max-w-[220px]">
+                        <span className="text-[11px] text-slate-400 block mt-1 max-w-[220px]">
                           ចុចប៊ូតុងខាងក្រោមដើម្បីអញ្ជើញ ឬចែករំលែក PIN
                         </span>
-                        
+
                         {/* Custom Valorant Slanted Invite Button */}
-                        <div className="valorant-btn-borders mt-3.5">
+                        <div className="valorant-btn-borders mt-4">
                           <button
                             type="button"
                             onClick={(e) => {
@@ -2271,7 +2177,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                               fetchStudents();
                               setShowInviteModal(true);
                             }}
-                            className="valorant-invite-btn py-2 px-5"
+                            className="valorant-invite-btn py-2.5 px-6"
                           >
                             <UserPlus className="w-4 h-4 text-rose-400" />
                             <span>អញ្ជើញកីឡាករ (INVITE)</span>
@@ -2283,65 +2189,55 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
                 </div>
 
-                {/* Primary Action Bar */}
+                {/* ═══ 3. PRIMARY ACTION BAR ═══ */}
                 <div className="flex flex-col items-center gap-3 pt-2">
                   
                   {/* Warning notice when Host tries to start without ready opponent */}
                   {isHost && hostWarningNotice && (
-                    <div className="w-full max-w-md p-3 bg-rose-500/20 border border-rose-500/40 rounded-2xl text-rose-300 text-xs font-bold text-center flex items-center justify-center gap-2 animate-fade-in shadow-sm">
+                    <div className="w-full max-w-md p-3 bg-rose-500/20 border border-rose-500/40 rounded-xl text-rose-300 text-xs font-mono font-bold text-center flex items-center justify-center gap-2 animate-fade-in shadow-sm">
                       <AlertTriangle className="w-4 h-4 text-rose-400 flex-shrink-0" />
                       <span>{hostWarningNotice}</span>
                     </div>
                   )}
 
                   {isHost ? (
-                    // Host / Admin view: CYBER OCTAGON START MATCH BUTTON
+                    // Host: Iconic Valorant CTA Start Match Button
                     <button
                       type="button"
                       onClick={handleStartDuel}
-                      className="cyber-start-btn active:scale-98"
+                      className="valorant-cta-btn px-10 sm:px-14 py-3.5 flex items-center justify-center gap-3 text-sm sm:text-base active:scale-98"
                       title="Start Match"
                     >
-                      <div className="cyber-clip">
-                        <div className="cyber-corner cyber-leftTop" />
-                        <div className="cyber-corner cyber-rightTop" />
-                        <div className="cyber-corner cyber-leftBottom" />
-                        <div className="cyber-corner cyber-rightBottom" />
-                      </div>
-                      <div className="cyber-arrow cyber-leftArrow" />
-                      <div className="cyber-arrow cyber-rightArrow" />
-                      <span className="relative z-10 flex items-center justify-center gap-2 font-black text-sm tracking-wider">
-                        <Play className="w-4 h-4 fill-white" />
-                        <span>ចាប់ផ្តើមការប្រកួត (START)</span>
-                      </span>
+                      <Play className="w-5 h-5 fill-white" />
+                      <span>ចាប់ផ្តើមការប្រកួត (START MATCH)</span>
                     </button>
                   ) : (
-                    // Challenger view: LIQUID WAVE READY BUTTON
+                    // Challenger: Valorant Ready Button
                     <div className="flex flex-col items-center gap-2.5 w-full sm:w-auto">
                       <button
                         type="button"
                         onClick={handleToggleReady}
-                        className="liquid-ready-btn active:scale-98"
+                        className={`valorant-cta-btn px-10 sm:px-14 py-3.5 flex items-center justify-center gap-3 text-sm sm:text-base active:scale-98 ${
+                          isChallengerReady ? '!bg-gradient-to-r !from-emerald-600 !to-teal-600 !shadow-[0_0_25px_rgba(16,185,129,0.5)]' : ''
+                        }`}
                       >
-                        <p className="btn-text">
-                          {isChallengerReady ? (
-                            <>
-                              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
-                              <span>រួចរាល់ហើយ! (READY)</span>
-                            </>
-                          ) : (
-                            <>
-                              <Zap className="w-4 h-4 fill-amber-400 text-amber-400" />
-                              <span>ចុចដើម្បី READY</span>
-                            </>
-                          )}
-                        </p>
+                        {isChallengerReady ? (
+                          <>
+                            <CheckCircle2 className="w-5 h-5 text-white" />
+                            <span>រួចរាល់ហើយ! (LOCKED IN)</span>
+                          </>
+                        ) : (
+                          <>
+                            <Zap className="w-5 h-5 fill-amber-400 text-amber-400" />
+                            <span>ចុចដើម្បី READY (LOCK IN)</span>
+                          </>
+                        )}
                       </button>
 
                       {isChallengerReady && (
-                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1.5 animate-pulse">
+                        <span className="text-xs text-emerald-400 font-mono font-bold flex items-center gap-1.5 animate-pulse">
                           <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          កំពុងរង់ចាំម្ចាស់បន្ទប់ (Host) ចុចចាប់ផ្តើមការប្រកួត...
+                          <span>កំពុងរង់ចាំម្ចាស់បន្ទប់ (Host) ចុចចាប់ផ្តើមការប្រកួត...</span>
                         </span>
                       )}
                     </div>
@@ -2351,10 +2247,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                   <button
                     type="button"
                     onClick={handleCloseModal}
-                    className="w-full sm:w-auto px-8 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 bg-rose-600/15 hover:bg-rose-600/30 text-rose-300 hover:text-white border border-rose-500/30 hover:border-rose-500/50"
+                    className="valorant-tag px-8 py-2.5 rounded-lg font-mono font-bold text-xs tracking-wider shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 bg-slate-900/80 hover:bg-rose-950/40 text-slate-300 hover:text-white border border-slate-700/60 hover:border-rose-500/50"
                   >
-                    <LogOut className="w-3.5 h-3.5" />
-                    <span>ចាកចេញពីបន្ទប់ (Leave Room)</span>
+                    <LogOut className="w-3.5 h-3.5 text-rose-400" />
+                    <span>ចាកចេញពីបន្ទប់ (ABORT / LEAVE)</span>
                   </button>
                 </div>
 
