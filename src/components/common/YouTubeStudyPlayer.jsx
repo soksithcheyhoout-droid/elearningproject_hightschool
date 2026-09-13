@@ -117,9 +117,8 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
   const [customUrl, setCustomUrl] = useState('');
   const [urlError, setUrlError] = useState('');
 
-  // Single persistent iframe reference & YouTube API player ref
+  // Single persistent iframe reference
   const iframeRef = useRef(null);
-  const ytPlayerRef = useRef(null);
   const volumeRef = useRef(volume);
   const searchInputRef = useRef(null);
   const tagsScrollRef = useRef(null);
@@ -128,21 +127,6 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
   useEffect(() => {
     volumeRef.current = volume;
   }, [volume]);
-
-  // Load official YouTube IFrame API script once
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    if (!window.YT) {
-      const tag = document.createElement('script');
-      tag.src = 'https://www.youtube.com/iframe_api';
-      const firstScriptTag = document.getElementsByTagName('script')[0];
-      if (firstScriptTag && firstScriptTag.parentNode) {
-        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
-      } else {
-        document.head.appendChild(tag);
-      }
-    }
-  }, []);
 
   // Notify parent of play state change (for navbar soundbars)
   useEffect(() => {
@@ -193,17 +177,9 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     return () => window.removeEventListener('message', handleMessage);
   }, []);
 
-  // Handle postMessage commands to YouTube IFrame (Official YT.Player priority + postMessage fallback)
+  // Handle postMessage commands to YouTube IFrame (clean, reliable, never mutates DOM)
   const sendIframeCommand = useCallback((command, args = []) => {
     try {
-      // 1. If official YT.Player instance is bound, use it directly (100% reliable)
-      if (ytPlayerRef.current && typeof ytPlayerRef.current[command] === 'function') {
-        try {
-          ytPlayerRef.current[command](...(args || []));
-        } catch (e) {}
-      }
-
-      // 2. Direct postMessage to iframe window
       if (iframeRef.current && iframeRef.current.contentWindow) {
         iframeRef.current.contentWindow.postMessage(
           JSON.stringify({
@@ -235,59 +211,22 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
           }),
           '*'
         );
+        if (hasUserStartedRef.current) {
+          iframeRef.current.contentWindow.postMessage(
+            JSON.stringify({
+              event: 'command',
+              func: 'unMute',
+              args: []
+            }),
+            '*'
+          );
+        }
       }
     };
 
     sendHandshake();
     setTimeout(sendHandshake, 350);
     setTimeout(sendHandshake, 800);
-
-    // Initialize official YT.Player wrapper if script is available
-    const initYT = () => {
-      if (window.YT && window.YT.Player && iframeRef.current) {
-        try {
-          if (ytPlayerRef.current && typeof ytPlayerRef.current.destroy === 'function') {
-            try { ytPlayerRef.current.destroy(); } catch (e) {}
-          }
-          ytPlayerRef.current = new window.YT.Player(iframeRef.current, {
-            events: {
-              onReady: (event) => {
-                try {
-                  event.target.setVolume(volumeRef.current);
-                  if (hasUserStartedRef.current) {
-                    event.target.unMute();
-                  }
-                } catch (e) {}
-              },
-              onStateChange: (event) => {
-                if (event.data === 1) {
-                  setHasUserStarted(true);
-                  hasUserStartedRef.current = true;
-                  setIsPlaying(true);
-                } else if (event.data === 2 || event.data === 0) {
-                  setIsPlaying(false);
-                }
-              }
-            }
-          });
-        } catch (e) {}
-      }
-    };
-
-    if (window.YT && window.YT.Player) {
-      initYT();
-    } else {
-      let tries = 0;
-      const timer = setInterval(() => {
-        tries++;
-        if (window.YT && window.YT.Player) {
-          clearInterval(timer);
-          initYT();
-        } else if (tries > 15) {
-          clearInterval(timer);
-        }
-      }, 250);
-    }
   }, []);
 
   // Toggle Play / Pause
@@ -554,9 +493,6 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     setShowUrlInput(false);
   };
 
-  // Only mount player iframe if modal has been opened or user has initiated playback
-  const shouldMountPlayer = isOpen || hasUserStarted;
-
   // Construct iframe embed URL with native YouTube controls visible (play, volume, progress, fullscreen)
   // Disable autoplay until the student explicitly clicks play
   const embedUrl = `https://www.youtube.com/embed/${activeVideoId}?enablejsapi=1&autoplay=${hasUserStarted ? 1 : 0}&playsinline=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}&rel=0&iv_load_policy=3&modestbranding=1`;
@@ -658,24 +594,16 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
               
               {/* THE SINGLE YOUTUBE IFRAME CANVAS */}
               <div className="relative w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl flex-shrink-0 group">
-                {shouldMountPlayer ? (
-                  <iframe
-                    ref={iframeRef}
-                    id="youtube-study-player-iframe"
-                    key={activeVideoId}
-                    src={embedUrl}
-                    onLoad={handleIframeLoad}
-                    title="YouTube Player"
-                    allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                    allowFullScreen
-                    className={showVideo ? "w-full h-full border-0" : "w-1 h-1 opacity-0 absolute pointer-events-none"}
-                  />
-                ) : (
-                  <div className="w-full h-full flex flex-col items-center justify-center bg-slate-950 text-slate-500 gap-2">
-                    <Headphones className="w-10 h-10 opacity-40 animate-pulse text-red-500" />
-                    <span className="text-xs text-slate-400 font-medium">YouTube Study Player</span>
-                  </div>
-                )}
+                <iframe
+                  ref={iframeRef}
+                  id="youtube-study-player-iframe"
+                  src={embedUrl}
+                  onLoad={handleIframeLoad}
+                  title="YouTube Player"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className={showVideo ? "w-full h-full border-0" : "w-1 h-1 opacity-0 absolute pointer-events-none"}
+                />
 
                 {/* Custom Volume Button - shown ONLY on mobile (hidden on PC/desktop) */}
                 <div 

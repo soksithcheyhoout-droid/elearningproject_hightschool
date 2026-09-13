@@ -4,6 +4,26 @@ import './index.css';
 import App from './App.jsx';
 import { initSecurityProtection } from './utils/securityProtection.js';
 
+// Universal protection against "Failed to execute 'removeChild' on 'Node'"
+// Caused when extensions, Google Translate, or third-party embeds modify DOM nodes
+if (typeof Node === 'function' && Node.prototype) {
+  const originalRemoveChild = Node.prototype.removeChild;
+  Node.prototype.removeChild = function(child) {
+    if (child && child.parentNode !== this) {
+      return child;
+    }
+    return originalRemoveChild.apply(this, arguments);
+  };
+
+  const originalInsertBefore = Node.prototype.insertBefore;
+  Node.prototype.insertBefore = function(newNode, referenceNode) {
+    if (referenceNode && referenceNode.parentNode !== this) {
+      return newNode;
+    }
+    return originalInsertBefore.apply(this, arguments);
+  };
+}
+
 // Activate Anti-Inspect & Asset Protection
 initSecurityProtection();
 
