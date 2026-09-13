@@ -120,8 +120,7 @@ function MainApp() {
 
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-  // Bottom nav INSTANT hide on scroll down, INSTANT show on scroll up
-  // NEVER auto-show at bottom of page — only shows when user actively scrolls UP
+  // Bottom nav: hide on scroll down, show on ANY scroll up
   const [isBottomNavHidden, setIsBottomNavHidden] = useState(false);
   const lastScrollYRef = useRef(0);
 
@@ -130,22 +129,24 @@ function MainApp() {
       const currentY = window.scrollY;
       const delta = currentY - lastScrollYRef.current;
 
-      // Only react to meaningful scroll deltas (prevents micro-jitter)
-      if (delta > 3) {
-        // Scrolling DOWN — hide instantly (no slow animation)
+      if (delta > 8) {
+        // Scrolling DOWN significantly — hide
         setIsBottomNavHidden(true);
-      } else if (delta < -3) {
-        // Scrolling UP with intent — show instantly
+      } else if (delta < -1) {
+        // Scrolling UP even slightly — show immediately
         setIsBottomNavHidden(false);
       }
 
-      // Show at the very top of the page (user has scrolled all the way up)
-      if (currentY <= 5) {
+      // Always show at very top of page
+      if (currentY <= 10) {
         setIsBottomNavHidden(false);
       }
 
-      // NOTE: We intentionally do NOT auto-show at the bottom of the page.
-      // The nav remains hidden even at the very bottom — it only reappears on scroll UP.
+      // Always show at very bottom of page
+      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
+      if (currentY >= maxScroll - 20) {
+        setIsBottomNavHidden(false);
+      }
 
       lastScrollYRef.current = currentY;
     };
