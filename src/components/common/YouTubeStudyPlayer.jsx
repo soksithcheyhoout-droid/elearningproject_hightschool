@@ -437,8 +437,8 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     setShowUrlInput(false);
   };
 
-  // Construct iframe embed URL with controls=0 (removes native YouTube top bar & native 🔊x clutter) and playsinline=1
-  const embedUrl = `https://www.youtube.com/embed/${activeVideoId}?enablejsapi=1&autoplay=1&controls=0&playsinline=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}&rel=0&iv_load_policy=3&modestbranding=1&disablekb=1&fs=0`;
+  // Construct iframe embed URL with native YouTube controls visible (play, volume, progress, fullscreen)
+  const embedUrl = `https://www.youtube.com/embed/${activeVideoId}?enablejsapi=1&autoplay=1&playsinline=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}&rel=0&iv_load_policy=3&modestbranding=1`;
 
   return (
     <>
@@ -547,93 +547,6 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                   allowFullScreen
                   className={showVideo ? "w-full h-full border-0" : "w-1 h-1 opacity-0 absolute pointer-events-none"}
                 />
-
-                {/* Sound / Volume Button Overlay on Video (Top-Right Corner - Image 2) */}
-                <div 
-                  ref={volumeContainerRef}
-                  className="absolute top-2.5 sm:top-3 right-2.5 sm:right-3 z-30 select-none"
-                  onMouseEnter={() => setShowVolumePopup(true)}
-                  onMouseLeave={() => !isDraggingVolume && setShowVolumePopup(false)}
-                  onWheel={handleWheelVolume}
-                >
-                  <button
-                    type="button"
-                    onClick={handleMainSoundButtonClick}
-                    className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all cursor-pointer shadow-lg backdrop-blur-md border active:scale-95 ${
-                      isMuted || volume === 0
-                        ? 'bg-black/80 hover:bg-black/95 text-rose-400 border-rose-500/40 ring-1 ring-rose-500/30'
-                        : showVolumePopup
-                        ? 'bg-black/90 text-emerald-400 border-emerald-400/50 ring-2 ring-emerald-500/30'
-                        : 'bg-black/60 hover:bg-black/80 text-emerald-400 border-white/20 hover:border-emerald-400/40'
-                    }`}
-                    title={isMuted ? "Muted (Click to Unmute)" : `Sound Volume ${volume}% (Click to adjust)`}
-                  >
-                    {isMuted || volume === 0 ? (
-                      <VolumeX className="w-4 h-4 text-rose-400" />
-                    ) : (
-                      <Volume2 className="w-4 h-4 text-emerald-400" />
-                    )}
-                  </button>
-
-                  {/* THE VERTICAL VOLUME CAPSULE POPUP (EXACTLY MATCHING USER REQUEST 9 & IMAGE 2) */}
-                  {showVolumePopup && (
-                    <div 
-                      className="absolute top-full right-0 mt-1.5 z-40 animate-fadeIn"
-                      onWheel={handleWheelVolume}
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <div className="w-10 sm:w-11 h-36 sm:h-40 bg-[#090e1a]/95 backdrop-blur-xl border border-white/25 rounded-full shadow-[0_15px_45px_rgba(0,0,0,0.95)] flex flex-col items-center justify-between py-2.5 select-none ring-1 ring-white/10">
-                        
-                        {/* Top: Speaker Mute / Unmute Icon */}
-                        <button
-                          type="button"
-                          onClick={handlePopupMuteToggle}
-                          className="w-6 h-6 rounded-full flex items-center justify-center text-white hover:text-emerald-400 active:scale-90 transition-all cursor-pointer"
-                          title={isMuted ? "Click to Unmute" : "Click to Mute"}
-                        >
-                          {isMuted || volume === 0 ? (
-                            <VolumeX className="w-3.5 h-3.5 text-rose-400" />
-                          ) : (
-                            <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
-                          )}
-                        </button>
-
-                        {/* Middle: Interactive Vertical Slider Track */}
-                        <div 
-                          ref={volumeSliderRef}
-                          onMouseDown={handleSliderMouseDown}
-                          onTouchStart={handleSliderTouchStart}
-                          onTouchMove={handleSliderTouchMove}
-                          className="relative w-7 h-20 sm:h-24 flex items-center justify-center cursor-pointer touch-none"
-                          title="Drag or click to adjust volume"
-                        >
-                          {/* Center Thin Track Line */}
-                          <div className="w-1 h-full bg-white/25 rounded-full relative overflow-hidden pointer-events-none">
-                            {/* Active Solid White Fill from bottom */}
-                            <div 
-                              className="absolute bottom-0 left-0 right-0 bg-white rounded-full transition-all duration-75"
-                              style={{ height: `${isMuted ? 0 : volume}%` }}
-                            />
-                          </div>
-
-                          {/* Circular White Knob */}
-                          <div 
-                            className="absolute w-3.5 h-3.5 bg-white rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.8)] border border-slate-200 pointer-events-none transition-all duration-75 left-1/2 -translate-x-1/2"
-                            style={{ 
-                              bottom: `calc(${isMuted ? 0 : volume}% - 7px)`
-                            }}
-                          />
-                        </div>
-
-                        {/* Bottom: Volume Percentage Text */}
-                        <span className="text-[9.5px] sm:text-[10px] font-mono font-bold text-white/90">
-                          {isMuted || volume === 0 ? '0%' : `${volume}%`}
-                        </span>
-
-                      </div>
-                    </div>
-                  )}
-                </div>
 
                 {/* Audio-Only Visualizer Mode */}
                 {!showVideo && (
