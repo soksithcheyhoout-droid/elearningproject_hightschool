@@ -223,45 +223,51 @@ export default function BacIIHubView() {
         </div>
 
         {/* 3 Main Stream Tabs */}
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-2 sm:gap-3 text-xs font-bold">
+        <div className="grid grid-cols-3 gap-1.5 sm:gap-3 text-[10.5px] sm:text-xs font-bold">
           
           <button
             type="button"
             onClick={() => handleSelectStream('all')}
-            className={`p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl border transition-all flex items-center justify-center gap-2 cursor-pointer font-bold active:scale-[0.98] ${
+            className={`p-2 sm:p-3.5 rounded-xl sm:rounded-2xl border transition-all flex items-center justify-center gap-1 sm:gap-2 cursor-pointer font-bold active:scale-[0.98] ${
               selectedStream === 'all'
                 ? 'bg-gradient-to-r from-[#003366] to-[#005baa] dark:from-blue-600 dark:to-cyan-600 text-white border-[#003366] dark:border-blue-500 shadow-md ring-2 ring-blue-500/30'
                 : 'bg-slate-50 dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 text-slate-700 dark:text-slate-200 border-slate-200 dark:border-slate-700'
             }`}
           >
-            <Layers className={`w-4 h-4 ${selectedStream === 'all' ? 'text-amber-300' : 'text-slate-500 dark:text-slate-400'}`} />
-            <span>{lang === 'km' ? 'វិញ្ញាសាទាំងពីរផ្នែក' : 'All Streams'} ({allPapers.length})</span>
+            <Layers className={`w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0 ${selectedStream === 'all' ? 'text-amber-300' : 'text-slate-500 dark:text-slate-400'}`} />
+            <span className="hidden sm:inline">{lang === 'km' ? 'វិញ្ញាសាទាំងពីរផ្នែក' : 'All Streams'}</span>
+            <span className="sm:hidden">{lang === 'km' ? 'ទាំងអស់' : 'All'}</span>
+            <span className="text-[9.5px] sm:text-xs opacity-80 font-normal">({allPapers.length})</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleSelectStream('social')}
-            className={`p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl border transition-all flex items-center justify-center gap-2 cursor-pointer font-bold active:scale-[0.98] ${
+            className={`p-2 sm:p-3.5 rounded-xl sm:rounded-2xl border transition-all flex items-center justify-center gap-1 sm:gap-2 cursor-pointer font-bold active:scale-[0.98] ${
               selectedStream === 'social'
                 ? 'bg-gradient-to-r from-amber-600 to-amber-700 text-white border-amber-600 shadow-md ring-2 ring-amber-400/40'
                 : 'bg-amber-50/50 dark:bg-slate-800 hover:bg-amber-100/70 dark:hover:bg-slate-700 text-amber-950 dark:text-amber-300 border-amber-200 dark:border-slate-700'
             }`}
           >
-            <Landmark className={`w-4 h-4 ${selectedStream === 'social' ? 'text-amber-200' : 'text-amber-600 dark:text-amber-400'}`} />
-            <span>{lang === 'km' ? 'ថ្នាក់វិទ្យាសាស្ត្រសង្គម' : 'Social Sciences'} ({socialCount})</span>
+            <Landmark className={`w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0 ${selectedStream === 'social' ? 'text-amber-200' : 'text-amber-600 dark:text-amber-400'}`} />
+            <span className="hidden sm:inline">{lang === 'km' ? 'ថ្នាក់វិទ្យាសាស្ត្រសង្គម' : 'Social Sciences'}</span>
+            <span className="sm:hidden">{lang === 'km' ? 'សង្គម' : 'Social'}</span>
+            <span className="text-[9.5px] sm:text-xs opacity-80 font-normal">({socialCount})</span>
           </button>
 
           <button
             type="button"
             onClick={() => handleSelectStream('science')}
-            className={`p-2.5 sm:p-3.5 rounded-xl sm:rounded-2xl border transition-all flex items-center justify-center gap-2 cursor-pointer font-bold active:scale-[0.98] ${
+            className={`p-2 sm:p-3.5 rounded-xl sm:rounded-2xl border transition-all flex items-center justify-center gap-1 sm:gap-2 cursor-pointer font-bold active:scale-[0.98] ${
               selectedStream === 'science'
                 ? 'bg-gradient-to-r from-[#005baa] to-[#0284c7] text-white border-[#005baa] shadow-md ring-2 ring-blue-400/40'
                 : 'bg-blue-50/50 dark:bg-slate-800 hover:bg-blue-100/70 dark:hover:bg-slate-700 text-[#003366] dark:text-cyan-300 border-blue-200 dark:border-slate-700'
             }`}
           >
-            <Atom className={`w-4 h-4 ${selectedStream === 'science' ? 'text-cyan-300' : 'text-[#005baa] dark:text-cyan-400'}`} />
-            <span>{lang === 'km' ? 'ថ្នាក់វិទ្យាសាស្ត្រពិត' : 'Science Stream'} ({scienceCount})</span>
+            <Atom className={`w-3.5 h-3.5 sm:w-4 sm:h-4 flex-shrink-0 ${selectedStream === 'science' ? 'text-cyan-300' : 'text-[#005baa] dark:text-cyan-400'}`} />
+            <span className="hidden sm:inline">{lang === 'km' ? 'ថ្នាក់វិទ្យាសាស្ត្រពិត' : 'Science Stream'}</span>
+            <span className="sm:hidden">{lang === 'km' ? 'វិទ្យាសាស្ត្រ' : 'Science'}</span>
+            <span className="text-[9.5px] sm:text-xs opacity-80 font-normal">({scienceCount})</span>
           </button>
 
         </div>
@@ -353,29 +359,25 @@ export default function BacIIHubView() {
           </span>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-3.5">
+        <div className="grid grid-cols-2 lg:grid-cols-3 gap-2 sm:gap-3.5">
           {filteredQuizzes.map((quiz) => (
-            <div key={quiz.id} className="p-3.5 sm:p-5 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 flex flex-col justify-between gap-3 sm:gap-3.5 shadow-xs hover:border-[#005baa] dark:hover:border-cyan-500 hover:shadow-lg transition-all rounded-2xl sm:rounded-3xl">
-              <div className="space-y-1.5 sm:space-y-2">
-                <div className="flex items-center justify-between gap-1 sm:gap-2 flex-wrap">
-                  <div className="flex items-center gap-1.5">
-                    <span className={`text-[9px] sm:text-[10px] font-black px-2 py-0.5 rounded-md ${quiz.stream === 'social' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-blue-100 text-blue-900 border border-blue-300'}`}>
+            <div key={quiz.id} className="p-2.5 sm:p-5 bg-white dark:bg-[#0f172a] border border-slate-200 dark:border-slate-800 flex flex-col justify-between gap-2.5 sm:gap-3.5 shadow-xs hover:border-[#005baa] dark:hover:border-cyan-500 hover:shadow-lg transition-all rounded-xl sm:rounded-3xl">
+              <div className="space-y-1 sm:space-y-2">
+                <div className="flex items-center justify-between gap-1 flex-wrap">
+                  <div className="flex items-center gap-1">
+                    <span className={`text-[8.5px] sm:text-[10px] font-black px-1.5 py-0.5 rounded-md ${quiz.stream === 'social' ? 'bg-amber-100 text-amber-900 border border-amber-300' : 'bg-blue-100 text-blue-900 border border-blue-300'}`}>
                       {quiz.stream === 'social' ? (lang === 'km' ? 'សង្គម' : 'Social') : (lang === 'km' ? 'វិទ្យាសាស្ត្រ' : 'Science')}
                     </span>
-                    <span className="badge-moeys-blue text-[9px] sm:text-[10px] px-2 py-0.5 rounded-md font-bold">
+                    <span className="badge-moeys-blue text-[8.5px] sm:text-[10px] px-1.5 py-0.5 rounded-md font-bold truncate max-w-[70px] sm:max-w-none">
                       {quiz.subject}
                     </span>
                   </div>
-                  <div className="flex items-center gap-1.5 sm:gap-2 text-[10px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium">
-                    <span className="flex items-center gap-0.5">
-                      <Clock className="w-3 h-3 text-[#005baa] dark:text-cyan-400" />
-                      <span>{Math.round(quiz.timeLimitSeconds / 60)} {lang === 'km' ? 'នាទី' : 'mins'}</span>
-                    </span>
-                    <span>•</span>
-                    <span>{quiz.questions?.length || 5} {lang === 'km' ? 'សំណួរ' : 'Q'}</span>
+                  <div className="flex items-center gap-1 text-[9px] sm:text-[11px] text-slate-500 dark:text-slate-400 font-medium">
+                    <Clock className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#005baa] dark:text-cyan-400" />
+                    <span>{Math.round(quiz.timeLimitSeconds / 60)} នាទី</span>
                   </div>
                 </div>
-                <h4 className="font-black text-xs sm:text-sm text-[#003366] dark:text-white leading-snug">
+                <h4 className="font-black text-[11px] sm:text-sm text-[#003366] dark:text-white leading-snug line-clamp-2">
                   {lang === 'km' ? quiz.titleKm : quiz.titleEn}
                 </h4>
               </div>
@@ -383,9 +385,9 @@ export default function BacIIHubView() {
               <button
                 type="button"
                 onClick={() => setActiveQuizModal(quiz)}
-                className="w-full btn-moeys-primary text-xs py-2 sm:py-2.5 flex items-center justify-center gap-1.5 font-bold shadow-xs cursor-pointer active:scale-95 transition-all"
+                className="w-full btn-moeys-primary text-[10.5px] sm:text-xs py-1.5 sm:py-2.5 flex items-center justify-center gap-1 font-bold shadow-xs cursor-pointer active:scale-95 transition-all"
               >
-                <Play className="w-3.5 h-3.5 text-amber-300 fill-amber-300" />
+                <Play className="w-3 h-3 text-amber-300 fill-amber-300" />
                 <span>{lang === 'km' ? 'ចាប់ផ្តើមតេស្ត' : 'Start Mock'}</span>
               </button>
             </div>
@@ -440,56 +442,55 @@ export default function BacIIHubView() {
 
         {/* Papers Grid View */}
         {viewMode === 'grid' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5 sm:gap-4">
+          <div className="grid grid-cols-2 lg:grid-cols-3 gap-2.5 sm:gap-4">
             {paginatedPapers.map((paper) => (
               <div
                 key={paper.id}
                 onClick={() => setActiveSolutionModal(paper)}
-                className="bg-white rounded-2xl border border-slate-200 p-4 sm:p-5 space-y-3.5 sm:space-y-4 hover:border-[#005baa] hover:shadow-lg transition-all flex flex-col justify-between cursor-pointer group"
+                className="bg-white rounded-xl sm:rounded-2xl border border-slate-200 p-3 sm:p-5 space-y-2.5 sm:space-y-4 hover:border-[#005baa] hover:shadow-lg transition-all flex flex-col justify-between cursor-pointer group active:scale-[0.98]"
               >
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between">
-                    <span className="badge-moeys-gold text-xs font-cinzel">{paper.year}</span>
-                    <span className={`text-[10px] font-bold px-2.5 py-0.5 rounded-full flex items-center gap-1 ${
+                <div className="space-y-1.5 sm:space-y-2">
+                  <div className="flex items-center justify-between gap-1 flex-wrap">
+                    <span className="badge-moeys-gold text-[10.5px] sm:text-xs font-cinzel font-black px-2 py-0.5">{paper.year}</span>
+                    <span className={`text-[8.5px] sm:text-[10px] font-bold px-1.5 sm:px-2 py-0.5 rounded-full flex items-center gap-0.5 sm:gap-1 ${
                       paper.stream === 'social' 
                         ? 'bg-amber-100 text-amber-900 border border-amber-300' 
                         : 'bg-blue-100 text-blue-900 border border-blue-300'
                     }`}>
-                      {paper.stream === 'social' ? <Landmark className="w-3 h-3 text-amber-600" /> : <Atom className="w-3 h-3 text-[#005baa]" />}
-                      <span>{paper.stream === 'social' ? 'ថ្នាក់វិទ្យាសាស្ត្រសង្គម' : 'ថ្នាក់វិទ្យាសាស្ត្រពិត'}</span>
+                      {paper.stream === 'social' ? <Landmark className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-amber-600" /> : <Atom className="w-2.5 h-2.5 sm:w-3 sm:h-3 text-[#005baa]" />}
+                      <span>{paper.stream === 'social' ? (lang === 'km' ? 'សង្គម' : 'Social') : (lang === 'km' ? 'វិទ្យាសាស្ត្រ' : 'Science')}</span>
                     </span>
                   </div>
 
-                  <h4 className="text-xs sm:text-sm font-black text-[#003366] leading-snug group-hover:text-[#005baa] transition-colors">
+                  <h4 className="text-[11.5px] sm:text-sm font-black text-[#003366] leading-snug line-clamp-2 group-hover:text-[#005baa] transition-colors">
                     {paper.paperTitleKm}
                   </h4>
-                  <p className="text-[11px] sm:text-xs text-slate-500 font-medium">
+                  <p className="text-[9.5px] sm:text-xs text-slate-500 font-medium truncate">
                     {paper.paperTitleEn}
                   </p>
 
-                  <div className="flex items-center gap-2 sm:gap-3 text-[10.5px] sm:text-xs text-slate-500 pt-1 flex-wrap">
-                    <span className="flex items-center gap-1">
-                      <Clock className="w-3.5 h-3.5 text-[#005baa]" />
+                  <div className="flex items-center gap-1 sm:gap-2 text-[9px] sm:text-xs text-slate-500 pt-1 flex-wrap">
+                    <span className="flex items-center gap-0.5">
+                      <Clock className="w-2.5 h-2.5 sm:w-3.5 sm:h-3.5 text-[#005baa]" />
                       <span>{paper.duration}</span>
                     </span>
                     <span>•</span>
-                    <span>{paper.totalPoints} ពិន្ទុពេញ</span>
-                    <span>•</span>
-                    <span>{paper.exercises?.length || 4} លំហាត់/សំណួរ</span>
+                    <span>{paper.totalPoints} ពិន្ទុ</span>
                   </div>
                 </div>
 
-                <div className="pt-2 sm:pt-3 border-t border-slate-100">
+                <div className="pt-1.5 sm:pt-3 border-t border-slate-100">
                   <button
                     type="button"
                     onClick={(e) => {
                       e.stopPropagation();
                       setActiveSolutionModal(paper);
                     }}
-                    className="w-full btn-moeys-primary text-xs py-2 sm:py-2.5 flex items-center justify-center gap-2 font-bold cursor-pointer shadow-xs active:scale-[0.99] transition-all"
+                    className="w-full btn-moeys-primary text-[10px] sm:text-xs py-1.5 sm:py-2.5 flex items-center justify-center gap-1 font-bold cursor-pointer shadow-xs active:scale-[0.99] transition-all"
                   >
-                    <Eye className="w-4 h-4" />
-                    <span>{lang === 'km' ? 'មើលកម្រងវិញ្ញាសា & ដំណោះស្រាយ' : 'View Exam & Solutions'}</span>
+                    <Eye className="w-3 h-3 sm:w-4 sm:h-4" />
+                    <span className="sm:hidden">{lang === 'km' ? 'មើលវិញ្ញាសា' : 'View Exam'}</span>
+                    <span className="hidden sm:inline">{lang === 'km' ? 'មើលកម្រងវិញ្ញាសា & ដំណោះស្រាយ' : 'View Exam & Solutions'}</span>
                   </button>
                 </div>
               </div>

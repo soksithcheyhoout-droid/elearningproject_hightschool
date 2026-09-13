@@ -308,7 +308,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
 
   return (
     <header 
-      className="fixed top-0 left-0 right-0 z-[100] w-full select-none font-kantumruy bg-[#002d62]"
+      className="fixed top-0 left-0 right-0 z-[100] w-full select-none font-kantumruy bg-white dark:bg-slate-900 md:bg-[#002d62]"
       style={{
         paddingTop: 'env(safe-area-inset-top, 0px)'
       }}
@@ -373,13 +373,10 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
             ? 'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-md' 
             : 'bg-white dark:bg-slate-900'
         }`}
-        style={{
-          paddingTop: 'max(env(safe-area-inset-top, 0px), 12px)'
-        }}
       >
         <div className="w-full max-w-[1600px] mx-auto px-2 sm:px-4 lg:px-6 relative z-20 overflow-visible">
           <div className={`flex items-center justify-between gap-1 sm:gap-3 min-w-0 transition-all duration-300 ${
-            isScrolled ? 'max-md:h-[74px] md:h-[60px] md:sm:h-[64px]' : 'h-[74px] sm:h-[80px]'
+            isScrolled ? 'h-[56px] md:h-[60px]' : 'h-[60px] md:h-[68px]'
           }`}>
           
           {/* Mobile / Tablet Menu Hamburger Toggle (Visible on screens < xl) */}

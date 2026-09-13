@@ -353,10 +353,9 @@ function MainApp() {
         isYouTubeMusicPlaying={isYouTubeMusicPlaying}
       />
 
-      {/* Spacer to offset the fixed top navbar cleanly with safe area + 24px extra */}
+      {/* Responsive Spacer to cleanly offset the fixed top navbar without unwanted gaps */}
       <div 
-        className="w-full flex-shrink-0" 
-        style={{ height: 'calc(106px + env(safe-area-inset-top, 0px) + 24px)' }}
+        className="w-full flex-shrink-0 h-[calc(60px+env(safe-area-inset-top,0px))] md:h-[calc(102px+env(safe-area-inset-top,0px))]"
         aria-hidden="true" 
       />
 
@@ -382,7 +381,7 @@ function MainApp() {
           
           {/* HOME TAB */}
           {activeTab === 'home' && (
-            <div className="max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8 pt-3 sm:pt-4 pb-6 space-y-4 sm:space-y-8 animate-fadeIn overflow-x-hidden">
+            <div className="max-w-7xl mx-auto w-full px-3 sm:px-6 lg:px-8 pt-2 sm:pt-4 pb-6 space-y-4 sm:space-y-8 animate-fadeIn overflow-x-hidden">
               <HeroSection
                 onStartLearning={handleStartLearning}
                 onExploreBacII={handleExploreBacII}
