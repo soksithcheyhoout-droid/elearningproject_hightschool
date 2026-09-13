@@ -120,46 +120,29 @@ function MainApp() {
 
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-  // Bottom nav auto-hide on scroll down, show on scroll up
+  // Bottom nav INSTANT hide on scroll down, INSTANT show on scroll up
   const [isBottomNavHidden, setIsBottomNavHidden] = useState(false);
   const lastScrollYRef = useRef(0);
-  const scrollDeltaRef = useRef(0);
 
   useEffect(() => {
-    // Only track on mobile (md breakpoint = 768px)
-    const SCROLL_THRESHOLD = 12; // px of accumulated scroll before toggling
-    let ticking = false;
-
     const handleScroll = () => {
-      if (ticking) return;
-      ticking = true;
-      window.requestAnimationFrame(() => {
-        const currentY = window.scrollY;
-        const delta = currentY - lastScrollYRef.current;
+      const currentY = window.scrollY;
+      const delta = currentY - lastScrollYRef.current;
 
-        // Accumulate scroll delta in the same direction
-        if ((delta > 0 && scrollDeltaRef.current > 0) || (delta < 0 && scrollDeltaRef.current < 0)) {
-          scrollDeltaRef.current += delta;
-        } else {
-          scrollDeltaRef.current = delta;
-        }
+      if (delta > 5) {
+        // Scrolling DOWN — hide instantly
+        setIsBottomNavHidden(true);
+      } else if (delta < -1) {
+        // Scrolling UP even 1px — show instantly
+        setIsBottomNavHidden(false);
+      }
 
-        if (scrollDeltaRef.current > SCROLL_THRESHOLD) {
-          // Scrolling DOWN past threshold
-          setIsBottomNavHidden(true);
-        } else if (scrollDeltaRef.current < -SCROLL_THRESHOLD) {
-          // Scrolling UP past threshold
-          setIsBottomNavHidden(false);
-        }
+      // Always show at very top of page
+      if (currentY <= 5) {
+        setIsBottomNavHidden(false);
+      }
 
-        // Always show at top of page
-        if (currentY <= 10) {
-          setIsBottomNavHidden(false);
-        }
-
-        lastScrollYRef.current = currentY;
-        ticking = false;
-      });
+      lastScrollYRef.current = currentY;
     };
 
     window.addEventListener('scroll', handleScroll, { passive: true });
@@ -399,10 +382,10 @@ function MainApp() {
         isYouTubeMusicPlaying={isYouTubeMusicPlaying}
       />
 
-      {/* Spacer to offset the fixed top navbar cleanly with safe area */}
+      {/* Spacer to offset the fixed top navbar cleanly with safe area + 24px extra */}
       <div 
         className="w-full flex-shrink-0" 
-        style={{ height: 'calc(106px + max(env(safe-area-inset-top, 0px), 0px))' }}
+        style={{ height: 'calc(106px + env(safe-area-inset-top, 0px) + 24px)' }}
         aria-hidden="true" 
       />
 
@@ -780,8 +763,7 @@ function MainApp() {
             style={{
               paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 0.5rem)',
               transform: isBottomNavHidden ? 'translateY(100%)' : 'translateY(0)',
-              transition: 'transform 0.3s ease-in-out',
-              willChange: 'transform'
+              transition: 'none'
             }}
           >
             {/* Main Bar Container (Light & Dark Mode Support) */}
