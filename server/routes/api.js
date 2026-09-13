@@ -158,10 +158,14 @@ router.get('/ai/chat', handleAIChat);
 router.post('/ai/quiz-generate', generateAIQuizQuestions);
 
 import { getQuestionBankStats, getQuestionsFromPool } from '../controllers/questionBankController.js';
+import { searchYouTube } from '../controllers/youtubeController.js';
 
 // 13. Master 12,000 National Examination Question Pool (6,000 Science + 6,000 Social)
 router.get('/questions/stats', getQuestionBankStats);
 router.get('/questions/master-pool', getQuestionsFromPool);
+
+// 14. YouTube Song & Study Music Live Search Engine
+router.get('/youtube/search', searchYouTube);
 
 export default router;
 

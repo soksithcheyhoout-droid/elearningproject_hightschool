@@ -23,7 +23,7 @@ import {
 import { useLanguage } from '../../context/LanguageContext';
 import ThemeToggle from '../common/ThemeToggle';
 
-export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor, isOpen, onClose }) {
+export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor, onOpenYouTube, isYouTubeMusicPlaying, isOpen, onClose }) {
   const { lang, t } = useLanguage();
   const [isScrolled, setIsScrolled] = useState(false);
 
@@ -223,6 +223,47 @@ export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor, isOpen
               );
             })}
           </nav>
+
+          {/* 🎵 YouTube Music & Song Search in Sidebar */}
+          <div className="pt-2">
+            <button
+              type="button"
+              onClick={() => {
+                if (onOpenYouTube) onOpenYouTube();
+                if (onClose) onClose();
+              }}
+              className={`w-full p-2.5 rounded-2xl flex items-center justify-between transition-all border cursor-pointer select-none active:scale-[0.98] ${
+                isYouTubeMusicPlaying
+                  ? 'bg-red-600 text-white border-red-500 shadow-md ring-2 ring-red-400/40'
+                  : 'bg-red-50/80 hover:bg-red-100/90 dark:bg-red-950/30 dark:hover:bg-red-900/40 border-red-200 dark:border-red-900/40 text-red-600 dark:text-red-400'
+              }`}
+            >
+              <div className="flex items-center gap-2.5 min-w-0">
+                <div className="w-7 h-7 rounded-xl bg-red-600 text-white flex items-center justify-center flex-shrink-0 shadow-xs">
+                  <svg className="w-4 h-4 fill-current" viewBox="0 0 24 24">
+                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                  </svg>
+                </div>
+                <div className="text-left leading-tight min-w-0">
+                  <span className="text-xs font-bold truncate block">
+                    {lang === 'km' ? 'YouTube តន្ត្រីសិក្សា' : 'YouTube Study Music'}
+                  </span>
+                  <span className="text-[10px] text-slate-500 dark:text-slate-400 truncate block">
+                    {lang === 'km' ? 'ស្វែងរក និងចាក់ចម្រៀង' : 'Search & Play Any Song'}
+                  </span>
+                </div>
+              </div>
+              {isYouTubeMusicPlaying ? (
+                <span className="text-[9px] font-black px-2 py-0.5 rounded-full bg-white text-red-600 animate-pulse">
+                  Playing
+                </span>
+              ) : (
+                <span className="text-[9px] font-bold px-2 py-0.5 rounded-full bg-red-100 dark:bg-red-900/50 text-red-600 dark:text-red-300">
+                  Search
+                </span>
+              )}
+            </button>
+          </div>
 
           {/* ☀️ / 🌙 Background Theme Selector (White or Black) */}
           <div className="pt-2 pb-1">

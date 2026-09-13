@@ -26,6 +26,7 @@ import AdminLoginView from './components/admin/AdminLoginView';
 import MoEYSIntroSplash from './components/common/MoEYSIntroSplash';
 import MinistryDonationModal from './components/common/MinistryDonationModal';
 import HumanVoiceStudioModal from './components/common/HumanVoiceStudioModal';
+import YouTubeStudyPlayer from './components/common/YouTubeStudyPlayer';
 import { curriculumData } from './data/curriculumData';
 import { quizData } from './data/quizData';
 import { useAuth } from './context/AuthContext';
@@ -96,6 +97,8 @@ function MainApp() {
   });
   const [isDonationModalOpen, setIsDonationModalOpen] = useState(false);
   const [isVoiceStudioOpen, setIsVoiceStudioOpen] = useState(false);
+  const [isYouTubeOpen, setIsYouTubeOpen] = useState(false);
+  const [isYouTubeMusicPlaying, setIsYouTubeMusicPlaying] = useState(false);
 
   const handleSplashFinish = () => {
     try {
@@ -346,6 +349,8 @@ function MainApp() {
           window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         onToggleSidebar={() => setIsMobileSidebarOpen(prev => !prev)}
+        onOpenYouTube={() => setIsYouTubeOpen(true)}
+        isYouTubeMusicPlaying={isYouTubeMusicPlaying}
       />
 
       {/* Spacer to offset the fixed top navbar permanently */}
@@ -359,6 +364,11 @@ function MainApp() {
           activeTab={activeTab}
           setActiveTab={setTabAndUrl}
           onOpenAITutor={() => setIsAITutorOpen(true)}
+          onOpenYouTube={() => {
+            setIsYouTubeOpen(true);
+            setIsMobileSidebarOpen(false);
+          }}
+          isYouTubeMusicPlaying={isYouTubeMusicPlaying}
           isOpen={isMobileSidebarOpen}
           onClose={() => setIsMobileSidebarOpen(false)}
         />
@@ -608,6 +618,13 @@ function MainApp() {
           onClose={() => setIsVoiceStudioOpen(false)}
         />
       )}
+
+      {/* Persistent YouTube Study Music & Song Search Player */}
+      <YouTubeStudyPlayer
+        isOpen={isYouTubeOpen}
+        onClose={(openState = false) => setIsYouTubeOpen(openState)}
+        onPlayStateChange={(playing) => setIsYouTubeMusicPlaying(playing)}
+      />
 
       {/* Level Up Golden Celebratory Modal */}
       {levelUpToast && (
