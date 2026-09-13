@@ -310,15 +310,22 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
     <header 
       className={`fixed top-0 left-0 right-0 z-[100] w-full select-none font-kantumruy transition-all duration-300 ${
         isScrolled 
-          ? 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-md shadow-md border-b border-slate-200/60 dark:border-slate-800/60' 
+          ? 'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-md border-b border-slate-200/80 dark:border-slate-800' 
           : 'bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800'
       }`}
+      style={{
+        transform: 'translate3d(0, 0, 0)',
+        WebkitTransform: 'translate3d(0, 0, 0)',
+        willChange: 'transform'
+      }}
     >
       
       {/* 1. Official MoEYS Full-Width Top Utility Ribbon (Edge-to-Edge with Phone & Gmail on Mobile & PC) */}
       <div 
         className={`w-full bg-gradient-to-r from-[#002d62] via-[#005baa] to-[#0077cc] text-white select-none overflow-hidden transition-all duration-300 ease-in-out border-b border-white/15 ${
-          isScrolled ? 'max-h-0 opacity-0 -translate-y-2 pointer-events-none' : 'max-h-12 opacity-100 translate-y-0 h-8 sm:h-9'
+          isScrolled 
+            ? 'max-md:h-8 max-md:opacity-100 max-md:translate-y-0 md:max-h-0 md:opacity-0 md:-translate-y-2 md:pointer-events-none' 
+            : 'max-h-12 opacity-100 translate-y-0 h-8 sm:h-9'
         }`}
       >
         <div className="w-full max-w-[1600px] mx-auto px-2.5 sm:px-4 lg:px-6 h-full flex items-center justify-between text-[10.5px] sm:text-xs font-medium">
@@ -368,7 +375,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
       {/* 2. Main Navigation Bar with Grand 4K Emblem, Vibrant Blue Links & User Profile (PF) */}
       <div className="w-full max-w-[1600px] mx-auto px-2 sm:px-4 lg:px-6 relative z-20">
         <div className={`flex items-center justify-between gap-1 sm:gap-3 min-w-0 transition-all duration-300 ${
-          isScrolled ? 'h-[60px] sm:h-[64px]' : 'h-[74px] sm:h-[80px]'
+          isScrolled ? 'max-md:h-[74px] md:h-[60px] md:sm:h-[64px]' : 'h-[74px] sm:h-[80px]'
         }`}>
           
           {/* Mobile / Tablet Menu Hamburger Toggle (Visible on screens < xl) */}
