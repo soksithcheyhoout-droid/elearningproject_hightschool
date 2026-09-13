@@ -1604,6 +1604,183 @@ div[class*="extension-floating"] {
 }
 
 /* ==========================================================================
+   MOTDAR ARENA ESPORTS DESIGN SYSTEM (EDUCATION × ESPORTS × FUTURE)
+   ========================================================================== */
+
+:root {
+  --motdar-bg-base: #030712;
+  --motdar-bg-surface: #06101F;
+  --motdar-bg-card: #081426;
+  --motdar-cyan: #00D9FF;
+  --motdar-blue: #2563FF;
+  --motdar-magenta: #FF2D6F;
+  --motdar-purple: #8B5CF6;
+  --motdar-gold: #F5C542;
+}
+
+/* Atmospheric Cinematic Arena Background */
+.motdar-arena-bg {
+  background-color: #030712;
+  background-image: 
+    radial-gradient(ellipse 60% 40% at 10% 20%, rgba(0, 217, 255, 0.08) 0%, transparent 60%),
+    radial-gradient(ellipse 55% 40% at 90% 80%, rgba(255, 45, 111, 0.07) 0%, transparent 60%),
+    radial-gradient(circle at 50% 10%, rgba(37, 99, 255, 0.06) 0%, transparent 50%),
+    linear-gradient(rgba(255, 255, 255, 0.015) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255, 255, 255, 0.015) 1px, transparent 1px);
+  background-size: 100% 100%, 100% 100%, 100% 100%, 40px 40px, 40px 40px;
+}
+
+/* Layered Glassmorphic Panel */
+.motdar-glass {
+  background: rgba(6, 16, 31, 0.88);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  border: 1px solid rgba(0, 217, 255, 0.18);
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.6), inset 0 1px 0 rgba(255, 255, 255, 0.06);
+}
+
+/* MOTDAR Player Host Card (Electric Cyan / Deep Blue Identity) */
+.motdar-card-host {
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  background: linear-gradient(175deg, rgba(8, 20, 38, 0.95) 0%, rgba(4, 10, 20, 0.98) 100%);
+  border: 1px solid rgba(0, 217, 255, 0.3);
+  box-shadow: 0 16px 40px -10px rgba(0, 217, 255, 0.18), inset 0 1px 0 rgba(0, 217, 255, 0.4);
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.motdar-card-host:hover {
+  border-color: rgba(0, 217, 255, 0.55);
+  box-shadow: 0 20px 50px -8px rgba(0, 217, 255, 0.3), inset 0 1px 0 rgba(0, 217, 255, 0.6);
+}
+
+/* MOTDAR Player Challenger Card (Magenta / Crimson Identity) */
+.motdar-card-challenger {
+  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
+  background: linear-gradient(175deg, rgba(36, 10, 22, 0.95) 0%, rgba(18, 5, 12, 0.98) 100%);
+  border: 1px solid rgba(255, 45, 111, 0.3);
+  box-shadow: 0 16px 40px -10px rgba(255, 45, 111, 0.18), inset 0 1px 0 rgba(255, 45, 111, 0.4);
+  position: relative;
+  transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+.motdar-card-challenger:hover {
+  border-color: rgba(255, 45, 111, 0.55);
+  box-shadow: 0 20px 50px -8px rgba(255, 45, 111, 0.3), inset 0 1px 0 rgba(255, 45, 111, 0.6);
+}
+
+/* MOTDAR Professional Subject Cards */
+.motdar-subject-card {
+  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  position: relative;
+}
+
+.motdar-subject-card-active {
+  background: linear-gradient(180deg, rgba(0, 217, 255, 0.16) 0%, rgba(8, 20, 38, 0.96) 100%);
+  border: 1px solid #00D9FF;
+  box-shadow: 0 0 20px rgba(0, 217, 255, 0.28), inset 0 0 14px rgba(0, 217, 255, 0.14);
+  transform: translateY(-2px);
+}
+
+.motdar-subject-card-inactive {
+  background: rgba(8, 20, 38, 0.7);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.motdar-subject-card-inactive:hover {
+  background: rgba(12, 28, 52, 0.85);
+  border-color: rgba(0, 217, 255, 0.4);
+  transform: translateY(-2px);
+}
+
+/* MOTDAR Futuristic Primary Button with Shine */
+.motdar-btn-primary {
+  position: relative;
+  background: linear-gradient(135deg, #00D9FF 0%, #2563FF 100%);
+  color: #030712;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-weight: 900;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  transition: all 0.2s ease-in-out;
+  box-shadow: 0 0 25px rgba(0, 217, 255, 0.35);
+  border: none;
+  cursor: pointer;
+  overflow: hidden;
+}
+
+.motdar-btn-primary::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.35) 50%, transparent 100%);
+  transform: translateX(-100%);
+  transition: transform 0.6s ease;
+}
+
+.motdar-btn-primary:hover {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 0 35px rgba(0, 217, 255, 0.6);
+  color: #ffffff;
+}
+
+.motdar-btn-primary:hover::after {
+  transform: translateX(100%);
+}
+
+.motdar-btn-primary:active {
+  transform: translateY(1px) scale(0.99);
+}
+
+/* MOTDAR VS Collision Nexus */
+.motdar-vs-nexus {
+  clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  position: relative;
+  background: linear-gradient(180deg, #06101F 0%, #030712 100%);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  box-shadow: -8px 0 25px rgba(0, 217, 255, 0.3), 8px 0 25px rgba(255, 45, 111, 0.3);
+}
+
+/* MOTDAR Navigation Link */
+.motdar-nav-link {
+  position: relative;
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: #94A3B8;
+  transition: all 0.2s ease;
+  padding: 6px 12px;
+  border-radius: 8px;
+}
+
+.motdar-nav-link:hover {
+  color: #ffffff;
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.motdar-nav-link-active {
+  color: #00D9FF !important;
+  background: rgba(0, 217, 255, 0.1);
+  box-shadow: inset 0 0 12px rgba(0, 217, 255, 0.15);
+}
+
+.motdar-nav-link-active::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 20%;
+  right: 20%;
+  height: 2px;
+  background: #00D9FF;
+  box-shadow: 0 0 8px #00D9FF;
+  border-radius: 2px;
+}
+
+
+/* ==========================================================================
    Cyberpunk / Glowing Tech Neon Input (.ds-label)
    ========================================================================== */
 .ds-label {
