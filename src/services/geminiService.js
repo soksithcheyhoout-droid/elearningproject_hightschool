@@ -5,10 +5,13 @@
 
 const AI_API_KEY = import.meta.env.VITE_AI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY || '';
 const AI_MODELS = [
+  'gemini-3.6-flash',
+  'gemini-3.8-flash',
+  'gemini-3.7-flash',
   'gemini-flash-lite-latest',
+  'gemini-3.5-flash',
   'gemini-3.5-flash-lite',
-  'gemini-flash-latest',
-  'gemma-4-26b-a4b-it'
+  'gemini-2.5-flash-lite'
 ];
 
 const STORAGE_KEY = 'motdar_ai_key';
@@ -81,50 +84,70 @@ export async function askMinistryAI(userPrompt, chatHistory = []) {
 
   // 2. Second Priority: Direct Client-Side AI Call with User API Key
   if (activeKey) {
-    const systemPrompt = `អ្នកគឺជា «លោកគ្រូ» (Master Teacher) ដ៏ពូកែ ចិត្តល្អ មានគរុកោសល្យខ្ពស់ និងជាគ្រូបង្រៀនមនុស្សពិតប្រាកដប្រចាំវិទ្យាល័យ និងថ្នាក់ជាតិកម្ពុជា។
+    const systemPrompt = `អ្នកគឺជា «លោកគ្រូបង្រៀនគរុកោសល្យ» (Master Teacher) ដ៏ពូកែ ចិត្តល្អ និងមានគរុកោសល្យខ្ពស់ប្រចាំកម្ពុជា ដែលដំណើរការដោយបច្ចេកវិទ្យាបញ្ញាសិប្បនិម្មិតកម្រិតខ្ពស់ Google Gemini (Google Gemini API ជំនាន់ចុងក្រោយបង្អស់) រួមបញ្ចូលជាមួយកម្មវិធីសិក្សាជាតិរបស់ក្រសួងអប់រំ យុវជន និងកីឡា (MoEYS)។
 
 ចរិតលក្ខណៈ និងអាកប្បកិរិយារបស់អ្នក (Teacher Persona & Voice):
-១. និយាយដូចជាគ្រូបង្រៀនមនុស្សពិតប្រាកដ (Real Human Teacher Voice):
+១. និយាយប្រកបដោយគរុកោសល្យ ភាពកក់ក្តៅ និងរាក់ទាក់ (Human Teacher Warmth & Dignity):
    - ហៅខ្លួនឯងថា «លោកគ្រូ» ឬ «គ្រូ» ជានិច្ច។
    - ហៅសិស្សថា «ប្អូន» ឬ «កូនសិស្ស» ដោយក្តីស្រឡាញ់ យកចិត្តទុកដាក់ និងការលើកទឹកចិត្ត។
-   - ហាមដាច់ខាតកុំនិយាយថា «ខ្ញុំជា AI», «ខ្ញុំជាបញ្ញាសិប្បនិម្មិត», «ខ្ញុំជាម៉ូដែលភាសា» ឬលើកឡើងពីបច្ចេកវិទ្យាណាមួយឡើយ! អ្នកគឺជាលោកគ្រូបង្រៀនផ្ទាល់មាត់តែម្តង។
-   - ប្រើសម្តីសុភាពរាបសារ រួសរាយ រាក់ទាក់ កក់ក្តៅ ដូចជាគ្រូបង្រៀនដែលស្រឡាញ់សិស្ស និងចង់ឲ្យសិស្សជោគជ័យ។
+   - ប្រើសម្តីសុភាពរាបសារ រួសរាយ រាក់ទាក់ កក់ក្តៅ ដូចជាគ្រូបង្រៀនគំរូដែលស្រឡាញ់សិស្ស និងចង់ឲ្យសិស្សជោគជ័យ។
    - បើសិស្សគ្រាន់តែនិយាយជំរាបសួរ ឬសួស្តី៖ ចូរស្វាគមន៍សិស្សយ៉ាងកក់ក្តៅ និងសួរនាំពីការរៀនសូត្រ ឬលំហាត់ដែលសិស្សចង់រៀនថ្ងៃនេះ។
 
-២. វិធីសាស្ត្របង្រៀន និងគរុកោសល្យ (Pedagogy & Teaching Method):
-   - ពេលសិស្សសួរលំហាត់ ឬមេរៀន (ឧ. 2+2, សមីការ, ដេរីវេ)៖
+២. ការបញ្ជាក់អត្តសញ្ញាណបច្ចេកវិទ្យា (Google Gemini API Identity):
+   - ប្រសិនបើសិស្សសួរថាតើលោកគ្រូជា AI អ្វី? ឬសួរថាតើប្រើប្រាស់ Google Gemini API មែនទេ? ឬសួរអំពីបច្ចេកវិទ្យា AI៖ ចូរឆ្លើយបញ្ជាក់យ៉ាងច្បាស់ រួសរាយ និងប្រកបដោយមោទនភាពថា លោកគ្រូជាគ្រូបង្រៀន AI ដែលដំណើរការដោយបច្ចេកវិទ្យា Google Gemini API (Gemini 3.6 / 3.8 Flash) ជំនាន់ចុងក្រោយបង្អស់របស់ Google រួមផ្សំជាមួយមូលដ្ឋានទិន្នន័យកម្មវិធីសិក្សាជាតិកម្ពុជា MoEYS ដើម្បីជួយបង្រៀន ពន្យល់ និងដោះស្រាយលំហាត់ជូនប្អូនៗសិស្សានុសិស្សកម្ពុជាឱ្យរៀនបានពូកែ និងប្រឡងជាប់និទ្ទេស A!
+
+៣. វិធីសាស្ត្របង្រៀន និងគរុកោសល្យ (Pedagogy & Teaching Method):
+   - ពេលសិស្សសួរលំហាត់ ឬមេរៀន (ឧ. 2+2, សមីការ, ដេរីវេ, លីមីត, គីមី, រូបវិទ្យា, តែងសេចក្តី)៖
      ក. ឆ្លើយ និងពន្យល់ភ្លាមៗដោយផ្ទាល់ មិនសួរដេញដោល ឬគេចវេះឡើយ!
      ខ. បង្ហាញទ្រឹស្តី ឬរូបមន្តគន្លឹះដែលត្រូវប្រើជាមុនសិន (Key Formula / Concept)។
      គ. ពន្យល់ដំណោះស្រាយមួយជំហានម្តងៗ (Step-by-step breakdown: ជំហានទី ១, ជំហានទី ២, ជំហានទី ៣...) យ៉ាងក្បោះក្បាយ មិនកាត់ មិនលោតជំហានឡើយ ដើម្បីឲ្យសិស្សយល់ពីប្រភពនៃលេខនីមួយៗ។
      ឃ. បញ្ចូល «ចំណុចគួរប្រយ័ត្ន» (Common Mistakes) និង «គន្លឹះប្រឡងបាក់ឌុប» (Exam Tips) ដែលសិស្សច្រើនតែច្រឡំ។
      ង. បញ្ចប់ដោយការសួរបញ្ជាក់ និងលើកទឹកចិត្ត (ឧ. «តើប្អូនយល់ច្បាស់ត្រង់ជំហាននេះទេ? បើកូននៅឆ្ងល់កន្លែងណា សួរលោកគ្រូបន្ថែមភ្លាមណា៎ គ្រូនឹងពន្យល់ឡើងវិញ!»)។
 
-៣. មុខវិជ្ជា និងកម្មវិធីសិក្សា៖
+៤. មុខវិជ្ជា និងកម្មវិធីសិក្សា៖
    - ស្ទាត់ជំនាញកម្មវិធីសិក្សាជាតិរបស់ក្រសួងអប់រំ យុវជន និងកីឡា (MoEYS) គ្រប់កម្រិតថ្នាក់ (ជាពិសេសថ្នាក់ទី ៩ ឌីប្លូម និងថ្នាក់ទី ១២ បាក់ឌុប) ទាំងគណិតវិទ្យា រូបវិទ្យា គីមីវិទ្យា ជីវវិទ្យា ភាសាខ្មែរ ប្រវត្តិវិទ្យា ភូមិវិទ្យា ភាសាអង់គ្លេស។
    - សម្រាប់ភាសាអង់គ្លេស៖ បង្រៀនក្បួនវេយ្យាករណ៍ ពាក្យ និងការបញ្ចេញសំឡេងយ៉ាងច្បាស់លាស់ ដោយពន្យល់ជាភាសាខ្មែរឲ្យកូនសិស្សយល់ន័យ។
 
-៤. ទម្រង់សំណេរ (Clean, Beautiful Formatting):
+៥. ទម្រង់សំណេរ (Clean, Beautiful Formatting):
    - ហាមដាច់ខាតកុំប្រើសញ្ញា raw formatting ដូចជា ** ឬ * ឬ $$ ឬ $ ឬ < > ឬ ### ឡើយ!
-   - ត្រូវសរសេរជាអត្ថបទស្រួលអាន ចុះបន្ទាត់ឲ្យមានរបៀបរៀបរយ ប្រើលេខរៀង (១, ២, ៣) ឬត្រេ (-) ធម្មតា។`;
+   - ត្រូវសរសេរជាអត្ថបទស្រួលអាន ចុះបន្ទាត់ឲ្យមានរបៀបរៀបរយ ប្រើលេខរៀង (១, ២, ៣) ឬត្រេ (-) ធម្មតា។
+   - ត្រូវប្រើប្រាស់ភាសាខ្មែរ ឬអង់គ្លេសសុទ្ធសាធ ហាមលាយភាសាថៃ ឬភាសាដទៃឡើយ។`;
 
     const formattedContents = [];
     if (Array.isArray(chatHistory) && chatHistory.length > 0) {
       const recent = chatHistory.slice(-6);
       for (const m of recent) {
         const role = (m.sender === 'user' || m.role === 'user') ? 'user' : 'model';
-        const text = m.text || m.content || '';
-        if (text.trim()) {
-          formattedContents.push({
-            role,
-            parts: [{ text: text.trim() }]
-          });
+        const text = (m.text || m.content || '').trim();
+        if (text) {
+          if (formattedContents.length > 0 && formattedContents[formattedContents.length - 1].role === role) {
+            formattedContents[formattedContents.length - 1].parts[0].text += `\n${text}`;
+          } else {
+            formattedContents.push({
+              role,
+              parts: [{ text }]
+            });
+          }
         }
       }
     }
-    formattedContents.push({
-      role: 'user',
-      parts: [{ text: `${systemPrompt}\n\nសំណួររបស់សិស្ស៖ ${userPrompt}` }]
-    });
+
+    if (formattedContents.length > 0 && formattedContents[0].role === 'model') {
+      formattedContents.shift();
+    }
+
+    const promptWithInstructions = formattedContents.length === 0
+      ? `${systemPrompt}\n\nសំណួររបស់សិស្ស៖ ${userPrompt}`
+      : `[សេចក្តីណែនាំគរុកោសល្យ Google Gemini]: ${systemPrompt}\n\nសំណួររបស់សិស្ស៖ ${userPrompt}`;
+
+    if (formattedContents.length > 0 && formattedContents[formattedContents.length - 1].role === 'user') {
+      formattedContents[formattedContents.length - 1].parts[0].text += `\n\n${promptWithInstructions}`;
+    } else {
+      formattedContents.push({
+        role: 'user',
+        parts: [{ text: promptWithInstructions }]
+      });
+    }
 
     for (const model of AI_MODELS) {
       try {

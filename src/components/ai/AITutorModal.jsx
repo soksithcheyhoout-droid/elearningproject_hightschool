@@ -55,7 +55,7 @@ export default function AITutorModal({ isOpen, onClose, initialPrompt = '' }) {
     {
       id: 1,
       sender: 'ai',
-      text: "សួស្តីប្អូន " + (student.name || '') + "! លោកគ្រូរីករាយណាស់ដែលបានជួបប្អូននៅថ្ងៃនេះ។ មិនថាលំហាត់គណិតវិទ្យា រូបវិទ្យា គីមីវិទ្យា ជីវវិទ្យា ឬសំណួរតែងសេចក្តីភាសាខ្មែរ ប្រវត្តិវិទ្យាទេ កូនអាចសួរលោកគ្រូបានទាំងអស់ណា៎! តើថ្ងៃនេះកូនចង់ឱ្យលោកគ្រូជួយពន្យល់ ឬបង្រៀនមេរៀនអ្វីដែរ?",
+      text: "សួស្តីប្អូន " + (student.name || '') + "! លោកគ្រូ AI (ដំណើរការដោយ Google Gemini API) រីករាយណាស់ដែលបានជួបប្អូននៅថ្ងៃនេះ។ មិនថាលំហាត់គណិតវិទ្យា រូបវិទ្យា គីមីវិទ្យា ជីវវិទ្យា ឬសំណួរតែងសេចក្តីភាសាខ្មែរ ប្រវត្តិវិទ្យាទេ កូនអាចសួរលោកគ្រូបានទាំងអស់ណា៎! តើថ្ងៃនេះកូនចង់ឱ្យលោកគ្រូជួយពន្យល់ ឬបង្រៀនមេរៀនអ្វីដែរ?",
       time: "ឥឡូវនេះ"
     }
   ]);
@@ -183,14 +183,21 @@ export default function AITutorModal({ isOpen, onClose, initialPrompt = '' }) {
               <GraduationCap className="w-6 h-6 text-amber-300" />
             </div>
             <div>
-              <h2 className="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
-                <span>លោកគ្រូបង្រៀនគរុកោសល្យ</span>
-                <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-300/30 font-sans font-bold uppercase">
-                  Master Teacher
+              <div className="flex items-center gap-2 flex-wrap">
+                <h2 className="text-base sm:text-lg font-extrabold text-white flex items-center gap-2">
+                  <span>លោកគ្រូបង្រៀនគរុកោសល្យ</span>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-amber-400/20 text-amber-300 border border-amber-300/30 font-sans font-bold uppercase">
+                    Master Teacher
+                  </span>
+                </h2>
+                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-cyan-400/20 text-cyan-200 border border-cyan-300/30 font-sans font-bold flex items-center gap-1 shadow-xs">
+                  <Sparkles className="w-3 h-3 text-cyan-300 animate-pulse" />
+                  Google Gemini 3.8 Flash
                 </span>
-              </h2>
-              <p className="text-xs text-blue-100 mt-0.5">
-                គ្រូបង្រៀនពិតប្រាកដ • ជំនួយការដោះស្រាយលំហាត់ និងត្រៀមប្រឡងបាក់ឌុប
+              </div>
+              <p className="text-xs text-blue-100 mt-0.5 flex items-center gap-1.5">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
+                <span>Google Gemini AI Engine Active • ជំនួយការដោះស្រាយលំហាត់ និងត្រៀមប្រឡងបាក់ឌុប</span>
               </p>
             </div>
           </div>
@@ -239,28 +246,34 @@ export default function AITutorModal({ isOpen, onClose, initialPrompt = '' }) {
                 {(msg.text || '').replace(/\*{2,}/g, '').replace(/\*/g, '').replace(/\${1,2}/g, '').replace(/<[^>]*>/g, '').replace(/^#+\s*/gm, '').replace(/^>\s*/gm, '')}
                 <div className={`text-[10px] mt-2.5 flex items-center justify-between gap-2 ${msg.sender === 'user' ? 'text-blue-200' : 'text-slate-400'}`}>
                   {msg.sender === 'ai' && (
-                    <button
-                      type="button"
-                      onClick={() => handleSpeak(msg.id, msg.text)}
-                      className={`px-3 py-1.5 rounded-lg font-bold text-[11px] transition-all cursor-pointer flex items-center gap-1.5 border shadow-2xs ${
-                        speakingMsgId === msg.id 
-                          ? 'bg-rose-600 hover:bg-rose-700 text-white border-rose-600 ring-2 ring-rose-200 animate-pulse' 
-                          : 'bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-[#003366] border-slate-200'
-                      }`}
-                      title={speakingMsgId === msg.id ? "ចុចដើម្បីបញ្ឈប់ការអាន (Click to Stop Voice)" : "ស្តាប់លោកគ្រូអាន (Speak Voice)"}
-                    >
-                      {speakingMsgId === msg.id ? (
-                        <>
-                          <Square className="w-3 h-3 fill-white text-white" />
-                          <span>⏹️ បញ្ឈប់ការអាន (Stop)</span>
-                        </>
-                      ) : (
-                        <>
-                          <Volume2 className="w-3.5 h-3.5 text-[#005baa]" />
-                          <span>🔊 ស្តាប់លោកគ្រូអាន</span>
-                        </>
-                      )}
-                    </button>
+                    <div className="flex items-center gap-2">
+                      <button
+                        type="button"
+                        onClick={() => handleSpeak(msg.id, msg.text)}
+                        className={`px-3 py-1.5 rounded-lg font-bold text-[11px] transition-all cursor-pointer flex items-center gap-1.5 border shadow-2xs ${
+                          speakingMsgId === msg.id 
+                            ? 'bg-rose-600 hover:bg-rose-700 text-white border-rose-600 ring-2 ring-rose-200 animate-pulse' 
+                            : 'bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-[#003366] border-slate-200'
+                        }`}
+                        title={speakingMsgId === msg.id ? "ចុចដើម្បីបញ្ឈប់ការអាន (Click to Stop Voice)" : "ស្តាប់លោកគ្រូអាន (Speak Voice)"}
+                      >
+                        {speakingMsgId === msg.id ? (
+                          <>
+                            <Square className="w-3 h-3 fill-white text-white" />
+                            <span>⏹️ បញ្ឈប់ការអាន (Stop)</span>
+                          </>
+                        ) : (
+                          <>
+                            <Volume2 className="w-3.5 h-3.5 text-[#005baa]" />
+                            <span>🔊 ស្តាប់លោកគ្រូអាន</span>
+                          </>
+                        )}
+                      </button>
+                      <span className="hidden sm:inline-flex items-center gap-1 text-[10px] text-blue-700 font-semibold bg-blue-50 border border-blue-200/70 px-2 py-0.5 rounded-md font-sans">
+                        <Sparkles className="w-2.5 h-2.5 text-blue-600" />
+                        Google Gemini AI
+                      </span>
+                    </div>
                   )}
                   <span className="ml-auto font-mono">{msg.time}</span>
                 </div>

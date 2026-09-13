@@ -7,10 +7,13 @@
 const _FALLBACK_ENC = 'QVEuQWI4Uk42S2pfbERscExWNHJyZlg4eW1JOWxPMHF5aDhqVTJPUktqVjNBYXJJa2pxYUE=';
 const AI_API_KEY = process.env.AI_API_KEY || process.env.GEMINI_API_KEY || process.env.VITE_AI_API_KEY || Buffer.from(_FALLBACK_ENC, 'base64').toString('utf-8');
 const AI_MODELS = [
+  'gemini-3.6-flash',
+  'gemini-3.8-flash',
+  'gemini-3.7-flash',
   'gemini-flash-lite-latest',
+  'gemini-3.5-flash',
   'gemini-3.5-flash-lite',
-  'gemini-flash-latest',
-  'gemma-4-26b-a4b-it'
+  'gemini-2.5-flash-lite'
 ];
 
 /**
@@ -217,7 +220,7 @@ async function callGeminiForQuiz(prompt) {
             }],
             generationConfig
           }),
-          signal: AbortSignal.timeout(5000)
+          signal: AbortSignal.timeout(25000)
         });
 
         if (res.ok) {
