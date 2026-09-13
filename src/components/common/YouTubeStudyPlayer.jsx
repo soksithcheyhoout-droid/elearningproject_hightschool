@@ -548,6 +548,85 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                   className={showVideo ? "w-full h-full border-0" : "w-1 h-1 opacity-0 absolute pointer-events-none"}
                 />
 
+                {/* Custom Volume Button - needed because YouTube mobile has NO volume slider */}
+                <div 
+                  ref={volumeContainerRef}
+                  className="absolute bottom-11 sm:bottom-12 left-2 sm:left-2.5 z-30 select-none"
+                  onMouseEnter={() => setShowVolumePopup(true)}
+                  onMouseLeave={() => !isDraggingVolume && setShowVolumePopup(false)}
+                  onWheel={handleWheelVolume}
+                >
+                  <button
+                    type="button"
+                    onClick={handleMainSoundButtonClick}
+                    className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all cursor-pointer shadow-lg backdrop-blur-md border active:scale-95 ${
+                      isMuted || volume === 0
+                        ? 'bg-black/70 hover:bg-black/90 text-rose-400 border-rose-500/40'
+                        : showVolumePopup
+                        ? 'bg-black/85 text-white border-white/40 ring-2 ring-white/20'
+                        : 'bg-black/50 hover:bg-black/70 text-white border-white/20'
+                    }`}
+                    title={isMuted ? "Unmute" : `Volume ${volume}%`}
+                  >
+                    {isMuted || volume === 0 ? (
+                      <VolumeX className="w-3.5 h-3.5" />
+                    ) : (
+                      <Volume2 className="w-3.5 h-3.5" />
+                    )}
+                  </button>
+
+                  {/* Vertical Volume Capsule Popup */}
+                  {showVolumePopup && (
+                    <div 
+                      className="absolute bottom-full left-0 mb-1.5 z-40 animate-fadeIn"
+                      onWheel={handleWheelVolume}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="w-9 sm:w-10 h-32 sm:h-36 bg-black/90 backdrop-blur-xl border border-white/20 rounded-full shadow-[0_10px_40px_rgba(0,0,0,0.9)] flex flex-col items-center justify-between py-2 select-none">
+                        
+                        {/* Top: Mute/Unmute */}
+                        <button
+                          type="button"
+                          onClick={handlePopupMuteToggle}
+                          className="w-5 h-5 rounded-full flex items-center justify-center text-white hover:text-rose-400 active:scale-90 transition-all cursor-pointer"
+                          title={isMuted ? "Unmute" : "Mute"}
+                        >
+                          {isMuted || volume === 0 ? (
+                            <VolumeX className="w-3 h-3 text-rose-400" />
+                          ) : (
+                            <Volume2 className="w-3 h-3" />
+                          )}
+                        </button>
+
+                        {/* Vertical Slider */}
+                        <div 
+                          ref={volumeSliderRef}
+                          onMouseDown={handleSliderMouseDown}
+                          onTouchStart={handleSliderTouchStart}
+                          onTouchMove={handleSliderTouchMove}
+                          className="relative w-6 h-16 sm:h-20 flex items-center justify-center cursor-pointer touch-none"
+                        >
+                          <div className="w-[3px] h-full bg-white/20 rounded-full relative overflow-hidden pointer-events-none">
+                            <div 
+                              className="absolute bottom-0 left-0 right-0 bg-white rounded-full transition-all duration-75"
+                              style={{ height: `${isMuted ? 0 : volume}%` }}
+                            />
+                          </div>
+                          <div 
+                            className="absolute w-3 h-3 bg-white rounded-full shadow-md pointer-events-none transition-all duration-75 left-1/2 -translate-x-1/2"
+                            style={{ bottom: `calc(${isMuted ? 0 : volume}% - 6px)` }}
+                          />
+                        </div>
+
+                        {/* Volume % */}
+                        <span className="text-[8px] sm:text-[9px] font-mono font-bold text-white/80">
+                          {isMuted ? 0 : volume}%
+                        </span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+
                 {/* Audio-Only Visualizer Mode */}
                 {!showVideo && (
                   <div className="w-full h-full relative flex flex-col items-center justify-center p-4 sm:p-6 text-center bg-gradient-to-b from-slate-900 via-[#0d1424] to-black">
