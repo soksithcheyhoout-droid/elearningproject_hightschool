@@ -308,24 +308,20 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
 
   return (
     <header 
-      className={`fixed top-0 left-0 right-0 z-[100] w-full select-none font-kantumruy transition-all duration-300 ${
-        isScrolled 
-          ? 'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-md border-b border-slate-200/80 dark:border-slate-800' 
-          : 'bg-white dark:bg-slate-900 border-b border-slate-200/80 dark:border-slate-800'
-      }`}
+      className="fixed top-0 left-0 right-0 z-[100] w-full select-none font-kantumruy transition-all duration-300 bg-[#002d62] overflow-visible"
       style={{
+        paddingTop: 'env(safe-area-inset-top, 0px)',
         transform: 'translate3d(0, 0, 0)',
-        WebkitTransform: 'translate3d(0, 0, 0)',
-        willChange: 'transform'
+        WebkitTransform: 'translate3d(0, 0, 0)'
       }}
     >
       
       {/* 1. Official MoEYS Full-Width Top Utility Ribbon (Edge-to-Edge with Phone & Gmail on Mobile & PC) */}
       <div 
-        className={`w-full bg-gradient-to-r from-[#002d62] via-[#005baa] to-[#0077cc] text-white select-none overflow-hidden transition-all duration-300 ease-in-out border-b border-white/15 ${
+        className={`w-full bg-gradient-to-r from-[#002d62] via-[#005baa] to-[#0077cc] text-white select-none transition-all duration-300 ease-in-out border-b border-white/15 ${
           isScrolled 
-            ? 'max-md:h-8 max-md:opacity-100 max-md:translate-y-0 md:max-h-0 md:opacity-0 md:-translate-y-2 md:pointer-events-none' 
-            : 'max-h-12 opacity-100 translate-y-0 h-8 sm:h-9'
+            ? 'max-md:h-8 max-md:opacity-100 max-md:translate-y-0 md:max-h-0 md:opacity-0 md:-translate-y-2 md:pointer-events-none md:overflow-hidden' 
+            : 'h-8 sm:h-9 opacity-100 translate-y-0'
         }`}
       >
         <div className="w-full max-w-[1600px] mx-auto px-2.5 sm:px-4 lg:px-6 h-full flex items-center justify-between text-[10.5px] sm:text-xs font-medium">
@@ -373,10 +369,15 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
       </div>
 
       {/* 2. Main Navigation Bar with Grand 4K Emblem, Vibrant Blue Links & User Profile (PF) */}
-      <div className="w-full max-w-[1600px] mx-auto px-2 sm:px-4 lg:px-6 relative z-20">
-        <div className={`flex items-center justify-between gap-1 sm:gap-3 min-w-0 transition-all duration-300 ${
-          isScrolled ? 'max-md:h-[74px] md:h-[60px] md:sm:h-[64px]' : 'h-[74px] sm:h-[80px]'
-        }`}>
+      <div className={`w-full transition-all duration-300 border-b border-slate-200/80 dark:border-slate-800 ${
+        isScrolled 
+          ? 'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-md' 
+          : 'bg-white dark:bg-slate-900'
+      }`}>
+        <div className="w-full max-w-[1600px] mx-auto px-2 sm:px-4 lg:px-6 relative z-20 overflow-visible">
+          <div className={`flex items-center justify-between gap-1 sm:gap-3 min-w-0 transition-all duration-300 ${
+            isScrolled ? 'max-md:h-[74px] md:h-[60px] md:sm:h-[64px]' : 'h-[74px] sm:h-[80px]'
+          }`}>
           
           {/* Mobile / Tablet Menu Hamburger Toggle (Visible on screens < xl) */}
           <button
@@ -533,7 +534,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
 
                   <div 
                     onClick={(e) => e.stopPropagation()}
-                    className="fixed sm:absolute top-16 sm:top-full left-3 right-3 sm:left-auto sm:right-0 mt-0 sm:mt-2 sm:w-96 max-h-[82vh] sm:max-h-[520px] bg-white dark:bg-[#0f172a] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-[0_25px_60px_rgba(0,30,80,0.22)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.7)] p-3.5 sm:p-4 z-[9999] animate-scale-up font-kantumruy select-none ring-1 ring-black/5 dark:ring-white/10 text-slate-800 dark:text-slate-200 flex flex-col"
+                    className="fixed sm:absolute top-[calc(106px+env(safe-area-inset-top,0px)+8px)] sm:top-full left-3 right-3 sm:left-auto sm:right-0 mt-0 sm:mt-2 sm:w-96 max-h-[calc(100vh-120px-env(safe-area-inset-top,0px))] sm:max-h-[520px] bg-white dark:bg-[#0f172a] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-[0_25px_60px_rgba(0,30,80,0.22)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.7)] p-3.5 sm:p-4 z-[9999] animate-scale-up font-kantumruy select-none ring-1 ring-black/5 dark:ring-white/10 text-slate-800 dark:text-slate-200 flex flex-col"
                   >
                     {/* Header with Title and Close Button on Mobile */}
                     <div className="flex items-center justify-between pb-2 mb-2 border-b border-slate-100 dark:border-slate-800 sm:hidden">
@@ -677,7 +678,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
 
                   <div 
                     onClick={(e) => e.stopPropagation()}
-                    className="fixed sm:absolute top-16 sm:top-full left-3 right-3 sm:left-auto sm:right-0 mt-0 sm:mt-2 sm:w-[420px] max-h-[82vh] sm:max-h-[540px] bg-white dark:bg-[#0f172a] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-[0_25px_60px_rgba(0,30,80,0.22)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.7)] p-3.5 sm:p-4 z-[9999] animate-scale-up font-kantumruy select-none ring-1 ring-black/5 dark:ring-white/10 text-slate-800 dark:text-slate-200 flex flex-col"
+                    className="fixed sm:absolute top-[calc(106px+env(safe-area-inset-top,0px)+8px)] sm:top-full left-3 right-3 sm:left-auto sm:right-0 mt-0 sm:mt-2 sm:w-[420px] max-h-[calc(100vh-120px-env(safe-area-inset-top,0px))] sm:max-h-[540px] bg-white dark:bg-[#0f172a] rounded-3xl border border-slate-200 dark:border-slate-800 shadow-[0_25px_60px_rgba(0,30,80,0.22)] dark:shadow-[0_25px_60px_rgba(0,0,0,0.7)] p-3.5 sm:p-4 z-[9999] animate-scale-up font-kantumruy select-none ring-1 ring-black/5 dark:ring-white/10 text-slate-800 dark:text-slate-200 flex flex-col"
                   >
                     
                     {/* Official Header with Angkor Crest & Close Button */}
@@ -1290,6 +1291,7 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
 
         </div>
       </div>
+    </div>
 
     </header>
   );

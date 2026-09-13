@@ -138,7 +138,7 @@ export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor, onOpen
       >
         
         {/* Header Menu Section Badge (Prominent on Mobile, Compact on PC) */}
-        <div className="flex items-center justify-between px-3.5 py-3 border-b border-slate-100 dark:border-slate-800/80 flex-shrink-0 bg-slate-50/70 dark:bg-slate-900/70">
+        <div className="flex items-center justify-between px-3.5 py-3 border-b border-slate-100 dark:border-slate-800/80 flex-shrink-0 bg-slate-50/70 dark:bg-slate-900/70 pt-[max(0.75rem,calc(0.75rem+env(safe-area-inset-top,0px)))]">
           <div className="flex items-center gap-2.5">
             <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-200/80 dark:border-blue-500/30 flex items-center justify-center p-1 shadow-2xs flex-shrink-0">
               <img 
@@ -326,7 +326,7 @@ export default function Sidebar({ activeTab, setActiveTab, onOpenAITutor, onOpen
           </div>
 
           {/* Bottom Buffer to Guarantee No Cut-Off on iOS Safari & Mobile Browsers */}
-          <div className="h-8 flex-shrink-0" />
+          <div className="h-[max(2rem,calc(2rem+env(safe-area-inset-bottom,0px)))] flex-shrink-0" />
 
         </div>
 
