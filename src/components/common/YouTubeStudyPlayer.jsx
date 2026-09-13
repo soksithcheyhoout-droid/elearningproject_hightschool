@@ -382,9 +382,9 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
           <div className="p-3 sm:p-5 md:p-6 overflow-y-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-4 sm:gap-5 lg:gap-6 [scrollbar-width:thin] [-webkit-overflow-scrolling:touch]">
             
             {/* ================================================================= */}
-            {/* COLUMN 1: THE PLAYER (Left 5 Cols on Desktop)                     */}
+            {/* COLUMN 1: THE PLAYER (Left 6 Cols on Desktop)                     */}
             {/* ================================================================= */}
-            <div className="lg:col-span-5 flex flex-col space-y-3 sm:space-y-4">
+            <div className="lg:col-span-6 flex flex-col space-y-3 sm:space-y-4">
               
               {/* THE SINGLE YOUTUBE IFRAME CANVAS */}
               <div className="relative w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl flex-shrink-0">
@@ -437,90 +437,12 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                 )}
               </div>
 
-              {/* Now Playing Track Info & Dedicated Player Controls */}
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-3 sm:p-4 space-y-3">
-                <div className="min-w-0">
-                  <div className="flex items-center gap-2 mb-1">
-                    <span className="text-[9.5px] font-bold uppercase text-red-400 bg-red-500/20 border border-red-500/30 px-2 py-0.5 rounded-md">
-                      {isPlaying ? 'Playing' : 'Paused'}
-                    </span>
-                    {currentTrack.duration && (
-                      <span className="text-[10px] text-slate-400 font-mono">{currentTrack.duration}</span>
-                    )}
-                  </div>
-                  <h4 className="text-xs sm:text-sm font-bold text-white line-clamp-1 leading-snug">
-                    {currentTrack.title}
-                  </h4>
-                  <p className="text-[11px] text-slate-400 truncate mt-0.5">
-                    {currentTrack.channel || 'YouTube'}
-                  </p>
-                </div>
-
-                {/* Primary Player Controls */}
-                <div className="flex items-center justify-between pt-2 border-t border-white/5">
-                  <div className="flex items-center gap-1.5 sm:gap-2">
-                    {/* Previous Track */}
-                    <button
-                      type="button"
-                      onClick={handlePrevTrack}
-                      className="p-2 sm:p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-colors active:scale-95"
-                      title="Previous Track"
-                    >
-                      <SkipBack className="w-4 h-4" />
-                    </button>
-
-                    {/* Play / Pause Toggle Button */}
-                    <button
-                      type="button"
-                      onClick={handleTogglePlay}
-                      className="px-4 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs sm:text-sm flex items-center gap-2 cursor-pointer shadow-lg shadow-red-600/30 transition-transform active:scale-95"
-                      title={isPlaying ? "Pause" : "Play"}
-                    >
-                      {isPlaying ? <Pause className="w-4 h-4 fill-white" /> : <Play className="w-4 h-4 fill-white ml-0.5" />}
-                      <span>{isPlaying ? 'Pause' : 'Play'}</span>
-                    </button>
-
-                    {/* Next Track */}
-                    <button
-                      type="button"
-                      onClick={handleNextTrack}
-                      className="p-2 sm:p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-colors active:scale-95"
-                      title="Next Track"
-                    >
-                      <SkipForward className="w-4 h-4" />
-                    </button>
-                  </div>
-
-                  <div className="flex items-center gap-1.5">
-                    {/* Mute Toggle */}
-                    <button
-                      type="button"
-                      onClick={handleToggleMute}
-                      className="p-2 sm:p-2.5 rounded-xl bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-colors"
-                      title={isMuted ? "Unmute" : "Mute"}
-                    >
-                      {isMuted ? <VolumeX className="w-4 h-4 text-red-400" /> : <Volume2 className="w-4 h-4 text-slate-200" />}
-                    </button>
-
-                    {/* Stop Button (Stops playback and resets time to 0) */}
-                    <button
-                      type="button"
-                      onClick={handleStop}
-                      className="p-2 sm:p-2.5 rounded-xl bg-slate-800 hover:bg-red-500/20 text-slate-300 hover:text-red-400 border border-slate-700 text-xs font-bold transition-colors cursor-pointer"
-                      title="Stop Playback"
-                    >
-                      <Square className="w-4 h-4 fill-current" />
-                    </button>
-                  </div>
-                </div>
-              </div>
-
             </div>
 
             {/* ================================================================= */}
-            {/* COLUMN 2: SEARCH & TRACKLIST (Right 7 Cols on Desktop)            */}
+            {/* COLUMN 2: SEARCH & TRACKLIST (Right 6 Cols on Desktop)            */}
             {/* ================================================================= */}
-            <div className="lg:col-span-7 flex flex-col space-y-3 min-h-[340px]">
+            <div className="lg:col-span-6 flex flex-col space-y-3 min-h-[340px]">
               
               {/* Search Bar Input */}
               <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 flex-shrink-0">
@@ -742,10 +664,10 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
 
           {/* Clean Bottom Footer Bar */}
           <div className="px-4 sm:px-6 py-2.5 bg-slate-900/90 border-t border-white/10 flex items-center justify-between text-xs text-slate-400 flex-shrink-0">
-            <div className="flex items-center gap-2 truncate max-w-[65%] sm:max-w-[75%]">
+            <div className="flex items-center gap-2">
               <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isPlaying ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`} />
-              <span className="truncate text-[11px] sm:text-xs">
-                {isPlaying ? `Playing: ${currentTrack.title}` : `Paused: ${currentTrack.title}`}
+              <span className="text-[11px] sm:text-xs text-slate-300 font-medium">
+                {isPlaying ? 'Audio Playing in Background' : 'Audio Paused'}
               </span>
             </div>
 
