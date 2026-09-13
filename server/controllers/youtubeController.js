@@ -19,44 +19,44 @@ function decodeHtmlEntities(str) {
 // Fallback high-quality curated tracks if network search fails
 const FALLBACK_TRACKS = [
   {
-    id: 'jfKfPfyJRdk',
-    title: 'Lofi Hip Hop Beats to Study & Relax',
+    id: 'lTRiuFIWV54',
+    title: '1 A.M Study Session - Lofi Hip Hop Beats',
     channel: 'Lofi Girl',
-    duration: 'Live',
-    thumbnail: 'https://i.ytimg.com/vi/jfKfPfyJRdk/hqdefault.jpg'
+    duration: '1:01:00',
+    thumbnail: 'https://i.ytimg.com/vi/lTRiuFIWV54/hqdefault.jpg'
   },
   {
     id: 'rvje5oblrLw',
-    title: 'VannDa - Time To Rise feat. Master Kong Nay (Official Music Video)',
-    channel: 'វណ្ណដា-VannDa Official',
+    title: 'VannDa - Time To Rise feat. Master Kong Nay',
+    channel: 'VannDa Official',
     duration: '5:40',
     thumbnail: 'https://i.ytimg.com/vi/rvje5oblrLw/hqdefault.jpg'
   },
   {
-    id: '5qap5aO4i9A',
-    title: 'Khmer Acoustic Chill Guitar for Study',
-    channel: 'Khmer Chill Vibes 🇰🇭',
-    duration: '1:12:30',
-    thumbnail: 'https://i.ytimg.com/vi/5qap5aO4i9A/hqdefault.jpg'
+    id: 'gyTRfSOpQUM',
+    title: 'Acoustic Guitar Nonstop - Khmer Chill Melodies',
+    channel: 'Nob Acoustic',
+    duration: '45:20',
+    thumbnail: 'https://i.ytimg.com/vi/gyTRfSOpQUM/hqdefault.jpg'
   },
   {
     id: 'MIHCnP8pDrQ',
-    title: 'ដួង វីរៈសិទ្ធ - បទចម្រៀងជ្រើសរើសពិរោះៗ (Doung Virakseth Special)',
+    title: 'Doung Virakseth - Selected Acoustic Hits',
     channel: 'MT Records',
     duration: '40:30',
     thumbnail: 'https://i.ytimg.com/vi/MIHCnP8pDrQ/hqdefault.jpg'
   },
   {
-    id: '4xDzrJKXOOY',
-    title: 'Deep Focus Study Piano & Peaceful Music',
-    channel: 'Peaceful Mind 🎹',
-    duration: '3:00:00',
-    thumbnail: 'https://i.ytimg.com/vi/4xDzrJKXOOY/hqdefault.jpg'
+    id: 'oiGmGFxsJi8',
+    title: 'Calm Piano Music for Studying, Reading & Focus',
+    channel: 'HALIDONMUSIC',
+    duration: '2:05:00',
+    thumbnail: 'https://i.ytimg.com/vi/oiGmGFxsJi8/hqdefault.jpg'
   },
   {
     id: 'mPZkdNFkNps',
-    title: 'Gentle Rain & Soft Study Piano for Deep Concentration',
-    channel: 'Rain & Focus 🌧️',
+    title: 'Gentle Rain & Soft Study Piano for Concentration',
+    channel: 'Rain & Focus',
     duration: '2:30:15',
     thumbnail: 'https://i.ytimg.com/vi/mPZkdNFkNps/hqdefault.jpg'
   }
