@@ -163,14 +163,23 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
 
   // Synchronize audio volume on new video load
   const handleIframeLoad = useCallback(() => {
+    sendIframeCommand('listening');
     setTimeout(() => {
+      sendIframeCommand('listening');
       if (isMuted) {
         sendIframeCommand('mute');
+        sendIframeCommand('setVolume', [0]);
       } else {
         sendIframeCommand('unMute');
         sendIframeCommand('setVolume', [volume]);
       }
-    }, 450);
+    }, 400);
+    setTimeout(() => {
+      if (!isMuted) {
+        sendIframeCommand('unMute');
+        sendIframeCommand('setVolume', [volume]);
+      }
+    }, 900);
   }, [isMuted, volume, sendIframeCommand]);
 
   // Toggle Play / Pause
@@ -194,32 +203,33 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
   // Toggle Mute / Unmute
   const handleToggleMute = useCallback(() => {
     if (isMuted) {
-      sendIframeCommand('unMute');
       const restoreVol = volume > 0 ? volume : 80;
-      setVolume(restoreVol);
-      sendIframeCommand('setVolume', [restoreVol]);
       setIsMuted(false);
+      setVolume(restoreVol);
+      sendIframeCommand('unMute');
+      sendIframeCommand('setVolume', [restoreVol]);
     } else {
-      sendIframeCommand('mute');
       setIsMuted(true);
+      sendIframeCommand('mute');
+      sendIframeCommand('setVolume', [0]);
     }
   }, [isMuted, volume, sendIframeCommand]);
 
   // Handle Smooth Volume Slider Change
   const handleVolumeChange = useCallback((newVal) => {
-    const val = Math.max(0, Math.min(100, Number(newVal)));
+    const val = Math.max(0, Math.min(100, Math.round(Number(newVal))));
     setVolume(val);
     if (val === 0) {
       setIsMuted(true);
       sendIframeCommand('mute');
+      sendIframeCommand('setVolume', [0]);
     } else {
-      if (isMuted) {
-        setIsMuted(false);
-        sendIframeCommand('unMute');
-      }
+      setIsMuted(false);
+      // Ensure player is unmuted first, then set volume so audio always follows
+      sendIframeCommand('unMute');
       sendIframeCommand('setVolume', [val]);
     }
-  }, [isMuted, sendIframeCommand]);
+  }, [sendIframeCommand]);
 
   // Handle track selection from list: if already active, toggle play/pause; otherwise play new
   const handleTrackClick = useCallback((track) => {
@@ -322,8 +332,8 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     setShowUrlInput(false);
   };
 
-  // Construct iframe embed URL with playsinline=1 for smooth mobile iOS Safari playback
-  const embedUrl = `https://www.youtube.com/embed/${activeVideoId}?enablejsapi=1&autoplay=1&playsinline=1&origin=${typeof window !== 'undefined' ? encodeURIComponent(window.location.origin) : ''}&rel=0&iv_load_policy=3&modestbranding=1`;
+  // Construct iframe embed URL with controls=0 (removes all native YouTube vertical popups/clutter) and playsinline=1
+  const embedUrl = `https://www.youtube.com/embed/${activeVideoId}?enablejsapi=1&autoplay=1&controls=0&playsinline=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}&rel=0&iv_load_policy=3&modestbranding=1&disablekb=1&fs=0`;
 
   return (
     <>
@@ -421,7 +431,7 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
             <div className="lg:col-span-6 flex flex-col space-y-2.5 sm:space-y-3">
               
               {/* THE SINGLE YOUTUBE IFRAME CANVAS */}
-              <div className="relative w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl flex-shrink-0">
+              <div className="relative w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl flex-shrink-0 group">
                 <iframe
                   ref={iframeRef}
                   key={activeVideoId}
@@ -432,6 +442,25 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                   allowFullScreen
                   className={showVideo ? "w-full h-full border-0" : "w-1 h-1 opacity-0 absolute pointer-events-none"}
                 />
+
+                {/* Clean Custom Click-to-Play Overlay (Zero native YouTube vertical popup sliders) */}
+                {showVideo && (
+                  <div 
+                    onClick={handleTogglePlay}
+                    className={`absolute inset-0 flex items-center justify-center transition-all cursor-pointer ${
+                      !isPlaying 
+                        ? 'bg-black/35 opacity-100' 
+                        : 'bg-transparent opacity-0 hover:bg-black/20 hover:opacity-100'
+                    }`}
+                    title={isPlaying ? "Click to Pause" : "Click to Play"}
+                  >
+                    {!isPlaying && (
+                      <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full bg-red-600/95 text-white flex items-center justify-center shadow-2xl shadow-red-600/50 backdrop-blur-xs transform hover:scale-110 active:scale-95 transition-transform">
+                        <Play className="w-7 h-7 fill-white ml-1" />
+                      </div>
+                    )}
+                  </div>
+                )}
 
                 {/* Audio-Only Visualizer Mode */}
                 {!showVideo && (
@@ -584,8 +613,9 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                         max="100"
                         value={isMuted ? 0 : volume}
                         onChange={(e) => handleVolumeChange(e.target.value)}
+                        onInput={(e) => handleVolumeChange(e.target.value)}
                         aria-label="Volume Slider"
-                        className="w-full h-1.5 rounded-lg appearance-none cursor-pointer accent-red-500 focus:outline-none"
+                        className="w-full h-1.5 rounded-lg appearance-none cursor-pointer accent-red-500 focus:outline-none touch-none"
                         style={{
                           background: `linear-gradient(to right, #ef4444 0%, #ef4444 ${isMuted ? 0 : volume}%, #334155 ${isMuted ? 0 : volume}%, #334155 100%)`
                         }}

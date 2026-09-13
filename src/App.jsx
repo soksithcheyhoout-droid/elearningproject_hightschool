@@ -323,7 +323,7 @@ function MainApp() {
   }
 
   return (
-    <div className={`${activeTab === 'chat' ? 'h-[100dvh] overflow-hidden' : 'min-h-screen'} bg-[#f4f7fb] dark:bg-[#090d16] text-slate-800 dark:text-slate-100 flex flex-col font-kantumruy relative selection:bg-blue-500 selection:text-white overflow-x-clip w-full max-w-[100vw]`}>
+    <div className={`${activeTab === 'chat' ? 'h-[100dvh] overflow-hidden' : 'min-h-screen'} bg-[#f4f7fb] dark:bg-[#090d16] text-slate-800 dark:text-slate-100 flex flex-col font-kantumruy relative selection:bg-blue-500 selection:text-white w-full max-w-[100vw]`}>
       
       {/* 🎓 Subtle Ambient Lighting Orbs */}
       <div className="fixed inset-0 pointer-events-none select-none z-0 overflow-hidden">
@@ -357,7 +357,7 @@ function MainApp() {
       <div className="h-[106px] sm:h-[116px] flex-shrink-0 w-full" aria-hidden="true" />
 
       {/* Main Content Body */}
-      <div className={`flex-1 flex w-full overflow-x-clip xl:pl-72 ${activeTab === 'chat' ? 'min-h-0 overflow-hidden' : ''}`}>
+      <div className={`flex-1 flex w-full xl:pl-72 ${activeTab === 'chat' ? 'min-h-0 overflow-hidden' : ''}`}>
         
         {/* Left Navigation Sidebar */}
         <Sidebar
@@ -374,7 +374,7 @@ function MainApp() {
         />
 
         {/* Dynamic Center Canvas View */}
-        <main className={`flex-1 flex flex-col min-w-0 ${activeTab === 'chat' ? 'min-h-0 overflow-hidden p-0' : 'overflow-x-hidden pb-24 md:pb-0'}`} style={activeTab === 'chat' ? {minHeight:0, flex:'1 1 0%'} : undefined}>
+        <main className={`flex-1 flex flex-col min-w-0 ${activeTab === 'chat' ? 'min-h-0 overflow-hidden p-0' : 'overflow-x-hidden pb-28 sm:pb-32 md:pb-0'}`} style={activeTab === 'chat' ? {minHeight:0, flex:'1 1 0%'} : undefined}>
           
           {/* HOME TAB */}
           {activeTab === 'home' && (
@@ -725,7 +725,14 @@ function MainApp() {
         ];
 
         return (
-          <nav className="fixed bottom-0 left-0 right-0 z-40 md:hidden select-none font-kantumruy">
+          <nav 
+            className="fixed bottom-0 left-0 right-0 z-50 md:hidden select-none font-kantumruy bg-white dark:bg-[#0c1427]"
+            style={{
+              transform: 'translate3d(0, 0, 0)',
+              WebkitTransform: 'translate3d(0, 0, 0)',
+              willChange: 'transform'
+            }}
+          >
             {/* Main Bar Container (Light & Dark Mode Support) */}
             <div className="relative bg-white dark:bg-[#0c1427] border-t border-slate-200/80 dark:border-slate-800 shadow-[0_-6px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_-6px_25px_rgba(0,0,0,0.5)] h-[66px] flex items-center px-1 pb-[calc(0.35rem+env(safe-area-inset-bottom,0px))]">
               
@@ -811,6 +818,12 @@ function MainApp() {
                   </button>
                 );
               })}
+              
+              {/* Bottom Solid Shield: Permanently blocks page content from peeking through on mobile overscroll/bounce */}
+              <div 
+                className="absolute top-full left-0 right-0 h-40 bg-white dark:bg-[#0c1427] pointer-events-none" 
+                aria-hidden="true" 
+              />
             </div>
           </nav>
         );
