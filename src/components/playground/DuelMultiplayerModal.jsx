@@ -54,75 +54,13 @@ import {
   Scale,
   Leaf,
   Brain,
-  ChevronDown,
-  Bell,
-  Settings,
-  Activity,
-  Landmark,
-  Sun,
-  Link2,
-  ChevronRight
+  ChevronDown
 } from 'lucide-react';
 import { useAuth, computeLevelData } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
 import { getRandomizedGameQuestions, fetchLiveExamQuestions, expandQuestionsTo8Options, resetGameSessionQuestions } from '../../utils/gamePoolManager';
 import { getInstantGradeQuestions } from '../../utils/gradeQuestionBank';
 import api from '../../services/api';
-
-// Official Futuristic MOTDAR Brand Logo Component
-const MotdarLogo = ({ className = "w-9 h-9" }) => (
-  <div className={`relative flex-shrink-0 ${className}`}>
-    <div className="absolute -inset-1 bg-gradient-to-r from-[#00D9FF]/40 via-[#2563FF]/30 to-[#8B5CF6]/40 rounded-xl blur-xs pointer-events-none" />
-    <svg viewBox="0 0 100 100" fill="none" className="w-full h-full relative z-10 drop-shadow-[0_2px_10px_rgba(0,217,255,0.4)]">
-      <defs>
-        <linearGradient id="motdarBrandGrad" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#00D9FF" />
-          <stop offset="50%" stopColor="#2563FF" />
-          <stop offset="100%" stopColor="#8B5CF6" />
-        </linearGradient>
-        <linearGradient id="motdarGoldApex" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#FDE047" />
-          <stop offset="100%" stopColor="#F5C542" />
-        </linearGradient>
-      </defs>
-      <polygon points="50,4 92,26 92,74 50,96 8,74 8,26" stroke="url(#motdarBrandGrad)" strokeWidth="3" fill="#06101F" />
-      <polygon points="50,12 85,30 85,70 50,88 15,70 15,30" stroke="#00D9FF" strokeOpacity="0.35" strokeWidth="1.2" fill="#030712" fillOpacity="0.9" />
-      <path d="M26,67 L26,38 L50,56 L74,38 L74,67 L64,67 L64,48 L50,59 L36,48 L36,67 Z" fill="url(#motdarBrandGrad)" />
-      <polygon points="50,16 57,25 50,33 43,25" fill="url(#motdarGoldApex)" />
-      <line x1="20" y1="29" x2="32" y2="29" stroke="#00D9FF" strokeWidth="1.5" strokeLinecap="round"/>
-      <line x1="68" y1="29" x2="80" y2="29" stroke="#00D9FF" strokeWidth="1.5" strokeLinecap="round"/>
-      <circle cx="50" cy="56" r="2.5" fill="#00D9FF" />
-    </svg>
-  </div>
-);
-
-// Futuristic MOTDAR Arena Holographic Stadium Backdrop
-const ArenaStadiumHologram = () => (
-  <div className="relative w-full h-24 sm:h-28 md:h-32 flex items-center justify-center overflow-hidden rounded-2xl pointer-events-none select-none border border-cyan-500/40 shadow-[0_0_25px_rgba(0,217,255,0.25)]">
-    {/* Photorealistic 3D Arena Stadium Image */}
-    <img
-      src="/assets/motdar-stadium-arena.jpg"
-      alt="MOTDAR Arena Stadium"
-      className="absolute inset-0 w-full h-full object-cover object-center filter brightness-95 contrast-110"
-      onError={(e) => { e.currentTarget.style.display = 'none'; }}
-    />
-    <div className="absolute inset-0 bg-gradient-to-t from-[#040914] via-transparent to-[#040914]/50 pointer-events-none" />
-    <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_65%_at_50%_50%,transparent_15%,#040914_92%)] pointer-events-none" />
-
-    {/* Center Floating Hologram Display Stage with MOTDAR Logo */}
-    <div className="relative z-10 flex flex-col items-center justify-center px-4 py-1.5 rounded-xl bg-[#061224]/90 border border-cyan-400/70 shadow-[0_0_30px_rgba(0,217,255,0.6)] backdrop-blur-md">
-      <div className="absolute -top-1 -left-1 w-2 h-2 border-t-2 border-l-2 border-cyan-400" />
-      <div className="absolute -top-1 -right-1 w-2 h-2 border-t-2 border-r-2 border-cyan-400" />
-      <div className="absolute -bottom-1 -left-1 w-2 h-2 border-b-2 border-l-2 border-cyan-400" />
-      <div className="absolute -bottom-1 -right-1 w-2 h-2 border-b-2 border-r-2 border-cyan-400" />
-      
-      <MotdarLogo className="w-8 h-8 sm:w-9 sm:h-9 drop-shadow-[0_0_15px_rgba(0,217,255,0.9)]" />
-      <span className="text-[9px] sm:text-[10px] font-black tracking-widest text-cyan-300 font-mono mt-0.5">
-        MOTDAR
-      </span>
-    </div>
-  </div>
-);
 
 // High-end Avatar with Frame Renderer
 const PlayerAvatarWithFrame = ({ avatar, frame, name = '', size = 'md', className = '' }) => {
@@ -133,9 +71,7 @@ const PlayerAvatarWithFrame = ({ avatar, frame, name = '', size = 'md', classNam
     sm: 'w-11 h-11',
     md: 'w-14 h-14 sm:w-16 sm:h-16',
     lg: 'w-20 h-20 sm:w-24 sm:h-24',
-    xl: 'w-24 h-24 sm:w-28 sm:h-28',
-    '2xl': 'w-24 h-24 sm:w-28 sm:h-28',
-    hero: 'w-24 h-24 sm:w-28 sm:h-28 md:w-32 md:h-32'
+    xl: 'w-24 h-24 sm:w-28 sm:h-28'
   };
 
   const dim = sizeClasses[size] || sizeClasses.md;
@@ -240,13 +176,13 @@ const GRADE_COLORS_DUEL = [
 ];
 
 const DUEL_SCIENCE_SUBJECTS = [
-  { key: 'គណិតវិទ្យា', label: 'គណិតវិទ្យា', en: 'MATH', icon: Calculator, color: 'bg-blue-500/15 border-blue-400/30 text-blue-300' },
-  { key: 'ភាសាខ្មែរ', label: 'ភាសាខ្មែរ', en: 'KHMER', icon: BookOpen, color: 'bg-amber-500/15 border-amber-400/30 text-amber-300' },
-  { key: 'រូបវិទ្យា', label: 'រូបវិទ្យា', en: 'PHYSICS', icon: Atom, color: 'bg-cyan-500/15 border-cyan-400/30 text-cyan-300' },
-  { key: 'គីមីវិទ្យា', label: 'គីមីវិទ្យា', en: 'CHEMISTRY', icon: Beaker, color: 'bg-emerald-500/15 border-emerald-400/30 text-emerald-300' },
-  { key: 'ជីវវិទ្យា', label: 'ជីវវិទ្យា', en: 'BIOLOGY', icon: Leaf, color: 'bg-pink-500/15 border-pink-400/30 text-pink-300' },
-  { key: 'ប្រវត្តិវិទ្យា', label: 'ប្រវត្តិវិទ្យា', en: 'HISTORY', icon: Landmark, color: 'bg-yellow-500/15 border-yellow-400/30 text-yellow-300' },
-  { key: 'ភាសាអង់គ្លេស', label: 'ភាសាអង់គ្លេស', en: 'ENGLISH', icon: Languages, color: 'bg-violet-500/15 border-violet-400/30 text-violet-300' },
+  { key: 'គណិតវិទ្យា', label: 'គណិតវិទ្យា', en: 'Math', icon: Calculator, color: 'bg-blue-500/15 border-blue-400/30 text-blue-300' },
+  { key: 'ភាសាខ្មែរ', label: 'ភាសាខ្មែរ', en: 'Khmer', icon: BookOpen, color: 'bg-amber-500/15 border-amber-400/30 text-amber-300' },
+  { key: 'រូបវិទ្យា', label: 'រូបវិទ្យា', en: 'Physics', icon: Atom, color: 'bg-cyan-500/15 border-cyan-400/30 text-cyan-300' },
+  { key: 'គីមីវិទ្យា', label: 'គីមីវិទ្យា', en: 'Chemistry', icon: Beaker, color: 'bg-emerald-500/15 border-emerald-400/30 text-emerald-300' },
+  { key: 'ជីវវិទ្យា', label: 'ជីវវិទ្យា', en: 'Biology', icon: Brain, color: 'bg-pink-500/15 border-pink-400/30 text-pink-300' },
+  { key: 'ប្រវត្តិវិទ្យា', label: 'ប្រវត្តិវិទ្យា', en: 'History', icon: Target, color: 'bg-yellow-500/15 border-yellow-400/30 text-yellow-300' },
+  { key: 'ភាសាអង់គ្លេស', label: 'ភាសាអង់គ្លេស', en: 'English', icon: Languages, color: 'bg-violet-500/15 border-violet-400/30 text-violet-300' },
 ];
 
 const DUEL_SOCIAL_SUBJECTS = [
@@ -293,15 +229,6 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   const [copied, setCopied] = useState(false);
   const [joinError, setJoinError] = useState('');
   const [isHost, setIsHost] = useState(!initialRoomCode);
-
-  // Lock background scroll when multiplayer modal is active to eliminate background scrollbars
-  useEffect(() => {
-    const prevOverflow = document.body.style.overflow;
-    document.body.style.overflow = 'hidden';
-    return () => {
-      document.body.style.overflow = prevOverflow;
-    };
-  }, []);
 
   // Ready State Management
   const [isChallengerReady, setIsChallengerReady] = useState(false);
@@ -434,9 +361,8 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
   // Grade & Subject Selection for AI Questions
   const [selectedGrade, setSelectedGrade] = useState(() => parseInt(student?.grade, 10) || 12);
-  const [selectedSubjectKey, setSelectedSubjectKey] = useState('គណិតវិទ្យា');
+  const [selectedSubjectKey, setSelectedSubjectKey] = useState(null);
   const [isLoadingAI, setIsLoadingAI] = useState(false);
-  const [showGradeSettings, setShowGradeSettings] = useState(false);
   const duelSubjects = selectedGrade >= 11
     ? (selectedStream === 'social' ? DUEL_SOCIAL_SUBJECTS : DUEL_SCIENCE_SUBJECTS)
     : DUEL_GENERAL_SUBJECTS;
@@ -1004,7 +930,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     if (soundEnabled) playSound.click();
     resetGameSessionQuestions();
     setSelectedStream(newStream);
-    setSelectedSubjectKey('គណិតវិទ្យា');
+    setSelectedSubjectKey(null); // Reset subject when stream changes
 
     // If grade < 11 and switching to science/social, auto-reset to random
     if (selectedGrade < 11 && (newStream === 'science' || newStream === 'social')) {
@@ -1126,7 +1052,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     if (!isHost) return;
     if (soundEnabled) playSound.click();
     setSelectedGrade(grade);
-    setSelectedSubjectKey('គណិតវិទ្យា');
+    setSelectedSubjectKey(null);
 
     // If grade < 11, stream is 'random' (no science/social split); if >= 11, default to 'science'
     let nextStream = selectedStream;
@@ -1592,296 +1518,180 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   });
 
   return createPortal(
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-1 sm:p-2.5 md:p-3 bg-black/92 backdrop-blur-xl animate-fade-in font-kantumruy overflow-y-auto lg:overflow-hidden" data-modal="valorant">
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-1 sm:p-4 bg-black/90 backdrop-blur-lg animate-fade-in font-kantumruy overflow-y-auto">
       
-      {/* ═══ MOTDAR ARENA CONTAINER BOX ═══ */}
-      <div className={`relative w-full ${currentStep === 'lobby' ? 'max-w-6xl xl:max-w-[1360px] 2xl:max-w-[1440px]' : 'max-w-4xl'} max-h-[98vh] rounded-2xl sm:rounded-3xl overflow-hidden border flex flex-col shadow-2xl transition-all duration-300 ${currentStep === 'lobby' ? 'motdar-arena-bg border-cyan-500/30 shadow-[0_0_60px_rgba(0,0,0,0.9),0_0_40px_rgba(0,217,255,0.15)]' : `${currentTheme.boxBg} ${currentTheme.boxBorder}`}`}>
+      {/* ARENA CONTAINER BOX */}
+      <div className={`relative w-full max-w-4xl h-[98dvh] sm:h-auto sm:max-h-[92vh] rounded-2xl sm:rounded-3xl overflow-hidden border flex flex-col shadow-2xl transition-all duration-300 ${currentTheme.boxBg} ${currentTheme.boxBorder}`}>
         
-        {/* ═══ 1. MOTDAR ARENA TOP GLOBAL NAV BAR ═══ */}
-        <header className="px-3 sm:px-6 py-2 sm:py-2.5 border-b border-cyan-500/20 flex items-center justify-between gap-3 bg-[#040914]/95 backdrop-blur-xl relative z-30 flex-shrink-0">
-          {/* Left: MOTDAR Brand Logo & Title */}
-          <div className="flex items-center gap-3 min-w-0">
-            <MotdarLogo className="w-9 h-9 sm:w-10 sm:h-10" />
-            <div className="flex flex-col justify-center">
-              <div className="flex items-center gap-1.5">
-                <span className="font-black text-sm sm:text-base tracking-wider text-white font-mono uppercase">
-                  MOTDAR
+        {/* TOP STATUS HEADER */}
+        <header className="px-3 sm:px-6 py-2.5 sm:py-3.5 border-b border-slate-800 flex items-center justify-between gap-2 sm:gap-3 bg-[#080f1e]/95 backdrop-blur-md relative z-20 flex-shrink-0">
+          <div className="flex items-center gap-2 sm:gap-3 min-w-0">
+            <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center border flex-shrink-0 shadow-sm transition-colors duration-300 ${currentTheme.badgeClass}`}>
+              <Swords className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
+            </div>
+
+            <div className="min-w-0">
+              <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
+                <span className={`text-[10px] sm:text-[11px] font-bold uppercase tracking-wider flex items-center gap-1 transition-colors duration-300 ${currentTheme.accentText}`}>
+                  <span className="hidden sm:inline">1v1 Arena • First to 6 Correct</span>
+                  <span className="sm:hidden">1v1 Arena</span>
                 </span>
+                <span className={`text-[9px] sm:text-[10px] px-2 sm:px-2.5 py-0.5 rounded-full font-bold border transition-all duration-300 flex items-center gap-1 sm:gap-1.5 shadow-xs ${currentTheme.headerBadge}`}>
+                  <CurrentStreamIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
+                  <span className="truncate">{currentTheme.shortName}</span>
+                </span>
+                {isOvertime && (
+                  <span className="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/40 animate-pulse flex items-center gap-1">
+                    OT
+                  </span>
+                )}
               </div>
-              <span className="text-[9px] sm:text-[10px] font-mono font-bold tracking-widest text-cyan-400 uppercase leading-none">
-                MOTDAR ARENA
-              </span>
+              <h2 className="text-xs sm:text-base md:text-lg font-black text-white leading-tight truncate mt-0.5">
+                <span className="hidden sm:inline">
+                  {selectedStream === 'social'
+                    ? 'សង្វៀនប្រឡងវិទ្យាសាស្ត្រសង្គម (Social Science Arena)'
+                    : selectedStream === 'random'
+                      ? 'សង្វៀនប្រកួតសំណួរចម្រុះ (Random Academic Arena)'
+                      : (game?.titleKm || 'សង្វៀនប្រឡងវិទ្យាសាស្ត្រពិត (Science Arena)')}
+                </span>
+                <span className="sm:hidden">
+                  {selectedStream === 'social'
+                    ? 'សង្វៀនសង្គមវិទ្យា'
+                    : selectedStream === 'random'
+                      ? 'សង្វៀនសំណួរចម្រុះ'
+                      : 'សង្វៀនវិទ្យាសាស្ត្រ'}
+                </span>
+              </h2>
             </div>
           </div>
 
-          {/* Center: Navigation Pills (Home, Arena, Battle, Leaderboard, Events, Profile) */}
-          <nav className="hidden lg:flex items-center gap-1">
-            <button type="button" className="motdar-nav-link motdar-nav-link-active cursor-pointer">
-              Home
-            </button>
-            <button type="button" className="motdar-nav-link cursor-pointer">
-              Arena
-            </button>
-            <button type="button" className="motdar-nav-link cursor-pointer">
-              Battle
-            </button>
-            <button type="button" className="motdar-nav-link cursor-pointer">
-              Leaderboard
-            </button>
-            <button type="button" className="motdar-nav-link cursor-pointer">
-              Events
-            </button>
-            <button type="button" className="motdar-nav-link cursor-pointer">
-              Profile
-            </button>
-          </nav>
+          <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+            {currentStep === 'battle' && (
+              <div className={`px-2 sm:px-2.5 h-8 sm:h-9 rounded-lg sm:rounded-xl flex items-center justify-center font-mono font-black text-[11px] sm:text-xs border transition-colors ${
+                secondsLeft <= 10 
+                  ? 'bg-rose-500/25 text-rose-300 border-rose-500/50 animate-pulse shadow-[0_0_10px_rgba(244,63,94,0.4)]' 
+                  : 'bg-slate-800/90 text-amber-300 border-slate-700/80 shadow-xs'
+              }`}>
+                {secondsLeft}s
+              </div>
+            )}
 
-          {/* Right: Gold Trophy Badge, Controls, User Chip & Close */}
-          <div className="flex items-center gap-2 sm:gap-3 flex-shrink-0">
-            {/* Gold Trophy Badge: FIRST TO 6 TO WIN */}
-            <div className="hidden sm:flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 border border-amber-500/30 text-amber-300 text-[10px] sm:text-[11px] font-mono font-black shadow-[0_0_12px_rgba(245,197,66,0.15)]">
-              <Trophy className="w-3.5 h-3.5 text-amber-400" />
-              <span>FIRST TO 6 TO WIN</span>
-            </div>
-
-            {/* Notification Bell */}
-            <button
-              type="button"
-              className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-xl bg-[#081426] hover:bg-[#0c1f3d] border border-cyan-500/25 hover:border-cyan-400/50 text-slate-300 hover:text-white flex items-center justify-center transition-all cursor-pointer relative"
-              title="Notifications"
-            >
-              <Bell className="w-3.5 h-3.5" />
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-rose-500 rounded-full animate-ping" />
-            </button>
-
-            {/* Sound Toggle */}
             <button
               type="button"
               onClick={() => setSoundEnabled(!soundEnabled)}
-              className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-xl bg-[#081426] hover:bg-[#0c1f3d] border border-cyan-500/25 hover:border-cyan-400/50 text-slate-300 hover:text-white flex items-center justify-center transition-all cursor-pointer"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-slate-800/80 hover:bg-slate-700 text-slate-300 hover:text-white border border-slate-700/80 flex items-center justify-center transition-all cursor-pointer shadow-xs"
               title="Toggle Audio"
             >
-              {soundEnabled ? <Sun className="w-3.5 h-3.5 text-amber-400" /> : <VolumeX className="w-3.5 h-3.5 text-slate-500" />}
+              {soundEnabled ? <Volume2 className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-indigo-400" /> : <VolumeX className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-500" />}
             </button>
 
-            {/* User Profile Chip: (R) rikistack • Online */}
-            <div className="flex items-center gap-2 px-2.5 py-1 rounded-xl bg-[#081426] border border-cyan-500/30 shadow-xs">
-              <div className="w-6 h-6 rounded-full bg-gradient-to-tr from-cyan-600 to-blue-600 flex items-center justify-center text-white text-[11px] font-mono font-black border border-cyan-400/60 shadow-xs">
-                {student?.username ? student.username.charAt(0).toUpperCase() : (student?.name ? student.name.charAt(0).toUpperCase() : 'R')}
-              </div>
-              <div className="hidden md:flex flex-col text-left">
-                <span className="text-[11px] font-mono font-bold text-white leading-tight truncate max-w-[100px]">
-                  {student?.username || (student?.name ? student.name.toLowerCase().replace(/\s+/g, '') : 'rikistack')}
-                </span>
-                <span className="text-[9px] font-mono text-emerald-400 flex items-center gap-1 leading-none mt-0.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 shadow-[0_0_6px_#10B981]" />
-                  Online
-                </span>
-              </div>
-              <ChevronDown className="w-3 h-3 text-slate-400 hidden md:block" />
-            </div>
-
-            {/* Close Modal Button */}
             <button
               type="button"
               onClick={handleCloseModal}
-              className="w-8 h-8 sm:w-8.5 sm:h-8.5 rounded-xl bg-[#081426] hover:bg-rose-950/40 text-slate-400 hover:text-rose-300 border border-cyan-500/25 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer ml-1"
-              title="Close Arena"
+              className="w-8 h-8 sm:w-9 sm:h-9 rounded-lg sm:rounded-xl bg-slate-800/80 hover:bg-rose-500/20 text-slate-400 hover:text-rose-300 border border-slate-700/80 hover:border-rose-500/40 flex items-center justify-center transition-all cursor-pointer shadow-xs"
+              title="Leave Room & Close"
             >
-              <X className="w-4 h-4" />
+              <X className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
             </button>
           </div>
         </header>
 
         {/* ========================================================================= */}
-        {/* STEP 1: MATCH LOBBY & STAGING (MOTDAR ARENA ESPORTS) */}
+        {/* STEP 1: MATCH LOBBY & STAGING */}
         {/* ========================================================================= */}
         {currentStep === 'lobby' && (
-          <div className="p-2 sm:p-3 md:p-3.5 flex-1 flex flex-col justify-between overflow-y-auto lg:overflow-visible space-y-2 sm:space-y-2.5 animate-fade-in relative z-10 min-h-0">
+          <div className="p-4 sm:p-7 md:p-8 flex-1 flex flex-col justify-between overflow-y-auto space-y-6 animate-fade-in relative z-10">
             
-            {/* ═══ 2. CINEMATIC HERO ARENA BANNER (WELCOME TO MOTDAR ARENA) ═══ */}
-            <div className="w-full motdar-glass p-3 sm:p-4 rounded-2xl sm:rounded-3xl border border-cyan-500/30 shadow-2xl relative overflow-hidden">
-              {/* Radial Ambient Core */}
-              <div className="absolute -top-12 left-1/3 w-64 h-32 bg-cyan-500/15 blur-3xl pointer-events-none" />
+            {/* Unified Control Bar: PIN + Share Actions + Tab Toggle */}
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#0e1628] p-3 sm:p-3.5 rounded-2xl border border-slate-800 shadow-sm">
+              
+              {/* PIN Code Pill & Copy Actions */}
+              <div className="flex items-center gap-2 w-full sm:w-auto flex-wrap sm:flex-nowrap">
+                <button
+                  type="button"
+                  onClick={() => {
+                    navigator.clipboard.writeText(roomCode);
+                    setCopied(true);
+                    setTimeout(() => setCopied(false), 2000);
+                  }}
+                  className="flex-1 sm:flex-initial flex items-center justify-center gap-2 px-3.5 py-1.5 rounded-xl bg-amber-500/10 hover:bg-amber-500/20 border border-amber-400/30 hover:border-amber-400/60 text-xs font-mono transition-all cursor-pointer group shadow-xs"
+                  title="ចុចដើម្បីចម្លងលេខកូដ"
+                >
+                  <span className="text-slate-400 font-sans text-xs font-semibold">PIN:</span>
+                  <strong className="text-amber-300 font-black tracking-wider text-sm">#{roomCode}</strong>
+                  <span className="text-[10px] text-amber-400/80 bg-amber-400/10 px-1.5 py-0.5 rounded border border-amber-400/20 group-hover:bg-amber-400/20 font-sans">
+                    {copied ? 'បានចម្លង' : 'Copy'}
+                  </span>
+                </button>
 
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-3 sm:gap-4 items-center">
-                
-                {/* Left Column: Welcome Banner & Match Controls */}
-                <div className="md:col-span-5 flex flex-col justify-center space-y-2 sm:space-y-2.5">
-                  <div>
-                    <span className="text-[10px] sm:text-[11px] font-mono font-bold uppercase tracking-widest text-cyan-300 flex items-center gap-1.5">
-                      WELCOME TO
-                    </span>
-                    <h1 className="text-xl sm:text-2xl md:text-3xl font-black tracking-tight text-white uppercase font-mono leading-none mt-1">
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-white via-cyan-100 to-[#00D9FF] drop-shadow-[0_0_20px_rgba(0,217,255,0.4)]">
-                        MOTDAR ARENA
-                      </span>
-                    </h1>
-                    <p className="text-[11px] sm:text-xs text-slate-400 mt-1 font-medium">
-                      Play &nbsp;•&nbsp; Challenge &nbsp;•&nbsp; Win &nbsp;•&nbsp; Be the Best
-                    </p>
-                  </div>
+                <button
+                  type="button"
+                  onClick={handleCopyLink}
+                  className="px-3 py-1.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold border border-slate-700 flex items-center gap-1.5 transition-all cursor-pointer shadow-xs"
+                >
+                  {copied ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
+                  <span>{copied ? 'បានចម្លង' : 'Copy Link'}</span>
+                </button>
 
-                  {/* Tactical PIN & Quick Invite Share Pills */}
-                  <div className="flex items-center gap-2 flex-wrap pt-1">
-                    {/* Tactical Room PIN Badge */}
-                    <div className="flex items-center bg-[#081426] border border-amber-500/40 hover:border-amber-400/70 rounded-xl overflow-hidden h-9 shadow-sm transition-all flex-shrink-0">
-                      <div className="px-2.5 sm:px-3 flex items-center gap-1.5 border-r border-amber-500/20 bg-amber-500/10 h-full">
-                        <KeyRound className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
-                        <span className="text-[10px] font-mono font-black text-slate-400 uppercase tracking-wider whitespace-nowrap">PIN //</span>
-                        <span className="text-xs sm:text-sm font-mono font-black text-amber-300 tracking-widest whitespace-nowrap">#{roomCode}</span>
-                      </div>
-                      <button
-                        type="button"
-                        onClick={() => {
-                          navigator.clipboard.writeText(roomCode);
-                          setCopied(true);
-                          setTimeout(() => setCopied(false), 2000);
-                        }}
-                        className="px-2.5 sm:px-3 h-full hover:bg-amber-500/20 text-[10px] sm:text-[11px] font-mono font-black text-amber-300 transition-colors cursor-pointer flex items-center gap-1 whitespace-nowrap active:scale-95"
-                        title="Copy Match PIN"
-                      >
-                        {copied ? (
-                          <>
-                            <Check className="w-3 h-3 text-emerald-400 flex-shrink-0" />
-                            <span className="text-emerald-400 font-black">COPIED</span>
-                          </>
-                        ) : (
-                          <>
-                            <Copy className="w-3 h-3 text-amber-400 flex-shrink-0" />
-                            <span>COPY</span>
-                          </>
-                        )}
-                      </button>
-                    </div>
+                <div className="flex items-center gap-1.5">
+                  <button
+                    type="button"
+                    onClick={handleShareTelegram}
+                    className="p-1.5 rounded-xl bg-[#229ED9]/15 hover:bg-[#229ED9]/25 text-[#229ED9] border border-[#229ED9]/30 transition-all cursor-pointer hover:scale-105 shadow-xs"
+                    title="Share to Telegram"
+                  >
+                    <Send className="w-3.5 h-3.5" />
+                  </button>
 
-                    {/* Electric Blue INVITE LINK Pill Button */}
-                    <button
-                      type="button"
-                      onClick={handleCopyLink}
-                      className="h-9 px-3.5 rounded-xl bg-gradient-to-r from-[#00D9FF] to-[#2563FF] hover:from-[#38e1ff] hover:to-[#3b75ff] text-[#030712] hover:text-white font-mono font-black text-xs transition-all cursor-pointer flex items-center gap-1.5 shadow-[0_0_20px_rgba(0,217,255,0.4)] active:scale-95 whitespace-nowrap flex-shrink-0"
-                      title="Copy Match Invite Link"
-                    >
-                      <Link2 className="w-3.5 h-3.5 flex-shrink-0" />
-                      <span>INVITE LINK</span>
-                    </button>
-
-                    {/* Tactical Mini Share Circular Buttons */}
-                    <div className="flex items-center gap-1.5 flex-shrink-0">
-                      <button
-                        type="button"
-                        onClick={() => {
-                          if (navigator.share) {
-                            navigator.share({
-                              title: 'MOTDAR ARENA 1v1 Battle',
-                              text: `ចូលរួមការប្រកួតចំណេះដឹង MOTDAR ARENA! Room PIN: ${roomCode}`,
-                              url: window.location.href
-                            }).catch(() => {});
-                          } else {
-                            handleCopyLink();
-                          }
-                        }}
-                        className="w-9 h-9 rounded-xl bg-[#081426] hover:bg-[#0c1f3d] border border-cyan-500/30 text-cyan-400 transition-all cursor-pointer flex items-center justify-center shadow-xs active:scale-95 flex-shrink-0"
-                        title="Quick Share"
-                      >
-                        <Share2 className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleShareTelegram}
-                        className="w-9 h-9 rounded-xl bg-[#081426] hover:bg-[#229ED9]/20 border border-slate-700 hover:border-[#229ED9]/60 text-[#229ED9] transition-all cursor-pointer flex items-center justify-center shadow-xs active:scale-95 flex-shrink-0"
-                        title="Share via Telegram"
-                      >
-                        <Send className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        type="button"
-                        onClick={handleCopyLink}
-                        className="w-9 h-9 rounded-xl bg-[#081426] hover:bg-[#0c1f3d] border border-slate-700 hover:border-cyan-400/50 text-slate-300 transition-all cursor-pointer flex items-center justify-center shadow-xs active:scale-95 flex-shrink-0"
-                        title="Copy Match Link"
-                      >
-                        <Link2 className="w-3.5 h-3.5" />
-                      </button>
-                    </div>
-                  </div>
+                  <button
+                    type="button"
+                    onClick={handleShareFacebook}
+                    className="p-1.5 rounded-xl bg-[#1877F2]/15 hover:bg-[#1877F2]/25 text-[#1877F2] border border-[#1877F2]/30 transition-all cursor-pointer hover:scale-105 shadow-xs"
+                    title="Share to Facebook"
+                  >
+                    <Share2 className="w-3.5 h-3.5" />
+                  </button>
                 </div>
-
-                {/* Center Column: 3D Holographic Stadium Display */}
-                <div className="hidden md:block md:col-span-4">
-                  <ArenaStadiumHologram />
-                </div>
-
-                {/* Right Column: Status Pool, Grade Pill & Segmented Switch */}
-                <div className="md:col-span-3 flex flex-col items-start md:items-end justify-center space-y-2 sm:space-y-2.5">
-                  {/* Green Instant Pool Ready Indicator */}
-                  <div className="flex items-center gap-1.5 text-xs font-mono font-bold text-emerald-400">
-                    <span className="w-2 h-2 rounded-full bg-emerald-400 shadow-[0_0_8px_#10B981] animate-pulse" />
-                    <span>INSTANT POOL READY (8ms)</span>
-                  </div>
-
-                  {/* Academic Grade / Stream Pill Chip */}
-                  {isHost ? (
-                    <button
-                      type="button"
-                      onClick={() => setShowGradeSettings(!showGradeSettings)}
-                      className={`h-8.5 px-3 rounded-xl text-xs font-mono font-bold border transition-all cursor-pointer flex items-center gap-1.5 active:scale-95 whitespace-nowrap ${
-                        showGradeSettings
-                          ? 'bg-cyan-500/20 text-cyan-300 border-cyan-400 shadow-[0_0_15px_rgba(0,217,255,0.3)]'
-                          : 'bg-[#081426] hover:bg-[#0c1f3d] text-slate-200 hover:text-white border-cyan-500/25'
-                      }`}
-                      title="ជ្រើសរើសថ្នាក់ & ផ្នែកប្រកួត"
-                    >
-                      <Layers className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
-                      <span>ថ្នាក់ទី {KHMER_NUMS[selectedGrade - 1]} • {selectedStream === 'social' ? 'វិទ្យាសាស្ត្រសង្គម' : 'វិទ្យាសាស្ត្រ'}</span>
-                      <ChevronDown className={`w-3 h-3 text-cyan-400 transition-transform ${showGradeSettings ? 'rotate-180' : ''}`} />
-                    </button>
-                  ) : (
-                    <div className="h-8.5 px-3 rounded-xl text-xs font-mono font-bold border border-cyan-500/25 bg-[#081426] text-slate-200 flex items-center gap-1.5">
-                      <Layers className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
-                      <span>ថ្នាក់ទី {KHMER_NUMS[selectedGrade - 1]} • {selectedStream === 'social' ? 'វិទ្យាសាស្ត្រសង្គម' : 'វិទ្យាសាស្ត្រ'}</span>
-                    </div>
-                  )}
-
-                  {/* Segmented Switch: LOBBY vs JOIN PIN */}
-                  <div className="flex items-center p-1 rounded-xl bg-[#030712] border border-cyan-500/20 h-9.5 shadow-inner">
-                    <button
-                      type="button"
-                      onClick={() => setTab('host')}
-                      className={`px-4 h-full rounded-lg text-xs font-mono font-black tracking-wider transition-all cursor-pointer flex items-center gap-1.5 whitespace-nowrap ${
-                        tab === 'host'
-                          ? 'bg-gradient-to-r from-[#FF2D6F] to-[#E11D48] text-white shadow-[0_0_15px_rgba(255,45,111,0.6)]'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      <Layers className="w-3 h-3" />
-                      <span>LOBBY</span>
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => setTab('join')}
-                      className={`px-4 h-full rounded-lg text-xs font-mono font-black tracking-wider transition-all cursor-pointer flex items-center whitespace-nowrap ${
-                        tab === 'join'
-                          ? 'bg-gradient-to-r from-[#FF2D6F] to-[#E11D48] text-white shadow-[0_0_15px_rgba(255,45,111,0.6)]'
-                          : 'text-slate-400 hover:text-white'
-                      }`}
-                    >
-                      JOIN PIN
-                    </button>
-                  </div>
-                </div>
-
               </div>
+
+              {/* Tab Switcher: Host vs Join */}
+              <div className="flex items-center p-1 rounded-xl bg-[#080d1a] border border-slate-800 w-full sm:w-auto shadow-inner">
+                <button
+                  type="button"
+                  onClick={() => setTab('host')}
+                  className={`flex-1 sm:flex-initial px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    tab === 'host'
+                      ? 'bg-indigo-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  បន្ទប់ប្រកួត (Lobby)
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => setTab('join')}
+                  className={`flex-1 sm:flex-initial px-4 py-1.5 rounded-lg text-xs font-bold transition-all cursor-pointer ${
+                    tab === 'join'
+                      ? 'bg-indigo-600 text-white shadow-md'
+                      : 'text-slate-400 hover:text-slate-200'
+                  }`}
+                >
+                  ចូលរួម (Join PIN)
+                </button>
+              </div>
+
             </div>
 
             {/* TAB: JOIN BY PIN */}
             {tab === 'join' && (
-              <div className="bg-[#081426] p-6 sm:p-8 rounded-2xl border border-cyan-500/30 max-w-md mx-auto w-full space-y-4 shadow-2xl my-auto motdar-glass">
+              <div className="bg-[#0e1628] p-6 sm:p-8 rounded-3xl border border-slate-800 max-w-md mx-auto w-full space-y-4 shadow-lg my-auto">
                 <div className="text-center space-y-1">
-                  <div className="w-12 h-12 rounded-xl bg-[#FF2D6F]/15 border border-[#FF2D6F]/30 text-[#FF2D6F] flex items-center justify-center mx-auto mb-2 shadow-[0_0_15px_rgba(255,45,111,0.25)]">
+                  <div className="w-12 h-12 rounded-2xl bg-indigo-600/20 border border-indigo-500/30 text-indigo-400 flex items-center justify-center mx-auto mb-2">
                     <KeyRound className="w-6 h-6" />
                   </div>
-                  <h3 className="text-base font-black text-white font-mono tracking-wide">ENTER ACCESS CODE // ចូលរួមបន្ទប់</h3>
-                  <p className="text-xs text-slate-400">បញ្ចូលលេខកូដ ៦ ខ្ទង់ដែលបានចែករំលែកដោយមិត្តភក្តិ</p>
+                  <h3 className="text-base font-black text-white">ចូលរួមបន្ទប់ប្រកួត (Join Game)</h3>
+                  <p className="text-xs text-slate-400">បញ្ចូលលេខកូដសម្ងាត់ ៦ ខ្ទង់ដែលបានចែករំលែកដោយមិត្តភក្តិ</p>
                 </div>
 
                 <div className="space-y-3">
@@ -1894,13 +1704,13 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                         setJoinCodeInput(e.target.value.trim());
                         setJoinError('');
                       }}
-                      placeholder="000000"
-                      className="w-full bg-[#030712] border-2 border-slate-700 focus:border-[#00D9FF] rounded-xl px-4 py-3 text-center text-2xl font-mono font-black text-amber-300 placeholder:text-slate-700 tracking-widest outline-none shadow-inner"
+                      placeholder="ឧ. 123456"
+                      className="w-full bg-[#080d1a] border-2 border-slate-700 focus:border-indigo-500 rounded-2xl px-4 py-3.5 text-center text-xl font-mono font-black text-amber-300 placeholder:text-slate-600 tracking-widest outline-none shadow-inner"
                     />
                   </div>
 
                   {joinError && (
-                    <div className="p-2.5 rounded-lg bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-semibold text-center flex items-center justify-center gap-1.5 animate-fade-in font-mono">
+                    <div className="p-2.5 rounded-xl bg-rose-500/15 border border-rose-500/30 text-rose-300 text-xs font-semibold text-center flex items-center justify-center gap-1.5 animate-fade-in">
                       <AlertTriangle className="w-3.5 h-3.5" />
                       <span>{joinError}</span>
                     </div>
@@ -1918,9 +1728,9 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                           }
                         } catch (e) { }
                       }}
-                      className="w-full py-2 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-mono font-bold border border-slate-700 transition-colors cursor-pointer"
+                      className="w-full py-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs font-semibold border border-slate-700 transition-colors cursor-pointer"
                     >
-                      PASTE CODE FROM CLIPBOARD
+                      បិទភ្ជាប់កូដពី Clipboard (Paste Code)
                     </button>
                   </div>
                 </div>
@@ -1929,10 +1739,21 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                   <button
                     type="button"
                     onClick={handleJoinWithCode}
-                    className="motdar-btn-primary w-full py-3 rounded-xl flex items-center justify-center gap-2 text-sm font-black"
+                    className="cyber-start-btn active:scale-98"
+                    title="Join Match"
                   >
-                    <LogIn className="w-4 h-4 text-slate-950" />
-                    <span>CONNECT TO MATCH (JOIN)</span>
+                    <div className="cyber-clip">
+                      <div className="cyber-corner cyber-leftTop" />
+                      <div className="cyber-corner cyber-rightTop" />
+                      <div className="cyber-corner cyber-leftBottom" />
+                      <div className="cyber-corner cyber-rightBottom" />
+                    </div>
+                    <div className="cyber-arrow cyber-leftArrow" />
+                    <div className="cyber-arrow cyber-rightArrow" />
+                    <span className="relative z-10 flex items-center justify-center gap-2 font-black text-sm tracking-wider">
+                      <LogIn className="w-4 h-4 text-cyan-300" />
+                      <span>ចូលរួមការប្រកួត (JOIN MATCH)</span>
+                    </span>
                   </button>
                 </div>
               </div>
@@ -1940,25 +1761,99 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
             {/* TAB: HOST / 1v1 MATCHUP CARDS */}
             {tab === 'host' && (
-              <div className="space-y-3 sm:space-y-4 my-auto">
+              <div className="space-y-6 my-auto">
 
-                {/* ═══ OPTIONAL EXPANDABLE GRADE & STREAM CONFIGURATION ═══ */}
-                {showGradeSettings && (
-                  <div className="relative rounded-2xl p-4 sm:p-5 bg-[#06101F]/98 border border-amber-500/40 shadow-2xl space-y-4 animate-fade-in motdar-glass">
-                    <div className="flex items-center justify-between border-b border-white/10 pb-3">
-                      <div className="flex items-center gap-2">
-                        <GraduationCap className="w-4 h-4 text-amber-400" />
-                        <h4 className="text-xs sm:text-sm font-mono font-bold text-white uppercase tracking-wider">
-                          ACADEMY LEVEL & STREAM // កម្រិតថ្នាក់ & ផ្នែកប្រកួត
-                        </h4>
+                {/* ═══ ARENA COMMAND CENTER: MODERN REFINED MATCH CONFIGURATION ═══ */}
+                <div className="relative rounded-2xl p-5 sm:p-6 bg-slate-900/80 backdrop-blur-xl border border-slate-800 shadow-xl space-y-5">
+                  
+                  {/* Header: Title, Active Status, and Host Permission */}
+                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-3 pb-4 border-b border-slate-800">
+                    <div className="flex items-center gap-3">
+                      <div className="w-10 h-10 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center text-slate-200 flex-shrink-0">
+                        <Swords className="w-5 h-5 text-sky-400" />
                       </div>
-                      <button
-                        type="button"
-                        onClick={() => setShowGradeSettings(false)}
-                        className="text-slate-400 hover:text-white text-xs font-mono px-2 py-0.5 rounded bg-slate-800"
-                      >
-                        ✕ CLOSE
-                      </button>
+                      <div>
+                        <div className="flex items-center gap-2">
+                          <h4 className="text-sm sm:text-base font-bold text-white tracking-wide">
+                            ការកំណត់សង្វៀនប្រកួត
+                          </h4>
+                          <span className="text-[10px] font-mono font-medium px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 uppercase">
+                            Match Setup
+                          </span>
+                        </div>
+                        <p className="text-[11px] text-slate-400">
+                          ជ្រើសរើសកម្រិតថ្នាក់ ផ្នែក និងមុខវិជ្ជាសម្រាប់ការប្រកួត 1v1
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Right Header Status */}
+                    <div className="flex items-center gap-2 flex-wrap">
+                      {/* Active Summary Pill */}
+                      <div className="px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-xs text-slate-300 flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-emerald-400" />
+                        <span>ថ្នាក់ទី {KHMER_NUMS[selectedGrade - 1]}</span>
+                        {selectedGrade >= 11 && (
+                          <>
+                            <span className="text-slate-600">•</span>
+                            <span className={selectedStream === 'social' ? 'text-amber-400' : 'text-sky-400'}>
+                              {selectedStream === 'social' ? 'សង្គម' : 'ពិត'}
+                            </span>
+                          </>
+                        )}
+                        {selectedSubjectKey && (
+                          <>
+                            <span className="text-slate-600">•</span>
+                            <span className="text-emerald-400">{selectedSubjectKey}</span>
+                          </>
+                        )}
+                      </div>
+
+                      {/* Host Control Badge */}
+                      {!isHost ? (
+                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800/80 border border-slate-700 text-slate-400 text-xs font-medium">
+                          <Lock className="w-3.5 h-3.5 text-slate-400" />
+                          <span>មេបន្ទប់ជាអ្នកកំណត់</span>
+                        </div>
+                      ) : (
+                        <div className="flex items-center gap-1.5 px-3 py-1 rounded-full bg-slate-800 border border-slate-700 text-slate-200 text-xs font-medium">
+                          <Crown className="w-3.5 h-3.5 text-amber-400" />
+                          <span>មេបន្ទប់ (Host)</span>
+                        </div>
+                      )}
+                    </div>
+                  </div>
+
+                  {/* ═══ 1. GRADE SELECTOR (CYCLES: PRIMARY • SECONDARY • HIGH SCHOOL) ═══ */}
+                  <div className="space-y-2">
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-1">
+                      <div className="flex items-center gap-2">
+                        <GraduationCap className="w-4 h-4 text-slate-400" />
+                        <span className="text-xs font-bold text-slate-200">
+                          កម្រិតថ្នាក់ (Grade Level)
+                        </span>
+                        <span className="text-[11px] text-slate-500 hidden sm:inline">
+                          — ជ្រើសរើសថ្នាក់ទី ១ ដល់ ១២
+                        </span>
+                      </div>
+                      
+                      {/* Tier Indicators */}
+                      <div className="flex items-center gap-2 text-[10px] font-medium text-slate-400">
+                        <span className="flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-sky-400" />
+                          <span>បឋម (1-6)</span>
+                        </span>
+                        <span className="text-slate-600">•</span>
+                        <span className="flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-indigo-400" />
+                          <span>អនុវិទ្យាល័យ (7-9)</span>
+                        </span>
+                        <span className="text-slate-600">•</span>
+                        <span className="flex items-center gap-1">
+                          <span className="w-1.5 h-1.5 rounded-full bg-amber-400" />
+                          <span>វិទ្យាល័យ (10-12)</span>
+                        </span>
+                      </div>
                     </div>
 
                     {/* 12-Slot Tactical Grade Cards */}
@@ -1966,30 +1861,40 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                       {Array.from({ length: 12 }, (_, i) => i + 1).map((g) => {
                         const isSelected = selectedGrade === g;
                         const isBac2 = g >= 11;
+                        
                         return (
                           <button
                             key={g}
                             type="button"
                             disabled={!isHost}
                             onClick={() => handleSelectGrade(g)}
-                            className={`py-2 px-1 rounded-xl flex flex-col items-center justify-center transition-all ${
+                            className={`group relative rounded-xl py-2 px-1 flex flex-col items-center justify-center transition-all duration-150 ${
                               isSelected
-                                ? 'bg-gradient-to-b from-[#00D9FF] to-[#2563FF] text-slate-950 font-black shadow-[0_0_15px_rgba(0,217,255,0.5)] scale-105 z-10'
-                                : 'bg-[#081426] hover:bg-[#0c1f3d] text-slate-300 border border-slate-700'
+                                ? 'bg-sky-500 text-slate-950 font-bold shadow-md shadow-sky-500/20 scale-[1.03] z-10'
+                                : 'bg-slate-800/50 hover:bg-slate-800 text-slate-300 border border-slate-700/60 hover:border-slate-600'
                             } ${isHost ? 'cursor-pointer' : 'cursor-default opacity-85'}`}
                           >
+                            {/* Top Micro-Tag for High School / Bac II */}
                             {isBac2 && (
-                              <span className={`text-[7px] font-black px-1 rounded-sm mb-0.5 uppercase ${
-                                isSelected ? 'bg-slate-950 text-[#00D9FF]' : 'text-amber-400'
+                              <span className={`text-[7px] font-black tracking-tighter px-1 rounded-sm mb-0.5 uppercase ${
+                                isSelected
+                                  ? 'bg-slate-950 text-sky-300'
+                                  : 'text-amber-400/90 font-bold'
                               }`}>
                                 BAC II
                               </span>
                             )}
-                            <span className="text-sm sm:text-base font-black leading-none font-mono">
+
+                            {/* Khmer Numeral */}
+                            <span className={`text-base sm:text-lg font-bold leading-none ${
+                              isSelected ? 'text-slate-950' : 'text-slate-200 group-hover:text-white'
+                            }`}>
                               {KHMER_NUMS[g - 1]}
                             </span>
-                            <span className={`text-[8px] mt-0.5 font-mono ${
-                              isSelected ? 'text-slate-900 font-bold' : 'text-slate-500'
+
+                            {/* English Subscript */}
+                            <span className={`text-[9px] mt-0.5 font-mono ${
+                              isSelected ? 'text-slate-900 font-semibold' : 'text-slate-500 group-hover:text-slate-400'
                             }`}>
                               G{g}
                             </span>
@@ -1997,269 +1902,269 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                         );
                       })}
                     </div>
+                  </div>
 
-                    {/* Track Selection (Grades 11-12) */}
-                    {selectedGrade >= 11 && (
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-2 border-t border-white/10">
+                  {/* ═══ 2. TRACK SELECTION (FOR GRADES 11-12) ═══ */}
+                  {selectedGrade >= 11 ? (
+                    <div className="space-y-2.5 pt-4 border-t border-slate-800 relative z-10 animate-fade-in">
+                      <div className="flex items-center justify-between text-xs">
+                        <div className="flex items-center gap-2">
+                          <Atom className="w-4 h-4 text-sky-400" />
+                          <span className="font-bold text-slate-200">
+                            ផ្នែកប្រកួត (Specialization Track)
+                          </span>
+                        </div>
+                        <span className="text-[11px] text-slate-400">
+                          ជ្រើសរើសផ្នែកសម្រាប់ការប្រកួតថ្នាក់ទី {selectedGrade}
+                        </span>
+                      </div>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {/* Real Science Track Card */}
                         <button
                           type="button"
                           disabled={!isHost}
                           onClick={() => handleSelectStream('science')}
-                          className={`p-3 rounded-xl text-left transition-all border ${
+                          className={`relative rounded-2xl p-4 text-left transition-all duration-150 ${
                             selectedStream === 'science'
-                              ? 'bg-cyan-950/40 border-[#00D9FF] shadow-[0_0_15px_rgba(0,217,255,0.2)]'
-                              : 'bg-slate-900/40 border-slate-800 hover:border-slate-700'
-                          }`}
+                              ? 'bg-slate-900 border-2 border-sky-500 shadow-lg shadow-sky-500/10'
+                              : 'bg-slate-900/40 hover:bg-slate-800/60 border border-slate-800 hover:border-slate-700'
+                          } ${isHost ? 'cursor-pointer' : 'cursor-default opacity-85'}`}
                         >
-                          <div className="flex items-center gap-2.5">
-                            <Atom className="w-4 h-4 text-[#00D9FF]" />
-                            <div>
-                              <div className="text-xs font-bold text-white">ថ្នាក់វិទ្យាសាស្ត្រពិត (Natural Science)</div>
-                              <div className="text-[10px] text-slate-400">គណិត, រូប, គីមី, ជីវ, អង់គ្លេស</div>
+                          <div className="flex items-center gap-3.5">
+                            <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${
+                              selectedStream === 'science'
+                                ? 'bg-sky-500/15 text-sky-400 border border-sky-500/30'
+                                : 'bg-slate-800/80 text-slate-500 border border-slate-700/60'
+                            }`}>
+                              <Atom className="w-5 h-5" />
+                            </div>
+
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center justify-between gap-2">
+                                <h5 className="text-sm font-bold text-white truncate">
+                                  វិទ្យាសាស្ត្រពិត
+                                </h5>
+                                <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
+                                  selectedStream === 'science'
+                                    ? 'bg-sky-500 text-slate-950'
+                                    : 'border border-slate-700 bg-slate-800/50'
+                                }`}>
+                                  {selectedStream === 'science' && <Check className="w-3 h-3 stroke-[3]" />}
+                                </div>
+                              </div>
+                              <p className="text-[11px] text-slate-400 mt-1 truncate">
+                                គណិតវិទ្យា, រូបវិទ្យា, គីមីវិទ្យា, ជីវវិទ្យា, អង់គ្លេស
+                              </p>
                             </div>
                           </div>
                         </button>
 
+                        {/* Social Sciences Track Card */}
                         <button
                           type="button"
                           disabled={!isHost}
                           onClick={() => handleSelectStream('social')}
-                          className={`p-3 rounded-xl text-left transition-all border ${
+                          className={`relative rounded-2xl p-4 text-left transition-all duration-150 ${
                             selectedStream === 'social'
-                              ? 'bg-amber-950/40 border-amber-400 shadow-[0_0_15px_rgba(245,158,11,0.2)]'
-                              : 'bg-slate-900/40 border-slate-800 hover:border-slate-700'
-                          }`}
+                              ? 'bg-slate-900 border-2 border-amber-500 shadow-lg shadow-amber-500/10'
+                              : 'bg-slate-900/40 hover:bg-slate-800/60 border border-slate-800 hover:border-slate-700'
+                          } ${isHost ? 'cursor-pointer' : 'cursor-default opacity-85'}`}
                         >
-                          <div className="flex items-center gap-2.5">
-                            <BookOpen className="w-4 h-4 text-amber-400" />
-                            <div>
-                              <div className="text-xs font-bold text-white">ថ្នាក់វិទ្យាសាស្ត្រសង្គម (Social Science)</div>
-                              <div className="text-[10px] text-slate-400">ខ្មែរ, គណិត, ប្រវត្តិ, ភូមិ, សីលធម៌, ផែនដី</div>
+                          <div className="flex items-center gap-3.5">
+                            <div className={`w-11 h-11 rounded-xl flex items-center justify-center flex-shrink-0 transition-colors ${
+                              selectedStream === 'social'
+                                ? 'bg-amber-500/15 text-amber-400 border border-amber-500/30'
+                                : 'bg-slate-800/80 text-slate-500 border border-slate-700/60'
+                            }`}>
+                              <BookOpen className="w-5 h-5" />
+                            </div>
+
+                            <div className="min-w-0 flex-1">
+                              <div className="flex items-center justify-between gap-2">
+                                <h5 className="text-sm font-bold text-white truncate">
+                                  ថ្នាក់វិទ្យាសាស្ត្រសង្គម
+                                </h5>
+                                <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-colors ${
+                                  selectedStream === 'social'
+                                    ? 'bg-amber-500 text-slate-950'
+                                    : 'border border-slate-700 bg-slate-800/50'
+                                }`}>
+                                  {selectedStream === 'social' && <Check className="w-3 h-3 stroke-[3]" />}
+                                </div>
+                              </div>
+                              <p className="text-[11px] text-slate-400 mt-1 truncate">
+                                ភាសាខ្មែរ, គណិត, ប្រវត្តិ, ភូមិ, សីលធម៌, ផែនដី
+                              </p>
                             </div>
                           </div>
                         </button>
                       </div>
-                    )}
-                  </div>
-                )}
-
-                {/* ═══ 4. MOTDAR BATTLE SUBJECT LOADOUT CARDS (7 CARDS) ═══ */}
-                <div className="space-y-2">
-                  <div className="flex items-center justify-between text-xs px-1">
-                    <div className="flex items-center gap-2">
-                      <span className="text-[#00D9FF] font-mono font-black">//</span>
-                      <span className="font-mono font-bold text-white uppercase tracking-wider text-xs sm:text-sm">
-                        SELECT BATTLE SUBJECT // ជ្រើសរើសមុខវិជ្ជាប្រកួត
+                    </div>
+                  ) : (
+                    /* For Grade 1-10: Clean Foundation Level Banner */
+                    <div className="p-3.5 rounded-xl bg-slate-900/60 border border-slate-800 flex items-center justify-between text-xs relative z-10 animate-fade-in">
+                      <div className="flex items-center gap-2.5">
+                        <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/20 flex items-center justify-center text-emerald-400">
+                          <Sparkles className="w-4 h-4" />
+                        </div>
+                        <div>
+                          <span className="text-slate-200 font-semibold block">
+                            ថ្នាក់ទី {KHMER_NUMS[selectedGrade - 1]} — កម្មវិធីចំណេះទូទៅថ្នាក់ជាតិ
+                          </span>
+                          <span className="text-[10px] text-slate-400 block">
+                            កម្រិតមូលដ្ឋានរួម គ្មានការបែងចែកផ្នែកពិត ឬសង្គមឡើយ
+                          </span>
+                        </div>
+                      </div>
+                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-400 border border-slate-700 hidden sm:inline">
+                        Standard
                       </span>
                     </div>
+                  )}
 
-                    <div className="flex items-center gap-1.5 text-xs text-rose-400 font-medium">
-                      <Flame className="w-3.5 h-3.5 text-rose-400 animate-pulse" />
-                      <span className="hidden sm:inline">Choose your subject and join the battle</span>
-                      <span className="sm:hidden">Join battle</span>
+                  {/* ═══ 3. SUBJECT SELECTION DECK ═══ */}
+                  <div className="space-y-2.5 pt-4 border-t border-slate-800 relative z-10">
+                    <div className="flex items-center justify-between text-xs">
+                      <div className="flex items-center gap-2">
+                        <Layers className="w-4 h-4 text-slate-400" />
+                        <span className="font-bold text-slate-200">
+                          មុខវិជ្ជាប្រកួត (Battle Subject)
+                        </span>
+                      </div>
+
+                      {isLoadingAI ? (
+                        <span className="text-[11px] text-amber-400 font-medium animate-pulse flex items-center gap-1.5">
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          <span>AI កំពុងបង្កើតសំណួរថ្នាក់ទី {selectedGrade}...</span>
+                        </span>
+                      ) : (
+                        <span className="text-[11px] text-emerald-400 font-medium flex items-center gap-1">
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>សំណួររួចរាល់ភ្លាមៗ (Instant 0ms)</span>
+                        </span>
+                      )}
                     </div>
-                  </div>
 
-                  {/* 7-Subject Horizontal Grid */}
-                  <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
-                    {duelSubjects.map((sub) => {
-                      const SubIcon = sub.icon;
-                      const activeKey = selectedSubjectKey || duelSubjects[0]?.key || 'គណិតវិទ្យា';
-                      const isActive = activeKey === sub.key;
-                      return (
-                        <button
-                          key={sub.key}
-                          type="button"
-                          disabled={!isHost}
-                          onClick={() => handleSelectSubject(sub.key)}
-                          className={`motdar-subject-card p-2.5 sm:p-3 flex flex-col items-center justify-center text-center cursor-pointer group ${
-                            isActive
-                              ? 'motdar-subject-card-active text-white'
-                              : 'motdar-subject-card-inactive text-slate-300'
-                          } ${!isHost ? 'opacity-85 cursor-default' : ''}`}
-                        >
-                          {/* Top Right Active Energy Dot */}
-                          {isActive && (
-                            <div className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-[#00D9FF] shadow-[0_0_8px_#00D9FF]" />
-                          )}
+                    {/* Responsive Grid of Subject Battle Tiles */}
+                    <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
+                      {duelSubjects.map((sub) => {
+                        const SubIcon = sub.icon;
+                        const isActive = selectedSubjectKey === sub.key;
+                        return (
+                          <button
+                            key={sub.key}
+                            type="button"
+                            disabled={!isHost}
+                            onClick={() => handleSelectSubject(sub.key)}
+                            className={`group relative rounded-xl p-3 flex flex-col items-center justify-center text-center transition-all duration-150 ${
+                              isActive
+                                ? 'bg-slate-800 border-2 border-sky-500 shadow-sm text-white'
+                                : 'bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800 hover:border-slate-700 text-slate-300'
+                            } ${isHost ? 'cursor-pointer' : 'cursor-default opacity-85'}`}
+                          >
+                            {/* Subject Icon */}
+                            <div className={`w-8 h-8 rounded-lg flex items-center justify-center mb-1.5 transition-colors ${
+                              isActive
+                                ? 'bg-sky-500/20 text-sky-300'
+                                : 'bg-slate-800 text-slate-400 group-hover:text-slate-200'
+                            }`}>
+                              <SubIcon className="w-4 h-4" />
+                            </div>
 
-                          {/* Subject Icon Circle */}
-                          <div className={`w-8 h-8 sm:w-9 sm:h-9 rounded-xl flex items-center justify-center mb-1.5 transition-all ${
-                            isActive
-                              ? 'bg-cyan-500/20 text-[#00D9FF] shadow-[0_0_15px_rgba(0,217,255,0.4)] border border-cyan-400/40'
-                              : 'bg-slate-800/80 text-slate-400 group-hover:text-cyan-300 group-hover:bg-slate-800 border border-slate-700/50'
-                          }`}>
-                            <SubIcon className="w-4 h-4 sm:w-4.5 sm:h-4.5" />
-                          </div>
+                            {/* Subject Khmer Label */}
+                            <span className="text-xs font-semibold truncate max-w-full">
+                              {sub.label}
+                            </span>
 
-                          {/* Subject Khmer Name */}
-                          <span className="text-[11px] sm:text-xs font-bold truncate max-w-full leading-snug">
-                            {sub.label}
-                          </span>
-
-                          {/* Subject English Uppercase Subtitle */}
-                          <span className={`text-[8px] sm:text-[9px] uppercase font-mono tracking-wider mt-0.5 ${
-                            isActive ? 'text-[#00D9FF] font-black' : 'text-slate-500'
-                          }`}>
-                            {sub.en || 'SUBJECT'}
-                          </span>
-                        </button>
-                      );
-                    })}
+                            {/* Subject English Subtitle */}
+                            <span className={`text-[8.5px] uppercase font-mono tracking-wider mt-0.5 ${
+                              isActive ? 'text-sky-300 font-medium' : 'text-slate-500'
+                            }`}>
+                              {sub.en || 'Subject'}
+                            </span>
+                          </button>
+                        );
+                      })}
+                    </div>
                   </div>
                 </div>
 
-                {/* ═══ 5 & 6. MOTDAR 1v1 BATTLE MATCHUP STAGE ═══ */}
-                <div className="grid grid-cols-1 md:grid-cols-11 gap-3 sm:gap-4 items-stretch relative">
+                {/* 2-Player Modern Matchup Cards */}
+                <div className="grid grid-cols-1 md:grid-cols-11 gap-4 sm:gap-6 items-stretch relative">
                   
-                  {/* Left Player Card: Host (Defender / Blue Side) */}
-                  <div className="md:col-span-5 motdar-card-host p-3 sm:p-3.5 md:p-4 relative flex flex-col items-center justify-between text-center min-h-[260px] sm:min-h-[280px] group">
+                  {/* Left Player Card: Host */}
+                  <div className="md:col-span-5 bg-gradient-to-b from-[#101b38] to-[#0a1226] p-5 sm:p-6 rounded-3xl border border-cyan-500/30 shadow-xl shadow-cyan-950/20 relative flex flex-col items-center justify-between text-center min-h-[300px] sm:min-h-[320px] group transition-all">
+                    
                     {/* Top Status Bar */}
-                    <div className="w-full flex items-center justify-between pb-2 border-b border-cyan-500/20">
-                      <span className="text-xs font-mono font-black text-cyan-300 flex items-center gap-1.5 uppercase tracking-wider">
-                        <Crown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 fill-amber-400" />
-                        <span>DEF // HOST (ម្ចាស់បន្ទប់)</span>
+                    <div className="w-full flex items-center justify-between pb-3 border-b border-slate-700/50">
+                      <span className="text-xs font-bold text-cyan-300 flex items-center gap-1.5">
+                        <Crown className="w-4 h-4 text-amber-400 fill-amber-400" />
+                        ម្ចាស់បន្ទប់ (Host)
                       </span>
-                      <span className="text-[9px] sm:text-[10px] font-mono font-black px-2.5 sm:px-3 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 flex items-center gap-1 shadow-[0_0_10px_rgba(16,185,129,0.3)]">
-                        <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-400" />
-                        <span>LOCKED IN</span>
+                      <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                        <Check className="w-3.5 h-3.5 text-emerald-400" /> រួចរាល់
                       </span>
                     </div>
 
-                    {/* Center Hero Avatar Showcase */}
+                    {/* Center Hero Avatar */}
                     {hostPlayer ? (
-                      <div className="my-auto py-1.5 flex flex-col items-center w-full">
-                        {/* Avatar Pedestal with Sakura Frame */}
-                        <div className="relative mb-2 flex items-center justify-center">
-                          {/* Radial Glow Pedestal */}
-                          <div className="absolute inset-0 rounded-full bg-cyan-500/15 blur-lg pointer-events-none" />
-                          <div className="absolute -inset-2 rounded-full border border-dashed border-cyan-400/30 animate-spin-slow pointer-events-none" />
-                          
+                      <div className="my-auto py-2 flex flex-col items-center w-full">
+                        {/* Avatar */}
+                        <div className="relative mb-2.5">
                           <PlayerAvatarWithFrame
                             avatar={hostPlayer.avatar}
-                            frame={hostPlayer.avatarFrame || hostPlayer.avatar_frame || '/assets/frames/sakura.webp'}
+                            frame={hostPlayer.avatarFrame || hostPlayer.avatar_frame}
                             name={hostPlayer.name}
-                            size="hero"
-                            className="scale-105 drop-shadow-[0_12px_24px_rgba(0,0,0,0.8)] relative z-10"
+                            size="lg"
+                            className="scale-105 drop-shadow-lg"
                           />
-
-                          {/* Tactical Rank / Level Diamond */}
-                          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-[#06101F] border border-[#00D9FF] text-[9px] sm:text-[10px] font-mono font-black text-[#00D9FF] shadow-[0_0_15px_rgba(0,217,255,0.4)] rounded-md flex items-center gap-1 z-20 whitespace-nowrap">
-                            <span>LVL</span>
-                            <span className="text-white">//</span>
-                            <span>{hostPlayer.level || 7} / 8</span>
+                          {/* Level Badge */}
+                          <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-cyan-600 to-blue-600 border border-cyan-300 text-[10px] font-black text-white shadow-md z-20 whitespace-nowrap">
+                            Lv.{hostPlayer.level || 1}
                           </div>
                         </div>
 
                         {/* Player Name & School */}
-                        <h3 className="text-base sm:text-lg font-black text-white font-mono tracking-wider truncate max-w-[240px] mt-1 drop-shadow-md">
-                          {hostPlayer.name || 'riki.dev'}
+                        <h3 className="text-base sm:text-lg font-black text-white tracking-tight truncate max-w-[220px] mt-1">
+                          {hostPlayer.name || 'សុខ វិបុល'}
                         </h3>
-                        <p className="text-[11px] sm:text-xs text-slate-300 font-medium flex items-center gap-1.5 mt-0.5 truncate max-w-[240px] px-2.5 py-0.5 rounded-full bg-[#061224] border border-cyan-500/30 text-cyan-300">
+                        <p className="text-xs text-slate-300 font-medium flex items-center gap-1 mt-0.5 truncate max-w-[220px]">
                           <Building2 className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
-                          <span className="truncate">{hostPlayer.school || 'វិទ្យាល័យ ព្រះស៊ីសុវត្ថិ'}</span>
+                          <span className="truncate">{hostPlayer.school || 'វិទ្យាល័យជាតិ'}</span>
                         </p>
 
-                        {/* Tactical Combat Rating (XP) Bar */}
-                        <div className="w-full max-w-[230px] mt-2 pt-1.5 border-t border-cyan-500/20 flex flex-col gap-1">
-                          <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-mono tracking-wider text-slate-400">
-                            <span>RATING (XP)</span>
-                            <span className="text-[#00D9FF] font-black font-mono text-[11px] sm:text-xs">{(hostPlayer.xp || 3568).toLocaleString()} XP</span>
-                          </div>
-                          <div className="w-full h-1.5 bg-[#030712] rounded-full overflow-hidden p-0.5 border border-cyan-500/30">
-                            <div
-                              className="h-full bg-gradient-to-r from-[#00D9FF] to-[#2563FF] rounded-full shadow-[0_0_8px_#00D9FF]"
-                              style={{ width: `${Math.min(100, Math.max(20, ((hostPlayer.xp || 3568) % 1000) / 10))}%` }}
-                            />
-                          </div>
+                        {/* XP Badge */}
+                        <div className="mt-3">
+                          <span className="px-3 py-1 rounded-xl bg-indigo-500/15 border border-indigo-400/30 text-indigo-300 text-xs font-bold flex items-center gap-1 shadow-xs font-mono">
+                            {(hostPlayer.xp || 500).toLocaleString()} XP
+                          </span>
                         </div>
                       </div>
                     ) : (
-                      <div className="my-auto py-6 text-center text-slate-400 text-xs flex flex-col items-center justify-center gap-2 font-mono">
+                      <div className="my-auto py-8 text-center text-slate-400 text-xs flex flex-col items-center justify-center gap-2">
                         <Loader2 className="w-6 h-6 animate-spin text-cyan-400" />
-                        <span>SYNCING AGENT DATA...</span>
+                        <span>កំពុងទាញយកទិន្នន័យ...</span>
                       </div>
                     )}
-
-                    {/* Bottom Tag */}
-                    <div className="w-full flex items-center justify-end pt-1 text-[9px] font-mono text-cyan-400/60">
-                      <span>LOC // BLUE</span>
-                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 ml-1 shadow-[0_0_4px_#00D9FF]" />
-                    </div>
                   </div>
 
-                  {/* Center: MOTDAR "VS" Collision Nexus */}
-                  <div className="col-span-12 md:col-span-1 flex flex-col items-center justify-center py-2 md:py-0 relative my-auto">
-                    {/* Floating Warning Notice (Host tries to start without ready opponent) */}
-                    {isHost && hostWarningNotice && (
-                      <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-60 p-2 bg-rose-950/95 border border-rose-500/60 rounded-xl text-rose-300 text-[10px] font-mono font-bold text-center flex items-center justify-center gap-1.5 shadow-[0_0_20px_rgba(255,45,111,0.5)] z-30 animate-bounce">
-                        <AlertTriangle className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
-                        <span className="truncate">{hostWarningNotice}</span>
-                      </div>
-                    )}
-
-                    {/* Split Diamond Hex Shield */}
-                    <div
-                      className="motdar-vs-nexus flex items-center justify-center cursor-pointer group"
-                      onClick={isHost ? handleStartDuel : handleToggleReady}
-                      title={isHost ? "Click to Start Match" : "Click to Ready"}
-                    >
-                      <div className="transform -rotate-45 flex items-center justify-center">
-                        <span className="font-black text-base sm:text-lg font-mono text-white tracking-tight drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
+                  {/* Center: VS Circle Badge */}
+                  <div className="md:col-span-1 flex flex-row md:flex-col items-center justify-center py-2 relative my-auto">
+                    <div className="w-13 h-13 sm:w-14 sm:h-14 rounded-2xl bg-gradient-to-br from-indigo-600 to-purple-600 p-0.5 shadow-lg shadow-indigo-600/40 animate-pulse">
+                      <div className="w-full h-full bg-[#0a1226] rounded-2xl flex flex-col items-center justify-center">
+                        <span className="font-black text-base sm:text-lg text-white">
                           VS
                         </span>
                       </div>
                     </div>
-
-                    {/* Match Subtitle */}
-                    <span className="text-[8px] sm:text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest mt-2">
-                      MATCH POINT
-                    </span>
-                    <span className="text-[9px] sm:text-[10px] font-mono font-black text-amber-400 uppercase tracking-wider">
-                      FIRST TO 6
-                    </span>
-
-                    {/* Sleek Integrated Start Match / Ready Trigger */}
-                    <div className="mt-2 flex flex-col items-center">
-                      {isHost ? (
-                        <button
-                          type="button"
-                          onClick={handleStartDuel}
-                          className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#00D9FF] via-[#00B4D8] to-[#2563FF] hover:from-[#38e1ff] hover:to-[#3b75ff] text-slate-950 font-mono font-black text-[10px] sm:text-[11px] tracking-wider shadow-[0_0_20px_rgba(0,217,255,0.6)] hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center gap-1 whitespace-nowrap"
-                          title="Start 1v1 Battle"
-                        >
-                          <Play className="w-3 h-3 fill-slate-950" />
-                          <span>START</span>
-                        </button>
-                      ) : (
-                        <button
-                          type="button"
-                          onClick={handleToggleReady}
-                          className={`px-3.5 py-1.5 rounded-full font-mono font-black text-[10px] sm:text-[11px] tracking-wider transition-all cursor-pointer flex items-center gap-1 whitespace-nowrap active:scale-95 ${
-                            isChallengerReady
-                              ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.6)]'
-                              : 'bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-[0_0_20px_rgba(255,45,111,0.6)] animate-pulse'
-                          }`}
-                        >
-                          {isChallengerReady ? (
-                            <>
-                              <Check className="w-3 h-3 text-white" />
-                              <span>READY</span>
-                            </>
-                          ) : (
-                            <>
-                              <Zap className="w-3 h-3 fill-white" />
-                              <span>LOCK IN</span>
-                            </>
-                          )}
-                        </button>
-                      )}
-                    </div>
                   </div>
 
-                  {/* Right Player Card: Challenger (Attacker / Red Side) */}
-                  <div className={`md:col-span-5 motdar-card-challenger p-3 sm:p-3.5 md:p-4 relative flex flex-col items-center justify-between text-center min-h-[260px] sm:min-h-[280px] group ${
-                    !challengerPlayer ? 'cursor-pointer' : ''
+                  {/* Right Player Card: Challenger */}
+                  <div className={`md:col-span-5 p-5 sm:p-6 rounded-3xl border transition-all flex flex-col items-center justify-between text-center min-h-[300px] sm:min-h-[320px] ${
+                    challengerPlayer
+                      ? 'bg-gradient-to-b from-[#2a1226] to-[#150713] border-rose-500/30 shadow-xl shadow-rose-950/20'
+                      : 'bg-gradient-to-b from-[#181128] to-[#0c0818] border-rose-500/30 shadow-xl shadow-rose-950/10 hover:border-rose-400/60 cursor-pointer'
                   }`}
                   onClick={() => {
                     if (!challengerPlayer) {
@@ -2269,26 +2174,25 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                   }}
                   >
                     {/* Top Status Bar */}
-                    <div className="w-full flex items-center justify-between pb-2 border-b border-rose-500/20">
-                      <span className="text-xs font-mono font-black text-rose-300 flex items-center gap-1.5 uppercase tracking-wider">
-                        <Swords className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-400" />
-                        <span>ATK // CHALLENGER (គូប្រជែង)</span>
+                    <div className="w-full flex items-center justify-between pb-3 border-b border-slate-700/50">
+                      <span className="text-xs font-bold text-rose-300 flex items-center gap-1.5">
+                        <Swords className="w-4 h-4 text-rose-400" /> 
+                        គូប្រជែង (Challenger)
                       </span>
 
                       {challengerPlayer ? (
                         <div className="flex items-center gap-2">
                           {isChallengerReady ? (
-                            <span className="text-[9px] sm:text-[10px] font-mono font-black px-2.5 sm:px-3 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-400/40 flex items-center gap-1 shadow-[0_0_10px_rgba(16,185,129,0.3)]">
-                              <Check className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-emerald-400" />
-                              <span>LOCKED IN</span>
+                            <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-emerald-500/15 text-emerald-300 border border-emerald-500/30 flex items-center gap-1">
+                              <Check className="w-3.5 h-3.5 text-emerald-400" /> រួចរាល់
                             </span>
                           ) : (
-                            <span className="text-[9px] sm:text-[10px] font-mono font-black px-2.5 py-0.5 rounded-full bg-amber-500/20 text-amber-300 border border-amber-400/40 flex items-center gap-1 animate-pulse">
-                              <Clock className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
-                              <span>PREPARING...</span>
+                            <span className="text-[11px] font-bold px-2.5 py-0.5 rounded-full bg-amber-500/15 text-amber-300 border border-amber-500/30 flex items-center gap-1 animate-pulse">
+                              <Clock className="w-3.5 h-3.5" /> កំពុងរៀបចំ...
                             </span>
                           )}
 
+                          {/* Kick Button for Host */}
                           {isHost && (
                             <button
                               type="button"
@@ -2296,7 +2200,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                                 e.stopPropagation();
                                 handleKickChallenger();
                               }}
-                              className="px-2 py-0.5 rounded bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 hover:text-white border border-rose-500/40 text-[10px] font-bold font-mono transition-all cursor-pointer"
+                              className="px-2 py-0.5 rounded-lg bg-rose-500/20 hover:bg-rose-500/40 text-rose-300 hover:text-white border border-rose-500/30 text-[10px] font-bold transition-all cursor-pointer"
                               title="បណ្តេញចេញ"
                             >
                               <UserX className="w-3.5 h-3.5" />
@@ -2304,123 +2208,158 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                           )}
                         </div>
                       ) : (
-                        <span className="text-[9px] font-mono font-bold px-2.5 py-0.5 rounded-full bg-rose-500/15 text-rose-400 border border-rose-500/30 flex items-center gap-1">
-                          <span>ATK // 02</span>
-                          <span className="text-white/60">AWAITING</span>
-                          <ChevronRight className="w-3 h-3" />
+                        <span className="text-[10px] font-semibold px-2.5 py-0.5 rounded-full bg-slate-800 text-slate-400 border border-slate-700">
+                          រង់ចាំ
                         </span>
                       )}
                     </div>
 
                     {/* Center Content */}
                     {challengerPlayer ? (
-                      <div className="my-auto py-1.5 flex flex-col items-center w-full">
-                        <div className="relative mb-2 flex items-center justify-center">
-                          <div className="absolute inset-0 rounded-full bg-rose-500/15 blur-lg pointer-events-none" />
-                          <div className="absolute -inset-2 rounded-full border border-dashed border-rose-400/30 animate-spin-slow pointer-events-none" />
-
+                      <div className="my-auto py-2 flex flex-col items-center w-full">
+                        {/* Avatar */}
+                        <div className="relative mb-2.5">
                           <PlayerAvatarWithFrame
                             avatar={challengerPlayer.avatar}
                             frame={challengerPlayer.avatarFrame || challengerPlayer.avatar_frame}
                             name={challengerPlayer.name}
-                            size="hero"
-                            className="scale-105 drop-shadow-[0_12px_24px_rgba(0,0,0,0.8)] relative z-10"
+                            size="lg"
+                            className="scale-105 drop-shadow-lg"
                           />
-
-                          <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-[#1d0912] border border-[#FF2D6F] text-[9px] sm:text-[10px] font-mono font-black text-[#FF2D6F] shadow-[0_0_15px_rgba(255,45,111,0.4)] rounded-md flex items-center gap-1 z-20 whitespace-nowrap">
-                            <span>LVL</span>
-                            <span className="text-white">//</span>
-                            <span>{challengerPlayer.level || 1}</span>
+                          {/* Level Badge */}
+                          <div className="absolute -bottom-1.5 left-1/2 -translate-x-1/2 px-2.5 py-0.5 rounded-full bg-gradient-to-r from-rose-600 to-pink-600 border border-rose-300 text-[10px] font-black text-white shadow-md z-20 whitespace-nowrap">
+                            Lv.{challengerPlayer.level || 1}
                           </div>
                         </div>
 
-                        <h3 className="text-base sm:text-lg font-black text-white font-mono tracking-wider truncate max-w-[240px] mt-1 drop-shadow-md">
+                        {/* Player Name & School */}
+                        <h3 className="text-base sm:text-lg font-black text-white tracking-tight truncate max-w-[220px] mt-1">
                           {challengerPlayer.name}
                         </h3>
-                        <p className="text-[11px] sm:text-xs text-slate-300 font-medium flex items-center gap-1.5 mt-0.5 truncate max-w-[240px] px-2.5 py-0.5 rounded-full bg-[#180812] border border-rose-500/30 text-rose-300">
+                        <p className="text-xs text-slate-300 font-medium flex items-center gap-1 mt-0.5 truncate max-w-[220px]">
                           <Building2 className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
-                          <span className="truncate">{challengerPlayer.school || 'វិទ្យាល័យជាតិ'}</span>
+                          <span className="truncate">{challengerPlayer.school}</span>
                         </p>
 
-                        <div className="w-full max-w-[230px] mt-2 pt-1.5 border-t border-rose-500/20 flex flex-col gap-1">
-                          <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-mono tracking-wider text-slate-400">
-                            <span>RATING (XP)</span>
-                            <span className="text-rose-400 font-black font-mono text-[11px] sm:text-xs">{(challengerPlayer.xp || 500).toLocaleString()} XP</span>
-                          </div>
-                          <div className="w-full h-1.5 bg-[#030712] rounded-full overflow-hidden p-0.5 border border-rose-500/30">
-                            <div
-                              className="h-full bg-gradient-to-r from-rose-500 to-pink-500 rounded-full shadow-[0_0_8px_#FF2D6F]"
-                              style={{ width: `${Math.min(100, Math.max(20, ((challengerPlayer.xp || 500) % 1000) / 10))}%` }}
-                            />
-                          </div>
+                        {/* XP Badge */}
+                        <div className="mt-3">
+                          <span className="px-3 py-1 rounded-xl bg-indigo-500/15 border border-indigo-400/30 text-indigo-300 text-xs font-bold flex items-center gap-1 shadow-xs font-mono">
+                            {(challengerPlayer.xp || 500).toLocaleString()} XP
+                          </span>
                         </div>
                       </div>
                     ) : (
-                      /* Empty Slot Concentric Radar Motif (Matching Screenshot) */
-                      <div className="my-auto py-2.5 flex flex-col items-center justify-center text-center w-full">
-                        {/* Concentric Neon Radar Circle */}
-                        <div className="relative w-18 h-18 sm:w-20 sm:h-20 rounded-full border border-rose-500/30 flex items-center justify-center mb-2 bg-[#13050b]/80 shadow-[0_0_20px_rgba(255,45,111,0.25)] group-hover:border-rose-400 transition-all">
-                          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-rose-500/60 flex items-center justify-center shadow-[0_0_15px_rgba(255,45,111,0.4)] bg-rose-500/15">
-                            <UserPlus className="w-5 h-5 sm:w-6 sm:h-6 text-rose-400 group-hover:scale-110 transition-transform" />
-                          </div>
+                      /* Empty Slot */
+                      <div className="my-auto py-6 flex flex-col items-center justify-center text-center w-full">
+                        <div className="w-18 h-18 sm:w-20 sm:h-20 rounded-full bg-slate-900/80 border-2 border-dashed border-rose-400/40 flex items-center justify-center mb-3 shadow-inner group-hover:scale-105 group-hover:border-rose-400 transition-all">
+                          <UserPlus className="w-8 h-8 text-rose-400/80" />
                         </div>
 
-                        <span className="text-xs sm:text-sm font-black text-white font-mono tracking-wider block uppercase">
-                          // AWAITING AGENT...
+                        <span className="text-sm font-black text-white block">
+                          រង់ចាំគូប្រជែងចូលរួម
                         </span>
-                        <span className="text-[10px] sm:text-[11px] text-slate-400 block mt-0.5 max-w-[240px]">
-                          រង់ចាំគូប្រកួតចូលរួម ឬអញ្ជើញមិត្តភក្តិ ឬចែករំលែក PIN
+                        <span className="text-[11px] text-slate-400 block mt-0.5 max-w-[220px]">
+                          ចុចប៊ូតុងខាងក្រោមដើម្បីអញ្ជើញ ឬចែករំលែក PIN
                         </span>
-
-                        {/* Slanted Glowing Magenta Invite Button */}
-                        <button
-                          type="button"
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            fetchStudents();
-                            setShowInviteModal(true);
-                          }}
-                          className="mt-2.5 px-5 py-1.5 rounded-xl bg-gradient-to-r from-rose-500/20 via-pink-500/30 to-rose-500/20 border border-rose-500/70 hover:border-rose-400 text-white font-mono font-bold text-xs flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(255,45,111,0.4)] hover:shadow-[0_0_30px_rgba(255,45,111,0.7)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
-                        >
-                          <UserPlus className="w-3.5 h-3.5 text-rose-400" />
-                          <span>+ អញ្ជើញកីឡាករ (INVITE)</span>
-                          <ChevronRight className="w-3 h-3 text-rose-400" />
-                        </button>
+                        
+                        {/* Custom Valorant Slanted Invite Button */}
+                        <div className="valorant-btn-borders mt-3.5">
+                          <button
+                            type="button"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              fetchStudents();
+                              setShowInviteModal(true);
+                            }}
+                            className="valorant-invite-btn py-2 px-5"
+                          >
+                            <UserPlus className="w-4 h-4 text-rose-400" />
+                            <span>អញ្ជើញកីឡាករ (INVITE)</span>
+                          </button>
+                        </div>
                       </div>
                     )}
-
-                    {/* Bottom Tag */}
-                    <div className="w-full flex items-center justify-start pt-1 text-[9px] font-mono text-rose-400/60">
-                      <span className="w-1.5 h-1.5 rounded-full bg-rose-400 mr-1 shadow-[0_0_4px_#FF2D6F]" />
-                      <span>LOC // RED</span>
-                    </div>
                   </div>
 
                 </div>
 
+                {/* Primary Action Bar */}
+                <div className="flex flex-col items-center gap-3 pt-2">
+                  
+                  {/* Warning notice when Host tries to start without ready opponent */}
+                  {isHost && hostWarningNotice && (
+                    <div className="w-full max-w-md p-3 bg-rose-500/20 border border-rose-500/40 rounded-2xl text-rose-300 text-xs font-bold text-center flex items-center justify-center gap-2 animate-fade-in shadow-sm">
+                      <AlertTriangle className="w-4 h-4 text-rose-400 flex-shrink-0" />
+                      <span>{hostWarningNotice}</span>
+                    </div>
+                  )}
+
+                  {isHost ? (
+                    // Host / Admin view: CYBER OCTAGON START MATCH BUTTON
+                    <button
+                      type="button"
+                      onClick={handleStartDuel}
+                      className="cyber-start-btn active:scale-98"
+                      title="Start Match"
+                    >
+                      <div className="cyber-clip">
+                        <div className="cyber-corner cyber-leftTop" />
+                        <div className="cyber-corner cyber-rightTop" />
+                        <div className="cyber-corner cyber-leftBottom" />
+                        <div className="cyber-corner cyber-rightBottom" />
+                      </div>
+                      <div className="cyber-arrow cyber-leftArrow" />
+                      <div className="cyber-arrow cyber-rightArrow" />
+                      <span className="relative z-10 flex items-center justify-center gap-2 font-black text-sm tracking-wider">
+                        <Play className="w-4 h-4 fill-white" />
+                        <span>ចាប់ផ្តើមការប្រកួត (START)</span>
+                      </span>
+                    </button>
+                  ) : (
+                    // Challenger view: LIQUID WAVE READY BUTTON
+                    <div className="flex flex-col items-center gap-2.5 w-full sm:w-auto">
+                      <button
+                        type="button"
+                        onClick={handleToggleReady}
+                        className="liquid-ready-btn active:scale-98"
+                      >
+                        <p className="btn-text">
+                          {isChallengerReady ? (
+                            <>
+                              <CheckCircle2 className="w-4 h-4 text-emerald-400" />
+                              <span>រួចរាល់ហើយ! (READY)</span>
+                            </>
+                          ) : (
+                            <>
+                              <Zap className="w-4 h-4 fill-amber-400 text-amber-400" />
+                              <span>ចុចដើម្បី READY</span>
+                            </>
+                          )}
+                        </p>
+                      </button>
+
+                      {isChallengerReady && (
+                        <span className="text-xs text-emerald-400 font-bold flex items-center gap-1.5 animate-pulse">
+                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                          កំពុងរង់ចាំម្ចាស់បន្ទប់ (Host) ចុចចាប់ផ្តើមការប្រកួត...
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Leave Room Button */}
+                  <button
+                    type="button"
+                    onClick={handleCloseModal}
+                    className="w-full sm:w-auto px-8 py-2.5 rounded-xl font-bold text-xs shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 bg-rose-600/15 hover:bg-rose-600/30 text-rose-300 hover:text-white border border-rose-500/30 hover:border-rose-500/50"
+                  >
+                    <LogOut className="w-3.5 h-3.5" />
+                    <span>ចាកចេញពីបន្ទប់ (Leave Room)</span>
+                  </button>
+                </div>
+
               </div>
             )}
-
-            {/* ═══ 7. MOTDAR ARENA BOTTOM STATUS FOOTER ═══ */}
-            <footer className="w-full pt-2 border-t border-cyan-500/15 flex items-center justify-between text-xs font-mono text-slate-400 flex-shrink-0">
-              <div className="flex items-center gap-2">
-                <Trophy className="w-3.5 h-3.5 text-cyan-400" />
-                <span className="tracking-wider uppercase text-[10px] sm:text-xs">
-                  LEARN &nbsp;/&nbsp; COMPETE &nbsp;/&nbsp; BE THE BEST
-                </span>
-              </div>
-              <div className="flex items-center gap-2">
-                <MotdarLogo className="w-4 h-4 sm:w-5 sm:h-5" />
-                <div className="flex flex-col text-right">
-                  <span className="font-black text-[10px] sm:text-xs text-white uppercase tracking-wider leading-tight">
-                    MOTDAR ARENA
-                  </span>
-                  <span className="text-[8px] sm:text-[9px] text-cyan-400 tracking-widest uppercase leading-none">
-                    EDUCATION × ESPORTS × FUTURE
-                  </span>
-                </div>
-              </div>
-            </footer>
 
           </div>
         )}
