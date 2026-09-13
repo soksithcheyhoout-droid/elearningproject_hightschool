@@ -17,8 +17,7 @@ import {
   Minus,
   Link as LinkIcon,
   ChevronLeft,
-  ChevronRight,
-  Maximize2
+  ChevronRight
 } from 'lucide-react';
 
 // Extract YouTube Video ID from any URL format or bare ID
@@ -320,22 +319,7 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     }
   }, [isMuted, volume, handleUnmuteAndPlay, sendIframeCommand]);
 
-  // Toggle Fullscreen on video container
-  const handleToggleFullscreen = useCallback(() => {
-    const el = iframeRef.current?.parentElement;
-    if (!el) return;
-    if (!document.fullscreenElement) {
-      if (el.requestFullscreen) {
-        el.requestFullscreen().catch(err => console.warn(err));
-      } else if (el.webkitRequestFullscreen) {
-        el.webkitRequestFullscreen();
-      }
-    } else {
-      if (document.exitFullscreen) {
-        document.exitFullscreen().catch(err => console.warn(err));
-      }
-    }
-  }, []);
+
 
   // Click outside listener to dismiss vertical volume capsule on mobile
   useEffect(() => {
@@ -563,57 +547,6 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                   allowFullScreen
                   className={showVideo ? "w-full h-full border-0" : "w-1 h-1 opacity-0 absolute pointer-events-none"}
                 />
-
-                {/* Click-to-Play / Pause Tap Overlay on Video */}
-                {showVideo && (
-                  <div 
-                    onClick={() => {
-                      if (!isPlaying) {
-                        handleUnmuteAndPlay();
-                      } else {
-                        handleTogglePlay();
-                      }
-                    }}
-                    className={`absolute inset-0 flex items-center justify-center transition-all cursor-pointer z-10 ${
-                      !isPlaying 
-                        ? 'bg-black/40 opacity-100' 
-                        : 'bg-transparent opacity-0 hover:bg-black/15 hover:opacity-100'
-                    }`}
-                    title={isPlaying ? "Click to Pause" : "Click to Play with Sound"}
-                  >
-                    {!isPlaying && (
-                      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-red-600/95 text-white flex items-center justify-center shadow-2xl shadow-red-600/50 backdrop-blur-xs transform hover:scale-110 active:scale-95 transition-transform">
-                        <Play className="w-6 h-6 sm:w-7 sm:h-7 fill-white ml-0.5 sm:ml-1" />
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Video Title Badge (Bottom Left - subtle) */}
-                {showVideo && (
-                  <div className="absolute bottom-2.5 sm:bottom-3 left-2.5 sm:left-3 z-20 pointer-events-none max-w-[65%]">
-                    <div className="bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10 truncate">
-                      <p className="text-[11px] sm:text-xs font-semibold text-white truncate leading-tight">
-                        {currentTrack?.title || 'YouTube Study Audio'}
-                      </p>
-                    </div>
-                  </div>
-                )}
-
-                {/* Fullscreen Button (Bottom Right) */}
-                {showVideo && (
-                  <button
-                    type="button"
-                    onClick={(e) => {
-                      e.stopPropagation();
-                      handleToggleFullscreen();
-                    }}
-                    className="absolute bottom-2.5 sm:bottom-3 right-2.5 sm:right-3 z-20 w-8 h-8 rounded-full bg-black/60 hover:bg-black/85 text-white/90 hover:text-white border border-white/20 hover:border-white/40 flex items-center justify-center shadow-lg backdrop-blur-md cursor-pointer transition-all active:scale-95"
-                    title="Toggle Fullscreen"
-                  >
-                    <Maximize2 className="w-3.5 h-3.5" />
-                  </button>
-                )}
 
                 {/* Sound / Volume Button Overlay on Video (Top-Right Corner - Image 2) */}
                 <div 
