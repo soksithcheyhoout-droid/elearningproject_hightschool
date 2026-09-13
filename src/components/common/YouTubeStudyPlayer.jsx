@@ -97,6 +97,12 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
   const [volume, setVolume] = useState(100);
   const [showVideo, setShowVideo] = useState(true);
 
+  // Vertical Volume Capsule Popup State & Refs (Matching Image 2)
+  const [showVolumePopup, setShowVolumePopup] = useState(false);
+  const [isDraggingVolume, setIsDraggingVolume] = useState(false);
+  const volumeContainerRef = useRef(null);
+  const volumeSliderRef = useRef(null);
+
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
   const [activeTag, setActiveTag] = useState('All');
@@ -230,6 +236,74 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
       sendIframeCommand('setVolume', [val]);
     }
   }, [sendIframeCommand]);
+
+  // Handle vertical slider drag / click coordinate calculations (Image 2)
+  const updateVolumeFromY = useCallback((clientY) => {
+    if (!volumeSliderRef.current) return;
+    const rect = volumeSliderRef.current.getBoundingClientRect();
+    const height = rect.height;
+    // Bottom of rect is 0%, Top is 100%
+    const offsetY = rect.bottom - clientY;
+    const ratio = Math.max(0, Math.min(1, offsetY / height));
+    const newVol = Math.round(ratio * 100);
+    handleVolumeChange(newVol);
+  }, [handleVolumeChange]);
+
+  const handleSliderMouseDown = (e) => {
+    e.preventDefault();
+    setIsDraggingVolume(true);
+    updateVolumeFromY(e.clientY);
+  };
+
+  const handleSliderTouchStart = (e) => {
+    if (e.touches && e.touches[0]) {
+      updateVolumeFromY(e.touches[0].clientY);
+    }
+  };
+
+  const handleSliderTouchMove = (e) => {
+    if (e.touches && e.touches[0]) {
+      updateVolumeFromY(e.touches[0].clientY);
+    }
+  };
+
+  // Window drag listeners for smooth tracking
+  useEffect(() => {
+    if (!isDraggingVolume) return;
+    const onMouseMove = (e) => updateVolumeFromY(e.clientY);
+    const onMouseUp = () => setIsDraggingVolume(false);
+    window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('mouseup', onMouseUp);
+    return () => {
+      window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('mouseup', onMouseUp);
+    };
+  }, [isDraggingVolume, updateVolumeFromY]);
+
+  // Mouse wheel scroll handler (for desktop/laptop mouse wheel & trackpads)
+  const handleWheelVolume = useCallback((e) => {
+    e.preventDefault();
+    const step = 5;
+    const change = e.deltaY < 0 ? step : -step;
+    const newVol = Math.max(0, Math.min(100, (isMuted ? 0 : volume) + change));
+    handleVolumeChange(newVol);
+    setShowVolumePopup(true);
+  }, [isMuted, volume, handleVolumeChange]);
+
+  // Click outside listener to dismiss vertical volume capsule on mobile
+  useEffect(() => {
+    const handleClickOutside = (e) => {
+      if (volumeContainerRef.current && !volumeContainerRef.current.contains(e.target)) {
+        setShowVolumePopup(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    document.addEventListener('touchstart', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener('touchstart', handleClickOutside);
+    };
+  }, []);
 
   // Handle track selection from list: if already active, toggle play/pause; otherwise play new
   const handleTrackClick = useCallback((track) => {
@@ -384,6 +458,100 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
 
             {/* Header Actions */}
             <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
+              
+              {/* Sound / Volume Button with Interactive Vertical Capsule Slider Popup (Image 2) */}
+              <div 
+                ref={volumeContainerRef}
+                className="relative"
+                onMouseEnter={() => setShowVolumePopup(true)}
+                onMouseLeave={() => !isDraggingVolume && setShowVolumePopup(false)}
+                onWheel={handleWheelVolume}
+              >
+                <button
+                  type="button"
+                  onClick={() => setShowVolumePopup(prev => !prev)}
+                  className={`h-8 px-2 sm:px-2.5 rounded-xl border text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer select-none active:scale-95 ${
+                    isMuted || volume === 0
+                      ? 'bg-rose-500/20 text-rose-400 border-rose-500/40 shadow-xs'
+                      : showVolumePopup
+                      ? 'bg-emerald-500/25 text-emerald-300 border-emerald-500/40 shadow-xs ring-2 ring-emerald-500/20'
+                      : 'bg-white/10 hover:bg-white/20 text-white border-white/15'
+                  }`}
+                  title="Sound Volume (Click on mobile, scroll mouse on laptop)"
+                >
+                  {isMuted || volume === 0 ? (
+                    <VolumeX className="w-3.5 h-3.5 text-rose-400" />
+                  ) : (
+                    <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
+                  )}
+                  <span className="text-[11px] font-mono font-bold hidden min-[460px]:inline">
+                    {isMuted || volume === 0 ? '0%' : `${volume}%`}
+                  </span>
+                </button>
+
+                {/* THE VERTICAL VOLUME CAPSULE POPUP (EXACTLY LIKE USER IMAGE 2) */}
+                {showVolumePopup && (
+                  <div 
+                    className="absolute top-full right-0 mt-2 z-50 animate-fadeIn"
+                    onWheel={handleWheelVolume}
+                  >
+                    {/* Capsule Pill Container matching Image 2 */}
+                    <div className="w-11 sm:w-12 h-44 sm:h-48 bg-[#090e1a]/95 backdrop-blur-xl border border-white/25 rounded-full shadow-[0_15px_45px_rgba(0,0,0,0.9)] flex flex-col items-center justify-between py-3 select-none ring-1 ring-white/10">
+                      
+                      {/* Top: Speaker Mute / Unmute Button */}
+                      <button
+                        type="button"
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleToggleMute();
+                        }}
+                        className="w-7 h-7 rounded-full flex items-center justify-center text-white hover:text-red-400 active:scale-90 transition-all cursor-pointer"
+                        title={isMuted ? "Unmute" : "Mute"}
+                      >
+                        {isMuted || volume === 0 ? (
+                          <VolumeX className="w-4 h-4 text-rose-400" />
+                        ) : (
+                          <Volume2 className="w-4 h-4 text-white" />
+                        )}
+                      </button>
+
+                      {/* Middle: Interactive Vertical Slider Track */}
+                      <div 
+                        ref={volumeSliderRef}
+                        onMouseDown={handleSliderMouseDown}
+                        onTouchStart={handleSliderTouchStart}
+                        onTouchMove={handleSliderTouchMove}
+                        className="relative w-8 h-24 sm:h-28 flex items-center justify-center cursor-pointer touch-none"
+                        title="Drag or click to adjust volume"
+                      >
+                        {/* Thin Vertical Center Line */}
+                        <div className="w-1 h-full bg-white/25 rounded-full relative overflow-hidden pointer-events-none">
+                          {/* Active Solid White Fill from bottom */}
+                          <div 
+                            className="absolute bottom-0 left-0 right-0 bg-white rounded-full transition-all duration-75"
+                            style={{ height: `${isMuted ? 0 : volume}%` }}
+                          />
+                        </div>
+
+                        {/* Circular White Thumb Knob (Identical to Image 2) */}
+                        <div 
+                          className="absolute w-4 h-4 bg-white rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.8)] border border-slate-200 pointer-events-none transition-all duration-75 left-1/2 -translate-x-1/2"
+                          style={{ 
+                            bottom: `calc(${isMuted ? 0 : volume}% - 8px)`
+                          }}
+                        />
+                      </div>
+
+                      {/* Bottom: Volume Percentage Text */}
+                      <span className="text-[10px] font-mono font-bold text-white/90">
+                        {isMuted || volume === 0 ? '0%' : `${volume}%`}
+                      </span>
+
+                    </div>
+                  </div>
+                )}
+              </div>
+
               {/* Video / Audio Mode Toggle */}
               <button
                 type="button"
