@@ -1641,56 +1641,76 @@ div[class*="extension-floating"] {
 
 /* MOTDAR Player Host Card (Electric Cyan / Deep Blue Identity) */
 .motdar-card-host {
-  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
-  background: linear-gradient(175deg, rgba(8, 20, 38, 0.95) 0%, rgba(4, 10, 20, 0.98) 100%);
-  border: 1px solid rgba(0, 217, 255, 0.3);
-  box-shadow: 0 16px 40px -10px rgba(0, 217, 255, 0.18), inset 0 1px 0 rgba(0, 217, 255, 0.4);
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(8, 22, 44, 0.96) 0%, rgba(4, 10, 22, 0.98) 100%);
+  border: 2px solid #00D9FF;
+  box-shadow: 0 0 30px rgba(0, 217, 255, 0.38), inset 0 0 20px rgba(0, 217, 255, 0.12);
   position: relative;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .motdar-card-host:hover {
-  border-color: rgba(0, 217, 255, 0.55);
-  box-shadow: 0 20px 50px -8px rgba(0, 217, 255, 0.3), inset 0 1px 0 rgba(0, 217, 255, 0.6);
+  border-color: #38e1ff;
+  box-shadow: 0 0 45px rgba(0, 217, 255, 0.55), inset 0 0 25px rgba(0, 217, 255, 0.2);
 }
 
 /* MOTDAR Player Challenger Card (Magenta / Crimson Identity) */
 .motdar-card-challenger {
-  clip-path: polygon(0 0, calc(100% - 16px) 0, 100% 16px, 100% 100%, 16px 100%, 0 calc(100% - 16px));
-  background: linear-gradient(175deg, rgba(36, 10, 22, 0.95) 0%, rgba(18, 5, 12, 0.98) 100%);
-  border: 1px solid rgba(255, 45, 111, 0.3);
-  box-shadow: 0 16px 40px -10px rgba(255, 45, 111, 0.18), inset 0 1px 0 rgba(255, 45, 111, 0.4);
+  border-radius: 24px;
+  background: linear-gradient(180deg, rgba(38, 10, 24, 0.96) 0%, rgba(18, 5, 12, 0.98) 100%);
+  border: 2px solid #FF2D6F;
+  box-shadow: 0 0 30px rgba(255, 45, 111, 0.38), inset 0 0 20px rgba(255, 45, 111, 0.12);
   position: relative;
   transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 .motdar-card-challenger:hover {
-  border-color: rgba(255, 45, 111, 0.55);
-  box-shadow: 0 20px 50px -8px rgba(255, 45, 111, 0.3), inset 0 1px 0 rgba(255, 45, 111, 0.6);
+  border-color: #ff5287;
+  box-shadow: 0 0 45px rgba(255, 45, 111, 0.55), inset 0 0 25px rgba(255, 45, 111, 0.2);
+}
+
+/* MOTDAR VS Collision Nexus */
+.motdar-vs-nexus {
+  width: 54px;
+  height: 54px;
+  border-radius: 16px;
+  background: #06101E;
+  border: 2px solid #00D9FF;
+  border-right-color: #FF2D6F;
+  border-bottom-color: #FF2D6F;
+  box-shadow: 0 0 25px rgba(0, 217, 255, 0.45), 0 0 25px rgba(255, 45, 111, 0.4);
+  transform: rotate(45deg);
+  transition: all 0.25s ease;
+  position: relative;
+}
+
+.motdar-vs-nexus:hover {
+  transform: rotate(45deg) scale(1.08);
+  box-shadow: 0 0 35px rgba(0, 217, 255, 0.65), 0 0 35px rgba(255, 45, 111, 0.6);
 }
 
 /* MOTDAR Professional Subject Cards */
 .motdar-subject-card {
-  clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 10px, 100% 100%, 0 100%);
+  border-radius: 16px;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
   position: relative;
 }
 
 .motdar-subject-card-active {
-  background: linear-gradient(180deg, rgba(0, 217, 255, 0.16) 0%, rgba(8, 20, 38, 0.96) 100%);
-  border: 1px solid #00D9FF;
-  box-shadow: 0 0 20px rgba(0, 217, 255, 0.28), inset 0 0 14px rgba(0, 217, 255, 0.14);
+  background: linear-gradient(180deg, rgba(0, 217, 255, 0.22) 0%, rgba(6, 16, 35, 0.98) 100%) !important;
+  border: 2px solid #00D9FF !important;
+  box-shadow: 0 0 25px rgba(0, 217, 255, 0.45), inset 0 0 15px rgba(0, 217, 255, 0.2) !important;
   transform: translateY(-2px);
 }
 
 .motdar-subject-card-inactive {
-  background: rgba(8, 20, 38, 0.7);
-  border: 1px solid rgba(255, 255, 255, 0.08);
+  background: rgba(6, 16, 31, 0.75);
+  border: 1.5px solid rgba(255, 255, 255, 0.08);
 }
 
 .motdar-subject-card-inactive:hover {
-  background: rgba(12, 28, 52, 0.85);
-  border-color: rgba(0, 217, 255, 0.4);
+  background: rgba(12, 28, 52, 0.9);
+  border-color: rgba(0, 217, 255, 0.5);
   transform: translateY(-2px);
 }
 

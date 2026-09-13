@@ -98,58 +98,25 @@ const MotdarLogo = ({ className = "w-9 h-9" }) => (
 
 // Futuristic MOTDAR Arena Holographic Stadium Backdrop
 const ArenaStadiumHologram = () => (
-  <div className="relative w-full h-28 sm:h-32 md:h-36 flex items-center justify-center overflow-hidden rounded-2xl pointer-events-none select-none border border-cyan-500/20 shadow-inner">
-    {/* Stadium Darkness & Radial Ambient Core */}
-    <div className="absolute inset-0 bg-gradient-to-b from-[#02060f] via-[#051329] to-[#02060e]" />
-    <div className="absolute inset-0 bg-[radial-gradient(ellipse_70%_60%_at_50%_90%,rgba(0,217,255,0.22),transparent_75%)]" />
-    <div className="absolute -top-6 left-1/4 w-28 h-48 bg-cyan-400/15 blur-2xl -rotate-25 pointer-events-none" />
-    <div className="absolute -top-6 right-1/4 w-28 h-48 bg-purple-500/15 blur-2xl rotate-25 pointer-events-none" />
-
-    {/* Stadium Seating Lights Grid Matrix */}
-    <div
-      className="absolute inset-x-0 bottom-0 h-20 opacity-30"
-      style={{
-        backgroundImage: 'radial-gradient(circle, rgba(0,217,255,0.4) 1px, transparent 1px), radial-gradient(circle, rgba(139,92,246,0.4) 1px, transparent 1px)',
-        backgroundSize: '14px 14px',
-        backgroundPosition: '0 0, 7px 7px'
-      }}
+  <div className="relative w-full h-24 sm:h-28 md:h-32 flex items-center justify-center overflow-hidden rounded-2xl pointer-events-none select-none border border-cyan-500/40 shadow-[0_0_25px_rgba(0,217,255,0.25)]">
+    {/* Photorealistic 3D Arena Stadium Image */}
+    <img
+      src="/assets/motdar-stadium-arena.jpg"
+      alt="MOTDAR Arena Stadium"
+      className="absolute inset-0 w-full h-full object-cover object-center filter brightness-95 contrast-110"
+      onError={(e) => { e.currentTarget.style.display = 'none'; }}
     />
+    <div className="absolute inset-0 bg-gradient-to-t from-[#040914] via-transparent to-[#040914]/50 pointer-events-none" />
+    <div className="absolute inset-0 bg-[radial-gradient(ellipse_75%_65%_at_50%_50%,transparent_15%,#040914_92%)] pointer-events-none" />
 
-    {/* Stadium Beams & Truss Perspective Vector */}
-    <svg className="absolute inset-0 w-full h-full opacity-60" viewBox="0 0 360 140" preserveAspectRatio="none">
-      <polygon points="180,70 30,0 50,0" fill="url(#motdarBeamL)" opacity="0.45" />
-      <polygon points="180,70 310,0 330,0" fill="url(#motdarBeamR)" opacity="0.45" />
-      <polygon points="180,70 100,0 120,0" fill="url(#motdarBeamC)" opacity="0.3" />
-      <polygon points="180,70 240,0 260,0" fill="url(#motdarBeamC)" opacity="0.3" />
-      <path d="M 0,75 Q 180,105 360,75" stroke="rgba(0,217,255,0.25)" strokeWidth="1" fill="none" />
-      <path d="M 0,95 Q 180,125 360,95" stroke="rgba(0,217,255,0.2)" strokeWidth="1" fill="none" />
-      <ellipse cx="180" cy="105" rx="80" ry="20" stroke="rgba(0,217,255,0.6)" strokeWidth="1.2" fill="rgba(6,16,31,0.7)" />
-      <ellipse cx="180" cy="105" rx="55" ry="14" stroke="rgba(139,92,246,0.5)" strokeWidth="1" fill="rgba(0,217,255,0.08)" />
-
-      <defs>
-        <linearGradient id="motdarBeamL" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#00D9FF" stopOpacity="0.8" />
-          <stop offset="100%" stopColor="#00D9FF" stopOpacity="0" />
-        </linearGradient>
-        <linearGradient id="motdarBeamR" x1="100%" y1="0%" x2="0%" y2="100%">
-          <stop offset="0%" stopColor="#8B5CF6" stopOpacity="0.8" />
-          <stop offset="100%" stopColor="#8B5CF6" stopOpacity="0" />
-        </linearGradient>
-        <linearGradient id="motdarBeamC" x1="0%" y1="0%" x2="100%" y2="100%">
-          <stop offset="0%" stopColor="#2563FF" stopOpacity="0.7" />
-          <stop offset="100%" stopColor="#2563FF" stopOpacity="0" />
-        </linearGradient>
-      </defs>
-    </svg>
-
-    {/* Center Hologram Display Stage */}
-    <div className="relative z-10 flex flex-col items-center justify-center px-4 py-2 rounded-xl bg-[#061224]/85 border border-cyan-400/50 shadow-[0_0_25px_rgba(0,217,255,0.35)] backdrop-blur-md">
+    {/* Center Floating Hologram Display Stage with MOTDAR Logo */}
+    <div className="relative z-10 flex flex-col items-center justify-center px-4 py-1.5 rounded-xl bg-[#061224]/90 border border-cyan-400/70 shadow-[0_0_30px_rgba(0,217,255,0.6)] backdrop-blur-md">
       <div className="absolute -top-1 -left-1 w-2 h-2 border-t-2 border-l-2 border-cyan-400" />
       <div className="absolute -top-1 -right-1 w-2 h-2 border-t-2 border-r-2 border-cyan-400" />
       <div className="absolute -bottom-1 -left-1 w-2 h-2 border-b-2 border-l-2 border-cyan-400" />
       <div className="absolute -bottom-1 -right-1 w-2 h-2 border-b-2 border-r-2 border-cyan-400" />
       
-      <MotdarLogo className="w-8 h-8 sm:w-9 sm:h-9 drop-shadow-[0_0_12px_rgba(0,217,255,0.8)]" />
+      <MotdarLogo className="w-8 h-8 sm:w-9 sm:h-9 drop-shadow-[0_0_15px_rgba(0,217,255,0.9)]" />
       <span className="text-[9px] sm:text-[10px] font-black tracking-widest text-cyan-300 font-mono mt-0.5">
         MOTDAR
       </span>
@@ -467,7 +434,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
   // Grade & Subject Selection for AI Questions
   const [selectedGrade, setSelectedGrade] = useState(() => parseInt(student?.grade, 10) || 12);
-  const [selectedSubjectKey, setSelectedSubjectKey] = useState(null);
+  const [selectedSubjectKey, setSelectedSubjectKey] = useState('គណិតវិទ្យា');
   const [isLoadingAI, setIsLoadingAI] = useState(false);
   const [showGradeSettings, setShowGradeSettings] = useState(false);
   const duelSubjects = selectedGrade >= 11
@@ -1037,7 +1004,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     if (soundEnabled) playSound.click();
     resetGameSessionQuestions();
     setSelectedStream(newStream);
-    setSelectedSubjectKey(null); // Reset subject when stream changes
+    setSelectedSubjectKey('គណិតវិទ្យា');
 
     // If grade < 11 and switching to science/social, auto-reset to random
     if (selectedGrade < 11 && (newStream === 'science' || newStream === 'social')) {
@@ -1159,7 +1126,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     if (!isHost) return;
     if (soundEnabled) playSound.click();
     setSelectedGrade(grade);
-    setSelectedSubjectKey(null);
+    setSelectedSubjectKey('គណិតវិទ្យា');
 
     // If grade < 11, stream is 'random' (no science/social split); if >= 11, default to 'science'
     let nextStream = selectedStream;
@@ -1625,13 +1592,13 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   });
 
   return createPortal(
-    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-1 sm:p-3 md:p-4 bg-black/92 backdrop-blur-xl animate-fade-in font-kantumruy overflow-y-auto valorant-scrollbar" data-modal="valorant">
+    <div className="fixed inset-0 z-[99999] flex items-center justify-center p-1 sm:p-2.5 md:p-3 bg-black/92 backdrop-blur-xl animate-fade-in font-kantumruy overflow-y-auto lg:overflow-hidden" data-modal="valorant">
       
       {/* ═══ MOTDAR ARENA CONTAINER BOX ═══ */}
-      <div className={`relative w-full ${currentStep === 'lobby' ? 'max-w-6xl xl:max-w-7xl' : 'max-w-4xl'} h-[98dvh] sm:h-auto sm:max-h-[94vh] rounded-2xl sm:rounded-3xl overflow-hidden border flex flex-col shadow-2xl transition-all duration-300 ${currentStep === 'lobby' ? 'motdar-arena-bg border-cyan-500/30 shadow-[0_0_60px_rgba(0,0,0,0.9),0_0_40px_rgba(0,217,255,0.15)]' : `${currentTheme.boxBg} ${currentTheme.boxBorder}`}`}>
+      <div className={`relative w-full ${currentStep === 'lobby' ? 'max-w-6xl xl:max-w-[1360px] 2xl:max-w-[1440px]' : 'max-w-4xl'} max-h-[98vh] rounded-2xl sm:rounded-3xl overflow-hidden border flex flex-col shadow-2xl transition-all duration-300 ${currentStep === 'lobby' ? 'motdar-arena-bg border-cyan-500/30 shadow-[0_0_60px_rgba(0,0,0,0.9),0_0_40px_rgba(0,217,255,0.15)]' : `${currentTheme.boxBg} ${currentTheme.boxBorder}`}`}>
         
         {/* ═══ 1. MOTDAR ARENA TOP GLOBAL NAV BAR ═══ */}
-        <header className="px-3 sm:px-6 py-2.5 sm:py-3 border-b border-cyan-500/20 flex items-center justify-between gap-3 bg-[#040914]/95 backdrop-blur-xl relative z-30 flex-shrink-0">
+        <header className="px-3 sm:px-6 py-2 sm:py-2.5 border-b border-cyan-500/20 flex items-center justify-between gap-3 bg-[#040914]/95 backdrop-blur-xl relative z-30 flex-shrink-0">
           {/* Left: MOTDAR Brand Logo & Title */}
           <div className="flex items-center gap-3 min-w-0">
             <MotdarLogo className="w-9 h-9 sm:w-10 sm:h-10" />
@@ -1684,7 +1651,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
               title="Notifications"
             >
               <Bell className="w-3.5 h-3.5" />
-              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 rounded-full bg-cyan-400 shadow-[0_0_6px_#00D9FF]" />
+              <span className="absolute top-1.5 right-1.5 w-1.5 h-1.5 bg-rose-500 rounded-full animate-ping" />
             </button>
 
             {/* Sound Toggle */}
@@ -1730,7 +1697,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
         {/* STEP 1: MATCH LOBBY & STAGING (MOTDAR ARENA ESPORTS) */}
         {/* ========================================================================= */}
         {currentStep === 'lobby' && (
-          <div className="p-2.5 sm:p-4 md:p-5 flex-1 flex flex-col justify-between overflow-y-auto valorant-scrollbar space-y-3 sm:space-y-4 animate-fade-in relative z-10">
+          <div className="p-2 sm:p-3 md:p-3.5 flex-1 flex flex-col justify-between overflow-y-auto lg:overflow-visible space-y-2 sm:space-y-2.5 animate-fade-in relative z-10 min-h-0">
             
             {/* ═══ 2. CINEMATIC HERO ARENA BANNER (WELCOME TO MOTDAR ARENA) ═══ */}
             <div className="w-full motdar-glass p-3 sm:p-4 rounded-2xl sm:rounded-3xl border border-cyan-500/30 shadow-2xl relative overflow-hidden">
@@ -2097,7 +2064,8 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                   <div className="grid grid-cols-2 sm:grid-cols-4 lg:grid-cols-7 gap-2">
                     {duelSubjects.map((sub) => {
                       const SubIcon = sub.icon;
-                      const isActive = selectedSubjectKey === sub.key;
+                      const activeKey = selectedSubjectKey || duelSubjects[0]?.key || 'គណិតវិទ្យា';
+                      const isActive = activeKey === sub.key;
                       return (
                         <button
                           key={sub.key}
@@ -2145,9 +2113,9 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                 <div className="grid grid-cols-1 md:grid-cols-11 gap-3 sm:gap-4 items-stretch relative">
                   
                   {/* Left Player Card: Host (Defender / Blue Side) */}
-                  <div className="md:col-span-5 motdar-card-host p-3.5 sm:p-4 md:p-5 relative flex flex-col items-center justify-between text-center min-h-[280px] sm:min-h-[300px] group">
+                  <div className="md:col-span-5 motdar-card-host p-3 sm:p-3.5 md:p-4 relative flex flex-col items-center justify-between text-center min-h-[260px] sm:min-h-[280px] group">
                     {/* Top Status Bar */}
-                    <div className="w-full flex items-center justify-between pb-2 sm:pb-2.5 border-b border-cyan-500/20">
+                    <div className="w-full flex items-center justify-between pb-2 border-b border-cyan-500/20">
                       <span className="text-xs font-mono font-black text-cyan-300 flex items-center gap-1.5 uppercase tracking-wider">
                         <Crown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-amber-400 fill-amber-400" />
                         <span>DEF // HOST (ម្ចាស់បន្ទប់)</span>
@@ -2160,7 +2128,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
                     {/* Center Hero Avatar Showcase */}
                     {hostPlayer ? (
-                      <div className="my-auto py-2 flex flex-col items-center w-full">
+                      <div className="my-auto py-1.5 flex flex-col items-center w-full">
                         {/* Avatar Pedestal with Sakura Frame */}
                         <div className="relative mb-2 flex items-center justify-center">
                           {/* Radial Glow Pedestal */}
@@ -2179,7 +2147,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                           <div className="absolute -bottom-2 left-1/2 -translate-x-1/2 px-2.5 py-0.5 bg-[#06101F] border border-[#00D9FF] text-[9px] sm:text-[10px] font-mono font-black text-[#00D9FF] shadow-[0_0_15px_rgba(0,217,255,0.4)] rounded-md flex items-center gap-1 z-20 whitespace-nowrap">
                             <span>LVL</span>
                             <span className="text-white">//</span>
-                            <span>{hostPlayer.level || 1}</span>
+                            <span>{hostPlayer.level || 7} / 8</span>
                           </div>
                         </div>
 
@@ -2193,7 +2161,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                         </p>
 
                         {/* Tactical Combat Rating (XP) Bar */}
-                        <div className="w-full max-w-[230px] mt-2.5 pt-2 border-t border-cyan-500/20 flex flex-col gap-1">
+                        <div className="w-full max-w-[230px] mt-2 pt-1.5 border-t border-cyan-500/20 flex flex-col gap-1">
                           <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-mono tracking-wider text-slate-400">
                             <span>RATING (XP)</span>
                             <span className="text-[#00D9FF] font-black font-mono text-[11px] sm:text-xs">{(hostPlayer.xp || 3568).toLocaleString()} XP</span>
@@ -2214,25 +2182,83 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                     )}
 
                     {/* Bottom Tag */}
-                    <div className="w-full flex items-center justify-start pt-1 text-[9px] font-mono text-cyan-400/60">
-                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 mr-1 shadow-[0_0_4px_#00D9FF]" />
+                    <div className="w-full flex items-center justify-end pt-1 text-[9px] font-mono text-cyan-400/60">
                       <span>LOC // BLUE</span>
+                      <span className="w-1.5 h-1.5 rounded-full bg-cyan-400 ml-1 shadow-[0_0_4px_#00D9FF]" />
                     </div>
                   </div>
 
                   {/* Center: MOTDAR "VS" Collision Nexus */}
-                  <div className="md:col-span-1 flex flex-row md:flex-col items-center justify-center py-2 relative my-auto">
-                    <div className="motdar-vs-nexus w-12 h-12 sm:w-14 sm:h-14 flex items-center justify-center animate-pulse">
-                      <span className="font-black text-base sm:text-lg text-white tracking-widest font-mono">VS</span>
+                  <div className="col-span-12 md:col-span-1 flex flex-col items-center justify-center py-2 md:py-0 relative my-auto">
+                    {/* Floating Warning Notice (Host tries to start without ready opponent) */}
+                    {isHost && hostWarningNotice && (
+                      <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-60 p-2 bg-rose-950/95 border border-rose-500/60 rounded-xl text-rose-300 text-[10px] font-mono font-bold text-center flex items-center justify-center gap-1.5 shadow-[0_0_20px_rgba(255,45,111,0.5)] z-30 animate-bounce">
+                        <AlertTriangle className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
+                        <span className="truncate">{hostWarningNotice}</span>
+                      </div>
+                    )}
+
+                    {/* Split Diamond Hex Shield */}
+                    <div
+                      className="motdar-vs-nexus flex items-center justify-center cursor-pointer group"
+                      onClick={isHost ? handleStartDuel : handleToggleReady}
+                      title={isHost ? "Click to Start Match" : "Click to Ready"}
+                    >
+                      <div className="transform -rotate-45 flex items-center justify-center">
+                        <span className="font-black text-base sm:text-lg font-mono text-white tracking-tight drop-shadow-[0_0_8px_rgba(255,255,255,0.8)]">
+                          VS
+                        </span>
+                      </div>
                     </div>
-                    <div className="hidden md:flex flex-col items-center mt-2">
-                      <span className="text-[8px] font-mono tracking-widest text-slate-500 uppercase">MATCH POINT</span>
-                      <span className="text-[9px] font-mono font-black text-amber-400">FIRST TO 6</span>
+
+                    {/* Match Subtitle */}
+                    <span className="text-[8px] sm:text-[9px] font-mono font-bold text-slate-400 uppercase tracking-widest mt-2">
+                      MATCH POINT
+                    </span>
+                    <span className="text-[9px] sm:text-[10px] font-mono font-black text-amber-400 uppercase tracking-wider">
+                      FIRST TO 6
+                    </span>
+
+                    {/* Sleek Integrated Start Match / Ready Trigger */}
+                    <div className="mt-2 flex flex-col items-center">
+                      {isHost ? (
+                        <button
+                          type="button"
+                          onClick={handleStartDuel}
+                          className="px-3.5 py-1.5 rounded-full bg-gradient-to-r from-[#00D9FF] via-[#00B4D8] to-[#2563FF] hover:from-[#38e1ff] hover:to-[#3b75ff] text-slate-950 font-mono font-black text-[10px] sm:text-[11px] tracking-wider shadow-[0_0_20px_rgba(0,217,255,0.6)] hover:scale-105 active:scale-95 transition-all cursor-pointer flex items-center gap-1 whitespace-nowrap"
+                          title="Start 1v1 Battle"
+                        >
+                          <Play className="w-3 h-3 fill-slate-950" />
+                          <span>START</span>
+                        </button>
+                      ) : (
+                        <button
+                          type="button"
+                          onClick={handleToggleReady}
+                          className={`px-3.5 py-1.5 rounded-full font-mono font-black text-[10px] sm:text-[11px] tracking-wider transition-all cursor-pointer flex items-center gap-1 whitespace-nowrap active:scale-95 ${
+                            isChallengerReady
+                              ? 'bg-gradient-to-r from-emerald-500 to-teal-500 text-white shadow-[0_0_20px_rgba(16,185,129,0.6)]'
+                              : 'bg-gradient-to-r from-rose-500 to-pink-500 text-white shadow-[0_0_20px_rgba(255,45,111,0.6)] animate-pulse'
+                          }`}
+                        >
+                          {isChallengerReady ? (
+                            <>
+                              <Check className="w-3 h-3 text-white" />
+                              <span>READY</span>
+                            </>
+                          ) : (
+                            <>
+                              <Zap className="w-3 h-3 fill-white" />
+                              <span>LOCK IN</span>
+                            </>
+                          )}
+                        </button>
+                      )}
                     </div>
                   </div>
 
                   {/* Right Player Card: Challenger (Attacker / Red Side) */}
-                  <div className={`md:col-span-5 motdar-card-challenger p-3.5 sm:p-4 md:p-5 relative flex flex-col items-center justify-between text-center min-h-[280px] sm:min-h-[300px] group ${
+                  <div className={`md:col-span-5 motdar-card-challenger p-3 sm:p-3.5 md:p-4 relative flex flex-col items-center justify-between text-center min-h-[260px] sm:min-h-[280px] group ${
                     !challengerPlayer ? 'cursor-pointer' : ''
                   }`}
                   onClick={() => {
@@ -2243,7 +2269,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                   }}
                   >
                     {/* Top Status Bar */}
-                    <div className="w-full flex items-center justify-between pb-2 sm:pb-2.5 border-b border-rose-500/20">
+                    <div className="w-full flex items-center justify-between pb-2 border-b border-rose-500/20">
                       <span className="text-xs font-mono font-black text-rose-300 flex items-center gap-1.5 uppercase tracking-wider">
                         <Swords className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-rose-400" />
                         <span>ATK // CHALLENGER (គូប្រជែង)</span>
@@ -2288,7 +2314,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
                     {/* Center Content */}
                     {challengerPlayer ? (
-                      <div className="my-auto py-2 flex flex-col items-center w-full">
+                      <div className="my-auto py-1.5 flex flex-col items-center w-full">
                         <div className="relative mb-2 flex items-center justify-center">
                           <div className="absolute inset-0 rounded-full bg-rose-500/15 blur-lg pointer-events-none" />
                           <div className="absolute -inset-2 rounded-full border border-dashed border-rose-400/30 animate-spin-slow pointer-events-none" />
@@ -2316,7 +2342,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                           <span className="truncate">{challengerPlayer.school || 'វិទ្យាល័យជាតិ'}</span>
                         </p>
 
-                        <div className="w-full max-w-[230px] mt-2.5 pt-2 border-t border-rose-500/20 flex flex-col gap-1">
+                        <div className="w-full max-w-[230px] mt-2 pt-1.5 border-t border-rose-500/20 flex flex-col gap-1">
                           <div className="flex items-center justify-between text-[9px] sm:text-[10px] font-mono tracking-wider text-slate-400">
                             <span>RATING (XP)</span>
                             <span className="text-rose-400 font-black font-mono text-[11px] sm:text-xs">{(challengerPlayer.xp || 500).toLocaleString()} XP</span>
@@ -2331,18 +2357,18 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                       </div>
                     ) : (
                       /* Empty Slot Concentric Radar Motif (Matching Screenshot) */
-                      <div className="my-auto py-3 sm:py-4 flex flex-col items-center justify-center text-center w-full">
+                      <div className="my-auto py-2.5 flex flex-col items-center justify-center text-center w-full">
                         {/* Concentric Neon Radar Circle */}
-                        <div className="relative w-20 h-20 sm:w-24 sm:h-24 rounded-full border border-rose-500/30 flex items-center justify-center mb-3 bg-[#13050b]/80 shadow-[0_0_20px_rgba(255,45,111,0.2)] group-hover:border-rose-400 transition-all">
-                          <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-full border-2 border-rose-500/60 flex items-center justify-center shadow-[0_0_15px_rgba(255,45,111,0.4)] bg-rose-500/10">
-                            <UserPlus className="w-6 h-6 sm:w-7 sm:h-7 text-rose-400 group-hover:scale-110 transition-transform" />
+                        <div className="relative w-18 h-18 sm:w-20 sm:h-20 rounded-full border border-rose-500/30 flex items-center justify-center mb-2 bg-[#13050b]/80 shadow-[0_0_20px_rgba(255,45,111,0.25)] group-hover:border-rose-400 transition-all">
+                          <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-full border-2 border-rose-500/60 flex items-center justify-center shadow-[0_0_15px_rgba(255,45,111,0.4)] bg-rose-500/15">
+                            <UserPlus className="w-5 h-5 sm:w-6 sm:h-6 text-rose-400 group-hover:scale-110 transition-transform" />
                           </div>
                         </div>
 
                         <span className="text-xs sm:text-sm font-black text-white font-mono tracking-wider block uppercase">
                           // AWAITING AGENT...
                         </span>
-                        <span className="text-[10px] sm:text-[11px] text-slate-400 block mt-1 max-w-[240px]">
+                        <span className="text-[10px] sm:text-[11px] text-slate-400 block mt-0.5 max-w-[240px]">
                           រង់ចាំគូប្រកួតចូលរួម ឬអញ្ជើញមិត្តភក្តិ ឬចែករំលែក PIN
                         </span>
 
@@ -2354,10 +2380,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                             fetchStudents();
                             setShowInviteModal(true);
                           }}
-                          className="mt-3 px-6 py-2 rounded-xl bg-gradient-to-r from-rose-500/20 via-pink-500/30 to-rose-500/20 border border-rose-500/60 hover:border-rose-400 text-white font-mono font-bold text-xs flex items-center justify-center gap-2 shadow-[0_0_15px_rgba(255,45,111,0.3)] hover:shadow-[0_0_25px_rgba(255,45,111,0.6)] transition-all cursor-pointer"
+                          className="mt-2.5 px-5 py-1.5 rounded-xl bg-gradient-to-r from-rose-500/20 via-pink-500/30 to-rose-500/20 border border-rose-500/70 hover:border-rose-400 text-white font-mono font-bold text-xs flex items-center justify-center gap-2 shadow-[0_0_20px_rgba(255,45,111,0.4)] hover:shadow-[0_0_30px_rgba(255,45,111,0.7)] hover:scale-105 active:scale-95 transition-all cursor-pointer"
                         >
                           <UserPlus className="w-3.5 h-3.5 text-rose-400" />
-                          <span>អញ្ជើញកីឡាករ (INVITE)</span>
+                          <span>+ អញ្ជើញកីឡាករ (INVITE)</span>
                           <ChevronRight className="w-3 h-3 text-rose-400" />
                         </button>
                       </div>
@@ -2370,71 +2396,6 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                     </div>
                   </div>
 
-                </div>
-
-                {/* ═══ 3. PRIMARY ACTION BAR ═══ */}
-                <div className="flex flex-col items-center gap-2.5 pt-2">
-                  
-                  {/* Warning notice when Host tries to start without ready opponent */}
-                  {isHost && hostWarningNotice && (
-                    <div className="w-full max-w-md p-2.5 bg-rose-500/20 border border-rose-500/40 rounded-xl text-rose-300 text-xs font-mono font-bold text-center flex items-center justify-center gap-2 animate-fade-in shadow-sm">
-                      <AlertTriangle className="w-4 h-4 text-rose-400 flex-shrink-0" />
-                      <span>{hostWarningNotice}</span>
-                    </div>
-                  )}
-
-                  {isHost ? (
-                    // Host: Motdar Primary Start Match Button
-                    <button
-                      type="button"
-                      onClick={handleStartDuel}
-                      className="motdar-btn-primary px-12 sm:px-16 py-3.5 rounded-xl flex items-center justify-center gap-3 text-sm sm:text-base active:scale-98"
-                      title="Start Match"
-                    >
-                      <Play className="w-5 h-5 fill-slate-950" />
-                      <span>ចាប់ផ្តើមការប្រកួត (START MATCH)</span>
-                    </button>
-                  ) : (
-                    // Challenger: Ready Button
-                    <div className="flex flex-col items-center gap-2 w-full sm:w-auto">
-                      <button
-                        type="button"
-                        onClick={handleToggleReady}
-                        className={`motdar-btn-primary px-12 sm:px-16 py-3.5 rounded-xl flex items-center justify-center gap-3 text-sm sm:text-base active:scale-98 ${
-                          isChallengerReady ? '!bg-gradient-to-r !from-emerald-500 !to-teal-500 !shadow-[0_0_25px_rgba(16,185,129,0.5)] !text-white' : ''
-                        }`}
-                      >
-                        {isChallengerReady ? (
-                          <>
-                            <CheckCircle2 className="w-5 h-5 text-white" />
-                            <span>រួចរាល់ហើយ! (LOCKED IN)</span>
-                          </>
-                        ) : (
-                          <>
-                            <Zap className="w-5 h-5 fill-slate-950 text-slate-950" />
-                            <span>ចុចដើម្បី READY (LOCK IN)</span>
-                          </>
-                        )}
-                      </button>
-
-                      {isChallengerReady && (
-                        <span className="text-xs text-emerald-400 font-mono font-bold flex items-center gap-1.5 animate-pulse">
-                          <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                          <span>កំពុងរង់ចាំម្ចាស់បន្ទប់ (Host) ចុចចាប់ផ្តើមការប្រកួត...</span>
-                        </span>
-                      )}
-                    </div>
-                  )}
-
-                  {/* Leave Room Button */}
-                  <button
-                    type="button"
-                    onClick={handleCloseModal}
-                    className="px-6 py-2 rounded-xl font-mono font-bold text-xs tracking-wider shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer active:scale-98 bg-[#081426] hover:bg-rose-950/40 text-slate-300 hover:text-white border border-slate-700/60 hover:border-rose-500/50"
-                  >
-                    <LogOut className="w-3.5 h-3.5 text-rose-400" />
-                    <span>ចាកចេញពីបន្ទប់ (ABORT / LEAVE)</span>
-                  </button>
                 </div>
 
               </div>
