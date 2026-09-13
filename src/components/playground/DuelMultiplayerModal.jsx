@@ -1547,7 +1547,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             <div className="min-w-0 flex flex-col justify-center">
               <div className="flex items-center gap-1.5 sm:gap-2 flex-wrap">
                 <span className="text-[10px] sm:text-[11px] font-mono font-black uppercase tracking-widest text-[#00f5d4] flex items-center gap-1.5">
-                  <span className="w-1.5 h-1.5 rounded-full bg-[#00f5d4] animate-ping" />
+                  <Shield className="w-3.5 h-3.5 text-[#00f5d4] flex-shrink-0" />
                   <span>ក្រសួងអប់រំ យុវជន និងកីឡា // MOEYS ARENA</span>
                 </span>
                 <span className="text-[9px] sm:text-[10px] px-2 py-0.5 font-mono font-bold border flex items-center gap-1 shadow-xs valorant-tag bg-cyan-500/10 text-cyan-300 border-cyan-400/30">
@@ -1620,7 +1620,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
           <div className="p-3 sm:p-6 md:p-8 flex-1 flex flex-col justify-between overflow-y-auto space-y-4 sm:space-y-6 animate-fade-in relative z-10">
             
             {/* ═══ AAA VALORANT TACTICAL TOP HUD BAR ═══ */}
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#060b14]/95 p-3 rounded-2xl border border-cyan-500/25 shadow-2xl relative overflow-hidden backdrop-blur-2xl">
+            <div className="flex flex-col lg:flex-row items-center justify-between gap-3 bg-[#060b14]/95 px-3.5 sm:px-5 py-2.5 sm:py-3 rounded-2xl border border-cyan-500/25 shadow-2xl relative backdrop-blur-2xl">
               {/* Corner Sci-Fi Accent Marks */}
               <div className="absolute top-0 left-0 w-20 h-[2px] bg-gradient-to-r from-[#00f5d4] to-transparent pointer-events-none" />
               <div className="absolute bottom-0 right-0 w-20 h-[2px] bg-gradient-to-l from-[#ff4655] to-transparent pointer-events-none" />
@@ -1692,6 +1692,19 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                 </div>
               </div>
 
+              {/* CENTER: FULL MATCH STATUS TELEMETRY */}
+              <div className="hidden xl:flex items-center gap-3 px-4 h-10 rounded-xl bg-[#0c1422] border border-cyan-500/25 shadow-sm text-xs font-mono">
+                <div className="flex items-center gap-1.5 text-cyan-300 font-bold">
+                  <Shield className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
+                  <span className="tracking-wider">NATIONAL CHAMPIONSHIP</span>
+                </div>
+                <span className="text-slate-600">//</span>
+                <div className="flex items-center gap-1.5 text-amber-300 font-bold">
+                  <Trophy className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
+                  <span>FIRST TO 6 POINTS</span>
+                </div>
+              </div>
+
               {/* RIGHT: MATCH CONFIGURATION & LOBBY / JOIN PIN TABS */}
               <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap justify-end">
                 {isHost && (
@@ -1712,7 +1725,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                 )}
 
                 {/* Tactical Segmented Switch: LOBBY vs JOIN PIN */}
-                <div className="flex items-center p-1 rounded-xl bg-[#040810] border border-slate-800 h-10 shadow-inner flex-shrink-0">
+                <div className="flex items-center p-1 rounded-xl bg-[#040810] border border-slate-800 h-10 shadow-inner flex-shrink-0 mr-0.5">
                   <button
                     type="button"
                     onClick={() => setTab('host')}
