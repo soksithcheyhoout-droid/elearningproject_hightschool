@@ -120,41 +120,6 @@ function MainApp() {
 
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-  // Bottom nav: hide on scroll down, show on ANY scroll up
-  const [isBottomNavHidden, setIsBottomNavHidden] = useState(false);
-  const lastScrollYRef = useRef(0);
-
-  useEffect(() => {
-    const handleScroll = () => {
-      const currentY = window.scrollY;
-      const delta = currentY - lastScrollYRef.current;
-
-      if (delta > 8) {
-        // Scrolling DOWN significantly — hide
-        setIsBottomNavHidden(true);
-      } else if (delta < -1) {
-        // Scrolling UP even slightly — show immediately
-        setIsBottomNavHidden(false);
-      }
-
-      // Always show at very top of page
-      if (currentY <= 10) {
-        setIsBottomNavHidden(false);
-      }
-
-      // Always show at very bottom of page
-      const maxScroll = document.documentElement.scrollHeight - window.innerHeight;
-      if (currentY >= maxScroll - 20) {
-        setIsBottomNavHidden(false);
-      }
-
-      lastScrollYRef.current = currentY;
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
   // URL Browser History Sync
   const setTabAndUrl = (tab) => {
     setActiveTab(tab);
@@ -772,9 +737,7 @@ function MainApp() {
               borderTop: '1px solid rgba(226, 232, 240, 0.9)',
               boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.05)',
               paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)',
-              paddingTop: '8px',
-              transform: isBottomNavHidden ? 'translateY(100%)' : 'translateY(0)',
-              transition: 'none'
+              paddingTop: '8px'
             }}
           >
             {/* Main Bar Container */}
