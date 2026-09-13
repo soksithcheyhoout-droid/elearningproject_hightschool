@@ -1,5 +1,4 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { createPortal } from 'react-dom';
 import { 
   Play, 
   Pause, 
@@ -7,20 +6,18 @@ import {
   VolumeX, 
   Maximize2, 
   X, 
-  ExternalLink, 
   Search, 
   Headphones, 
-  Sparkles, 
-  Radio, 
   SkipForward, 
   SkipBack, 
   AlertCircle,
   Eye,
   EyeOff,
-  Music,
   Flame,
   Loader2,
-  Check
+  Square,
+  Minus,
+  Link as LinkIcon
 } from 'lucide-react';
 
 // Extract YouTube Video ID from any URL format or bare ID
@@ -33,68 +30,61 @@ export function extractYouTubeId(url) {
   return null;
 }
 
-// Quick Popular Search Tags for Students
+// Quick Popular Search Tags
 const POPULAR_SEARCH_TAGS = [
-  { label: '🔥 VannDa (វណ្ណដា)', query: 'VannDa' },
+  { label: 'ទាំងអស់ (All)', query: 'lofi study' },
+  { label: '🔥 VannDa', query: 'VannDa' },
   { label: '🎵 ដួង វីរៈសិទ្ធ', query: 'ដួង វីរៈសិទ្ធ' },
-  { label: '☕ Lo-Fi Study Chill', query: 'lofi hip hop study beats' },
-  { label: '🇰🇭 Khmer Acoustic Chill', query: 'khmer acoustic chill guitar' },
-  { label: '🎹 ព្យាណូស្ងប់ស្ងាត់ (Piano)', query: 'peaceful piano study music' },
-  { label: '🌧️ សំឡេងភ្លៀង & រៀន (Rain)', query: 'gentle rain study music' },
-  { label: '🧠 Alpha Waves Focus', query: 'alpha waves study focus' },
-  { label: '✨ Taylor Swift Chill', query: 'taylor swift acoustic' },
-  { label: '🎸 G-Devith', query: 'G-Devith' }
+  { label: '☕ Lo-Fi Chill', query: 'lofi hip hop beats study' },
+  { label: '🇰🇭 Acoustic ខ្មែរ', query: 'khmer acoustic chill guitar' },
+  { label: '🎹 ព្យាណូ (Piano)', query: 'peaceful piano study music' },
+  { label: '🌧️ សំឡេងភ្លៀង (Rain)', query: 'gentle rain study music' },
+  { label: '✨ Taylor Swift', query: 'taylor swift acoustic' }
 ];
 
-// Curated Baseline Study Tracks (Ready instantly offline or before searching)
+// Curated Baseline Study Tracks (Ready instantly on load)
 export const DEFAULT_STUDY_TRACKS = [
   {
     id: 'jfKfPfyJRdk',
     title: 'Lofi Hip Hop Beats (Relax & Study 24/7)',
     channel: 'Lofi Girl 🎧',
     duration: 'LIVE',
-    thumbnail: 'https://i.ytimg.com/vi/jfKfPfyJRdk/hqdefault.jpg',
-    category: 'Lo-Fi Chill'
+    thumbnail: 'https://i.ytimg.com/vi/jfKfPfyJRdk/hqdefault.jpg'
   },
   {
     id: 'rvje5oblrLw',
     title: 'VannDa - Time To Rise feat. Master Kong Nay',
     channel: 'វណ្ណដា-VannDa Official',
     duration: '5:40',
-    thumbnail: 'https://i.ytimg.com/vi/rvje5oblrLw/hqdefault.jpg',
-    category: 'Khmer HipHop'
+    thumbnail: 'https://i.ytimg.com/vi/rvje5oblrLw/hqdefault.jpg'
   },
   {
     id: '5qap5aO4i9A',
     title: 'Khmer Acoustic Chill Guitar for Study',
     channel: 'Khmer Chill Vibes 🇰🇭',
     duration: '1:12:30',
-    thumbnail: 'https://i.ytimg.com/vi/5qap5aO4i9A/hqdefault.jpg',
-    category: 'Khmer Acoustic'
+    thumbnail: 'https://i.ytimg.com/vi/5qap5aO4i9A/hqdefault.jpg'
   },
   {
     id: 'MIHCnP8pDrQ',
     title: 'ដួង វីរៈសិទ្ធ - បទចម្រៀងជ្រើសរើសពិរោះៗ (Doung Virakseth Special)',
     channel: 'MT Records',
     duration: '40:30',
-    thumbnail: 'https://i.ytimg.com/vi/MIHCnP8pDrQ/hqdefault.jpg',
-    category: 'Khmer Pop'
+    thumbnail: 'https://i.ytimg.com/vi/MIHCnP8pDrQ/hqdefault.jpg'
   },
   {
     id: '4xDzrJKXOOY',
     title: 'Deep Focus Study Piano & Peaceful Strings',
     channel: 'Peaceful Mind 🎹',
     duration: '3:00:00',
-    thumbnail: 'https://i.ytimg.com/vi/4xDzrJKXOOY/hqdefault.jpg',
-    category: 'Piano Study'
+    thumbnail: 'https://i.ytimg.com/vi/4xDzrJKXOOY/hqdefault.jpg'
   },
   {
     id: 'mPZkdNFkNps',
     title: 'Gentle Rain & Soft Study Piano for Concentration',
     channel: 'Rain & Focus 🌧️',
     duration: '2:30:15',
-    thumbnail: 'https://i.ytimg.com/vi/mPZkdNFkNps/hqdefault.jpg',
-    category: 'Rain & Nature'
+    thumbnail: 'https://i.ytimg.com/vi/mPZkdNFkNps/hqdefault.jpg'
   }
 ];
 
@@ -107,15 +97,17 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
 
   // Search State
   const [searchQuery, setSearchQuery] = useState('');
+  const [activeTag, setActiveTag] = useState('ទាំងអស់ (All)');
   const [searchResults, setSearchResults] = useState(DEFAULT_STUDY_TRACKS);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState('');
-  const [activeTab, setActiveTab] = useState('search'); // 'search' | 'curated' | 'url'
   
   // Custom URL paste state
+  const [showUrlInput, setShowUrlInput] = useState(false);
   const [customUrl, setCustomUrl] = useState('');
   const [urlError, setUrlError] = useState('');
 
+  // ONLY ONE IFRAME REF FOR THE ENTIRE APP
   const iframeRef = useRef(null);
   const searchInputRef = useRef(null);
 
@@ -126,32 +118,45 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     }
   }, [isPlaying, onPlayStateChange]);
 
-  // Focus search input when modal opens on search tab
+  // Listen to YouTube postMessage events for 100% accurate player state sync
   useEffect(() => {
-    if (isOpen && activeTab === 'search') {
-      setTimeout(() => {
-        searchInputRef.current?.focus();
-      }, 200);
-    }
-  }, [isOpen, activeTab]);
+    const handleMessage = (event) => {
+      try {
+        if (!event.data) return;
+        const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
+        if (data && data.event === 'onStateChange') {
+          // 1: PLAYING, 2: PAUSED, 0: ENDED, 3: BUFFERING
+          if (data.info === 1) {
+            setIsPlaying(true);
+          } else if (data.info === 2 || data.info === 0) {
+            setIsPlaying(false);
+          }
+        }
+      } catch (e) {
+        // Non-JSON message from other sources
+      }
+    };
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, []);
 
-  // Handle postMessage commands to YouTube IFrame
-  const sendIframeCommand = (command, args = '') => {
+  // Handle postMessage commands to YouTube IFrame (Single source of truth)
+  const sendIframeCommand = useCallback((command, args = []) => {
     try {
       if (iframeRef.current && iframeRef.current.contentWindow) {
         iframeRef.current.contentWindow.postMessage(
           JSON.stringify({
             event: 'command',
             func: command,
-            args: args ? [args] : []
+            args: args
           }),
           '*'
         );
       }
     } catch (e) {
-      console.warn('Iframe command warning:', e);
+      console.warn('Iframe command notice:', e);
     }
-  };
+  }, []);
 
   const handleTogglePlay = () => {
     if (isPlaying) {
@@ -173,15 +178,30 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     }
   };
 
-  const handlePlayVideo = (track) => {
+  const handleSelectTrack = (track) => {
     setCurrentTrack(track);
     setActiveVideoId(track.id);
     setIsPlaying(true);
     setUrlError('');
   };
 
+  const handleNextTrack = () => {
+    const list = searchResults.length > 0 ? searchResults : DEFAULT_STUDY_TRACKS;
+    const currentIndex = list.findIndex(t => t.id === activeVideoId);
+    const nextIndex = (currentIndex + 1) % list.length;
+    handleSelectTrack(list[nextIndex]);
+  };
+
+  const handlePrevTrack = () => {
+    const list = searchResults.length > 0 ? searchResults : DEFAULT_STUDY_TRACKS;
+    const currentIndex = list.findIndex(t => t.id === activeVideoId);
+    const prevIndex = (currentIndex - 1 + list.length) % list.length;
+    handleSelectTrack(list[prevIndex]);
+  };
+
   const handleStopAndDismiss = () => {
     sendIframeCommand('pauseVideo');
+    sendIframeCommand('seekTo', [0, true]);
     setIsPlaying(false);
     if (onClose) onClose(false);
   };
@@ -205,11 +225,11 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
         setSearchResults(data.results);
       } else {
         setSearchResults([]);
-        setSearchError('មិនមានលទ្ធផលសម្រាប់ "' + q + '" ទេ សូមសាកល្បងពាក្យគន្លឹះផ្សេង។');
+        setSearchError(`រកមិនឃើញបទចម្រៀងសម្រាប់ "${q}" ទេ`);
       }
     } catch (err) {
       console.error('YouTube search error:', err);
-      setSearchError('បណ្តាញមានបញ្ហាក្នុងការស្វែងរក សូមសាកល្បងម្តងទៀត។');
+      setSearchError('បណ្តាញមានបញ្ហាក្នុងការស្វែងរក សូមសាកល្បងម្តងទៀត');
     } finally {
       setIsSearching(false);
     }
@@ -217,12 +237,13 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
 
   const handleSearchSubmit = (e) => {
     if (e) e.preventDefault();
+    setActiveTag('');
     executeSearch();
   };
 
   const handleQuickTagClick = (tag) => {
+    setActiveTag(tag.label);
     setSearchQuery(tag.query);
-    setActiveTab('search');
     executeSearch(tag.query);
   };
 
@@ -233,59 +254,40 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
 
     const id = extractYouTubeId(customUrl);
     if (!id) {
-      setUrlError('សូមបញ្ចូលតំណភ្ជាប់ YouTube ឱ្យបានត្រឹមត្រូវ (ឧ. https://www.youtube.com/watch?v=...)');
+      setUrlError('សូមបញ្ចូលតំណភ្ជាប់ YouTube ឱ្យបានត្រឹមត្រូវ');
       return;
     }
 
     const newTrack = {
       id,
-      title: customUrl.length > 45 ? customUrl.slice(0, 42) + '...' : customUrl,
+      title: customUrl.length > 40 ? customUrl.slice(0, 38) + '...' : customUrl,
       channel: 'YouTube Video',
       duration: 'Custom',
-      thumbnail: `https://img.youtube.com/vi/${id}/hqdefault.jpg`,
-      category: 'User Custom'
+      thumbnail: `https://img.youtube.com/vi/${id}/hqdefault.jpg`
     };
 
-    handlePlayVideo(newTrack);
+    handleSelectTrack(newTrack);
     setCustomUrl('');
+    setShowUrlInput(false);
   };
 
-  // Construct iframe embed URL
+  // Construct iframe embed URL (enablejsapi=1 enables seamless control)
   const embedUrl = `https://www.youtube.com/embed/${activeVideoId}?enablejsapi=1&autoplay=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}&rel=0&iv_load_policy=3&modestbranding=1`;
 
   return (
     <>
       {/* ========================================================================= */}
-      {/* 1. PERSISTENT YOUTUBE IFRAME (NEVER UNMOUNTED - AUDIO KEEPS PLAYING!)     */}
-      {/* ========================================================================= */}
-      <div 
-        className="fixed bottom-0 right-0 w-1 h-1 opacity-0 pointer-events-none z-[1]"
-        style={{ display: 'block' }}
-        aria-hidden="true"
-      >
-        <iframe
-          ref={iframeRef}
-          key={activeVideoId}
-          src={embedUrl}
-          title="Persistent YouTube Background Audio Player"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
-          allowFullScreen
-          className="w-full h-full border-0"
-        />
-      </div>
-
-      {/* ========================================================================= */}
-      {/* 2. FLOATING MINI MUSIC DOCK (Appears when Modal is Closed BUT playing)   */}
+      {/* 1. ULTRA-MINIMAL FLOATING MINI MUSIC DOCK (When Modal is Closed & Playing)*/}
       {/* ========================================================================= */}
       {!isOpen && isPlaying && (
-        <div className="fixed bottom-20 md:bottom-6 right-3 sm:right-6 z-[9995] animate-fadeIn font-kantumruy select-none">
-          <div className="flex items-center gap-3 bg-slate-950/95 backdrop-blur-xl border border-red-500/40 text-white p-2 sm:p-2.5 pl-3 rounded-2xl shadow-[0_12px_45px_rgba(0,0,0,0.8)] hover:border-red-500/70 transition-all max-w-[92vw] sm:max-w-md ring-1 ring-red-500/20">
+        <div className="fixed bottom-20 md:bottom-6 right-3 sm:right-6 z-[9998] animate-fadeIn font-kantumruy select-none pointer-events-auto">
+          <div className="flex items-center gap-3 bg-slate-950/92 backdrop-blur-2xl border border-white/15 text-white p-2 sm:p-2.5 pl-2.5 rounded-2xl shadow-[0_16px_40px_rgba(0,0,0,0.65)] hover:border-red-500/50 transition-all max-w-[92vw] sm:max-w-sm ring-1 ring-white/10">
             
-            {/* Spinning Vinyl / Music Disc */}
+            {/* Spinning Album Artwork */}
             <div 
               onClick={() => onClose && onClose(true)} 
-              className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-xl overflow-hidden cursor-pointer flex-shrink-0 group shadow-md"
-              title="ចុចដើម្បីបើកផ្ទាំងស្វែងរក និងចាក់ចម្រៀងធំឡើងវិញ (Open YouTube Player)"
+              className="relative w-10 h-10 rounded-xl overflow-hidden cursor-pointer flex-shrink-0 group shadow-md"
+              title="ចុចដើម្បីបើកផ្ទាំងធំ (Open Full Player)"
             >
               <img 
                 src={currentTrack.thumbnail || `https://i.ytimg.com/vi/${activeVideoId}/hqdefault.jpg`} 
@@ -294,66 +296,55 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                 onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=300&auto=format&fit=crop&q=80'; }}
               />
               <div className="absolute inset-0 bg-black/40 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity">
-                <Maximize2 className="w-4 h-4 text-white" />
+                <Maximize2 className="w-3.5 h-3.5 text-white" />
               </div>
-              
-              {/* Pulsing red live dot */}
-              <span className="absolute bottom-1 right-1 w-2.5 h-2.5 rounded-full bg-red-500 ring-2 ring-slate-950 animate-pulse" />
+              <span className="absolute bottom-1 right-1 w-2 h-2 rounded-full bg-red-500 ring-2 ring-slate-950 animate-pulse" />
             </div>
 
-            {/* Track Information */}
+            {/* Track Title & Artist */}
             <div 
               onClick={() => onClose && onClose(true)}
-              className="min-w-0 flex-1 cursor-pointer"
-              title="ចុចដើម្បីបើកផ្ទាំងធំ (Expand to search songs)"
+              className="min-w-0 flex-1 cursor-pointer pr-1"
+              title="ចុចដើម្បីបើកផ្ទាំងធំ"
             >
-              <div className="flex items-center gap-1.5">
-                <span className="text-[10px] font-black uppercase tracking-wider text-red-400 flex items-center gap-1">
-                  <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-ping" />
-                  YouTube Music
-                </span>
-                {currentTrack.duration && (
-                  <span className="text-[10px] text-slate-400 truncate">• {currentTrack.duration}</span>
-                )}
-              </div>
-              <h4 className="text-xs sm:text-[13px] font-bold text-white truncate max-w-[140px] sm:max-w-[200px]">
+              <h4 className="text-xs font-bold text-white truncate max-w-[130px] sm:max-w-[170px]">
                 {currentTrack.title}
               </h4>
-              <p className="text-[10px] text-slate-400 truncate max-w-[140px] sm:max-w-[200px]">
+              <p className="text-[10px] text-slate-400 truncate max-w-[130px] sm:max-w-[170px] mt-0.5">
                 {currentTrack.channel || 'YouTube'}
               </p>
             </div>
 
-            {/* Quick Controls */}
+            {/* Compact Action Icons */}
             <div className="flex items-center gap-1 flex-shrink-0">
-              {/* Play / Pause */}
+              {/* Play / Pause Toggle */}
               <button
                 type="button"
                 onClick={handleTogglePlay}
                 className="w-8 h-8 rounded-xl bg-red-600 hover:bg-red-700 text-white flex items-center justify-center cursor-pointer transition-transform active:scale-95 shadow-xs"
-                title={isPlaying ? "ផ្អាក (Pause)" : "បន្តចាក់ (Play)"}
+                title={isPlaying ? "ផ្អាក (Pause)" : "ចាក់បន្ត (Play)"}
               >
-                {isPlaying ? <Pause className="w-4 h-4 fill-white" /> : <Play className="w-4 h-4 fill-white ml-0.5" />}
+                {isPlaying ? <Pause className="w-3.5 h-3.5 fill-white" /> : <Play className="w-3.5 h-3.5 fill-white ml-0.5" />}
               </button>
 
-              {/* Mute / Unmute */}
+              {/* Mute Toggle */}
               <button
                 type="button"
                 onClick={handleToggleMute}
                 className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center cursor-pointer transition-colors"
-                title={isMuted ? "បើកសំឡេង (Unmute)" : "បិទសំឡេង (Mute)"}
+                title={isMuted ? "បើកសំឡេង" : "បិទសំឡេង"}
               >
                 {isMuted ? <VolumeX className="w-3.5 h-3.5 text-red-400" /> : <Volume2 className="w-3.5 h-3.5 text-slate-200" />}
               </button>
 
-              {/* Expand to Search / Full Modal */}
+              {/* Expand Full Modal */}
               <button
                 type="button"
                 onClick={() => onClose && onClose(true)}
                 className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center cursor-pointer transition-colors"
-                title="ស្វែងរកបទផ្សេងទៀត (Search more songs)"
+                title="បើកផ្ទាំងស្វែងរក (Expand)"
               >
-                <Search className="w-3.5 h-3.5 text-slate-200" />
+                <Maximize2 className="w-3.5 h-3.5 text-slate-200" />
               </button>
 
               {/* Stop & Dismiss Completely */}
@@ -361,9 +352,9 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                 type="button"
                 onClick={handleStopAndDismiss}
                 className="w-8 h-8 rounded-xl hover:bg-red-500/20 text-slate-400 hover:text-red-400 flex items-center justify-center cursor-pointer transition-colors"
-                title="បិទតន្ត្រីទាំងស្រុង (Stop & Close)"
+                title="បញ្ឈប់ទាំងស្រុង (Stop)"
               >
-                <X className="w-4 h-4" />
+                <X className="w-3.5 h-3.5" />
               </button>
             </div>
 
@@ -372,459 +363,446 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
       )}
 
       {/* ========================================================================= */}
-      {/* 3. FULL INTERACTIVE YOUTUBE SEARCH & STUDY PLAYER MODAL                   */}
+      {/* 2. THE MASTER MODAL & PERSISTENT SINGLE IFRAME CONTAINER                  */}
+      {/* (CRITICAL: Never unmounted so the single iframe never reloads or restarts)*/}
       {/* ========================================================================= */}
-      {isOpen && createPortal(
-        <div className="fixed inset-0 z-[9999] flex items-center justify-center p-2 sm:p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto animate-fadeIn font-kantumruy select-none">
-          <div className="relative bg-[#0b1120] border border-slate-800 rounded-3xl shadow-[0_25px_90px_rgba(0,0,0,0.85)] max-w-4xl w-full max-h-[94vh] flex flex-col overflow-hidden my-auto text-white ring-1 ring-white/10">
+      <div 
+        className={`fixed inset-0 flex items-center justify-center p-3 sm:p-5 transition-all duration-300 font-kantumruy select-none ${
+          isOpen 
+            ? 'z-[9999] opacity-100 pointer-events-auto bg-slate-950/80 backdrop-blur-md' 
+            : 'opacity-0 pointer-events-none -z-50'
+        }`}
+      >
+        <div 
+          className={`relative bg-[#0d1424] border border-white/15 rounded-3xl shadow-[0_25px_80px_rgba(0,0,0,0.85)] max-w-5xl w-full max-h-[90vh] flex flex-col overflow-hidden my-auto text-white ring-1 ring-white/10 transition-transform duration-300 ${
+            isOpen ? 'scale-100' : 'scale-95'
+          }`}
+        >
+          
+          {/* Top Clean Header */}
+          <div className="px-5 py-3.5 bg-slate-900/90 border-b border-white/10 flex items-center justify-between flex-shrink-0">
             
-            {/* Header */}
-            <div className="px-4 sm:px-6 py-3.5 bg-gradient-to-r from-red-950/90 via-slate-900 to-[#0b1120] border-b border-white/10 flex items-center justify-between">
-              <div className="flex items-center gap-3">
-                <div className="w-10 h-10 rounded-2xl bg-red-600 flex items-center justify-center text-white shadow-[0_0_25px_rgba(239,68,68,0.6)]">
-                  <svg className="w-6 h-6 fill-current" viewBox="0 0 24 24">
-                    <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
-                  </svg>
-                </div>
-                <div>
-                  <div className="flex items-center gap-2">
-                    <h3 className="text-sm sm:text-base md:text-lg font-extrabold text-white flex items-center gap-2">
-                      <span>YouTube សិក្សា & ស្វែងរកបទចម្រៀង</span>
-                    </h3>
-                    <span className="text-[10px] px-2 py-0.5 rounded-full bg-red-500/20 text-red-300 border border-red-500/30 font-bold uppercase tracking-wider font-sans">
-                      Live Search
-                    </span>
-                  </div>
-                  <p className="text-[11px] sm:text-xs text-slate-400 mt-0.5 flex items-center gap-1.5">
-                    <Headphones className="w-3.5 h-3.5 text-emerald-400" />
-                    <span>ស្វែងរកបទចម្រៀងដែលប្អូនចង់ស្តាប់ពេលរៀន • បិទផ្ទាំងតន្ត្រីនៅតែបន្តចាក់</span>
-                  </p>
-                </div>
+            {/* Title & Status */}
+            <div className="flex items-center gap-3">
+              <div className="w-9 h-9 rounded-2xl bg-red-600 flex items-center justify-center text-white shadow-md shadow-red-600/40 flex-shrink-0">
+                <svg className="w-5 h-5 fill-current" viewBox="0 0 24 24">
+                  <path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/>
+                </svg>
               </div>
-
-              {/* Top Action Buttons */}
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setShowVideo(!showVideo)}
-                  className={`p-2 rounded-xl border text-xs font-bold transition-all flex items-center gap-1.5 ${
-                    showVideo 
-                      ? 'bg-white/10 text-white border-white/15' 
-                      : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
-                  }`}
-                  title={showVideo ? "លាក់វីដេអូ / ស្តាប់តែសំឡេង (Audio Only)" : "បង្ហាញវីដេអូ (Show Video)"}
-                >
-                  {showVideo ? <Eye className="w-3.5 h-3.5 text-slate-300" /> : <EyeOff className="w-3.5 h-3.5 text-emerald-400" />}
-                  <span className="hidden sm:inline">{showVideo ? 'វីដេអូ' : 'សន្សំថ្ម (Audio)'}</span>
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => onClose && onClose(false)}
-                  className="w-9 h-9 rounded-2xl bg-white/10 hover:bg-white/20 text-white flex items-center justify-center cursor-pointer transition-colors"
-                  title="បិទផ្ទាំង (តន្ត្រីនៅតែបន្តចាក់ក្នុងប្រព័ន្ធ)"
-                >
-                  <X className="w-5 h-5" />
-                </button>
+              <div className="leading-tight">
+                <div className="flex items-center gap-2">
+                  <h3 className="text-sm sm:text-base font-extrabold text-white">
+                    YouTube Music
+                  </h3>
+                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-emerald-500/15 text-emerald-400 border border-emerald-500/30 font-bold flex items-center gap-1">
+                    <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span>ចាក់បន្តក្នុង Background</span>
+                  </span>
+                </div>
+                <p className="text-[11px] text-slate-400 mt-0.5">
+                  ស្តាប់តន្ត្រីពេលរៀន • បិទផ្ទាំង (X) ចម្រៀងនៅតែបន្តចាក់
+                </p>
               </div>
             </div>
 
-            {/* Modal Body */}
-            <div className="p-4 sm:p-5 overflow-y-auto space-y-4 flex-1">
+            {/* Header Action Controls */}
+            <div className="flex items-center gap-2 flex-shrink-0">
+              {/* Video / Audio Mode Toggle */}
+              <button
+                type="button"
+                onClick={() => setShowVideo(!showVideo)}
+                className={`px-2.5 py-1.5 rounded-xl border text-xs font-bold transition-all flex items-center gap-1.5 cursor-pointer ${
+                  showVideo 
+                    ? 'bg-white/10 text-white border-white/15 hover:bg-white/15' 
+                    : 'bg-emerald-500/20 text-emerald-300 border-emerald-500/30'
+                }`}
+                title={showVideo ? "ប្តូរទៅស្តាប់តែសំឡេង (Audio Only)" : "បង្ហាញវីដេអូ (Show Video)"}
+              >
+                {showVideo ? <Eye className="w-3.5 h-3.5 text-slate-300" /> : <EyeOff className="w-3.5 h-3.5 text-emerald-400" />}
+                <span className="hidden sm:inline">{showVideo ? 'វីដេអូ' : 'សន្សំថ្ម'}</span>
+              </button>
+
+              {/* Minimize Button (Keep playing) */}
+              <button
+                type="button"
+                onClick={() => onClose && onClose(false)}
+                className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center cursor-pointer transition-colors"
+                title="បង្រួមតូច (តន្ត្រីនៅតែបន្តចាក់)"
+              >
+                <Minus className="w-4 h-4" />
+              </button>
+
+              {/* Close Button (Keep playing) */}
+              <button
+                type="button"
+                onClick={() => onClose && onClose(false)}
+                className="w-8 h-8 rounded-xl bg-white/10 hover:bg-red-600/30 text-slate-300 hover:text-white flex items-center justify-center cursor-pointer transition-colors"
+                title="បិទផ្ទាំង (តន្ត្រីនៅតែបន្តចាក់)"
+              >
+                <X className="w-4 h-4" />
+              </button>
+            </div>
+
+          </div>
+
+          {/* Clean Two-Column Body: Left = Player, Right = Search & Tracklist */}
+          <div className="p-4 sm:p-6 overflow-y-auto flex-1 grid grid-cols-1 lg:grid-cols-12 gap-5 lg:gap-6">
+            
+            {/* ================================================================= */}
+            {/* COLUMN 1: THE PLAYER (Left 5 Cols)                                */}
+            {/* ================================================================= */}
+            <div className="lg:col-span-5 flex flex-col space-y-4">
               
-              {/* Background Music Notice Banner */}
-              <div className="p-3 bg-gradient-to-r from-blue-950/70 via-slate-900 to-indigo-950/60 border border-blue-500/30 rounded-2xl flex items-center gap-3 text-xs text-blue-200 shadow-sm">
-                <Sparkles className="w-4 h-4 text-cyan-400 flex-shrink-0 animate-pulse" />
-                <span className="leading-relaxed">
-                  💡 <strong>គន្លឹះពិសេស៖</strong> នៅពេលប្អូនបិទផ្ទាំងនេះ (ចុចសញ្ញា X) <strong>តន្ត្រីនៅតែបន្តចាក់ក្នុងប្រព័ន្ធដដែល</strong> ដើម្បីឱ្យប្អូនអាចអានសៀវភៅ ឬធ្វើលំហាត់ដោយគ្មានការរំខាន!
-                </span>
-              </div>
+              {/* THE SINGLE YOUTUBE IFRAME CANVAS */}
+              <div className="relative w-full aspect-video rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl flex-shrink-0">
+                {/* 
+                  IMPORTANT: This is the ONLY iframe in the entire app.
+                  When showVideo is false, it is made 1px transparent so it stays alive playing audio!
+                */}
+                <iframe
+                  ref={iframeRef}
+                  key={activeVideoId}
+                  src={embedUrl}
+                  title="YouTube Player"
+                  allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                  allowFullScreen
+                  className={showVideo ? "w-full h-full border-0" : "w-1 h-1 opacity-0 absolute pointer-events-none"}
+                />
 
-              {/* ========================================================================= */}
-              {/* 🌟 SEARCH BAR SUITE (PRIMARY USER FEATURE)                               */}
-              {/* ========================================================================= */}
-              <div className="p-4 bg-white/5 border border-white/10 rounded-2xl space-y-3">
-                <form onSubmit={handleSearchSubmit} className="flex items-center gap-2">
-                  <div className="relative flex-1">
-                    <input
-                      ref={searchInputRef}
-                      type="text"
-                      placeholder="ស្វែងរកបទចម្រៀង ឬតារាចម្រៀង (ឧ. VannDa, ដួង វីរៈសិទ្ធ, Taylor Swift, Lofi, បទចម្រៀងរៀន...)"
-                      value={searchQuery}
-                      onChange={(e) => setSearchQuery(e.target.value)}
-                      className="w-full bg-slate-950 border border-slate-700 rounded-xl pl-10 pr-9 py-2.5 sm:py-3 text-xs sm:text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 shadow-inner font-kantumruy"
+                {/* Audio-Only Visualizer Mode (Shown when showVideo is false) */}
+                {!showVideo && (
+                  <div className="w-full h-full relative flex flex-col items-center justify-center p-6 text-center bg-gradient-to-b from-slate-900 via-[#0d1424] to-black">
+                    <img 
+                      src={currentTrack.thumbnail || `https://i.ytimg.com/vi/${activeVideoId}/hqdefault.jpg`} 
+                      alt={currentTrack.title}
+                      className="absolute inset-0 w-full h-full object-cover opacity-20 blur-xl"
                     />
-                    <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 sm:top-3.5 pointer-events-none" />
-                    {searchQuery && (
-                      <button
-                        type="button"
-                        onClick={() => setSearchQuery('')}
-                        className="p-1 rounded-lg text-slate-400 hover:text-white absolute right-2.5 top-2.5 cursor-pointer"
-                      >
-                        <X className="w-4 h-4" />
-                      </button>
-                    )}
-                  </div>
-                  
-                  <button
-                    type="submit"
-                    disabled={isSearching}
-                    className="px-4 sm:px-5 py-2.5 sm:py-3 rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-lg shadow-red-600/30 transition-transform active:scale-95 cursor-pointer disabled:cursor-not-allowed flex-shrink-0"
-                  >
-                    {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
-                    <span>{isSearching ? 'កំពុងស្វែងរក...' : 'ស្វែងរក'}</span>
-                  </button>
-                </form>
-
-                {/* Quick Suggestion Chips */}
-                <div className="flex items-center gap-1.5 flex-wrap pt-1">
-                  <span className="text-[11px] font-bold text-slate-400 flex items-center gap-1 mr-1">
-                    <Flame className="w-3.5 h-3.5 text-amber-400" />
-                    <span>ពេញនិយម៖</span>
-                  </span>
-                  {POPULAR_SEARCH_TAGS.map((tag) => (
-                    <button
-                      key={tag.label}
-                      type="button"
-                      onClick={() => handleQuickTagClick(tag)}
-                      className="px-2.5 py-1 rounded-lg bg-white/5 hover:bg-red-600/20 hover:border-red-500/40 border border-white/10 text-[11px] font-medium text-slate-300 hover:text-white transition-all cursor-pointer active:scale-95"
-                    >
-                      {tag.label}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              {/* ========================================================================= */}
-              {/* ACTIVE PLAYER BAR & SCREEN (CURRENT PLAYING TRACK)                        */}
-              {/* ========================================================================= */}
-              <div className="bg-slate-950/60 border border-white/10 rounded-2xl p-3 sm:p-4 space-y-3">
-                <div className="flex flex-col sm:flex-row items-center justify-between gap-3">
-                  
-                  {/* Current Song Display */}
-                  <div className="flex items-center gap-3 min-w-0 w-full sm:w-auto">
-                    <div className="w-12 h-12 sm:w-14 sm:h-14 rounded-xl overflow-hidden relative flex-shrink-0 bg-black shadow-md border border-white/10">
-                      <img 
-                        src={currentTrack.thumbnail || `https://i.ytimg.com/vi/${activeVideoId}/hqdefault.jpg`} 
-                        alt={currentTrack.title}
-                        className="w-full h-full object-cover"
-                        onError={(e) => { e.target.src = 'https://images.unsplash.com/photo-1518709268805-4e9042af9f23?w=300&auto=format&fit=crop&q=80'; }}
-                      />
-                      {isPlaying && (
-                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center">
-                          <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
-                        </div>
-                      )}
-                    </div>
-
-                    <div className="min-w-0 flex-1">
-                      <div className="flex items-center gap-1.5 mb-0.5">
-                        <span className="text-[10px] font-black uppercase text-red-400 bg-red-500/20 border border-red-500/30 px-1.5 py-0.2 rounded-md">
-                          កំពុងចាក់
-                        </span>
-                        {currentTrack.duration && (
-                          <span className="text-[10px] text-slate-400">{currentTrack.duration}</span>
-                        )}
+                    
+                    {/* Spinning Disc Visualizer */}
+                    <div className="relative z-10 space-y-3">
+                      <div className="w-20 h-20 mx-auto rounded-full bg-red-600/20 border-2 border-red-500/40 flex items-center justify-center shadow-lg">
+                        <Headphones className="w-9 h-9 text-red-400 animate-pulse" />
                       </div>
-                      <h4 className="text-xs sm:text-sm font-bold text-white truncate max-w-[260px] sm:max-w-md">
-                        {currentTrack.title}
-                      </h4>
-                      <p className="text-[11px] text-slate-400 truncate">
-                        {currentTrack.channel || 'YouTube Channel'}
-                      </p>
+
+                      <div className="space-y-1 max-w-[220px] mx-auto">
+                        <span className="px-2.5 py-0.5 rounded-full bg-emerald-500/20 text-emerald-300 border border-emerald-500/30 text-[10px] font-bold">
+                          ⚡ Audio Only • សន្សំថ្ម
+                        </span>
+                        <h4 className="text-xs font-bold text-white truncate pt-1">
+                          {currentTrack.title}
+                        </h4>
+                        <p className="text-[10px] text-slate-400 truncate">{currentTrack.channel}</p>
+                      </div>
+
+                      {/* Animated Soundwave Equalizer */}
+                      <div className="flex items-center justify-center gap-1 pt-1">
+                        {[0.3, 0.6, 0.9, 0.4, 0.8, 1, 0.5, 0.7, 0.3].map((h, i) => (
+                          <span 
+                            key={i} 
+                            className="w-1 bg-gradient-to-t from-red-600 to-amber-400 rounded-full animate-pulse"
+                            style={{ height: `${h * 20}px`, animationDelay: `${i * 0.1}s` }}
+                          />
+                        ))}
+                      </div>
                     </div>
-                  </div>
-
-                  {/* Player Controls */}
-                  <div className="flex items-center gap-2 flex-shrink-0 w-full sm:w-auto justify-end">
-                    {/* Play / Pause Toggle */}
-                    <button
-                      type="button"
-                      onClick={handleTogglePlay}
-                      className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-lg shadow-red-600/30 transition-transform active:scale-95"
-                    >
-                      {isPlaying ? <Pause className="w-4 h-4 fill-white" /> : <Play className="w-4 h-4 fill-white" />}
-                      <span>{isPlaying ? 'ផ្អាក (Pause)' : 'ចាក់ (Play)'}</span>
-                    </button>
-
-                    {/* Mute toggle */}
-                    <button
-                      type="button"
-                      onClick={handleToggleMute}
-                      className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-colors flex items-center gap-1 text-xs"
-                      title={isMuted ? "បើកសំឡេង" : "បិទសំឡេង"}
-                    >
-                      {isMuted ? <VolumeX className="w-4 h-4 text-red-400" /> : <Volume2 className="w-4 h-4 text-emerald-400" />}
-                    </button>
-
-                    {/* Stop button */}
-                    <button
-                      type="button"
-                      onClick={handleStopAndDismiss}
-                      className="px-3 py-2 rounded-xl bg-slate-800 hover:bg-red-500/20 text-slate-300 hover:text-red-400 border border-slate-700 text-xs font-bold transition-colors cursor-pointer"
-                      title="បញ្ឈប់តន្ត្រីទាំងស្រុង"
-                    >
-                      បញ្ឈប់
-                    </button>
-                  </div>
-
-                </div>
-
-                {/* Optional Video Screen or Audio Visualizer Screen */}
-                {showVideo ? (
-                  <div className="relative w-full aspect-video max-h-[300px] rounded-xl overflow-hidden bg-black border border-white/10 shadow-lg">
-                    <iframe
-                      src={embedUrl}
-                      title={currentTrack.title}
-                      allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                      allowFullScreen
-                      className="w-full h-full border-0"
-                    />
-                  </div>
-                ) : (
-                  <div className="w-full py-6 rounded-xl bg-gradient-to-b from-slate-900 via-slate-950 to-black border border-white/10 flex flex-col items-center justify-center text-center space-y-2 relative overflow-hidden">
-                    <div className="flex items-center justify-center gap-1">
-                      {[0.2, 0.5, 0.8, 1, 0.6, 0.9, 0.4, 0.7, 0.5, 0.3].map((h, i) => (
-                        <span 
-                          key={i} 
-                          className="w-1 bg-gradient-to-t from-red-600 to-amber-400 rounded-full animate-pulse"
-                          style={{ height: `${h * 24}px`, animationDelay: `${i * 0.1}s` }}
-                        />
-                      ))}
-                    </div>
-                    <span className="text-[11px] font-bold text-emerald-300">
-                      ⚡ របៀបសន្សំថ្ម & ស្តាប់តែសំឡេង (Audio Only Mode)
-                    </span>
                   </div>
                 )}
               </div>
 
-              {/* Navigation Tabs */}
-              <div className="flex items-center gap-2 border-b border-white/10 pb-2">
-                <button
-                  type="button"
-                  onClick={() => setActiveTab('search')}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
-                    activeTab === 'search'
-                      ? 'bg-red-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-white hover:bg-white/5'
-                  }`}
-                >
-                  <Search className="w-3.5 h-3.5" />
-                  <span>លទ្ធផលស្វែងរក ({searchResults.length})</span>
-                </button>
+              {/* Now Playing Track Details */}
+              <div className="bg-white/5 border border-white/10 rounded-2xl p-3.5 space-y-3">
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 mb-1">
+                    <span className="text-[9.5px] font-black uppercase text-red-400 bg-red-500/20 border border-red-500/30 px-1.5 py-0.2 rounded-md">
+                      {isPlaying ? 'កំពុងចាក់' : 'បានផ្អាក'}
+                    </span>
+                    {currentTrack.duration && (
+                      <span className="text-[10px] text-slate-400">{currentTrack.duration}</span>
+                    )}
+                  </div>
+                  <h4 className="text-sm font-bold text-white line-clamp-1 leading-snug">
+                    {currentTrack.title}
+                  </h4>
+                  <p className="text-xs text-slate-400 truncate mt-0.5">
+                    {currentTrack.channel || 'YouTube'}
+                  </p>
+                </div>
+
+                {/* Clean Control Buttons */}
+                <div className="flex items-center justify-between pt-1 border-t border-white/5">
+                  <div className="flex items-center gap-2">
+                    {/* Previous */}
+                    <button
+                      type="button"
+                      onClick={handlePrevTrack}
+                      className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-colors active:scale-95"
+                      title="បទមុន"
+                    >
+                      <SkipBack className="w-4 h-4" />
+                    </button>
+
+                    {/* Play / Pause */}
+                    <button
+                      type="button"
+                      onClick={handleTogglePlay}
+                      className="px-4 py-2 rounded-xl bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center gap-1.5 cursor-pointer shadow-md shadow-red-600/30 transition-transform active:scale-95"
+                    >
+                      {isPlaying ? <Pause className="w-4 h-4 fill-white" /> : <Play className="w-4 h-4 fill-white ml-0.5" />}
+                      <span>{isPlaying ? 'ផ្អាក' : 'ចាក់'}</span>
+                    </button>
+
+                    {/* Next */}
+                    <button
+                      type="button"
+                      onClick={handleNextTrack}
+                      className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-colors active:scale-95"
+                      title="បទបន្ទាប់"
+                    >
+                      <SkipForward className="w-4 h-4" />
+                    </button>
+                  </div>
+
+                  <div className="flex items-center gap-1.5">
+                    {/* Mute */}
+                    <button
+                      type="button"
+                      onClick={handleToggleMute}
+                      className="p-2 rounded-xl bg-white/10 hover:bg-white/20 text-white cursor-pointer transition-colors"
+                      title={isMuted ? "បើកសំឡេង" : "បិទសំឡេង"}
+                    >
+                      {isMuted ? <VolumeX className="w-4 h-4 text-red-400" /> : <Volume2 className="w-4 h-4 text-slate-200" />}
+                    </button>
+
+                    {/* Stop & Dismiss */}
+                    <button
+                      type="button"
+                      onClick={handleStopAndDismiss}
+                      className="px-2.5 py-2 rounded-xl bg-slate-800 hover:bg-red-500/20 text-slate-300 hover:text-red-400 border border-slate-700 text-xs font-bold transition-colors cursor-pointer"
+                      title="បញ្ឈប់តន្ត្រីទាំងស្រុង"
+                    >
+                      <Square className="w-3.5 h-3.5 fill-current" />
+                    </button>
+                  </div>
+                </div>
+              </div>
+
+            </div>
+
+            {/* ================================================================= */}
+            {/* COLUMN 2: SEARCH & TRACKLIST (Right 7 Cols)                       */}
+            {/* ================================================================= */}
+            <div className="lg:col-span-7 flex flex-col space-y-3.5 min-h-[360px]">
+              
+              {/* Minimal Search Bar */}
+              <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 flex-shrink-0">
+                <div className="relative flex-1">
+                  <input
+                    ref={searchInputRef}
+                    type="text"
+                    placeholder="ស្វែងរកបទចម្រៀង ឬតារាចម្រៀង (ឧ. VannDa, Taylor Swift, Lofi...)"
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full bg-slate-950/80 border border-white/15 rounded-xl pl-10 pr-9 py-2.5 text-xs sm:text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                  />
+                  <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
+                  {searchQuery && (
+                    <button
+                      type="button"
+                      onClick={() => setSearchQuery('')}
+                      className="p-1 rounded-lg text-slate-400 hover:text-white absolute right-2.5 top-2.5 cursor-pointer"
+                    >
+                      <X className="w-3.5 h-3.5" />
+                    </button>
+                  )}
+                </div>
 
                 <button
-                  type="button"
-                  onClick={() => setActiveTab('curated')}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
-                    activeTab === 'curated'
-                      ? 'bg-red-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-white hover:bg-white/5'
-                  }`}
+                  type="submit"
+                  disabled={isSearching}
+                  className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-md transition-transform active:scale-95 cursor-pointer flex-shrink-0"
                 >
-                  <Radio className="w-3.5 h-3.5" />
-                  <span>ស្ថានីយគំរូ (Curated Stations)</span>
+                  {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
+                  <span>ស្វែងរក</span>
                 </button>
+              </form>
 
+              {/* Category Quick Tags */}
+              <div className="flex items-center gap-1.5 overflow-x-auto pb-1 [scrollbar-width:none] flex-shrink-0">
+                {POPULAR_SEARCH_TAGS.map((tag) => {
+                  const isSelected = activeTag === tag.label;
+                  return (
+                    <button
+                      key={tag.label}
+                      type="button"
+                      onClick={() => handleQuickTagClick(tag)}
+                      className={`px-3 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition-all cursor-pointer ${
+                        isSelected
+                          ? 'bg-red-600 text-white shadow-xs'
+                          : 'bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white border border-white/5'
+                      }`}
+                    >
+                      {tag.label}
+                    </button>
+                  );
+                })}
+              </div>
+
+              {/* Direct URL Toggle Link */}
+              <div className="flex items-center justify-between text-xs text-slate-400 px-0.5 flex-shrink-0">
+                <span className="font-semibold text-white/90">
+                  {searchResults.length > 0 ? `លទ្ធផលស្វែងរក (${searchResults.length})` : 'លទ្ធផលស្វែងរក'}
+                </span>
+                
                 <button
                   type="button"
-                  onClick={() => setActiveTab('url')}
-                  className={`px-3.5 py-1.5 rounded-xl text-xs font-bold transition-all cursor-pointer flex items-center gap-2 ${
-                    activeTab === 'url'
-                      ? 'bg-red-600 text-white shadow-md'
-                      : 'text-slate-400 hover:text-white hover:bg-white/5'
-                  }`}
+                  onClick={() => setShowUrlInput(!showUrlInput)}
+                  className="text-slate-400 hover:text-red-400 text-xs font-medium flex items-center gap-1 cursor-pointer transition-colors"
                 >
-                  <ExternalLink className="w-3.5 h-3.5" />
-                  <span>ដាក់តំណភ្ជាប់ (Paste URL)</span>
+                  <LinkIcon className="w-3 h-3" />
+                  <span>{showUrlInput ? 'លាក់តំណភ្ជាប់' : 'ចាក់តាមតំណភ្ជាប់ផ្ទាល់ខ្លួន (Paste URL)'}</span>
                 </button>
               </div>
 
-              {/* ========================================================================= */}
-              {/* TAB 1: LIVE SEARCH RESULTS                                                */}
-              {/* ========================================================================= */}
-              {activeTab === 'search' && (
-                <div className="space-y-3">
-                  {isSearching ? (
-                    <div className="py-12 text-center space-y-3">
-                      <Loader2 className="w-8 h-8 text-red-500 animate-spin mx-auto" />
-                      <p className="text-xs text-slate-400">កំពុងស្វែងរកបទចម្រៀងលើ YouTube ជូនប្អូន...</p>
-                    </div>
-                  ) : searchError ? (
-                    <div className="p-6 bg-red-950/20 border border-red-500/30 rounded-2xl text-center space-y-2">
-                      <AlertCircle className="w-6 h-6 text-red-400 mx-auto" />
-                      <p className="text-xs text-red-300">{searchError}</p>
-                    </div>
-                  ) : searchResults.length > 0 ? (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5 max-h-[380px] overflow-y-auto pr-1">
-                      {searchResults.map((track) => {
-                        const isCurrent = activeVideoId === track.id;
-                        return (
-                          <div
-                            key={track.id}
-                            onClick={() => handlePlayVideo(track)}
-                            className={`p-2.5 rounded-2xl border transition-all cursor-pointer flex items-center gap-3 group relative overflow-hidden ${
-                              isCurrent
-                                ? 'bg-red-950/40 border-red-500/60 ring-2 ring-red-500/30 shadow-md'
-                                : 'bg-white/5 border-white/10 hover:border-white/25 hover:bg-white/8'
-                            }`}
-                          >
-                            {/* Thumbnail */}
-                            <div className="w-16 h-14 rounded-xl overflow-hidden relative flex-shrink-0 shadow-md bg-black">
-                              <img 
-                                src={track.thumbnail} 
-                                alt={track.title}
-                                className="w-full h-full object-cover group-hover:scale-105 transition-transform"
-                                onError={(e) => { e.target.src = `https://i.ytimg.com/vi/${track.id}/hqdefault.jpg`; }}
-                              />
-                              {track.duration && (
-                                <span className="absolute bottom-1 right-1 bg-black/80 text-white text-[9px] font-bold px-1 rounded">
-                                  {track.duration}
-                                </span>
-                              )}
-                              <div className={`absolute inset-0 bg-black/40 flex items-center justify-center ${isCurrent ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`}>
-                                {isCurrent && isPlaying ? (
-                                  <span className="w-3 h-3 rounded-full bg-red-500 animate-ping" />
-                                ) : (
-                                  <Play className="w-4 h-4 fill-white text-white" />
-                                )}
-                              </div>
-                            </div>
-
-                            {/* Details */}
-                            <div className="min-w-0 flex-1">
-                              <h5 className="text-xs font-bold text-white line-clamp-2 group-hover:text-red-300 transition-colors leading-snug">
-                                {track.title}
-                              </h5>
-                              <p className="text-[10px] text-slate-400 truncate mt-1 flex items-center gap-1">
-                                <span>{track.channel || 'YouTube'}</span>
-                              </p>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  ) : null}
-                </div>
+              {/* Collapsible Direct URL Drawer */}
+              {showUrlInput && (
+                <form onSubmit={handleLoadCustomUrl} className="p-3 bg-white/5 border border-white/10 rounded-xl space-y-2 flex-shrink-0 animate-fadeIn">
+                  <div className="flex items-center gap-2">
+                    <input
+                      type="text"
+                      placeholder="បិទភ្ជាប់តំណ YouTube: https://www.youtube.com/watch?v=..."
+                      value={customUrl}
+                      onChange={(e) => {
+                        setCustomUrl(e.target.value);
+                        setUrlError('');
+                      }}
+                      className="flex-1 bg-slate-950 border border-slate-700 rounded-lg px-3 py-2 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-red-500 font-mono"
+                    />
+                    <button
+                      type="submit"
+                      disabled={!customUrl.trim()}
+                      className="px-3.5 py-2 rounded-lg bg-red-600 hover:bg-red-700 text-white font-bold text-xs flex items-center gap-1 cursor-pointer disabled:opacity-50"
+                    >
+                      <Play className="w-3 h-3 fill-white" />
+                      <span>ចាក់</span>
+                    </button>
+                  </div>
+                  {urlError && (
+                    <p className="text-[11px] text-rose-400 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3 flex-shrink-0" />
+                      <span>{urlError}</span>
+                    </p>
+                  )}
+                </form>
               )}
 
-              {/* ========================================================================= */}
-              {/* TAB 2: CURATED STUDY STATIONS                                             */}
-              {/* ========================================================================= */}
-              {activeTab === 'curated' && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-2.5">
-                  {DEFAULT_STUDY_TRACKS.map((track) => {
-                    const isCurrent = activeVideoId === track.id;
-                    return (
-                      <div
-                        key={track.id}
-                        onClick={() => handlePlayVideo(track)}
-                        className={`p-2.5 rounded-2xl border transition-all cursor-pointer flex items-center gap-3 group relative overflow-hidden ${
-                          isCurrent
-                            ? 'bg-red-950/40 border-red-500/60 ring-2 ring-red-500/30'
-                            : 'bg-white/5 border-white/10 hover:border-white/25 hover:bg-white/8'
-                        }`}
-                      >
-                        <div className="w-14 h-14 rounded-xl overflow-hidden relative flex-shrink-0 shadow-md">
+              {/* Clean Track Rows List */}
+              <div className="flex-1 overflow-y-auto pr-1 space-y-1.5 max-h-[380px] [scrollbar-width:thin]">
+                {isSearching ? (
+                  <div className="py-12 text-center space-y-2">
+                    <Loader2 className="w-6 h-6 text-red-500 animate-spin mx-auto" />
+                    <p className="text-xs text-slate-400">កំពុងស្វែងរកបទចម្រៀង...</p>
+                  </div>
+                ) : searchError ? (
+                  <div className="py-10 text-center space-y-2">
+                    <AlertCircle className="w-6 h-6 text-slate-500 mx-auto" />
+                    <p className="text-xs text-slate-400">{searchError}</p>
+                  </div>
+                ) : searchResults.map((track) => {
+                  const isCurrent = activeVideoId === track.id;
+                  return (
+                    <div
+                      key={track.id}
+                      onClick={() => handleSelectTrack(track)}
+                      className={`p-2 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-3 group ${
+                        isCurrent
+                          ? 'bg-red-600/15 border-red-500/50 text-white shadow-xs'
+                          : 'bg-white/5 hover:bg-white/10 border-white/5 hover:border-white/15 text-slate-300'
+                      }`}
+                    >
+                      {/* Thumbnail & Track Name */}
+                      <div className="flex items-center gap-3 min-w-0 flex-1">
+                        <div className="relative w-12 h-10 rounded-lg overflow-hidden flex-shrink-0 bg-black shadow-xs">
                           <img 
-                            src={track.thumbnail} 
+                            src={track.thumbnail || `https://i.ytimg.com/vi/${track.id}/hqdefault.jpg`} 
                             alt={track.title}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform"
+                            onError={(e) => { e.target.src = `https://i.ytimg.com/vi/${track.id}/hqdefault.jpg`; }}
                           />
-                          <div className={`absolute inset-0 bg-black/40 flex items-center justify-center ${isCurrent ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'} transition-opacity`}>
+                          <div className={`absolute inset-0 bg-black/40 flex items-center justify-center transition-opacity ${
+                            isCurrent ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'
+                          }`}>
                             {isCurrent && isPlaying ? (
                               <span className="w-2.5 h-2.5 rounded-full bg-red-500 animate-ping" />
                             ) : (
-                              <Play className="w-4 h-4 fill-white text-white" />
+                              <Play className="w-3.5 h-3.5 fill-white text-white" />
                             )}
                           </div>
                         </div>
 
                         <div className="min-w-0 flex-1">
-                          <span className="text-[9px] px-1.5 py-0.2 rounded-md bg-white/10 text-red-300 font-bold mb-1 inline-block">
-                            {track.category}
-                          </span>
-                          <h5 className="text-xs font-bold text-white truncate group-hover:text-red-300 transition-colors">
+                          <h5 className={`text-xs font-bold truncate ${
+                            isCurrent ? 'text-red-300' : 'text-white group-hover:text-red-300'
+                          }`}>
                             {track.title}
                           </h5>
-                          <p className="text-[10px] text-slate-400 truncate mt-0.5">
-                            {track.channel}
+                          <p className="text-[10.5px] text-slate-400 truncate mt-0.5">
+                            {track.channel || 'YouTube'}
                           </p>
                         </div>
                       </div>
-                    );
-                  })}
-                </div>
-              )}
 
-              {/* ========================================================================= */}
-              {/* TAB 3: CUSTOM URL PASTE                                                  */}
-              {/* ========================================================================= */}
-              {activeTab === 'url' && (
-                <div className="p-4 bg-white/5 border border-white/10 rounded-2xl space-y-3">
-                  <div>
-                    <h4 className="text-sm font-bold text-white mb-1">
-                      បិទភ្ជាប់តំណ YouTube ណាមួយដែលប្អូនចូលចិត្ត
-                    </h4>
-                    <p className="text-xs text-slate-400">
-                      ប្អូនអាចដាក់តំណភ្ជាប់បទចម្រៀង ឬបញ្ជីចាក់ (Playlist) ពី YouTube ដូចជា acoustic, podcast ឬវីដេអូបង្រៀនបានទាំងអស់!
-                    </p>
-                  </div>
+                      {/* Duration & Play Action */}
+                      <div className="flex items-center gap-2 flex-shrink-0">
+                        {track.duration && (
+                          <span className="text-[10px] text-slate-400 font-mono">
+                            {track.duration}
+                          </span>
+                        )}
+                        <button
+                          type="button"
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleSelectTrack(track);
+                          }}
+                          className={`w-7 h-7 rounded-lg flex items-center justify-center transition-colors ${
+                            isCurrent && isPlaying
+                              ? 'bg-red-600 text-white'
+                              : 'bg-white/10 hover:bg-red-600 text-white'
+                          }`}
+                        >
+                          {isCurrent && isPlaying ? <Pause className="w-3 h-3 fill-white" /> : <Play className="w-3 h-3 fill-white ml-0.5" />}
+                        </button>
+                      </div>
 
-                  <form onSubmit={handleLoadCustomUrl} className="space-y-3">
-                    <div className="flex items-center gap-2">
-                      <input
-                        type="text"
-                        placeholder="ឧទាហរណ៍៖ https://www.youtube.com/watch?v=..."
-                        value={customUrl}
-                        onChange={(e) => {
-                          setCustomUrl(e.target.value);
-                          setUrlError('');
-                        }}
-                        className="flex-1 bg-slate-950 border border-slate-700 rounded-xl px-4 py-2.5 text-xs text-white placeholder:text-slate-500 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20 font-mono"
-                      />
-                      <button
-                        type="submit"
-                        disabled={!customUrl.trim()}
-                        className="px-4 py-2.5 rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold text-xs flex items-center gap-1.5 shadow-md transition-transform active:scale-95 cursor-pointer disabled:cursor-not-allowed"
-                      >
-                        <Play className="w-3.5 h-3.5 fill-white" />
-                        <span>ចាក់បទនេះ</span>
-                      </button>
                     </div>
-
-                    {urlError && (
-                      <p className="text-xs text-rose-400 flex items-center gap-1.5">
-                        <AlertCircle className="w-3.5 h-3.5 flex-shrink-0" />
-                        <span>{urlError}</span>
-                      </p>
-                    )}
-                  </form>
-                </div>
-              )}
-
-            </div>
-
-            {/* Footer */}
-            <div className="px-5 py-3 bg-slate-950/80 border-t border-white/10 flex items-center justify-between text-xs text-slate-400">
-              <div className="flex items-center gap-2 truncate max-w-[60%]">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse flex-shrink-0" />
-                <span className="text-slate-300 font-medium truncate">កំពុងចាក់៖ <strong>{currentTrack.title}</strong></span>
+                  );
+                })}
               </div>
-              <button
-                type="button"
-                onClick={() => onClose && onClose(false)}
-                className="px-4 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold transition-colors cursor-pointer flex-shrink-0"
-              >
-                បិទផ្ទាំង (តន្ត្រីនៅតែបន្តចាក់)
-              </button>
+
             </div>
 
           </div>
-        </div>,
-        document.body
-      )}
+
+          {/* Minimal Bottom Bar */}
+          <div className="px-5 py-2.5 bg-slate-900/90 border-t border-white/10 flex items-center justify-between text-xs text-slate-400 flex-shrink-0">
+            <div className="flex items-center gap-2 truncate max-w-[70%]">
+              <span className={`w-2 h-2 rounded-full ${isPlaying ? 'bg-emerald-400 animate-pulse' : 'bg-slate-500'}`} />
+              <span className="truncate">
+                {isPlaying ? `កំពុងចាក់៖ ${currentTrack.title}` : `បានផ្អាក៖ ${currentTrack.title}`}
+              </span>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => onClose && onClose(false)}
+              className="px-3 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 text-white font-bold text-xs transition-colors cursor-pointer"
+            >
+              បិទផ្ទាំង (រក្សាតន្ត្រីឱ្យនៅចាក់)
+            </button>
+          </div>
+
+        </div>
+      </div>
     </>
   );
 }
