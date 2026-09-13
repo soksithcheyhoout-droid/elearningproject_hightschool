@@ -1620,21 +1620,21 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
           <div className="p-3 sm:p-6 md:p-8 flex-1 flex flex-col justify-between overflow-y-auto space-y-4 sm:space-y-6 animate-fade-in relative z-10">
             
             {/* ═══ AAA VALORANT TACTICAL TOP HUD BAR ═══ */}
-            <div className="flex flex-col lg:flex-row items-center justify-between gap-3 bg-[#060b14]/95 p-2.5 sm:p-3 rounded-2xl border border-cyan-500/25 shadow-2xl relative overflow-hidden backdrop-blur-2xl">
+            <div className="flex flex-col sm:flex-row items-center justify-between gap-3 bg-[#060b14]/95 p-3 rounded-2xl border border-cyan-500/25 shadow-2xl relative overflow-hidden backdrop-blur-2xl">
               {/* Corner Sci-Fi Accent Marks */}
               <div className="absolute top-0 left-0 w-20 h-[2px] bg-gradient-to-r from-[#00f5d4] to-transparent pointer-events-none" />
               <div className="absolute bottom-0 right-0 w-20 h-[2px] bg-gradient-to-l from-[#ff4655] to-transparent pointer-events-none" />
               <div className="absolute top-0 right-0 w-[2px] h-4 bg-[#ff4655] pointer-events-none" />
               <div className="absolute bottom-0 left-0 w-[2px] h-4 bg-[#00f5d4] pointer-events-none" />
 
-              {/* POD 1: PIN CODE + QUICK INVITE + CHANNELS */}
-              <div className="flex items-center gap-2 w-full lg:w-auto flex-wrap sm:flex-nowrap">
+              {/* LEFT: ROOM ACCESS & INVITE CONTROLS */}
+              <div className="flex items-center gap-2 flex-wrap sm:flex-nowrap">
                 {/* Tactical Room PIN Badge */}
-                <div className="flex items-center bg-[#0c1422] border border-amber-500/35 hover:border-amber-400/60 rounded-xl overflow-hidden h-10 shadow-sm transition-all">
+                <div className="flex items-center bg-[#0c1422] border border-amber-500/40 hover:border-amber-400/70 rounded-xl overflow-hidden h-10 shadow-sm transition-all flex-shrink-0">
                   <div className="px-3 flex items-center gap-1.5 border-r border-amber-500/20 bg-amber-500/10 h-full">
-                    <KeyRound className="w-4 h-4 text-amber-400" />
-                    <span className="text-[10px] font-mono font-black text-slate-400 uppercase tracking-wider">PIN //</span>
-                    <span className="text-sm font-mono font-black text-amber-300 tracking-widest">#{roomCode}</span>
+                    <KeyRound className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                    <span className="text-[10px] font-mono font-black text-slate-400 uppercase tracking-wider whitespace-nowrap">PIN //</span>
+                    <span className="text-sm font-mono font-black text-amber-300 tracking-widest whitespace-nowrap">#{roomCode}</span>
                   </div>
                   <button
                     type="button"
@@ -1643,17 +1643,17 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                       setCopied(true);
                       setTimeout(() => setCopied(false), 2000);
                     }}
-                    className="px-3 h-full hover:bg-amber-500/20 text-[11px] font-mono font-black text-amber-300 transition-colors cursor-pointer flex items-center gap-1.5 active:scale-95"
+                    className="px-3 h-full hover:bg-amber-500/20 text-[11px] font-mono font-black text-amber-300 transition-colors cursor-pointer flex items-center gap-1.5 whitespace-nowrap active:scale-95"
                     title="Copy Match PIN"
                   >
                     {copied ? (
                       <>
-                        <Check className="w-3.5 h-3.5 text-emerald-400" />
-                        <span className="text-emerald-400">COPIED</span>
+                        <Check className="w-3.5 h-3.5 text-emerald-400 flex-shrink-0" />
+                        <span className="text-emerald-400 font-black">COPIED</span>
                       </>
                     ) : (
                       <>
-                        <Copy className="w-3.5 h-3.5 text-amber-400" />
+                        <Copy className="w-3.5 h-3.5 text-amber-400 flex-shrink-0" />
                         <span>COPY</span>
                       </>
                     )}
@@ -1664,19 +1664,19 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                 <button
                   type="button"
                   onClick={handleCopyLink}
-                  className="h-10 px-3.5 rounded-xl bg-[#0c1422] hover:bg-[#121c2e] border border-slate-700/80 hover:border-cyan-400/50 text-slate-200 hover:text-white text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-2 shadow-xs active:scale-95"
+                  className="h-10 px-3.5 rounded-xl bg-[#0c1422] hover:bg-[#121c2e] border border-slate-700/80 hover:border-cyan-400/50 text-slate-200 hover:text-white text-xs font-mono font-bold transition-all cursor-pointer flex items-center gap-2 shadow-xs active:scale-95 whitespace-nowrap flex-shrink-0"
                   title="Copy Match Invite Link"
                 >
-                  <Share2 className="w-3.5 h-3.5 text-cyan-400" />
-                  <span className="hidden sm:inline">INVITE LINK</span>
+                  <Share2 className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
+                  <span>INVITE LINK</span>
                 </button>
 
                 {/* Tactical Mini Share Buttons */}
-                <div className="flex items-center gap-1.5">
+                <div className="flex items-center gap-1.5 flex-shrink-0">
                   <button
                     type="button"
                     onClick={handleShareTelegram}
-                    className="w-10 h-10 rounded-xl bg-[#0c1422] hover:bg-[#229ED9]/20 border border-slate-700/80 hover:border-[#229ED9]/60 text-[#229ED9] transition-all cursor-pointer flex items-center justify-center shadow-xs active:scale-95"
+                    className="w-10 h-10 rounded-xl bg-[#0c1422] hover:bg-[#229ED9]/20 border border-slate-700/80 hover:border-[#229ED9]/60 text-[#229ED9] transition-all cursor-pointer flex items-center justify-center shadow-xs active:scale-95 flex-shrink-0"
                     title="Share via Telegram"
                   >
                     <Send className="w-4 h-4" />
@@ -1684,7 +1684,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                   <button
                     type="button"
                     onClick={handleShareFacebook}
-                    className="w-10 h-10 rounded-xl bg-[#0c1422] hover:bg-[#1877F2]/20 border border-slate-700/80 hover:border-[#1877F2]/60 text-[#1877F2] transition-all cursor-pointer flex items-center justify-center shadow-xs active:scale-95"
+                    className="w-10 h-10 rounded-xl bg-[#0c1422] hover:bg-[#1877F2]/20 border border-slate-700/80 hover:border-[#1877F2]/60 text-[#1877F2] transition-all cursor-pointer flex items-center justify-center shadow-xs active:scale-95 flex-shrink-0"
                     title="Share via Facebook"
                   >
                     <Share2 className="w-4 h-4" />
@@ -1692,46 +1692,31 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                 </div>
               </div>
 
-              {/* POD 2: COMPETITIVE TELEMETRY (Center) */}
-              <div className="hidden xl:flex items-center gap-2.5 text-[11px] font-mono">
-                <div className="flex items-center gap-2 px-3.5 h-10 rounded-xl bg-[#0c1422] border border-white/10 text-slate-300">
-                  <span className="w-2 h-2 rounded-full bg-[#00f5d4] animate-pulse shadow-[0_0_10px_#00f5d4]" />
-                  <span className="font-black text-white tracking-wider">128 TICK</span>
-                  <span className="text-slate-600">//</span>
-                  <span className="text-slate-400">TACTICAL HUD</span>
-                </div>
-
-                <div className="flex items-center gap-2 px-3.5 h-10 rounded-xl bg-[#0c1422] border border-cyan-500/30 text-cyan-300">
-                  <span className="font-bold">ថ្នាក់ទី {KHMER_NUMS[selectedGrade - 1]}</span>
-                  <span className="text-slate-600">•</span>
-                  <span className="text-amber-300 font-bold uppercase">{selectedStream === 'social' ? 'វិទ្យាសាស្ត្រសង្គម' : 'វិទ្យាសាស្ត្រពិត'}</span>
-                </div>
-              </div>
-
-              {/* POD 3: CONFIGURATION DRAWER & MODE TOGGLES (Right) */}
-              <div className="flex items-center gap-2 w-full lg:w-auto justify-end">
+              {/* RIGHT: MATCH CONFIGURATION & LOBBY / JOIN PIN TABS */}
+              <div className="flex items-center gap-2.5 flex-wrap sm:flex-nowrap justify-end">
                 {isHost && (
                   <button
                     type="button"
                     onClick={() => setShowGradeSettings(!showGradeSettings)}
-                    className={`h-10 px-4 rounded-xl text-xs font-mono font-bold border transition-all cursor-pointer flex items-center gap-2 active:scale-95 ${
+                    className={`h-10 px-3.5 rounded-xl text-xs font-mono font-bold border transition-all cursor-pointer flex items-center gap-2 active:scale-95 whitespace-nowrap flex-shrink-0 ${
                       showGradeSettings
                         ? 'bg-amber-500/20 text-amber-300 border-amber-500/60 shadow-[0_0_15px_rgba(245,158,11,0.3)]'
-                        : 'bg-[#0c1422] hover:bg-[#121c2e] text-slate-300 hover:text-white border-slate-700/80 hover:border-amber-400/50'
+                        : 'bg-[#0c1422] hover:bg-[#121c2e] text-slate-200 hover:text-white border-slate-700/80 hover:border-amber-400/50'
                     }`}
                     title="កំណត់កម្រិតថ្នាក់ & ផ្នែកប្រកួត"
                   >
-                    <GraduationCap className="w-4 h-4 text-amber-400" />
-                    <span>G{selectedGrade} {showGradeSettings ? '▲ CLOSE' : '⚙️ CONFIG'}</span>
+                    <GraduationCap className="w-4 h-4 text-amber-400 flex-shrink-0" />
+                    <span>ថ្នាក់ទី {KHMER_NUMS[selectedGrade - 1]} • {selectedStream === 'social' ? 'វិទ្យាសាស្ត្រសង្គម' : 'វិទ្យាសាស្ត្រពិត'}</span>
+                    <span className="text-amber-400 text-[11px] ml-0.5">{showGradeSettings ? '▲ បិទ' : '⚙️ កំណត់ថ្នាក់'}</span>
                   </button>
                 )}
 
                 {/* Tactical Segmented Switch: LOBBY vs JOIN PIN */}
-                <div className="flex items-center p-1 rounded-xl bg-[#040810] border border-slate-800 h-10 shadow-inner">
+                <div className="flex items-center p-1 rounded-xl bg-[#040810] border border-slate-800 h-10 shadow-inner flex-shrink-0">
                   <button
                     type="button"
                     onClick={() => setTab('host')}
-                    className={`px-4 h-full rounded-lg text-xs font-mono font-black tracking-wider transition-all cursor-pointer flex items-center ${
+                    className={`px-4 h-full rounded-lg text-xs font-mono font-black tracking-wider transition-all cursor-pointer flex items-center whitespace-nowrap ${
                       tab === 'host'
                         ? 'bg-[#ff4655] text-white shadow-[0_0_16px_rgba(255,70,85,0.6)]'
                         : 'text-slate-400 hover:text-white'
@@ -1742,7 +1727,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                   <button
                     type="button"
                     onClick={() => setTab('join')}
-                    className={`px-4 h-full rounded-lg text-xs font-mono font-black tracking-wider transition-all cursor-pointer flex items-center ${
+                    className={`px-4 h-full rounded-lg text-xs font-mono font-black tracking-wider transition-all cursor-pointer flex items-center whitespace-nowrap ${
                       tab === 'join'
                         ? 'bg-[#ff4655] text-white shadow-[0_0_16px_rgba(255,70,85,0.6)]'
                         : 'text-slate-400 hover:text-white'
