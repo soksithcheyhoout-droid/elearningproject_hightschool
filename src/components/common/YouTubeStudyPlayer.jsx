@@ -17,7 +17,8 @@ import {
   Minus,
   Link as LinkIcon,
   ChevronLeft,
-  ChevronRight
+  ChevronRight,
+  Maximize2
 } from 'lucide-react';
 
 // Extract YouTube Video ID from any URL format or bare ID
@@ -172,21 +173,15 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     sendIframeCommand('listening');
     setTimeout(() => {
       sendIframeCommand('listening');
-      if (isMuted) {
-        sendIframeCommand('mute');
-        sendIframeCommand('setVolume', [0]);
-      } else {
-        sendIframeCommand('unMute');
-        sendIframeCommand('setVolume', [volume]);
-      }
+      sendIframeCommand('unMute');
+      sendIframeCommand('setVolume', [volume > 0 ? volume : 80]);
+      setIsMuted(false);
     }, 400);
     setTimeout(() => {
-      if (!isMuted) {
-        sendIframeCommand('unMute');
-        sendIframeCommand('setVolume', [volume]);
-      }
+      sendIframeCommand('unMute');
+      sendIframeCommand('setVolume', [volume > 0 ? volume : 80]);
     }, 900);
-  }, [isMuted, volume, sendIframeCommand]);
+  }, [volume, sendIframeCommand]);
 
   // Toggle Play / Pause
   const handleTogglePlay = useCallback(() => {
@@ -206,20 +201,27 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     setIsPlaying(false);
   }, [sendIframeCommand]);
 
+  // Proactively unmute and activate sound reliably (never stay on "close" / VolumeX)
+  const handleUnmuteAndPlay = useCallback(() => {
+    const targetVol = volume > 0 ? volume : 100;
+    setIsMuted(false);
+    setVolume(targetVol);
+    sendIframeCommand('unMute');
+    sendIframeCommand('setVolume', [targetVol]);
+    sendIframeCommand('playVideo');
+    setIsPlaying(true);
+  }, [volume, sendIframeCommand]);
+
   // Toggle Mute / Unmute
   const handleToggleMute = useCallback(() => {
     if (isMuted) {
-      const restoreVol = volume > 0 ? volume : 80;
-      setIsMuted(false);
-      setVolume(restoreVol);
-      sendIframeCommand('unMute');
-      sendIframeCommand('setVolume', [restoreVol]);
+      handleUnmuteAndPlay();
     } else {
       setIsMuted(true);
       sendIframeCommand('mute');
       sendIframeCommand('setVolume', [0]);
     }
-  }, [isMuted, volume, sendIframeCommand]);
+  }, [isMuted, handleUnmuteAndPlay, sendIframeCommand]);
 
   // Handle Smooth Volume Slider Change
   const handleVolumeChange = useCallback((newVal) => {
@@ -289,6 +291,51 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     handleVolumeChange(newVol);
     setShowVolumePopup(true);
   }, [isMuted, volume, handleVolumeChange]);
+
+  // Handle Main Sound Button Click on Video Canvas:
+  // - If muted, unmutes immediately and plays sound
+  // - Ensures iframe is unmuted and active
+  // - Toggles volume popup slider open/close
+  // - NEVER accidentally mutes or shows "close" (VolumeX)
+  const handleMainSoundButtonClick = useCallback((e) => {
+    e.stopPropagation();
+    if (isMuted || volume === 0) {
+      handleUnmuteAndPlay();
+    } else {
+      sendIframeCommand('unMute');
+      sendIframeCommand('setVolume', [volume]);
+    }
+    setShowVolumePopup(prev => !prev);
+  }, [isMuted, volume, handleUnmuteAndPlay, sendIframeCommand]);
+
+  // Handle Popup Mute Toggle Button
+  const handlePopupMuteToggle = useCallback((e) => {
+    e.stopPropagation();
+    if (isMuted || volume === 0) {
+      handleUnmuteAndPlay();
+    } else {
+      setIsMuted(true);
+      sendIframeCommand('mute');
+      sendIframeCommand('setVolume', [0]);
+    }
+  }, [isMuted, volume, handleUnmuteAndPlay, sendIframeCommand]);
+
+  // Toggle Fullscreen on video container
+  const handleToggleFullscreen = useCallback(() => {
+    const el = iframeRef.current?.parentElement;
+    if (!el) return;
+    if (!document.fullscreenElement) {
+      if (el.requestFullscreen) {
+        el.requestFullscreen().catch(err => console.warn(err));
+      } else if (el.webkitRequestFullscreen) {
+        el.webkitRequestFullscreen();
+      }
+    } else {
+      if (document.exitFullscreen) {
+        document.exitFullscreen().catch(err => console.warn(err));
+      }
+    }
+  }, []);
 
   // Click outside listener to dismiss vertical volume capsule on mobile
   useEffect(() => {
@@ -406,8 +453,8 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     setShowUrlInput(false);
   };
 
-  // Construct iframe embed URL with playsinline=1 for smooth mobile iOS Safari playback
-  const embedUrl = `https://www.youtube.com/embed/${activeVideoId}?enablejsapi=1&autoplay=1&playsinline=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}&rel=0&iv_load_policy=3&modestbranding=1`;
+  // Construct iframe embed URL with controls=0 (removes native YouTube top bar & native 🔊x clutter) and playsinline=1
+  const embedUrl = `https://www.youtube.com/embed/${activeVideoId}?enablejsapi=1&autoplay=1&controls=0&playsinline=1&origin=${typeof window !== 'undefined' ? window.location.origin : ''}&rel=0&iv_load_policy=3&modestbranding=1&disablekb=1&fs=0`;
 
   return (
     <>
@@ -458,100 +505,6 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
 
             {/* Header Actions */}
             <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
-              
-              {/* Sound / Volume Button with Interactive Vertical Capsule Slider Popup (Image 2) */}
-              <div 
-                ref={volumeContainerRef}
-                className="relative"
-                onMouseEnter={() => setShowVolumePopup(true)}
-                onMouseLeave={() => !isDraggingVolume && setShowVolumePopup(false)}
-                onWheel={handleWheelVolume}
-              >
-                <button
-                  type="button"
-                  onClick={() => setShowVolumePopup(prev => !prev)}
-                  className={`h-8 px-2 sm:px-2.5 rounded-xl border text-xs font-semibold transition-all flex items-center gap-1.5 cursor-pointer select-none active:scale-95 ${
-                    isMuted || volume === 0
-                      ? 'bg-rose-500/20 text-rose-400 border-rose-500/40 shadow-xs'
-                      : showVolumePopup
-                      ? 'bg-emerald-500/25 text-emerald-300 border-emerald-500/40 shadow-xs ring-2 ring-emerald-500/20'
-                      : 'bg-white/10 hover:bg-white/20 text-white border-white/15'
-                  }`}
-                  title="Sound Volume (Click on mobile, scroll mouse on laptop)"
-                >
-                  {isMuted || volume === 0 ? (
-                    <VolumeX className="w-3.5 h-3.5 text-rose-400" />
-                  ) : (
-                    <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
-                  )}
-                  <span className="text-[11px] font-mono font-bold hidden min-[460px]:inline">
-                    {isMuted || volume === 0 ? '0%' : `${volume}%`}
-                  </span>
-                </button>
-
-                {/* THE VERTICAL VOLUME CAPSULE POPUP (EXACTLY LIKE USER IMAGE 2) */}
-                {showVolumePopup && (
-                  <div 
-                    className="absolute top-full right-0 mt-2 z-50 animate-fadeIn"
-                    onWheel={handleWheelVolume}
-                  >
-                    {/* Capsule Pill Container matching Image 2 */}
-                    <div className="w-11 sm:w-12 h-44 sm:h-48 bg-[#090e1a]/95 backdrop-blur-xl border border-white/25 rounded-full shadow-[0_15px_45px_rgba(0,0,0,0.9)] flex flex-col items-center justify-between py-3 select-none ring-1 ring-white/10">
-                      
-                      {/* Top: Speaker Mute / Unmute Button */}
-                      <button
-                        type="button"
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleToggleMute();
-                        }}
-                        className="w-7 h-7 rounded-full flex items-center justify-center text-white hover:text-red-400 active:scale-90 transition-all cursor-pointer"
-                        title={isMuted ? "Unmute" : "Mute"}
-                      >
-                        {isMuted || volume === 0 ? (
-                          <VolumeX className="w-4 h-4 text-rose-400" />
-                        ) : (
-                          <Volume2 className="w-4 h-4 text-white" />
-                        )}
-                      </button>
-
-                      {/* Middle: Interactive Vertical Slider Track */}
-                      <div 
-                        ref={volumeSliderRef}
-                        onMouseDown={handleSliderMouseDown}
-                        onTouchStart={handleSliderTouchStart}
-                        onTouchMove={handleSliderTouchMove}
-                        className="relative w-8 h-24 sm:h-28 flex items-center justify-center cursor-pointer touch-none"
-                        title="Drag or click to adjust volume"
-                      >
-                        {/* Thin Vertical Center Line */}
-                        <div className="w-1 h-full bg-white/25 rounded-full relative overflow-hidden pointer-events-none">
-                          {/* Active Solid White Fill from bottom */}
-                          <div 
-                            className="absolute bottom-0 left-0 right-0 bg-white rounded-full transition-all duration-75"
-                            style={{ height: `${isMuted ? 0 : volume}%` }}
-                          />
-                        </div>
-
-                        {/* Circular White Thumb Knob (Identical to Image 2) */}
-                        <div 
-                          className="absolute w-4 h-4 bg-white rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.8)] border border-slate-200 pointer-events-none transition-all duration-75 left-1/2 -translate-x-1/2"
-                          style={{ 
-                            bottom: `calc(${isMuted ? 0 : volume}% - 8px)`
-                          }}
-                        />
-                      </div>
-
-                      {/* Bottom: Volume Percentage Text */}
-                      <span className="text-[10px] font-mono font-bold text-white/90">
-                        {isMuted || volume === 0 ? '0%' : `${volume}%`}
-                      </span>
-
-                    </div>
-                  </div>
-                )}
-              </div>
-
               {/* Video / Audio Mode Toggle */}
               <button
                 type="button"
@@ -599,16 +552,155 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
             <div className="lg:col-span-6 flex flex-col space-y-2.5 sm:space-y-3">
               
               {/* THE SINGLE YOUTUBE IFRAME CANVAS */}
-              <div className="relative w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl flex-shrink-0">
+              <div className="relative w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl flex-shrink-0 group">
                 <iframe
                   ref={iframeRef}
                   key={activeVideoId}
                   src={embedUrl}
+                  onLoad={handleIframeLoad}
                   title="YouTube Player"
                   allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
                   allowFullScreen
                   className={showVideo ? "w-full h-full border-0" : "w-1 h-1 opacity-0 absolute pointer-events-none"}
                 />
+
+                {/* Click-to-Play / Pause Tap Overlay on Video */}
+                {showVideo && (
+                  <div 
+                    onClick={() => {
+                      if (!isPlaying) {
+                        handleUnmuteAndPlay();
+                      } else {
+                        handleTogglePlay();
+                      }
+                    }}
+                    className={`absolute inset-0 flex items-center justify-center transition-all cursor-pointer z-10 ${
+                      !isPlaying 
+                        ? 'bg-black/40 opacity-100' 
+                        : 'bg-transparent opacity-0 hover:bg-black/15 hover:opacity-100'
+                    }`}
+                    title={isPlaying ? "Click to Pause" : "Click to Play with Sound"}
+                  >
+                    {!isPlaying && (
+                      <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-full bg-red-600/95 text-white flex items-center justify-center shadow-2xl shadow-red-600/50 backdrop-blur-xs transform hover:scale-110 active:scale-95 transition-transform">
+                        <Play className="w-6 h-6 sm:w-7 sm:h-7 fill-white ml-0.5 sm:ml-1" />
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                {/* Video Title Badge (Bottom Left - subtle) */}
+                {showVideo && (
+                  <div className="absolute bottom-2.5 sm:bottom-3 left-2.5 sm:left-3 z-20 pointer-events-none max-w-[65%]">
+                    <div className="bg-black/70 backdrop-blur-md px-2.5 py-1 rounded-lg border border-white/10 truncate">
+                      <p className="text-[11px] sm:text-xs font-semibold text-white truncate leading-tight">
+                        {currentTrack?.title || 'YouTube Study Audio'}
+                      </p>
+                    </div>
+                  </div>
+                )}
+
+                {/* Fullscreen Button (Bottom Right) */}
+                {showVideo && (
+                  <button
+                    type="button"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleToggleFullscreen();
+                    }}
+                    className="absolute bottom-2.5 sm:bottom-3 right-2.5 sm:right-3 z-20 w-8 h-8 rounded-full bg-black/60 hover:bg-black/85 text-white/90 hover:text-white border border-white/20 hover:border-white/40 flex items-center justify-center shadow-lg backdrop-blur-md cursor-pointer transition-all active:scale-95"
+                    title="Toggle Fullscreen"
+                  >
+                    <Maximize2 className="w-3.5 h-3.5" />
+                  </button>
+                )}
+
+                {/* Sound / Volume Button Overlay on Video (Top-Right Corner - Image 2) */}
+                <div 
+                  ref={volumeContainerRef}
+                  className="absolute top-2.5 sm:top-3 right-2.5 sm:right-3 z-30 select-none"
+                  onMouseEnter={() => setShowVolumePopup(true)}
+                  onMouseLeave={() => !isDraggingVolume && setShowVolumePopup(false)}
+                  onWheel={handleWheelVolume}
+                >
+                  <button
+                    type="button"
+                    onClick={handleMainSoundButtonClick}
+                    className={`w-8 h-8 sm:w-9 sm:h-9 rounded-full flex items-center justify-center transition-all cursor-pointer shadow-lg backdrop-blur-md border active:scale-95 ${
+                      isMuted || volume === 0
+                        ? 'bg-black/80 hover:bg-black/95 text-rose-400 border-rose-500/40 ring-1 ring-rose-500/30'
+                        : showVolumePopup
+                        ? 'bg-black/90 text-emerald-400 border-emerald-400/50 ring-2 ring-emerald-500/30'
+                        : 'bg-black/60 hover:bg-black/80 text-emerald-400 border-white/20 hover:border-emerald-400/40'
+                    }`}
+                    title={isMuted ? "Muted (Click to Unmute)" : `Sound Volume ${volume}% (Click to adjust)`}
+                  >
+                    {isMuted || volume === 0 ? (
+                      <VolumeX className="w-4 h-4 text-rose-400" />
+                    ) : (
+                      <Volume2 className="w-4 h-4 text-emerald-400" />
+                    )}
+                  </button>
+
+                  {/* THE VERTICAL VOLUME CAPSULE POPUP (EXACTLY MATCHING USER REQUEST 9 & IMAGE 2) */}
+                  {showVolumePopup && (
+                    <div 
+                      className="absolute top-full right-0 mt-1.5 z-40 animate-fadeIn"
+                      onWheel={handleWheelVolume}
+                      onClick={(e) => e.stopPropagation()}
+                    >
+                      <div className="w-10 sm:w-11 h-36 sm:h-40 bg-[#090e1a]/95 backdrop-blur-xl border border-white/25 rounded-full shadow-[0_15px_45px_rgba(0,0,0,0.95)] flex flex-col items-center justify-between py-2.5 select-none ring-1 ring-white/10">
+                        
+                        {/* Top: Speaker Mute / Unmute Icon */}
+                        <button
+                          type="button"
+                          onClick={handlePopupMuteToggle}
+                          className="w-6 h-6 rounded-full flex items-center justify-center text-white hover:text-emerald-400 active:scale-90 transition-all cursor-pointer"
+                          title={isMuted ? "Click to Unmute" : "Click to Mute"}
+                        >
+                          {isMuted || volume === 0 ? (
+                            <VolumeX className="w-3.5 h-3.5 text-rose-400" />
+                          ) : (
+                            <Volume2 className="w-3.5 h-3.5 text-emerald-400" />
+                          )}
+                        </button>
+
+                        {/* Middle: Interactive Vertical Slider Track */}
+                        <div 
+                          ref={volumeSliderRef}
+                          onMouseDown={handleSliderMouseDown}
+                          onTouchStart={handleSliderTouchStart}
+                          onTouchMove={handleSliderTouchMove}
+                          className="relative w-7 h-20 sm:h-24 flex items-center justify-center cursor-pointer touch-none"
+                          title="Drag or click to adjust volume"
+                        >
+                          {/* Center Thin Track Line */}
+                          <div className="w-1 h-full bg-white/25 rounded-full relative overflow-hidden pointer-events-none">
+                            {/* Active Solid White Fill from bottom */}
+                            <div 
+                              className="absolute bottom-0 left-0 right-0 bg-white rounded-full transition-all duration-75"
+                              style={{ height: `${isMuted ? 0 : volume}%` }}
+                            />
+                          </div>
+
+                          {/* Circular White Knob */}
+                          <div 
+                            className="absolute w-3.5 h-3.5 bg-white rounded-full shadow-[0_2px_8px_rgba(0,0,0,0.8)] border border-slate-200 pointer-events-none transition-all duration-75 left-1/2 -translate-x-1/2"
+                            style={{ 
+                              bottom: `calc(${isMuted ? 0 : volume}% - 7px)`
+                            }}
+                          />
+                        </div>
+
+                        {/* Bottom: Volume Percentage Text */}
+                        <span className="text-[9.5px] sm:text-[10px] font-mono font-bold text-white/90">
+                          {isMuted || volume === 0 ? '0%' : `${volume}%`}
+                        </span>
+
+                      </div>
+                    </div>
+                  )}
+                </div>
 
                 {/* Audio-Only Visualizer Mode */}
                 {!showVideo && (
