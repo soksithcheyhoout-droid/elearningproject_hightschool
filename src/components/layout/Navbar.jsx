@@ -310,15 +310,15 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
     <header 
       className="fixed top-0 left-0 right-0 z-[100] w-full select-none font-kantumruy bg-[#002d62]"
       style={{
-        paddingTop: 'calc(env(safe-area-inset-top, 0px) + 24px)'
+        paddingTop: 'env(safe-area-inset-top, 0px)'
       }}
     >
       
-      {/* 1. Official MoEYS Full-Width Top Utility Ribbon (Edge-to-Edge with Phone & Gmail on Mobile & PC) */}
+      {/* 1. Official MoEYS Full-Width Top Utility Ribbon — HIDDEN on mobile to eliminate double-blue-bar */}
       <div 
-        className={`w-full bg-gradient-to-r from-[#002d62] via-[#005baa] to-[#0077cc] text-white select-none transition-all duration-300 ease-in-out border-b border-white/15 ${
+        className={`w-full bg-gradient-to-r from-[#002d62] via-[#005baa] to-[#0077cc] text-white select-none transition-all duration-300 ease-in-out border-b border-white/15 hidden md:block ${
           isScrolled 
-            ? 'max-md:h-8 max-md:opacity-100 max-md:translate-y-0 md:max-h-0 md:opacity-0 md:-translate-y-2 md:pointer-events-none md:overflow-hidden' 
+            ? 'md:max-h-0 md:opacity-0 md:-translate-y-2 md:pointer-events-none md:overflow-hidden' 
             : 'h-8 sm:h-9 opacity-100 translate-y-0'
         }`}
       >
@@ -367,11 +367,16 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
       </div>
 
       {/* 2. Main Navigation Bar with Grand 4K Emblem, Vibrant Blue Links & User Profile (PF) */}
-      <div className={`w-full transition-all duration-300 border-b border-slate-200/80 dark:border-slate-800 ${
-        isScrolled 
-          ? 'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-md' 
-          : 'bg-white dark:bg-slate-900'
-      }`}>
+      <div 
+        className={`w-full transition-all duration-300 border-b border-slate-200/80 dark:border-slate-800 ${
+          isScrolled 
+            ? 'bg-white/95 dark:bg-slate-900/95 backdrop-blur-md shadow-md' 
+            : 'bg-white dark:bg-slate-900'
+        }`}
+        style={{
+          paddingTop: 'max(env(safe-area-inset-top, 0px), 12px)'
+        }}
+      >
         <div className="w-full max-w-[1600px] mx-auto px-2 sm:px-4 lg:px-6 relative z-20 overflow-visible">
           <div className={`flex items-center justify-between gap-1 sm:gap-3 min-w-0 transition-all duration-300 ${
             isScrolled ? 'max-md:h-[74px] md:h-[60px] md:sm:h-[64px]' : 'h-[74px] sm:h-[80px]'
@@ -810,8 +815,8 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
               )}
             </div>
 
-            {/* Language Switcher Dropdown (En ▾ / Kh ▾) */}
-            <div className="relative flex-shrink-0">
+            {/* Language Switcher Dropdown (En ▾ / Kh ▾) — hidden on small mobile for cleaner look */}
+            <div className="relative flex-shrink-0 hidden min-[480px]:block">
               <button
                 type="button"
                 onClick={() => setIsLangOpen(!isLangOpen)}
@@ -855,11 +860,11 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
               )}
             </div>
 
-            {/* 🎵 YouTube Music & Study Song Search Button */}
+            {/* 🎵 YouTube Music & Study Song Search Button — hidden on small mobile for cleaner look */}
             <button
               type="button"
               onClick={() => onOpenYouTube && onOpenYouTube()}
-              className={`h-8 sm:h-9 px-2 sm:px-2.5 rounded-xl border text-[11px] sm:text-xs font-black transition-all duration-200 flex items-center gap-1.5 cursor-pointer flex-shrink-0 select-none active:scale-95 ${
+              className={`hidden min-[480px]:flex h-8 sm:h-9 px-2 sm:px-2.5 rounded-xl border text-[11px] sm:text-xs font-black transition-all duration-200 items-center gap-1.5 cursor-pointer flex-shrink-0 select-none active:scale-95 ${
                 isYouTubeMusicPlaying
                   ? 'bg-red-600 text-white border-red-500 shadow-md shadow-red-500/30 ring-2 ring-red-400/40'
                   : 'bg-red-50 hover:bg-red-100 dark:bg-red-950/40 dark:hover:bg-red-900/50 text-red-600 dark:text-red-400 border-red-200 dark:border-red-900/50 shadow-2xs'
@@ -1102,8 +1107,8 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
 
             </div>
 
-            {/* Mobile Hamburger Button */}
-            <div ref={mobileMenuRef} className="lg:hidden relative">
+            {/* Mobile Hamburger Button — HIDDEN on small mobile (< md) to avoid duplicate with sidebar toggle; shown only on md-lg tablets */}
+            <div ref={mobileMenuRef} className="hidden md:block lg:hidden relative">
               <button
                 type="button"
                 onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
