@@ -191,6 +191,26 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
   const [searchError, setSearchError] = useState('');
   const searchTimerRef = useRef(null);
 
+  // Auto-play next track in the current search/playlist when song ends
+  const [autoPlayNext, setAutoPlayNext] = useState(true);
+  const autoPlayNextRef = useRef(true);
+  useEffect(() => {
+    autoPlayNextRef.current = autoPlayNext;
+  }, [autoPlayNext]);
+
+  const searchResultsRef = useRef(searchResults);
+  useEffect(() => {
+    searchResultsRef.current = searchResults;
+  }, [searchResults]);
+
+  const activeVideoIdRef = useRef(activeVideoId);
+  useEffect(() => {
+    activeVideoIdRef.current = activeVideoId;
+  }, [activeVideoId]);
+
+  const lastEndedTimeRef = useRef(0);
+  const handleNextTrackRef = useRef(null);
+
   // Clean up search debounce timer on unmount
   useEffect(() => {
     return () => {
@@ -221,7 +241,7 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     }
   }, [isPlaying, onPlayStateChange]);
 
-  // Listen to YouTube postMessage events for accurate player state & volume sync
+  // Listen to YouTube postMessage events for accurate player state, volume sync & auto-next
   useEffect(() => {
     const handleMessage = (event) => {
       try {
@@ -246,13 +266,27 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
 
         // State changes (1: PLAYING, 2: PAUSED, 0: ENDED, 3: BUFFERING)
         if (data.event === 'onStateChange' || (data.event === 'infoDelivery' && data.info?.playerState !== undefined)) {
-          const state = data.info?.playerState !== undefined ? data.info.playerState : data.info;
+          const state = data.info?.playerState !== undefined 
+            ? data.info.playerState 
+            : (data.data !== undefined ? data.data : data.info);
+
           if (state === 1) {
             setHasUserStarted(true);
             hasUserStartedRef.current = true;
             setIsPlaying(true);
-          } else if (state === 2 || state === 0) {
+          } else if (state === 2) {
             setIsPlaying(false);
+          } else if (state === 0) {
+            // 🛑 SONG ENDED: Automatically advance to the next track in the searched list!
+            setIsPlaying(false);
+            const now = Date.now();
+            if (now - lastEndedTimeRef.current > 1200) {
+              lastEndedTimeRef.current = now;
+              if (autoPlayNextRef.current && hasUserStartedRef.current && handleNextTrackRef.current) {
+                console.log('[YouTube Player] Song finished, auto-advancing to next track in list...');
+                handleNextTrackRef.current();
+              }
+            }
           }
         }
       } catch (e) {
@@ -490,21 +524,46 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     }
   }, [activeVideoId, handleTogglePlay]);
 
-  // Next Track
+  // Next Track in current search/playlist
   const handleNextTrack = useCallback(() => {
-    const list = searchResults.length > 0 ? searchResults : DEFAULT_STUDY_TRACKS;
-    const currentIndex = list.findIndex(t => t.id === activeVideoId);
-    const nextIndex = (currentIndex + 1) % list.length;
-    handleTrackClick(list[nextIndex]);
-  }, [searchResults, activeVideoId, handleTrackClick]);
+    const list = (searchResultsRef.current && searchResultsRef.current.length > 0) ? searchResultsRef.current : DEFAULT_STUDY_TRACKS;
+    if (!list || list.length === 0) return;
+    const currentId = activeVideoIdRef.current;
+    const currentIndex = list.findIndex(t => t.id === currentId);
+    const nextIndex = currentIndex >= 0 ? (currentIndex + 1) % list.length : 0;
+    const nextTrack = list[nextIndex];
+    if (nextTrack) {
+      setHasUserStarted(true);
+      hasUserStartedRef.current = true;
+      setCurrentTrack(nextTrack);
+      setActiveVideoId(nextTrack.id);
+      setIsPlaying(true);
+      setUrlError('');
+    }
+  }, []);
 
-  // Previous Track
+  // Previous Track in current search/playlist
   const handlePrevTrack = useCallback(() => {
-    const list = searchResults.length > 0 ? searchResults : DEFAULT_STUDY_TRACKS;
-    const currentIndex = list.findIndex(t => t.id === activeVideoId);
+    const list = (searchResultsRef.current && searchResultsRef.current.length > 0) ? searchResultsRef.current : DEFAULT_STUDY_TRACKS;
+    if (!list || list.length === 0) return;
+    const currentId = activeVideoIdRef.current;
+    const currentIndex = list.findIndex(t => t.id === currentId);
     const prevIndex = (currentIndex - 1 + list.length) % list.length;
-    handleTrackClick(list[prevIndex]);
-  }, [searchResults, activeVideoId, handleTrackClick]);
+    const prevTrack = list[prevIndex];
+    if (prevTrack) {
+      setHasUserStarted(true);
+      hasUserStartedRef.current = true;
+      setCurrentTrack(prevTrack);
+      setActiveVideoId(prevTrack.id);
+      setIsPlaying(true);
+      setUrlError('');
+    }
+  }, []);
+
+  // Synchronize handleNextTrack ref for postMessage event listener
+  useEffect(() => {
+    handleNextTrackRef.current = handleNextTrack;
+  }, [handleNextTrack]);
 
   // Horizontal scroll tags handler
   const scrollTags = (direction) => {
@@ -1003,7 +1062,7 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
               </div>
 
               {/* Header Title & Direct URL Toggle */}
-              <div className="flex items-center justify-between text-xs text-slate-400 px-0.5 flex-shrink-0 pt-0.5">
+              <div className="flex items-center justify-between text-xs text-slate-400 px-0.5 flex-shrink-0 pt-0.5 gap-2 flex-wrap">
                 <span className="font-semibold text-white/90 text-xs flex items-center gap-1.5">
                   <span>{searchQuery ? `YouTube Results (${searchResults.length})` : `Featured Study Tracks (${searchResults.length})`}</span>
                   {isSearching && (
@@ -1013,14 +1072,31 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                   )}
                 </span>
                 
-                <button
-                  type="button"
-                  onClick={() => setShowUrlInput(!showUrlInput)}
-                  className="text-slate-400 hover:text-red-400 text-xs font-medium flex items-center gap-1 cursor-pointer transition-colors"
-                >
-                  <LinkIcon className="w-3 h-3" />
-                  <span>{showUrlInput ? 'Hide URL' : 'Paste YouTube URL'}</span>
-                </button>
+                <div className="flex items-center gap-2">
+                  {/* Auto-Play Next in list toggle */}
+                  <button
+                    type="button"
+                    onClick={() => setAutoPlayNext(prev => !prev)}
+                    className={`px-2.5 py-1 rounded-lg text-[10.5px] font-bold flex items-center gap-1.5 transition-all cursor-pointer ${
+                      autoPlayNext
+                        ? 'bg-red-600/20 text-red-300 border border-red-500/30'
+                        : 'bg-white/5 text-slate-400 border border-white/10 hover:text-white'
+                    }`}
+                    title={autoPlayNext ? "Auto-Play Next Track is ON (Continuous playback)" : "Auto-Play Next Track is OFF"}
+                  >
+                    <span className={`w-1.5 h-1.5 rounded-full ${autoPlayNext ? 'bg-red-500 animate-pulse' : 'bg-slate-500'}`} />
+                    <span>Auto-Play</span>
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setShowUrlInput(!showUrlInput)}
+                    className="text-slate-400 hover:text-red-400 text-xs font-medium flex items-center gap-1 cursor-pointer transition-colors"
+                  >
+                    <LinkIcon className="w-3 h-3" />
+                    <span>{showUrlInput ? 'Hide URL' : 'Paste YouTube URL'}</span>
+                  </button>
+                </div>
               </div>
 
               {/* Direct URL Input */}
@@ -1186,7 +1262,16 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
               </span>
             </div>
 
-            <div className="flex items-center gap-2 sm:gap-3">
+            <div className="flex items-center gap-1.5 sm:gap-2">
+              <button
+                type="button"
+                onClick={handlePrevTrack}
+                className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-white flex items-center justify-center cursor-pointer transition-all"
+                title="Previous Track in List"
+              >
+                <SkipBack className="w-3.5 h-3.5 fill-white" />
+              </button>
+
               <button
                 type="button"
                 onClick={handleTogglePlay}
@@ -1211,8 +1296,17 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
 
               <button
                 type="button"
+                onClick={handleNextTrack}
+                className="w-8 h-8 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-white flex items-center justify-center cursor-pointer transition-all"
+                title="Next Track in List"
+              >
+                <SkipForward className="w-3.5 h-3.5 fill-white" />
+              </button>
+
+              <button
+                type="button"
                 onClick={() => onClose && onClose(false)}
-                className="px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-white font-semibold text-xs transition-all cursor-pointer flex-shrink-0"
+                className="ml-1 px-3.5 py-1.5 rounded-xl bg-white/10 hover:bg-white/20 active:scale-95 text-white font-semibold text-xs transition-all cursor-pointer flex-shrink-0"
               >
                 Close & Listen
               </button>
