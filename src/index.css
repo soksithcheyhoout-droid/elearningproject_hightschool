@@ -2582,4 +2582,24 @@ html[data-theme="dark"] .truck-lampPost,
   }
 }
 
+/* YouTube Search Animation Utilities */
+@keyframes ytLoadingBar {
+  0% { transform: translateX(-100%); width: 30%; }
+  50% { transform: translateX(50%); width: 60%; }
+  100% { transform: translateX(250%); width: 30%; }
+}
+
+@keyframes ytShimmerEffect {
+  0% { transform: translateX(-100%); }
+  100% { transform: translateX(100%); }
+}
+
+.animate-yt-loader {
+  animation: ytLoadingBar 1.2s infinite ease-in-out;
+}
+
+.animate-yt-shimmer {
+  animation: ytShimmerEffect 1.5s infinite linear;
+}
+
 

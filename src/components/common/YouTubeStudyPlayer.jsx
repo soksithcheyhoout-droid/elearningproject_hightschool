@@ -43,49 +43,127 @@ const POPULAR_SEARCH_TAGS = [
   { label: 'G-Devith', query: 'G-Devith' }
 ];
 
-// Baseline High Quality Tracks (Verified 100% embeddable & active)
+// Baseline High Quality Tracks with Search Tags (Verified 100% embeddable & active)
 export const DEFAULT_STUDY_TRACKS = [
   {
     id: 'lTRiuFIWV54',
     title: '1 A.M Study Session - Lofi Hip Hop Beats',
     channel: 'Lofi Girl',
     duration: '1:01:00',
-    thumbnail: 'https://i.ytimg.com/vi/lTRiuFIWV54/hqdefault.jpg'
+    thumbnail: 'https://i.ytimg.com/vi/lTRiuFIWV54/hqdefault.jpg',
+    tags: ['lofi', 'chill', 'study', 'beats', 'focus', 'relax']
   },
   {
     id: 'rvje5oblrLw',
     title: 'VannDa - Time To Rise feat. Master Kong Nay',
     channel: 'VannDa Official',
     duration: '5:40',
-    thumbnail: 'https://i.ytimg.com/vi/rvje5oblrLw/hqdefault.jpg'
+    thumbnail: 'https://i.ytimg.com/vi/rvje5oblrLw/hqdefault.jpg',
+    tags: ['vannda', 'kong nay', 'khmer', 'rap', 'hip hop', 'time to rise', 'វណ្ណដា']
   },
   {
     id: 'gyTRfSOpQUM',
     title: 'Acoustic Guitar Nonstop - Khmer Chill Melodies',
     channel: 'Nob Acoustic',
     duration: '45:20',
-    thumbnail: 'https://i.ytimg.com/vi/gyTRfSOpQUM/hqdefault.jpg'
+    thumbnail: 'https://i.ytimg.com/vi/gyTRfSOpQUM/hqdefault.jpg',
+    tags: ['acoustic', 'guitar', 'khmer', 'chill', 'instrumental', 'ណុប']
   },
   {
     id: 'MIHCnP8pDrQ',
     title: 'Doung Virakseth - Selected Acoustic Hits',
     channel: 'MT Records',
     duration: '40:30',
-    thumbnail: 'https://i.ytimg.com/vi/MIHCnP8pDrQ/hqdefault.jpg'
+    thumbnail: 'https://i.ytimg.com/vi/MIHCnP8pDrQ/hqdefault.jpg',
+    tags: ['doung virakseth', 'acoustic', 'khmer', 'hits', 'ដួង វីរៈសិទ្ធ', 'virakseth']
   },
   {
     id: 'oiGmGFxsJi8',
     title: 'Calm Piano Music for Studying, Reading & Focus',
     channel: 'HALIDONMUSIC',
     duration: '2:05:00',
-    thumbnail: 'https://i.ytimg.com/vi/oiGmGFxsJi8/hqdefault.jpg'
+    thumbnail: 'https://i.ytimg.com/vi/oiGmGFxsJi8/hqdefault.jpg',
+    tags: ['piano', 'classical', 'calm', 'focus', 'study']
   },
   {
     id: 'mPZkdNFkNps',
     title: 'Gentle Rain & Soft Study Piano for Concentration',
     channel: 'Rain & Focus',
     duration: '2:30:15',
-    thumbnail: 'https://i.ytimg.com/vi/mPZkdNFkNps/hqdefault.jpg'
+    thumbnail: 'https://i.ytimg.com/vi/mPZkdNFkNps/hqdefault.jpg',
+    tags: ['rain', 'ambience', 'piano', 'concentration', 'gentle']
+  },
+  {
+    id: '5qap5aO4i9A',
+    title: 'Lofi Hip Hop Radio - Beats to Relax/Study to',
+    channel: 'Lofi Girl',
+    duration: 'LIVE',
+    thumbnail: 'https://i.ytimg.com/vi/5qap5aO4i9A/hqdefault.jpg',
+    tags: ['lofi', 'live', 'beats', 'relax', 'study', 'hip hop']
+  },
+  {
+    id: 'dF0rA0qVp-g',
+    title: 'VannDa - BOK KALO (Official Music Video)',
+    channel: 'VannDa Official',
+    duration: '4:15',
+    thumbnail: 'https://i.ytimg.com/vi/dF0rA0qVp-g/hqdefault.jpg',
+    tags: ['vannda', 'bok kalo', 'khmer', 'rap', 'វណ្ណដា']
+  },
+  {
+    id: 'G1Fw8m_X0G8',
+    title: 'Doung Virakseth - Bong Som Tveu Neak Thae (Acoustic)',
+    channel: 'Rasmey Hang Meas',
+    duration: '4:50',
+    thumbnail: 'https://i.ytimg.com/vi/G1Fw8m_X0G8/hqdefault.jpg',
+    tags: ['doung virakseth', 'bong som tveu neak thae', 'khmer', 'ដួង វីរៈសិទ្ធ']
+  },
+  {
+    id: 'd_hKzE5gHMo',
+    title: 'G-Devith - Acoustic Study Chill Session',
+    channel: 'G-Devith Official',
+    duration: '38:10',
+    thumbnail: 'https://i.ytimg.com/vi/d_hKzE5gHMo/hqdefault.jpg',
+    tags: ['g-devith', 'devith', 'g devith', 'khmer', 'acoustic', 'ដេវីត']
+  },
+  {
+    id: 'K-a8s8OLBSE',
+    title: 'Taylor Swift - Folklore & Evermore Acoustic Chill Study',
+    channel: 'Acoustic Chill',
+    duration: '1:12:30',
+    thumbnail: 'https://i.ytimg.com/vi/K-a8s8OLBSE/hqdefault.jpg',
+    tags: ['taylor swift', 'folklore', 'evermore', 'acoustic', 'chill', 'taylor']
+  },
+  {
+    id: 'xK9-8Z7vP0k',
+    title: 'Tena - Acoustic Chill Song Collection',
+    channel: 'Tena Official',
+    duration: '35:40',
+    thumbnail: 'https://i.ytimg.com/vi/xK9-8Z7vP0k/hqdefault.jpg',
+    tags: ['tena', 'acoustic', 'khmer', 'chill', 'ថេណា']
+  },
+  {
+    id: '7K0gXo3bF7U',
+    title: 'Khmer Acoustic Song Nonstop Collection 2026',
+    channel: 'Khmer Acoustic Club',
+    duration: '1:20:00',
+    thumbnail: 'https://i.ytimg.com/vi/7K0gXo3bF7U/hqdefault.jpg',
+    tags: ['khmer acoustic', 'nonstop', 'collection', 'guitar', 'ចម្រៀងខ្មែរ']
+  },
+  {
+    id: 'jfKfPfyJRdk',
+    title: 'Lofi Sleep & Deep Study Session - Deep Calm Focus Beats',
+    channel: 'Lofi Sleep',
+    duration: '3:00:00',
+    thumbnail: 'https://i.ytimg.com/vi/jfKfPfyJRdk/hqdefault.jpg',
+    tags: ['lofi', 'sleep', 'deep', 'calm', 'focus']
+  },
+  {
+    id: 'y8e_ih8eOcg',
+    title: 'Studio Ghibli Relaxing Piano for Studying & Reading',
+    channel: 'Ghibli Relax',
+    duration: '2:15:00',
+    thumbnail: 'https://i.ytimg.com/vi/y8e_ih8eOcg/hqdefault.jpg',
+    tags: ['ghibli', 'piano', 'relaxing', 'study', 'reading', 'anime']
   }
 ];
 
@@ -111,6 +189,14 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
   const [searchResults, setSearchResults] = useState(DEFAULT_STUDY_TRACKS);
   const [isSearching, setIsSearching] = useState(false);
   const [searchError, setSearchError] = useState('');
+  const searchTimerRef = useRef(null);
+
+  // Clean up search debounce timer on unmount
+  useEffect(() => {
+    return () => {
+      if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+    };
+  }, []);
   
   // Custom URL paste state
   const [showUrlInput, setShowUrlInput] = useState(false);
@@ -428,16 +514,31 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     }
   };
 
-  // Perform Live YouTube Search
+  // Perform Live YouTube Search with Local Instant Results & Debounce
   const executeSearch = useCallback(async (queryToSearch) => {
     const q = (queryToSearch !== undefined ? queryToSearch : searchQuery).trim();
     if (!q) {
       setSearchResults(DEFAULT_STUDY_TRACKS);
+      setIsSearching(false);
+      setSearchError('');
       return;
     }
 
+    const trimmed = q.toLowerCase();
+
+    // 1. Instant match in curated catalog
+    const localMatches = DEFAULT_STUDY_TRACKS.filter(t => 
+      t.title.toLowerCase().includes(trimmed) ||
+      t.channel.toLowerCase().includes(trimmed) ||
+      (t.tags && t.tags.some(tag => tag.toLowerCase().includes(trimmed)))
+    );
+
+    if (localMatches.length > 0) {
+      setSearchResults(localMatches);
+      setSearchError('');
+    }
+
     setIsSearching(true);
-    setSearchError('');
 
     try {
       const response = await fetch(`/api/youtube/search?q=${encodeURIComponent(q)}`);
@@ -445,25 +546,64 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
 
       if (data && data.results && data.results.length > 0) {
         setSearchResults(data.results);
-      } else {
+        setSearchError('');
+      } else if (localMatches.length === 0) {
         setSearchResults([]);
         setSearchError(`No tracks found for "${q}"`);
       }
     } catch (err) {
-      console.error('YouTube search error:', err);
-      setSearchError('Search service unavailable. Please try again.');
+      if (localMatches.length === 0) {
+        setSearchError('Search service unavailable. Please try again.');
+      }
     } finally {
       setIsSearching(false);
     }
   }, [searchQuery]);
 
+  // Real-time as-you-type search: triggers instantly from 1 letter or full name
+  const handleSearchInputChange = (e) => {
+    const text = e.target.value;
+    setSearchQuery(text);
+    setActiveTag('');
+
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
+
+    const trimmed = text.trim().toLowerCase();
+    if (!trimmed) {
+      setSearchResults(DEFAULT_STUDY_TRACKS);
+      setIsSearching(false);
+      setSearchError('');
+      return;
+    }
+
+    // 1. Instant 0ms response for single letters or partial names
+    const localMatches = DEFAULT_STUDY_TRACKS.filter(t => 
+      t.title.toLowerCase().includes(trimmed) ||
+      t.channel.toLowerCase().includes(trimmed) ||
+      (t.tags && t.tags.some(tag => tag.toLowerCase().includes(trimmed)))
+    );
+
+    if (localMatches.length > 0) {
+      setSearchResults(localMatches);
+      setSearchError('');
+    }
+
+    // 2. Play YouTube-style loading animation & query backend with 280ms debounce
+    setIsSearching(true);
+    searchTimerRef.current = setTimeout(() => {
+      executeSearch(text);
+    }, 280);
+  };
+
   const handleSearchSubmit = (e) => {
     if (e) e.preventDefault();
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
     setActiveTag('');
     executeSearch();
   };
 
   const handleQuickTagClick = (tag) => {
+    if (searchTimerRef.current) clearTimeout(searchTimerRef.current);
     setActiveTag(tag.label);
     setSearchQuery(tag.query);
     executeSearch(tag.query);
@@ -730,33 +870,41 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
             {/* ================================================================= */}
             <div className="lg:col-span-6 flex flex-col space-y-3 min-h-[320px]">
               
-              {/* Search Bar Input */}
+              {/* Search Bar Input with Live YouTube Animation */}
               <form onSubmit={handleSearchSubmit} className="flex items-center gap-2 flex-shrink-0">
-                <div className="relative flex-1">
+                <div className="relative flex-1 group">
                   <input
                     ref={searchInputRef}
                     type="text"
-                    placeholder="Search any song or artist (VannDa, Doung Virakseth, Lofi...)"
+                    placeholder="Search any song or artist (e.g. VannDa, Doung Virakseth, Lofi...)"
                     value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full bg-slate-950/90 border border-white/15 rounded-xl pl-9 sm:pl-10 pr-9 py-2 sm:py-2.5 text-xs sm:text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/20"
+                    onChange={handleSearchInputChange}
+                    className="w-full bg-slate-950/90 border border-white/15 rounded-xl pl-9 sm:pl-10 pr-9 py-2 sm:py-2.5 text-xs sm:text-sm text-white placeholder:text-slate-500 focus:outline-none focus:border-red-500 focus:ring-2 focus:ring-red-500/25 transition-all"
                   />
-                  <Search className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-slate-400 absolute left-3 sm:left-3.5 top-2.5 sm:top-3 pointer-events-none" />
-                  {searchQuery && (
+                  <Search className={`w-3.5 h-3.5 sm:w-4 sm:h-4 absolute left-3 sm:left-3.5 top-2.5 sm:top-3 pointer-events-none transition-colors ${
+                    isSearching ? 'text-red-500 animate-pulse' : 'text-slate-400 group-focus-within:text-red-400'
+                  }`} />
+                  
+                  {isSearching ? (
+                    <div className="absolute right-2.5 top-2.5 flex items-center gap-1.5">
+                      <Loader2 className="w-4 h-4 text-red-500 animate-spin" />
+                    </div>
+                  ) : searchQuery ? (
                     <button
                       type="button"
-                      onClick={() => setSearchQuery('')}
-                      className="p-1 rounded-lg text-slate-400 hover:text-white absolute right-2.5 top-2 cursor-pointer"
+                      onClick={() => handleSearchInputChange({ target: { value: '' } })}
+                      className="p-1 rounded-lg text-slate-400 hover:text-white absolute right-2.5 top-2 cursor-pointer transition-colors"
+                      title="Clear search"
                     >
                       <X className="w-3.5 h-3.5" />
                     </button>
-                  )}
+                  ) : null}
                 </div>
 
                 <button
                   type="submit"
                   disabled={isSearching}
-                  className="px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-50 text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-md transition-transform active:scale-95 cursor-pointer flex-shrink-0"
+                  className="px-3.5 sm:px-5 py-2 sm:py-2.5 rounded-xl bg-red-600 hover:bg-red-700 disabled:opacity-75 text-white font-bold text-xs sm:text-sm flex items-center gap-1.5 shadow-md transition-all active:scale-95 cursor-pointer flex-shrink-0"
                 >
                   {isSearching ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
                   <span className="hidden sm:inline">Search</span>
@@ -855,30 +1003,60 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                 </form>
               )}
 
+              {/* YouTube-style Red Top Loading Line */}
+              {isSearching && (
+                <div className="h-[2px] w-full bg-slate-800 overflow-hidden relative rounded-full flex-shrink-0">
+                  <div className="h-full bg-gradient-to-r from-red-600 via-red-400 to-red-600 animate-yt-loader rounded-full" />
+                </div>
+              )}
+
               {/* Scrollable Track Rows List */}
               <div className="flex-1 overflow-y-auto pr-1 space-y-1.5 max-h-[340px] sm:max-h-[380px] [scrollbar-width:thin] [-webkit-overflow-scrolling:touch]">
-                {isSearching ? (
-                  <div className="py-12 text-center space-y-2">
-                    <Loader2 className="w-6 h-6 text-red-500 animate-spin mx-auto" />
-                    <p className="text-xs text-slate-400">Searching YouTube tracks...</p>
+                {/* YouTube-style Skeleton Shimmer Loading (when searching and no items yet) */}
+                {isSearching && searchResults.length === 0 ? (
+                  <div className="space-y-1.5 animate-fadeIn">
+                    {[1, 2, 3, 4, 5].map((i) => (
+                      <div key={i} className="p-2 sm:p-2.5 rounded-xl border border-white/5 bg-white/[0.03] flex items-center justify-between gap-3 overflow-hidden relative">
+                        <div className="flex items-center gap-2.5 sm:gap-3 flex-1 min-w-0">
+                          {/* Shimmer Thumbnail */}
+                          <div className="w-12 h-10 sm:w-14 sm:h-11 rounded-lg bg-slate-800/90 relative overflow-hidden flex-shrink-0">
+                            <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-yt-shimmer" />
+                          </div>
+                          {/* Shimmer Text Lines */}
+                          <div className="space-y-2 flex-1 min-w-0">
+                            <div className="h-3.5 bg-slate-800 rounded w-3/4 relative overflow-hidden">
+                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-yt-shimmer" />
+                            </div>
+                            <div className="h-2.5 bg-slate-800/70 rounded w-1/3 relative overflow-hidden">
+                              <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-yt-shimmer" />
+                            </div>
+                          </div>
+                        </div>
+                        {/* Shimmer Play Button */}
+                        <div className="w-8 h-8 rounded-lg bg-slate-800/80 flex-shrink-0 relative overflow-hidden">
+                          <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-yt-shimmer" />
+                        </div>
+                      </div>
+                    ))}
                   </div>
-                ) : searchError ? (
-                  <div className="py-10 text-center space-y-2">
+                ) : searchError && searchResults.length === 0 ? (
+                  <div className="py-10 text-center space-y-2 animate-fadeIn">
                     <AlertCircle className="w-6 h-6 text-slate-500 mx-auto" />
                     <p className="text-xs text-slate-400">{searchError}</p>
                   </div>
-                ) : searchResults.map((track) => {
-                  const isCurrent = activeVideoId === track.id;
-                  return (
-                    <div
-                      key={track.id}
-                      onClick={() => handleTrackClick(track)}
-                      className={`p-2 sm:p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2.5 sm:gap-3 group ${
-                        isCurrent
-                          ? 'bg-red-600/15 border-red-500/50 text-white shadow-xs'
-                          : 'bg-white/5 hover:bg-white/10 border-white/5 hover:border-white/15 text-slate-300'
-                      }`}
-                    >
+                ) : (
+                  searchResults.map((track) => {
+                    const isCurrent = activeVideoId === track.id;
+                    return (
+                      <div
+                        key={track.id}
+                        onClick={() => handleTrackClick(track)}
+                        className={`p-2 sm:p-2.5 rounded-xl border transition-all cursor-pointer flex items-center justify-between gap-2.5 sm:gap-3 group animate-fadeIn ${
+                          isCurrent
+                            ? 'bg-red-600/15 border-red-500/50 text-white shadow-xs'
+                            : 'bg-white/5 hover:bg-white/10 border-white/5 hover:border-white/15 text-slate-300'
+                        }`}
+                      >
                       {/* Thumbnail & Title */}
                       <div className="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
                         <div className="relative w-12 h-10 sm:w-14 sm:h-11 rounded-lg overflow-hidden flex-shrink-0 bg-black shadow-xs">
@@ -938,10 +1116,9 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                           )}
                         </button>
                       </div>
-
                     </div>
                   );
-                })}
+                }))}
               </div>
 
             </div>
