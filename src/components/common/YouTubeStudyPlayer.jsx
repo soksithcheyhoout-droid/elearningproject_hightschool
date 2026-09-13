@@ -115,10 +115,32 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
   const [customUrl, setCustomUrl] = useState('');
   const [urlError, setUrlError] = useState('');
 
-  // Single persistent iframe reference
+  // Single persistent iframe reference & YouTube API player ref
   const iframeRef = useRef(null);
+  const ytPlayerRef = useRef(null);
+  const volumeRef = useRef(volume);
   const searchInputRef = useRef(null);
   const tagsScrollRef = useRef(null);
+
+  // Keep volumeRef in sync for callbacks without stale closures
+  useEffect(() => {
+    volumeRef.current = volume;
+  }, [volume]);
+
+  // Load official YouTube IFrame API script once
+  useEffect(() => {
+    if (typeof window === 'undefined') return;
+    if (!window.YT) {
+      const tag = document.createElement('script');
+      tag.src = 'https://www.youtube.com/iframe_api';
+      const firstScriptTag = document.getElementsByTagName('script')[0];
+      if (firstScriptTag && firstScriptTag.parentNode) {
+        firstScriptTag.parentNode.insertBefore(tag, firstScriptTag);
+      } else {
+        document.head.appendChild(tag);
+      }
+    }
+  }, []);
 
   // Notify parent of play state change (for navbar soundbars)
   useEffect(() => {
@@ -127,17 +149,35 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     }
   }, [isPlaying, onPlayStateChange]);
 
-  // Listen to YouTube postMessage events for accurate player state sync
+  // Listen to YouTube postMessage events for accurate player state & volume sync
   useEffect(() => {
     const handleMessage = (event) => {
       try {
         if (!event.data) return;
         const data = typeof event.data === 'string' ? JSON.parse(event.data) : event.data;
-        if (data && data.event === 'onStateChange') {
-          // 1: PLAYING, 2: PAUSED, 0: ENDED, 3: BUFFERING
-          if (data.info === 1) {
+        if (!data) return;
+
+        // When YouTube embed initializes, handshake with listening and apply user's volume
+        if (data.event === 'initialDelivery' || data.event === 'onReady') {
+          if (iframeRef.current && iframeRef.current.contentWindow) {
+            iframeRef.current.contentWindow.postMessage(JSON.stringify({ event: 'listening' }), '*');
+            iframeRef.current.contentWindow.postMessage(
+              JSON.stringify({
+                event: 'command',
+                func: 'setVolume',
+                args: [volumeRef.current]
+              }),
+              '*'
+            );
+          }
+        }
+
+        // State changes (1: PLAYING, 2: PAUSED, 0: ENDED, 3: BUFFERING)
+        if (data.event === 'onStateChange' || (data.event === 'infoDelivery' && data.info?.playerState !== undefined)) {
+          const state = data.info?.playerState !== undefined ? data.info.playerState : data.info;
+          if (state === 1) {
             setIsPlaying(true);
-          } else if (data.info === 2 || data.info === 0) {
+          } else if (state === 2 || state === 0) {
             setIsPlaying(false);
           }
         }
@@ -149,9 +189,17 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     return () => window.removeEventListener('message', handleMessage);
   }, []);
 
-  // Handle postMessage commands to YouTube IFrame (Single source of truth)
+  // Handle postMessage commands to YouTube IFrame (Official YT.Player priority + postMessage fallback)
   const sendIframeCommand = useCallback((command, args = []) => {
     try {
+      // 1. If official YT.Player instance is bound, use it directly (100% reliable)
+      if (ytPlayerRef.current && typeof ytPlayerRef.current[command] === 'function') {
+        try {
+          ytPlayerRef.current[command](...(args || []));
+        } catch (e) {}
+      }
+
+      // 2. Direct postMessage to iframe window
       if (iframeRef.current && iframeRef.current.contentWindow) {
         iframeRef.current.contentWindow.postMessage(
           JSON.stringify({
@@ -169,18 +217,67 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
 
   // Synchronize audio volume on new video load
   const handleIframeLoad = useCallback(() => {
-    sendIframeCommand('listening');
-    setTimeout(() => {
-      sendIframeCommand('listening');
-      sendIframeCommand('unMute');
-      sendIframeCommand('setVolume', [volume > 0 ? volume : 80]);
-      setIsMuted(false);
-    }, 400);
-    setTimeout(() => {
-      sendIframeCommand('unMute');
-      sendIframeCommand('setVolume', [volume > 0 ? volume : 80]);
-    }, 900);
-  }, [volume, sendIframeCommand]);
+    const targetVol = volumeRef.current > 0 ? volumeRef.current : 80;
+
+    // Send proper YouTube listening event and initial volume
+    const sendHandshake = () => {
+      if (iframeRef.current && iframeRef.current.contentWindow) {
+        iframeRef.current.contentWindow.postMessage(JSON.stringify({ event: 'listening' }), '*');
+        iframeRef.current.contentWindow.postMessage(
+          JSON.stringify({
+            event: 'command',
+            func: 'setVolume',
+            args: [targetVol]
+          }),
+          '*'
+        );
+      }
+    };
+
+    sendHandshake();
+    setTimeout(sendHandshake, 350);
+    setTimeout(sendHandshake, 800);
+
+    // Initialize official YT.Player wrapper if script is available
+    const initYT = () => {
+      if (window.YT && window.YT.Player && iframeRef.current) {
+        try {
+          if (ytPlayerRef.current && typeof ytPlayerRef.current.destroy === 'function') {
+            try { ytPlayerRef.current.destroy(); } catch (e) {}
+          }
+          ytPlayerRef.current = new window.YT.Player(iframeRef.current, {
+            events: {
+              onReady: (event) => {
+                try {
+                  event.target.unMute();
+                  event.target.setVolume(volumeRef.current);
+                } catch (e) {}
+              },
+              onStateChange: (event) => {
+                if (event.data === 1) setIsPlaying(true);
+                else if (event.data === 2 || event.data === 0) setIsPlaying(false);
+              }
+            }
+          });
+        } catch (e) {}
+      }
+    };
+
+    if (window.YT && window.YT.Player) {
+      initYT();
+    } else {
+      let tries = 0;
+      const timer = setInterval(() => {
+        tries++;
+        if (window.YT && window.YT.Player) {
+          clearInterval(timer);
+          initYT();
+        } else if (tries > 15) {
+          clearInterval(timer);
+        }
+      }, 250);
+    }
+  }, []);
 
   // Toggle Play / Pause
   const handleTogglePlay = useCallback(() => {
@@ -202,14 +299,15 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
 
   // Proactively unmute and activate sound reliably (never stay on "close" / VolumeX)
   const handleUnmuteAndPlay = useCallback(() => {
-    const targetVol = volume > 0 ? volume : 100;
+    const targetVol = volumeRef.current > 0 ? volumeRef.current : 100;
     setIsMuted(false);
     setVolume(targetVol);
+    volumeRef.current = targetVol;
     sendIframeCommand('unMute');
     sendIframeCommand('setVolume', [targetVol]);
     sendIframeCommand('playVideo');
     setIsPlaying(true);
-  }, [volume, sendIframeCommand]);
+  }, [sendIframeCommand]);
 
   // Toggle Mute / Unmute
   const handleToggleMute = useCallback(() => {
@@ -222,21 +320,24 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     }
   }, [isMuted, handleUnmuteAndPlay, sendIframeCommand]);
 
-  // Handle Smooth Volume Slider Change
+  // Handle Smooth Volume Slider Change (Correctly scales 0-100% directly to YouTube audio)
   const handleVolumeChange = useCallback((newVal) => {
     const val = Math.max(0, Math.min(100, Math.round(Number(newVal))));
     setVolume(val);
+    volumeRef.current = val;
+
     if (val === 0) {
       setIsMuted(true);
       sendIframeCommand('mute');
       sendIframeCommand('setVolume', [0]);
     } else {
-      setIsMuted(false);
-      // Ensure player is unmuted first, then set volume so audio always follows
-      sendIframeCommand('unMute');
+      if (isMuted) {
+        setIsMuted(false);
+        sendIframeCommand('unMute');
+      }
       sendIframeCommand('setVolume', [val]);
     }
-  }, [sendIframeCommand]);
+  }, [isMuted, sendIframeCommand]);
 
   // Handle vertical slider drag / click coordinate calculations (Image 2)
   const updateVolumeFromY = useCallback((clientY) => {
@@ -301,7 +402,6 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
     if (isMuted || volume === 0) {
       handleUnmuteAndPlay();
     } else {
-      sendIframeCommand('unMute');
       sendIframeCommand('setVolume', [volume]);
     }
     setShowVolumePopup(prev => !prev);
@@ -539,6 +639,7 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
               <div className="relative w-full aspect-video rounded-xl sm:rounded-2xl overflow-hidden bg-black border border-white/10 shadow-2xl flex-shrink-0 group">
                 <iframe
                   ref={iframeRef}
+                  id="youtube-study-player-iframe"
                   key={activeVideoId}
                   src={embedUrl}
                   onLoad={handleIframeLoad}
@@ -548,10 +649,10 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                   className={showVideo ? "w-full h-full border-0" : "w-1 h-1 opacity-0 absolute pointer-events-none"}
                 />
 
-                {/* Custom Volume Button - needed because YouTube mobile has NO volume slider */}
+                {/* Custom Volume Button - shown ONLY on mobile (hidden on PC/desktop) */}
                 <div 
                   ref={volumeContainerRef}
-                  className="absolute bottom-11 sm:bottom-12 left-2 sm:left-2.5 z-30 select-none"
+                  className="md:hidden absolute bottom-11 sm:bottom-12 left-2 sm:left-2.5 z-30 select-none"
                   onMouseEnter={() => setShowVolumePopup(true)}
                   onMouseLeave={() => !isDraggingVolume && setShowVolumePopup(false)}
                   onWheel={handleWheelVolume}
