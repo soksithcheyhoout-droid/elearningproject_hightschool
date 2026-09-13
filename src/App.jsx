@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { LanguageProvider, useLanguage } from './context/LanguageContext';
 import { AuthProvider } from './context/AuthContext';
 import { ThemeProvider } from './context/ThemeContext';
@@ -119,6 +119,52 @@ function MainApp() {
   });
 
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
+
+  // Bottom nav auto-hide on scroll down, show on scroll up
+  const [isBottomNavHidden, setIsBottomNavHidden] = useState(false);
+  const lastScrollYRef = useRef(0);
+  const scrollDeltaRef = useRef(0);
+
+  useEffect(() => {
+    // Only track on mobile (md breakpoint = 768px)
+    const SCROLL_THRESHOLD = 12; // px of accumulated scroll before toggling
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (ticking) return;
+      ticking = true;
+      window.requestAnimationFrame(() => {
+        const currentY = window.scrollY;
+        const delta = currentY - lastScrollYRef.current;
+
+        // Accumulate scroll delta in the same direction
+        if ((delta > 0 && scrollDeltaRef.current > 0) || (delta < 0 && scrollDeltaRef.current < 0)) {
+          scrollDeltaRef.current += delta;
+        } else {
+          scrollDeltaRef.current = delta;
+        }
+
+        if (scrollDeltaRef.current > SCROLL_THRESHOLD) {
+          // Scrolling DOWN past threshold
+          setIsBottomNavHidden(true);
+        } else if (scrollDeltaRef.current < -SCROLL_THRESHOLD) {
+          // Scrolling UP past threshold
+          setIsBottomNavHidden(false);
+        }
+
+        // Always show at top of page
+        if (currentY <= 10) {
+          setIsBottomNavHidden(false);
+        }
+
+        lastScrollYRef.current = currentY;
+        ticking = false;
+      });
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   // URL Browser History Sync
   const setTabAndUrl = (tab) => {
@@ -323,7 +369,7 @@ function MainApp() {
   }
 
   return (
-    <div className={`${activeTab === 'chat' ? 'h-[100dvh] overflow-hidden' : 'min-h-screen'} bg-[#f4f7fb] dark:bg-[#090d16] text-slate-800 dark:text-slate-100 flex flex-col font-kantumruy relative selection:bg-blue-500 selection:text-white w-full max-w-[100vw]`}>
+    <div className={`${activeTab === 'chat' ? 'h-[100dvh] overflow-hidden' : 'min-h-[100dvh]'} bg-[#f4f7fb] dark:bg-[#090d16] text-slate-800 dark:text-slate-100 flex flex-col font-kantumruy relative selection:bg-blue-500 selection:text-white w-full max-w-[100vw]`}>
       
       {/* 🎓 Subtle Ambient Lighting Orbs */}
       <div className="fixed inset-0 pointer-events-none select-none z-0 overflow-hidden">
@@ -355,7 +401,8 @@ function MainApp() {
 
       {/* Spacer to offset the fixed top navbar cleanly with safe area */}
       <div 
-        className="w-full flex-shrink-0 h-[calc(106px+env(safe-area-inset-top,0px))] sm:h-[calc(116px+env(safe-area-inset-top,0px))]" 
+        className="w-full flex-shrink-0" 
+        style={{ height: 'calc(106px + max(env(safe-area-inset-top, 0px), 0px))' }}
         aria-hidden="true" 
       />
 
@@ -377,7 +424,7 @@ function MainApp() {
         />
 
         {/* Dynamic Center Canvas View */}
-        <main className={`flex-1 flex flex-col min-w-0 ${activeTab === 'chat' ? 'min-h-0 overflow-hidden p-0' : 'overflow-x-hidden pb-[calc(5.5rem+env(safe-area-inset-bottom,0px))] md:pb-0'}`} style={activeTab === 'chat' ? {minHeight:0, flex:'1 1 0%'} : undefined}>
+        <main className={`flex-1 flex flex-col min-w-0 ${activeTab === 'chat' ? 'min-h-0 overflow-hidden p-0' : 'overflow-x-hidden md:pb-0'}`} style={activeTab === 'chat' ? {minHeight:0, flex:'1 1 0%'} : {paddingBottom: 'calc(6rem + max(env(safe-area-inset-bottom, 0px), 0px))'}}>
           
           {/* HOME TAB */}
           {activeTab === 'home' && (
@@ -729,9 +776,12 @@ function MainApp() {
 
         return (
           <nav 
-            className="fixed bottom-0 left-0 right-0 z-50 md:hidden select-none font-kantumruy bg-white dark:bg-[#0c1427] border-t border-slate-200/80 dark:border-slate-800 shadow-[0_-4px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_-4px_25px_rgba(0,0,0,0.5)]"
+            className="fixed bottom-0 left-0 right-0 w-full z-50 md:hidden select-none font-kantumruy bg-white dark:bg-[#0c1427] border-t border-slate-200/80 dark:border-slate-800 shadow-[0_-4px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_-4px_25px_rgba(0,0,0,0.5)]"
             style={{
-              paddingBottom: 'env(safe-area-inset-bottom, 0px)'
+              paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 0.5rem)',
+              transform: isBottomNavHidden ? 'translateY(100%)' : 'translateY(0)',
+              transition: 'transform 0.3s ease-in-out',
+              willChange: 'transform'
             }}
           >
             {/* Main Bar Container (Light & Dark Mode Support) */}

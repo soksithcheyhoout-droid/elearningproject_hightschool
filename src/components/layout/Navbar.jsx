@@ -308,9 +308,9 @@ export default function Navbar({ activeTab, setActiveTab, onOpenAITutor, onSelec
 
   return (
     <header 
-      className="fixed top-0 left-0 right-0 z-[100] w-full select-none font-kantumruy transition-all duration-300 bg-[#002d62] overflow-visible"
+      className="fixed top-0 left-0 right-0 z-[100] w-full select-none font-kantumruy transition-all duration-300 bg-[#002d62]"
       style={{
-        paddingTop: 'env(safe-area-inset-top, 0px)'
+        paddingTop: 'max(env(safe-area-inset-top, 0px), 0px)'
       }}
     >
       
