@@ -724,11 +724,6 @@ export default function YouTubeStudyPlayer({ isOpen, onClose, onPlayStateChange 
                           {isMuted ? 0 : volume}%
                         </span>
                       </div>
-
-                      {/* Mobile Volume Helper Pill */}
-                      <div className="absolute left-full ml-2 bottom-2 bg-slate-950/90 backdrop-blur-md border border-white/20 rounded-xl px-2 py-1 text-[9px] text-slate-300 whitespace-nowrap shadow-2xl flex items-center gap-1 pointer-events-none animate-fadeIn">
-                        <span>📱 Phone buttons for loudness • 0% = Mute</span>
-                      </div>
                     </div>
                   )}
                 </div>
