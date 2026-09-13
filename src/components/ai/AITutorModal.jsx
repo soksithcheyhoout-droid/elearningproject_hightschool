@@ -55,7 +55,7 @@ export default function AITutorModal({ isOpen, onClose, initialPrompt = '' }) {
     {
       id: 1,
       sender: 'ai',
-      text: "សួស្តីប្អូន " + (student.name || '') + "! លោកគ្រូ AI (ដំណើរការដោយ Google Gemini API) រីករាយណាស់ដែលបានជួបប្អូននៅថ្ងៃនេះ។ មិនថាលំហាត់គណិតវិទ្យា រូបវិទ្យា គីមីវិទ្យា ជីវវិទ្យា ឬសំណួរតែងសេចក្តីភាសាខ្មែរ ប្រវត្តិវិទ្យាទេ កូនអាចសួរលោកគ្រូបានទាំងអស់ណា៎! តើថ្ងៃនេះកូនចង់ឱ្យលោកគ្រូជួយពន្យល់ ឬបង្រៀនមេរៀនអ្វីដែរ?",
+      text: "សួស្តីប្អូន " + (student.name || '') + "! លោកគ្រូបង្រៀនគរុកោសល្យ រីករាយណាស់ដែលបានជួបប្អូននៅថ្ងៃនេះ។ មិនថាលំហាត់គណិតវិទ្យា រូបវិទ្យា គីមីវិទ្យា ជីវវិទ្យា ឬសំណួរតែងសេចក្តីភាសាខ្មែរ ប្រវត្តិវិទ្យាទេ កូនអាចសួរលោកគ្រូបានទាំងអស់ណា៎! តើថ្ងៃនេះកូនចង់ឱ្យលោកគ្រូជួយពន្យល់ ឬបង្រៀនមេរៀនអ្វីដែរ?",
       time: "ឥឡូវនេះ"
     }
   ]);
@@ -190,14 +190,14 @@ export default function AITutorModal({ isOpen, onClose, initialPrompt = '' }) {
                     Master Teacher
                   </span>
                 </h2>
-                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-cyan-400/20 text-cyan-200 border border-cyan-300/30 font-sans font-bold flex items-center gap-1 shadow-xs">
-                  <Sparkles className="w-3 h-3 text-cyan-300 animate-pulse" />
-                  Google Gemini 3.8 Flash
+                <span className="text-[10px] px-2.5 py-0.5 rounded-full bg-emerald-400/20 text-emerald-200 border border-emerald-300/30 font-sans font-bold flex items-center gap-1 shadow-xs">
+                  <Sparkles className="w-3 h-3 text-emerald-300 animate-pulse" />
+                  MoEYS AI Teacher
                 </span>
               </div>
               <p className="text-xs text-blue-100 mt-0.5 flex items-center gap-1.5">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-ping inline-block" />
-                <span>Google Gemini AI Engine Active • ជំនួយការដោះស្រាយលំហាត់ និងត្រៀមប្រឡងបាក់ឌុប</span>
+                <span>ប្រព័ន្ធបញ្ញាសិប្បនិម្មិតអប់រំជាតិ • ជំនួយការដោះស្រាយលំហាត់ និងត្រៀមប្រឡងបាក់ឌុប</span>
               </p>
             </div>
           </div>
@@ -271,7 +271,7 @@ export default function AITutorModal({ isOpen, onClose, initialPrompt = '' }) {
                       </button>
                       <span className="hidden sm:inline-flex items-center gap-1 text-[10px] text-blue-700 font-semibold bg-blue-50 border border-blue-200/70 px-2 py-0.5 rounded-md font-sans">
                         <Sparkles className="w-2.5 h-2.5 text-blue-600" />
-                        Google Gemini AI
+                        គ្រូបង្រៀន AI
                       </span>
                     </div>
                   )}

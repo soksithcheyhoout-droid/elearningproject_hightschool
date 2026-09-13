@@ -579,7 +579,7 @@ export default function PlaygroundGameModal({ game, onClose }) {
               <div className="text-center space-y-2">
                 <h3 className="text-lg font-black text-white">AI កំពុងបង្កើតសំណួរ...</h3>
                 <p className="text-xs text-slate-400 max-w-xs">
-                  Gemini AI is generating {selectedSubject?.label} questions for Grade {selectedGrade}
+                  AI Teacher is generating {selectedSubject?.label} questions for Grade {selectedGrade}
                 </p>
               </div>
 
