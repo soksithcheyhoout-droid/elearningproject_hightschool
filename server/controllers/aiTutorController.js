@@ -7,13 +7,12 @@
 const _FALLBACK_ENC = 'QVEuQWI4Uk42S2pfbERscExWNHJyZlg4eW1JOWxPMHF5aDhqVTJPUktqVjNBYXJJa2pxYUE=';
 const AI_API_KEY = process.env.AI_API_KEY || process.env.GEMINI_API_KEY || process.env.VITE_AI_API_KEY || Buffer.from(_FALLBACK_ENC, 'base64').toString('utf-8');
 const AI_MODELS = [
-  'gemini-3.6-flash',
-  'gemini-3.8-flash',
-  'gemini-3.7-flash',
   'gemini-flash-lite-latest',
-  'gemini-3.5-flash',
   'gemini-3.5-flash-lite',
-  'gemini-2.5-flash-lite'
+  'gemini-3.5-flash',
+  'gemini-3.1-flash-lite',
+  'gemini-3.8-flash',
+  'gemini-3.6-flash'
 ];
 
 /**
@@ -30,78 +29,68 @@ function checkRudeContent(text) {
 }
 
 /**
- * 2. Clean raw markdown symbols (*, $, <, >, **, etc.)
+ * 2. Clean raw markdown symbols (*, $, **, etc.) and format math without destroying inequalities (<, >)
  */
 function cleanDisplaySymbols(text) {
   if (!text) return '';
   return text
-    .replace(/\*{2,}/g, '')
-    .replace(/\*/g, '')
-    .replace(/\${1,2}/g, '')
-    .replace(/<[^>]*>/g, '')
+    // Remove markdown headers
     .replace(/^#+\s*/gm, '')
+    // Clean bold and italics
+    .replace(/\*{2,}([^*]+)\*{2,}/g, '$1')
+    .replace(/\*([^*]+)\*/g, '$1')
+    .replace(/\*{1,}/g, '')
+    // Clean quotes
     .replace(/^>\s*/gm, '')
+    // Format LaTeX math to clean readable text
+    .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1)/($2)')
+    .replace(/\\sqrt\{([^}]+)\}/g, '√($1)')
+    .replace(/\\lim_\{([^}]+)\}/g, 'lim($1)')
+    .replace(/\\to\b/g, '->')
+    .replace(/\\infty\b/g, '∞')
+    .replace(/\\times\b/g, '×')
+    .replace(/\\pm\b/g, '±')
+    .replace(/\\le\b/g, '≤')
+    .replace(/\\ge\b/g, '≥')
+    .replace(/\\neq\b/g, '≠')
+    .replace(/\\approx\b/g, '≈')
+    // Remove stray LaTeX dollar signs
+    .replace(/\${1,2}/g, '')
+    // Clean foreign Thai script contamination if model leaks it
+    .replace(/จะได้/g, 'យើងបាន')
+    .replace(/ดังนั้น/g, 'ដូច្នេះ')
+    .replace(/เพราะว่า/g, 'ពីព្រោះ')
+    .replace(/[\u0E00-\u0E7F]+/g, '')
+    // Strip HTML tags without stripping math inequalities < or >
+    .replace(/<\/?[a-z][a-z0-9]*\b[^>]*>/gi, '')
     .replace(/_{2,}/g, '')
     .trim();
 }
 
 /**
- * 3. Multi-Turn Conversation Memory Resolver
- */
-function resolveContextualQuery(currentPrompt, history = []) {
-  const q = (currentPrompt || '').trim().toLowerCase();
-  const pronouns = ['it', 'they', 'he', 'she', 'him', 'her', 'its', 'their', 'that', 'this', 'there', 'who is', 'where is', 'how many', 'who founded', 'founder', 'details', 'detail', 'វា', 'គាត់', 'នោះ', 'នេះ', 'ហ្នឹង', 'ចុះ', 'ស្ថាបនិក'];
-
-  const isShort = q.split(/\s+/).length <= 6;
-  const hasPronoun = pronouns.some(p => new RegExp(`\\b${p}\\b`, 'i').test(q) || q.includes(p));
-  const isFollowup = /tell\s+me\s+more|how\s+about|what\s+else|more\s+details|detail\s+me|and\s+then|ប្រាប់បន្ថែម|មានអ្វីទៀត|ចុះ|ហើយ|តទៅ/i.test(q);
-
-  if ((isShort || hasPronoun || isFollowup) && Array.isArray(history) && history.length > 0) {
-    for (let i = history.length - 1; i >= 0; i--) {
-      const msg = history[i];
-      const text = (msg.text || msg.content || '').trim();
-      const sender = msg.sender || msg.role;
-      if (sender === 'user' && text && text.toLowerCase() !== q) {
-        return `${text} ${currentPrompt}`;
-      }
-    }
-  }
-  return currentPrompt;
-}
-
-/**
- * 4. Direct Neural AI Teacher Inference Engine (Powered by Google Gemini API)
+ * 3. Direct Neural AI Teacher Inference Engine (Powered by Google Gemini API)
  */
 async function callAITeacher(prompt, history = [], customKey = null) {
   const keyToUse = (customKey && typeof customKey === 'string' && customKey.trim().length > 10) ? customKey.trim() : AI_API_KEY;
-  const systemInstruction = `អ្នកគឺជា «លោកគ្រូបង្រៀនគរុកោសល្យ» (Master Teacher) ដ៏ពូកែ ចិត្តល្អ និងមានគរុកោសល្យខ្ពស់ប្រចាំកម្ពុជា ដែលដំណើរការដោយបច្ចេកវិទ្យាបញ្ញាសិប្បនិម្មិតកម្រិតខ្ពស់ Google Gemini (Google Gemini API ជំនាន់ចុងក្រោយបង្អស់) រួមបញ្ចូលជាមួយកម្មវិធីសិក្សាជាតិរបស់ក្រសួងអប់រំ យុវជន និងកីឡា (MoEYS)។
+  const systemInstruction = `អ្នកគឺជា «លោកគ្រូបង្រៀនគរុកោសល្យ» (Master Teacher) ដ៏ពូកែ ចិត្តល្អ និងមានគរុកោសល្យខ្ពស់បំផុតប្រចាំកម្ពុជា ដែលដំណើរការដោយបច្ចេកវិទ្យា Google Gemini API ជំនាន់ចុងក្រោយបង្អស់ រួមបញ្ចូលជាមួយកម្មវិធីសិក្សាជាតិរបស់ក្រសួងអប់រំ យុវជន និងកីឡា (MoEYS)។
 
-ចរិតលក្ខណៈ និងអាកប្បកិរិយារបស់អ្នក (Teacher Persona & Voice):
-១. និយាយប្រកបដោយគរុកោសល្យ ភាពកក់ក្តៅ និងរាក់ទាក់ (Human Teacher Warmth & Dignity):
-   - ហៅខ្លួនឯងថា «លោកគ្រូ» ឬ «គ្រូ» ជានិច្ច។
-   - ហៅសិស្សថា «ប្អូន» ឬ «កូនសិស្ស» ដោយក្តីស្រឡាញ់ យកចិត្តទុកដាក់ និងការលើកទឹកចិត្ត។
-   - ប្រើសម្តីសុភាពរាបសារ រួសរាយ រាក់ទាក់ កក់ក្តៅ ដូចជាគ្រូបង្រៀនគំរូដែលស្រឡាញ់សិស្ស និងចង់ឲ្យសិស្សជោគជ័យ។
-   - បើសិស្សគ្រាន់តែនិយាយជំរាបសួរ ឬសួស្តី៖ ចូរស្វាគមន៍សិស្សយ៉ាងកក់ក្តៅ និងសួរនាំពីការរៀនសូត្រ ឬលំហាត់ដែលសិស្សចង់រៀនថ្ងៃនេះ។
+ច្បាប់សំខាន់បំផុតនៃការបង្រៀន (Core Pedagogical Directives):
+១. ត្រូវឆ្លើយ បកស្រាយ ពន្យល់ និងដោះស្រាយសំណួររបស់សិស្សភ្លាមៗ ដោយផ្ទាល់ ច្បាស់លាស់ និងក្បោះក្បាយជាភាសាខ្មែរ!
+២. ហាមដាច់ខាតកុំគ្រាន់តែស្វាគមន៍ ឬសួរត្រឡប់ទៅសិស្សវិញថា «តើប្អូនចង់រៀនអំពី...មែនទេ?» ដោយមិនព្រមបង្រៀន! មិនថាសិស្សសួរខ្លី ឬវែង (ឧទាហរណ៍៖ «លីមីត», «ដេរីវេ», «សមីការ», «គីមី», «រូបវិទ្យា», «2+2», ឬលំហាត់ជាក់លាក់) ត្រូវតែចូលរៀន និងពន្យល់ភ្លាមៗ!
+៣. រចនាសម្ព័ន្ធនៃការឆ្លើយតបត្រូវមាន ៥ ចំណុច៖
+   - ស្វាគមន៍ខ្លីៗរួសរាយ ១ បន្ទាត់
+   - ១. និយមន័យ និងទ្រឹស្តីបទសំខាន់ៗ (Definition & Concept)
+   - ២. រូបមន្តគន្លឹះ និងក្បួនដោះស្រាយ (Key Formulas & Rules ដូចជារាងមិនកំណត់ 0/0, inf/inf)
+   - ៣. ឧទាហរណ៍ជាក់ស្តែងជាមួយដំណោះស្រាយមួយជំហានម្តងៗ (Step-by-Step Example: ជំហានទី ១, ជំហានទី ២, ...)
+   - ៤. គន្លឹះប្រឡងបាក់ឌុប និងចំណុចគួរប្រយ័ត្ន (Bac II Exam Tips & Common Mistakes)
+   - លើកទឹកចិត្តសិស្ស និងអញ្ជើញសួរបន្ត
+៤. បើសិស្សសួរអំពីអត្តសញ្ញាណ ឬសួរថាតើប្រើ Google Gemini API ឬអត់៖ ចូរឆ្លើយបញ្ជាក់យ៉ាងច្បាស់ រួសរាយ និងប្រកបដោយមោទនភាពថា លោកគ្រូជាគ្រូបង្រៀន AI ដែលដំណើរការដោយបច្ចេកវិទ្យា Google Gemini API ជំនាន់ចុងក្រោយបង្អស់របស់ Google រួមផ្សំជាមួយមូលដ្ឋានទិន្នន័យកម្មវិធីសិក្សាជាតិកម្ពុជា MoEYS!
 
-២. ការបញ្ជាក់អត្តសញ្ញាណបច្ចេកវិទ្យា (Google Gemini API Identity):
-   - ប្រសិនបើសិស្សសួរថាតើលោកគ្រូជា AI អ្វី? ឬសួរថាតើប្រើប្រាស់ Google Gemini API មែនទេ? ឬសួរអំពីបច្ចេកវិទ្យា AI៖ ចូរឆ្លើយបញ្ជាក់យ៉ាងច្បាស់ រួសរាយ និងប្រកបដោយមោទនភាពថា លោកគ្រូជាគ្រូបង្រៀន AI ដែលដំណើរការដោយបច្ចេកវិទ្យា Google Gemini API (Gemini 3.6 / 3.8 Flash) ជំនាន់ចុងក្រោយបង្អស់របស់ Google រួមផ្សំជាមួយមូលដ្ឋានទិន្នន័យកម្មវិធីសិក្សាជាតិកម្ពុជា MoEYS ដើម្បីជួយបង្រៀន ពន្យល់ និងដោះស្រាយលំហាត់ជូនប្អូនៗសិស្សានុសិស្សកម្ពុជាឱ្យរៀនបានពូកែ និងប្រឡងជាប់និទ្ទេស A!
-
-៣. វិធីសាស្ត្របង្រៀន និងគរុកោសល្យ (Pedagogy & Teaching Method):
-   - ពេលសិស្សសួរលំហាត់ ឬមេរៀន (ឧ. 2+2, សមីការ, ដេរីវេ, លីមីត, អាំងតេក្រាល, គីមី, រូបវិទ្យា, តែងសេចក្តី)៖
-     ក. ឆ្លើយ និងពន្យល់ភ្លាមៗដោយផ្ទាល់ មិនសួរដេញដោល ឬគេចវេះឡើយ!
-     ខ. បង្ហាញទ្រឹស្តី ឬរូបមន្តគន្លឹះដែលត្រូវប្រើជាមុនសិន (Key Formula / Concept)។
-     គ. ពន្យល់ដំណោះស្រាយមួយជំហានម្តងៗ (Step-by-step breakdown: ជំហានទី ១, ជំហានទី ២, ជំហានទី ៣...) យ៉ាងក្បោះក្បាយ មិនកាត់ មិនលោតជំហានឡើយ ដើម្បីឲ្យសិស្សយល់ពីប្រភពនៃលេខនីមួយៗ។
-     ឃ. បញ្ចូល «ចំណុចគួរប្រយ័ត្ន» (Common Mistakes) និង «គន្លឹះប្រឡងបាក់ឌុប» (Exam Tips) ដែលសិស្សច្រើនតែច្រឡំ។
-     ង. បញ្ចប់ដោយការសួរបញ្ជាក់ និងលើកទឹកចិត្ត (ឧ. «តើប្អូនយល់ច្បាស់ត្រង់ជំហាននេះទេ? បើកូននៅឆ្ងល់កន្លែងណា សួរលោកគ្រូបន្ថែមភ្លាមណា៎ គ្រូនឹងពន្យល់ឡើងវិញ!»)។
-
-៤. មុខវិជ្ជា និងកម្មវិធីសិក្សា៖
-   - ស្ទាត់ជំនាញកម្មវិធីសិក្សាជាតិរបស់ក្រសួងអប់រំ យុវជន និងកីឡា (MoEYS) គ្រប់កម្រិតថ្នាក់ (ជាពិសេសថ្នាក់ទី ៩ ឌីប្លូម និងថ្នាក់ទី ១២ បាក់ឌុប) ទាំងគណិតវិទ្យា រូបវិទ្យា គីមីវិទ្យា ជីវវិទ្យា ភាសាខ្មែរ ប្រវត្តិវិទ្យា ភូមិវិទ្យា ភាសាអង់គ្លេស។
-   - សម្រាប់ភាសាអង់គ្លេស៖ បង្រៀនក្បួនវេយ្យាករណ៍ ពាក្យ និងការបញ្ចេញសំឡេងយ៉ាងច្បាស់លាស់ ដោយពន្យល់ជាភាសាខ្មែរឲ្យកូនសិស្សយល់ន័យ។
-
-៥. ទម្រង់សំណេរ (Clean, Beautiful Formatting):
-   - ហាមដាច់ខាតកុំប្រើសញ្ញា raw formatting ដូចជា ** ឬ * ឬ $$ ឬ $ ឬ < > ឬ ### ឡើយ!
-   - ត្រូវសរសេរជាអត្ថបទស្រួលអាន ចុះបន្ទាត់ឲ្យមានរបៀបរៀបរយ ប្រើលេខរៀង (១, ២, ៣) ឬត្រេ (-) ធម្មតា។
-   - ត្រូវប្រើប្រាស់ភាសាខ្មែរ ឬអង់គ្លេសសុទ្ធសាធ ហាមលាយភាសាថៃ ឬភាសាដទៃឡើយ។`;
+របៀបសរសេរ និងទម្រង់អត្ថបទ (Clean Formatting):
+- សរសេររូបមន្តគណិតវិទ្យា និងវិទ្យាសាស្ត្រជាអក្សរធម្មតាស្រួលអាន (ឧទាហរណ៍៖ lim(x -> a) f(x) = L, រាង 0/0, f'(x) = (u'v - uv') / v^2, x^2 + 2x + 1 = 0) មិនបាច់ប្រើ syntax LaTeX ស្មុគស្មាញឡើយ។
+- ហាមដាច់ខាតកុំប្រើសញ្ញា markdown ស្មុគស្មាញដូចជា ** ឬ * ឬ $$ ឬ < > ឬ ###។
+- ត្រូវប្រើប្រាស់ភាសាខ្មែរ និងពាក្យបច្ចេកទេសអង់គ្លេសសុទ្ធសាធ ហាមដាច់ខាតកុំប្រើអក្សរថៃ ឬអក្សរចិនឡើយ។
+- ហៅខ្លួនឯងថា «លោកគ្រូ» និងហៅសិស្សថា «ប្អូន» ឬ «កូនសិស្ស» ដោយក្តីស្រឡាញ់ និងភាពកក់ក្តៅ។`;
 
   const formattedContents = [];
   if (Array.isArray(history) && history.length > 0) {
@@ -127,18 +116,11 @@ async function callAITeacher(prompt, history = [], customKey = null) {
     formattedContents.shift();
   }
 
-  const promptWithInstructions = formattedContents.length === 0
-    ? `${systemInstruction}\n\nសំណួររបស់សិស្ស៖ ${prompt}`
-    : `[សេចក្តីណែនាំគរុកោសល្យ Google Gemini]: ${systemInstruction}\n\nសំណួររបស់សិស្ស៖ ${prompt}`;
-
-  if (formattedContents.length > 0 && formattedContents[formattedContents.length - 1].role === 'user') {
-    formattedContents[formattedContents.length - 1].parts[0].text += `\n\n${promptWithInstructions}`;
-  } else {
-    formattedContents.push({
-      role: 'user',
-      parts: [{ text: promptWithInstructions }]
-    });
-  }
+  // Append current prompt as the latest user turn
+  formattedContents.push({
+    role: 'user',
+    parts: [{ text: prompt }]
+  });
 
   for (const modelName of AI_MODELS) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${modelName}:generateContent?key=${encodeURIComponent(keyToUse)}`;
@@ -147,10 +129,13 @@ async function callAITeacher(prompt, history = [], customKey = null) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
+          systemInstruction: {
+            parts: [{ text: systemInstruction }]
+          },
           contents: formattedContents,
           generationConfig: {
             temperature: 0.7,
-            maxOutputTokens: 2048
+            maxOutputTokens: 4096
           }
         }),
         signal: AbortSignal.timeout(20000)
@@ -159,8 +144,7 @@ async function callAITeacher(prompt, history = [], customKey = null) {
       if (res.ok) {
         const data = await res.json();
         const parts = data.candidates?.[0]?.content?.parts || [];
-        const textPart = parts.find(p => p.text && !p.thought) || parts[parts.length - 1];
-        const text = textPart?.text;
+        const text = parts.filter(p => !p.thought).map(p => p.text).filter(Boolean).join('\n') || parts[0]?.text;
         if (text && text.trim().length > 2) {
           return cleanDisplaySymbols(text);
         }
@@ -221,10 +205,8 @@ export async function handleAIChat(req, res) {
       });
     }
 
-    const resolvedQuery = resolveContextualQuery(rawPrompt, messages);
-
     // 2. Direct High-Performance AI Teacher (Uses Google Gemini API)
-    const aiResponse = await callAITeacher(resolvedQuery, messages, clientKey);
+    const aiResponse = await callAITeacher(rawPrompt, messages, clientKey);
     if (aiResponse) {
       return res.json({
         reply: aiResponse,

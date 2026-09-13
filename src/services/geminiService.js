@@ -5,13 +5,12 @@
 
 const AI_API_KEY = import.meta.env.VITE_AI_API_KEY || import.meta.env.VITE_GEMINI_API_KEY || '';
 const AI_MODELS = [
-  'gemini-3.6-flash',
-  'gemini-3.8-flash',
-  'gemini-3.7-flash',
   'gemini-flash-lite-latest',
-  'gemini-3.5-flash',
   'gemini-3.5-flash-lite',
-  'gemini-2.5-flash-lite'
+  'gemini-3.5-flash',
+  'gemini-3.1-flash-lite',
+  'gemini-3.8-flash',
+  'gemini-3.6-flash'
 ];
 
 const STORAGE_KEY = 'motdar_ai_key';
@@ -38,15 +37,38 @@ function checkRudeContent(text) {
   return rudePatterns.some(pattern => pattern.test(t));
 }
 
-function cleanDisplaySymbols(text) {
+export function cleanDisplaySymbols(text) {
   if (!text) return '';
   return text
-    .replace(/\*{2,}/g, '')
-    .replace(/\*/g, '')
-    .replace(/\${1,2}/g, '')
-    .replace(/<[^>]*>/g, '')
+    // Remove markdown headers
     .replace(/^#+\s*/gm, '')
+    // Clean bold and italics
+    .replace(/\*{2,}([^*]+)\*{2,}/g, '$1')
+    .replace(/\*([^*]+)\*/g, '$1')
+    .replace(/\*{1,}/g, '')
+    // Clean quotes
     .replace(/^>\s*/gm, '')
+    // Format LaTeX math to clean readable text
+    .replace(/\\frac\{([^}]+)\}\{([^}]+)\}/g, '($1)/($2)')
+    .replace(/\\sqrt\{([^}]+)\}/g, '√($1)')
+    .replace(/\\lim_\{([^}]+)\}/g, 'lim($1)')
+    .replace(/\\to\b/g, '->')
+    .replace(/\\infty\b/g, '∞')
+    .replace(/\\times\b/g, '×')
+    .replace(/\\pm\b/g, '±')
+    .replace(/\\le\b/g, '≤')
+    .replace(/\\ge\b/g, '≥')
+    .replace(/\\neq\b/g, '≠')
+    .replace(/\\approx\b/g, '≈')
+    // Remove stray LaTeX dollar signs
+    .replace(/\${1,2}/g, '')
+    // Clean foreign Thai script contamination if model leaks it
+    .replace(/จะได้/g, 'យើងបាន')
+    .replace(/ดังนั้น/g, 'ដូច្នេះ')
+    .replace(/เพราะว่า/g, 'ពីព្រោះ')
+    .replace(/[\u0E00-\u0E7F]+/g, '')
+    // Strip HTML tags without stripping math inequalities < or >
+    .replace(/<\/?[a-z][a-z0-9]*\b[^>]*>/gi, '')
     .replace(/_{2,}/g, '')
     .trim();
 }
@@ -84,34 +106,25 @@ export async function askMinistryAI(userPrompt, chatHistory = []) {
 
   // 2. Second Priority: Direct Client-Side AI Call with User API Key
   if (activeKey) {
-    const systemPrompt = `អ្នកគឺជា «លោកគ្រូបង្រៀនគរុកោសល្យ» (Master Teacher) ដ៏ពូកែ ចិត្តល្អ និងមានគរុកោសល្យខ្ពស់ប្រចាំកម្ពុជា ដែលដំណើរការដោយបច្ចេកវិទ្យាបញ្ញាសិប្បនិម្មិតកម្រិតខ្ពស់ Google Gemini (Google Gemini API ជំនាន់ចុងក្រោយបង្អស់) រួមបញ្ចូលជាមួយកម្មវិធីសិក្សាជាតិរបស់ក្រសួងអប់រំ យុវជន និងកីឡា (MoEYS)។
+    const systemPrompt = `អ្នកគឺជា «លោកគ្រូបង្រៀនគរុកោសល្យ» (Master Teacher) ដ៏ពូកែ ចិត្តល្អ និងមានគរុកោសល្យខ្ពស់បំផុតប្រចាំកម្ពុជា ដែលដំណើរការដោយបច្ចេកវិទ្យា Google Gemini API ជំនាន់ចុងក្រោយបង្អស់ រួមបញ្ចូលជាមួយកម្មវិធីសិក្សាជាតិរបស់ក្រសួងអប់រំ យុវជន និងកីឡា (MoEYS)។
 
-ចរិតលក្ខណៈ និងអាកប្បកិរិយារបស់អ្នក (Teacher Persona & Voice):
-១. និយាយប្រកបដោយគរុកោសល្យ ភាពកក់ក្តៅ និងរាក់ទាក់ (Human Teacher Warmth & Dignity):
-   - ហៅខ្លួនឯងថា «លោកគ្រូ» ឬ «គ្រូ» ជានិច្ច។
-   - ហៅសិស្សថា «ប្អូន» ឬ «កូនសិស្ស» ដោយក្តីស្រឡាញ់ យកចិត្តទុកដាក់ និងការលើកទឹកចិត្ត។
-   - ប្រើសម្តីសុភាពរាបសារ រួសរាយ រាក់ទាក់ កក់ក្តៅ ដូចជាគ្រូបង្រៀនគំរូដែលស្រឡាញ់សិស្ស និងចង់ឲ្យសិស្សជោគជ័យ។
-   - បើសិស្សគ្រាន់តែនិយាយជំរាបសួរ ឬសួស្តី៖ ចូរស្វាគមន៍សិស្សយ៉ាងកក់ក្តៅ និងសួរនាំពីការរៀនសូត្រ ឬលំហាត់ដែលសិស្សចង់រៀនថ្ងៃនេះ។
+ច្បាប់សំខាន់បំផុតនៃការបង្រៀន (Core Pedagogical Directives):
+១. ត្រូវឆ្លើយ បកស្រាយ ពន្យល់ និងដោះស្រាយសំណួររបស់សិស្សភ្លាមៗ ដោយផ្ទាល់ ច្បាស់លាស់ និងក្បោះក្បាយជាភាសាខ្មែរ!
+២. ហាមដាច់ខាតកុំគ្រាន់តែស្វាគមន៍ ឬសួរត្រឡប់ទៅសិស្សវិញថា «តើប្អូនចង់រៀនអំពី...មែនទេ?» ដោយមិនព្រមបង្រៀន! មិនថាសិស្សសួរខ្លី ឬវែង (ឧទាហរណ៍៖ «លីមីត», «ដេរីវេ», «សមីការ», «គីមី», «រូបវិទ្យា», «2+2», ឬលំហាត់ជាក់លាក់) ត្រូវតែចូលរៀន និងពន្យល់ភ្លាមៗ!
+៣. រចនាសម្ព័ន្ធនៃការឆ្លើយតបត្រូវមាន ៥ ចំណុច៖
+   - ស្វាគមន៍ខ្លីៗរួសរាយ ១ បន្ទាត់
+   - ១. និយមន័យ និងទ្រឹស្តីបទសំខាន់ៗ (Definition & Concept)
+   - ២. រូបមន្តគន្លឹះ និងក្បួនដោះស្រាយ (Key Formulas & Rules ដូចជារាងមិនកំណត់ 0/0, inf/inf)
+   - ៣. ឧទាហរណ៍ជាក់ស្តែងជាមួយដំណោះស្រាយមួយជំហានម្តងៗ (Step-by-Step Example: ជំហានទី ១, ជំហានទី ២, ...)
+   - ៤. គន្លឹះប្រឡងបាក់ឌុប និងចំណុចគួរប្រយ័ត្ន (Bac II Exam Tips & Common Mistakes)
+   - លើកទឹកចិត្តសិស្ស និងអញ្ជើញសួរបន្ត
+៤. បើសិស្សសួរអំពីអត្តសញ្ញាណ ឬសួរថាតើប្រើ Google Gemini API ឬអត់៖ ចូរឆ្លើយបញ្ជាក់យ៉ាងច្បាស់ រួសរាយ និងប្រកបដោយមោទនភាពថា លោកគ្រូជាគ្រូបង្រៀន AI ដែលដំណើរការដោយបច្ចេកវិទ្យា Google Gemini API ជំនាន់ចុងក្រោយបង្អស់របស់ Google រួមផ្សំជាមួយមូលដ្ឋានទិន្នន័យកម្មវិធីសិក្សាជាតិកម្ពុជា MoEYS!
 
-២. ការបញ្ជាក់អត្តសញ្ញាណបច្ចេកវិទ្យា (Google Gemini API Identity):
-   - ប្រសិនបើសិស្សសួរថាតើលោកគ្រូជា AI អ្វី? ឬសួរថាតើប្រើប្រាស់ Google Gemini API មែនទេ? ឬសួរអំពីបច្ចេកវិទ្យា AI៖ ចូរឆ្លើយបញ្ជាក់យ៉ាងច្បាស់ រួសរាយ និងប្រកបដោយមោទនភាពថា លោកគ្រូជាគ្រូបង្រៀន AI ដែលដំណើរការដោយបច្ចេកវិទ្យា Google Gemini API (Gemini 3.6 / 3.8 Flash) ជំនាន់ចុងក្រោយបង្អស់របស់ Google រួមផ្សំជាមួយមូលដ្ឋានទិន្នន័យកម្មវិធីសិក្សាជាតិកម្ពុជា MoEYS ដើម្បីជួយបង្រៀន ពន្យល់ និងដោះស្រាយលំហាត់ជូនប្អូនៗសិស្សានុសិស្សកម្ពុជាឱ្យរៀនបានពូកែ និងប្រឡងជាប់និទ្ទេស A!
-
-៣. វិធីសាស្ត្របង្រៀន និងគរុកោសល្យ (Pedagogy & Teaching Method):
-   - ពេលសិស្សសួរលំហាត់ ឬមេរៀន (ឧ. 2+2, សមីការ, ដេរីវេ, លីមីត, គីមី, រូបវិទ្យា, តែងសេចក្តី)៖
-     ក. ឆ្លើយ និងពន្យល់ភ្លាមៗដោយផ្ទាល់ មិនសួរដេញដោល ឬគេចវេះឡើយ!
-     ខ. បង្ហាញទ្រឹស្តី ឬរូបមន្តគន្លឹះដែលត្រូវប្រើជាមុនសិន (Key Formula / Concept)។
-     គ. ពន្យល់ដំណោះស្រាយមួយជំហានម្តងៗ (Step-by-step breakdown: ជំហានទី ១, ជំហានទី ២, ជំហានទី ៣...) យ៉ាងក្បោះក្បាយ មិនកាត់ មិនលោតជំហានឡើយ ដើម្បីឲ្យសិស្សយល់ពីប្រភពនៃលេខនីមួយៗ។
-     ឃ. បញ្ចូល «ចំណុចគួរប្រយ័ត្ន» (Common Mistakes) និង «គន្លឹះប្រឡងបាក់ឌុប» (Exam Tips) ដែលសិស្សច្រើនតែច្រឡំ។
-     ង. បញ្ចប់ដោយការសួរបញ្ជាក់ និងលើកទឹកចិត្ត (ឧ. «តើប្អូនយល់ច្បាស់ត្រង់ជំហាននេះទេ? បើកូននៅឆ្ងល់កន្លែងណា សួរលោកគ្រូបន្ថែមភ្លាមណា៎ គ្រូនឹងពន្យល់ឡើងវិញ!»)។
-
-៤. មុខវិជ្ជា និងកម្មវិធីសិក្សា៖
-   - ស្ទាត់ជំនាញកម្មវិធីសិក្សាជាតិរបស់ក្រសួងអប់រំ យុវជន និងកីឡា (MoEYS) គ្រប់កម្រិតថ្នាក់ (ជាពិសេសថ្នាក់ទី ៩ ឌីប្លូម និងថ្នាក់ទី ១២ បាក់ឌុប) ទាំងគណិតវិទ្យា រូបវិទ្យា គីមីវិទ្យា ជីវវិទ្យា ភាសាខ្មែរ ប្រវត្តិវិទ្យា ភូមិវិទ្យា ភាសាអង់គ្លេស។
-   - សម្រាប់ភាសាអង់គ្លេស៖ បង្រៀនក្បួនវេយ្យាករណ៍ ពាក្យ និងការបញ្ចេញសំឡេងយ៉ាងច្បាស់លាស់ ដោយពន្យល់ជាភាសាខ្មែរឲ្យកូនសិស្សយល់ន័យ។
-
-៥. ទម្រង់សំណេរ (Clean, Beautiful Formatting):
-   - ហាមដាច់ខាតកុំប្រើសញ្ញា raw formatting ដូចជា ** ឬ * ឬ $$ ឬ $ ឬ < > ឬ ### ឡើយ!
-   - ត្រូវសរសេរជាអត្ថបទស្រួលអាន ចុះបន្ទាត់ឲ្យមានរបៀបរៀបរយ ប្រើលេខរៀង (១, ២, ៣) ឬត្រេ (-) ធម្មតា។
-   - ត្រូវប្រើប្រាស់ភាសាខ្មែរ ឬអង់គ្លេសសុទ្ធសាធ ហាមលាយភាសាថៃ ឬភាសាដទៃឡើយ។`;
+របៀបសរសេរ និងទម្រង់អត្ថបទ (Clean Formatting):
+- សរសេររូបមន្តគណិតវិទ្យា និងវិទ្យាសាស្ត្រជាអក្សរធម្មតាស្រួលអាន (ឧទាហរណ៍៖ lim(x -> a) f(x) = L, រាង 0/0, f'(x) = (u'v - uv') / v^2, x^2 + 2x + 1 = 0) មិនបាច់ប្រើ syntax LaTeX ស្មុគស្មាញឡើយ។
+- ហាមដាច់ខាតកុំប្រើសញ្ញា markdown ស្មុគស្មាញដូចជា ** ឬ * ឬ $$ ឬ < > ឬ ###។
+- ត្រូវប្រើប្រាស់ភាសាខ្មែរ និងពាក្យបច្ចេកទេសអង់គ្លេសសុទ្ធសាធ ហាមដាច់ខាតកុំប្រើអក្សរថៃ ឬអក្សរចិនឡើយ។
+- ហៅខ្លួនឯងថា «លោកគ្រូ» និងហៅសិស្សថា «ប្អូន» ឬ «កូនសិស្ស» ដោយក្តីស្រឡាញ់ និងភាពកក់ក្តៅ។`;
 
     const formattedContents = [];
     if (Array.isArray(chatHistory) && chatHistory.length > 0) {
@@ -136,18 +149,10 @@ export async function askMinistryAI(userPrompt, chatHistory = []) {
       formattedContents.shift();
     }
 
-    const promptWithInstructions = formattedContents.length === 0
-      ? `${systemPrompt}\n\nសំណួររបស់សិស្ស៖ ${userPrompt}`
-      : `[សេចក្តីណែនាំគរុកោសល្យ Google Gemini]: ${systemPrompt}\n\nសំណួររបស់សិស្ស៖ ${userPrompt}`;
-
-    if (formattedContents.length > 0 && formattedContents[formattedContents.length - 1].role === 'user') {
-      formattedContents[formattedContents.length - 1].parts[0].text += `\n\n${promptWithInstructions}`;
-    } else {
-      formattedContents.push({
-        role: 'user',
-        parts: [{ text: promptWithInstructions }]
-      });
-    }
+    formattedContents.push({
+      role: 'user',
+      parts: [{ text: userPrompt }]
+    });
 
     for (const model of AI_MODELS) {
       try {
@@ -156,15 +161,17 @@ export async function askMinistryAI(userPrompt, chatHistory = []) {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
+            systemInstruction: {
+              parts: [{ text: systemPrompt }]
+            },
             contents: formattedContents,
-            generationConfig: { temperature: 0.7, maxOutputTokens: 2048 }
+            generationConfig: { temperature: 0.7, maxOutputTokens: 4096 }
           })
         });
         if (res.ok) {
           const data = await res.json();
           const parts = data.candidates?.[0]?.content?.parts || [];
-          const textPart = parts.find(p => p.text && !p.thought) || parts[parts.length - 1];
-          const reply = textPart?.text;
+          const reply = parts.filter(p => !p.thought).map(p => p.text).filter(Boolean).join('\n') || parts[0]?.text;
           if (reply && reply.trim().length > 2) {
             return cleanDisplaySymbols(reply);
           }
@@ -186,6 +193,29 @@ export const askGeminiAI = askMinistryAI;
  */
 function fallbackStudyEngine(prompt) {
   const p = (prompt || '').toLowerCase();
+
+  if (p.includes('លីមីត') || p.includes('limit')) {
+    return `សួស្តីប្អូន! មេរៀន «លីមីត» (Limits) គឺជាមេរៀនគ្រឹះដ៏សំខាន់បំផុតក្នុងគណិតវិទ្យាថ្នាក់ទី១២ និងការប្រឡងបាក់ឌុប។
+
+១. និយមន័យគ្រឹះ៖
+លីមីតនៃអនុគមន៍ f(x) កាលណា x ខិតជិត a គឺតម្លៃដែល f(x) ឆ្ពោះទៅរក៖
+lim(x -> a) f(x) = L
+
+២. រាងមិនកំណត់ដែលជួបញឹកញាប់ក្នុងការប្រឡង៖
+- រាង 0/0៖ ត្រូវបំបែកជាផលគុណកត្តាសម្រួលចោល ឬគុណនឹងកន្សោមឆ្លាស់ (Conjugate)
+- រាង ∞/∞៖ ត្រូវដាក់អថេរដែលមានស្វ័យគុណធំជាងគេជាកត្តារួមទាំងភាគយក និងភាគបែង
+
+៣. ឧទាហរណ៍ជាក់ស្តែង៖
+គណនា lim(x -> 2) (x^2 - 4) / (x - 2)
+- ជំហានទី ១៖ ជំនួស x = 2 នាំឱ្យបាន 0/0 (រាងមិនកំណត់)
+- ជំហានទី ២៖ បំបែកផលគុណកត្តា x^2 - 4 = (x - 2)(x + 2)
+- ជំហានទី ៣៖ សម្រួលកត្តា (x - 2) ចោល នាំឱ្យនៅសល់ lim(x -> 2) (x + 2)
+- ជំហានទី ៤៖ ជំនួស x = 2 ចូល នាំឱ្យបាន 2 + 2 = 4
+
+៤. គន្លឹះបាក់ឌុប៖ ពេលជួបរ៉ាឌីកាល់ √(A) - B ក្នុងរាង 0/0 ត្រូវគុណកន្សោមឆ្លាស់ √(A) + B ភ្លាម!
+
+តើប្អូនចង់ឱ្យលោកគ្រូបង្ហាញលំហាត់លីមីតបែបណាទៀត? សួរមកណា៎!`;
+  }
 
   if (p.includes('ដេរីវេ') || p.includes('derivative') || p.includes('គណិត')) {
     return `សំណួរនេះល្អណាស់ប្អូន! រូបមន្តដេរីវេផលចែកគឺជារូបមន្តគ្រឹះដែលចេញប្រឡងបាក់ឌុបញឹកញាប់បំផុត។ តោះមកមើលរបៀបអនុវត្តជាមួយលោកគ្រូទាំងអស់គ្នាណា៎៖
