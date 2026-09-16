@@ -423,7 +423,7 @@ function MainApp() {
         />
 
         {/* Dynamic Center Canvas View */}
-        <main className={`flex-1 flex flex-col min-w-0 ${activeTab === 'chat' ? 'min-h-0 overflow-hidden p-0' : 'overflow-x-hidden md:pb-0'}`} style={activeTab === 'chat' ? {minHeight:0, flex:'1 1 0%'} : {paddingBottom: 'calc(6rem + max(env(safe-area-inset-bottom, 0px), 0px))'}}>
+        <main className={`flex-1 flex flex-col min-w-0 ${activeTab === 'chat' ? 'min-h-0 overflow-hidden p-0' : 'overflow-x-hidden md:pb-0'}`} style={activeTab === 'chat' ? {minHeight:0, flex:'1 1 0%'} : {paddingBottom: 'calc(8.5rem + max(env(safe-area-inset-bottom, 0px), 0px))'}}>
           
           {/* HOME TAB */}
           {activeTab === 'home' && (
@@ -787,22 +787,22 @@ function MainApp() {
             {/* Main Bar Container — with mx-3 for clean edge spacing on Tab 0 (Home) and Tab 5 (AI Tutor) */}
             <div className="relative mx-3 h-[56px] flex items-stretch overflow-visible">
               
-              {/* Dynamic Curved Cutout Scoop (Perfect Smooth S-curve Notch — Zero Edge Clipping) */}
+              {/* Dynamic Curved Cutout Scoop (Deeper S-curve Notch — Zero Edge Clipping) */}
               <svg
-                className="absolute -top-[1px] w-[70px] h-[22px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-10"
+                className="absolute -top-[1px] w-[70px] h-[26px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-10"
                 style={{
                   left: `calc((${activeIndex} + 0.5) * (100% / 6))`,
                   transform: 'translateX(-50%)'
                 }}
-                viewBox="0 0 70 22"
+                viewBox="0 0 70 26"
                 fill="none"
               >
                 <path
-                  d="M0 0 C 15 0, 22 18, 35 18 C 48 18, 55 0, 70 0 L 70 0 L 0 0 Z"
+                  d="M0 0 C 14 0, 20 22, 35 22 C 50 22, 56 0, 70 0 L 70 0 L 0 0 Z"
                   className="fill-[#f4f7fb] dark:fill-[#090d16]"
                 />
                 <path
-                  d="M0 0 C 15 0, 22 18, 35 18 C 48 18, 55 0, 70 0"
+                  d="M0 0 C 14 0, 20 22, 35 22 C 50 22, 56 0, 70 0"
                   className="stroke-slate-200/90 dark:stroke-slate-800"
                   strokeWidth="1.2"
                   strokeLinecap="round"
@@ -810,9 +810,9 @@ function MainApp() {
                 />
               </svg>
 
-              {/* Floating Active Circular Bubble with Signature MoEYS Royal Blue Gradient — Elevated High (-top-[30px]) for Full 360° Visibility */}
+              {/* Floating Active Circular Bubble with Signature MoEYS Royal Blue Gradient — Elevated Extra High (-top-[36px]) for Full 360° Visibility */}
               <div
-                className="absolute -top-[30px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-20"
+                className="absolute -top-[36px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-20"
                 style={{
                   left: `calc((${activeIndex} + 0.5) * (100% / 6))`,
                   transform: 'translateX(-50%)'
