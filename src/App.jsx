@@ -120,18 +120,10 @@ function MainApp() {
 
   const [isMobileSidebarOpen, setIsMobileSidebarOpen] = useState(false);
 
-  // Helper to scroll view to top smoothly across both desktop window and mobile App Shell container
-  const scrollToTop = () => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-    const scrollEl = document.getElementById('main-content-scroll');
-    if (scrollEl) scrollEl.scrollTo({ top: 0, behavior: 'smooth' });
-  };
-
   // URL Browser History Sync
   const setTabAndUrl = (tab) => {
     setActiveTab(tab);
     setIsMobileSidebarOpen(false);
-    scrollToTop();
     const targetPath = tab === 'home' ? '/' : `/${tab}`;
     try {
       if (window.location.pathname !== targetPath) {
@@ -148,10 +140,7 @@ function MainApp() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // Ensure scroll reset on tab change
-  useEffect(() => {
-    scrollToTop();
-  }, [activeTab]);
+  // Mobile bottom navigation: always visible, pure CSS fixed positioning (no JS transforms)
 
   // Real-Time Incoming Match Invitations Polling & Syncing (Cross-Tabs & Cross-Users)
   useEffect(() => {
@@ -336,7 +325,7 @@ function MainApp() {
   }
 
   return (
-    <div className="h-[100dvh] md:h-auto md:min-h-[100dvh] overflow-hidden md:overflow-visible bg-[#f4f7fb] dark:bg-[#090d16] text-slate-800 dark:text-slate-100 flex flex-col font-kantumruy relative selection:bg-blue-500 selection:text-white w-full max-w-[100vw]">
+    <div className={`${activeTab === 'chat' ? 'h-[100dvh] overflow-hidden' : 'min-h-[100dvh]'} bg-[#f4f7fb] dark:bg-[#090d16] text-slate-800 dark:text-slate-100 flex flex-col font-kantumruy relative selection:bg-blue-500 selection:text-white w-full max-w-[100vw]`}>
       
       {/* 🎓 Subtle Ambient Lighting Orbs */}
       <div className="fixed inset-0 pointer-events-none select-none z-0 overflow-hidden">
@@ -359,7 +348,7 @@ function MainApp() {
         onOpenDonation={() => setIsDonationModalOpen(true)}
         onOpenAdminLogin={() => {
           setTabAndUrl('admin');
-          scrollToTop();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
         }}
         onToggleSidebar={() => setIsMobileSidebarOpen(prev => !prev)}
         onOpenYouTube={() => setIsYouTubeOpen(true)}
@@ -373,7 +362,7 @@ function MainApp() {
       />
 
       {/* Main Content Body */}
-      <div className="flex-1 flex w-full xl:pl-72 relative z-0 min-h-0 overflow-hidden md:overflow-visible">
+      <div className={`flex-1 flex w-full xl:pl-72 relative z-0 ${activeTab === 'chat' ? 'min-h-0 overflow-hidden' : ''}`}>
         
         {/* Left Navigation Sidebar */}
         <Sidebar
@@ -390,15 +379,7 @@ function MainApp() {
         />
 
         {/* Dynamic Center Canvas View */}
-        <main 
-          id="main-content-scroll"
-          className={`flex-1 flex flex-col min-w-0 ${
-            activeTab === 'chat' 
-              ? 'min-h-0 overflow-hidden p-0' 
-              : 'overflow-y-auto md:overflow-y-visible overflow-x-hidden overscroll-contain pb-6 md:pb-8'
-          }`}
-          style={activeTab === 'chat' ? { minHeight: 0, flex: '1 1 0%' } : undefined}
-        >
+        <main className={`flex-1 flex flex-col min-w-0 ${activeTab === 'chat' ? 'min-h-0 overflow-hidden p-0' : 'overflow-x-hidden md:pb-0'}`} style={activeTab === 'chat' ? {minHeight:0, flex:'1 1 0%'} : {paddingBottom: 'calc(8.5rem + max(env(safe-area-inset-bottom, 0px), 0px))'}}>
           
           {/* HOME TAB */}
           {activeTab === 'home' && (
@@ -740,17 +721,17 @@ function MainApp() {
         const activeIndex = getMobileActiveIndex();
 
         const navItems = [
-          { id: 'home', icon: Home, labelKm: 'ទំព័រដើម', labelEn: 'Home', action: () => { setTabAndUrl('home'); scrollToTop(); } },
-          { id: 'courses', icon: BookOpen, labelKm: 'មេរៀន', labelEn: 'Lessons', action: () => { setTabAndUrl('courses'); scrollToTop(); } },
-          { id: 'playground', icon: Gamepad2, labelKm: 'ហ្គេម', labelEn: 'Games', action: () => { setTabAndUrl('playground'); scrollToTop(); } },
-          { id: 'bacii', icon: GraduationCap, labelKm: 'បាក់ឌុប', labelEn: 'Bac II', action: () => { setTabAndUrl('bacii'); scrollToTop(); } },
-          { id: 'chat', icon: MessageSquare, labelKm: 'ជជែក', labelEn: 'Chat', action: () => { setTabAndUrl('chat'); scrollToTop(); }, badgeDot: true },
+          { id: 'home', icon: Home, labelKm: 'ទំព័រដើម', labelEn: 'Home', action: () => { setTabAndUrl('home'); window.scrollTo({ top: 0, behavior: 'smooth' }); } },
+          { id: 'courses', icon: BookOpen, labelKm: 'មេរៀន', labelEn: 'Lessons', action: () => { setTabAndUrl('courses'); window.scrollTo({ top: 0, behavior: 'smooth' }); } },
+          { id: 'playground', icon: Gamepad2, labelKm: 'ហ្គេម', labelEn: 'Games', action: () => { setTabAndUrl('playground'); window.scrollTo({ top: 0, behavior: 'smooth' }); } },
+          { id: 'bacii', icon: GraduationCap, labelKm: 'បាក់ឌុប', labelEn: 'Bac II', action: () => { setTabAndUrl('bacii'); window.scrollTo({ top: 0, behavior: 'smooth' }); } },
+          { id: 'chat', icon: MessageSquare, labelKm: 'ជជែក', labelEn: 'Chat', action: () => { setTabAndUrl('chat'); window.scrollTo({ top: 0, behavior: 'smooth' }); }, badgeDot: true },
           { id: 'ai', icon: Bot, labelKm: 'គ្រូ AI', labelEn: 'AI Tutor', action: () => setIsAITutorOpen(true) }
         ];
 
         return (
           <nav 
-            className="w-full flex-shrink-0 z-50 md:hidden select-none font-kantumruy bg-white dark:bg-[#0c1427] border-t border-slate-200/90 dark:border-slate-800 shadow-[0_-4px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_-4px_25px_rgba(0,0,0,0.45)] overflow-visible"
+            className="fixed bottom-0 left-0 right-0 w-full z-[9999] md:hidden select-none font-kantumruy bg-white dark:bg-[#0c1427] border-t border-slate-200/90 dark:border-slate-800 shadow-[0_-4px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_-4px_25px_rgba(0,0,0,0.45)] overflow-visible"
             style={{
               paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 14px)',
               paddingTop: '6px'
@@ -840,6 +821,13 @@ function MainApp() {
                 );
               })}
             </div>
+
+            {/* iOS Safari/Chrome gap filler: extends nav background below the fixed bar
+                to cover the gap that appears when the browser toolbar collapses on scroll */}
+            <div 
+              className="absolute left-0 right-0 top-full h-[200px] bg-white dark:bg-[#0c1427] pointer-events-none"
+              aria-hidden="true"
+            />
           </nav>
         );
       })()}

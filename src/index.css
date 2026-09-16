@@ -87,26 +87,8 @@
     }
   }
 
-  /* Mobile App Shell Layout: locks viewport on mobile so bottom navigation bar is
-     permanently docked to the physical bottom of the phone screen with zero gaps */
-  @media (max-width: 767px) {
-    html, body {
-      height: 100%;
-      height: 100dvh;
-      overflow: hidden;
-    }
-    #root {
-      height: 100%;
-      height: 100dvh;
-      overflow: hidden;
-    }
-  }
-
-  /* Smooth momentum scrolling for mobile content viewport */
-  #main-content-scroll {
-    -webkit-overflow-scrolling: touch;
-  }
-
+  /* Prevent horizontal overflow — use clip on body to avoid creating a scroll 
+     container that decouples position:fixed from the viewport on iOS */
   body {
     overflow-x: clip;
   }
