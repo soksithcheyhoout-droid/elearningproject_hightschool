@@ -706,6 +706,19 @@ html[data-theme="dark"] footer span.text-\[\#003366\] {
   color: #f8fafc !important;
 }
 
+/* Mobile Curved Cutout in dark mode */
+html.dark nav svg path[fill="#f4f7fb"],
+html[data-theme="dark"] nav svg path[fill="#f4f7fb"],
+html.dark nav svg path.fill-\[\#f4f7fb\],
+html[data-theme="dark"] nav svg path.fill-\[\#f4f7fb\] {
+  fill: #090d16 !important;
+}
+html.dark nav svg path[stroke="#e2e8f0"],
+html[data-theme="dark"] nav svg path[stroke="#e2e8f0"],
+html.dark nav svg path.stroke-slate-200\/90,
+html[data-theme="dark"] nav svg path.stroke-slate-200\/90 {
+  stroke: #1e293b !important;
+}
 
 /* Scrollbar dark mode */
 html.dark ::-webkit-scrollbar-track,
