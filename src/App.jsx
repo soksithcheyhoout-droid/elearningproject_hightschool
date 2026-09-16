@@ -775,17 +775,36 @@ function MainApp() {
 
         return (
           <nav 
-            className={`fixed bottom-0 left-0 right-0 w-full z-50 md:hidden select-none font-kantumruy transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] bg-white/98 dark:bg-[#0c1427]/98 backdrop-blur-xl border-t border-slate-200/90 dark:border-slate-800 shadow-[0_-4px_25px_rgba(0,0,0,0.06)] dark:shadow-[0_-4px_25px_rgba(0,0,0,0.45)] ${
-              isMobileNavVisible ? 'translate-y-0' : 'translate-y-[calc(100%+24px)] pointer-events-none'
+            className={`fixed bottom-0 left-0 right-0 w-full z-50 md:hidden select-none font-kantumruy transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] bg-white/98 dark:bg-[#0c1427]/98 backdrop-blur-xl border-t border-slate-200/90 dark:border-slate-800 shadow-[0_-4px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_-4px_25px_rgba(0,0,0,0.5)] overflow-visible ${
+              isMobileNavVisible ? 'translate-y-0' : 'translate-y-[calc(100%+45px)] pointer-events-none'
             }`}
             style={{
-              paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 8px)',
-              paddingTop: '6px',
+              paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 10px)',
+              paddingTop: '8px',
               willChange: 'transform'
             }}
           >
             {/* Main Bar Container */}
-            <div className="relative h-[52px] flex items-stretch px-1">
+            <div className="relative h-[56px] flex items-stretch px-1 overflow-visible">
+              
+              {/* 🌟 Floating Active Circular Bubble — Elevated High (-top-[26px]) for Full Visibility with No Cuts */}
+              <div
+                className="absolute -top-[26px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-20"
+                style={{
+                  left: `calc(${activeIndex * (100 / 6)}% + ${(100 / 6) / 2}%)`,
+                  transform: 'translateX(-50%)'
+                }}
+              >
+                <div className="w-[52px] h-[52px] rounded-full bg-gradient-to-tr from-[#005baa] via-[#006bbd] to-[#008fe3] text-white flex items-center justify-center shadow-[0_8px_25px_rgba(0,91,170,0.55)] border-[3.5px] border-white dark:border-[#0c1427]">
+                  {activeIndex === 0 && <Home className="w-[22px] h-[22px] animate-scaleIn stroke-[2.2]" />}
+                  {activeIndex === 1 && <BookOpen className="w-[22px] h-[22px] animate-scaleIn stroke-[2.2]" />}
+                  {activeIndex === 2 && <Gamepad2 className="w-[22px] h-[22px] animate-scaleIn stroke-[2.2]" />}
+                  {activeIndex === 3 && <GraduationCap className="w-[22px] h-[22px] animate-scaleIn stroke-[2.2]" />}
+                  {activeIndex === 4 && <MessageSquare className="w-[22px] h-[22px] animate-scaleIn stroke-[2.2]" />}
+                  {activeIndex === 5 && <Bot className="w-[22px] h-[22px] animate-scaleIn stroke-[2.2]" />}
+                </div>
+              </div>
+
               {/* Navigation Tab Buttons */}
               {navItems.map((item, index) => {
                 const isActive = index === activeIndex;
@@ -796,32 +815,29 @@ function MainApp() {
                     key={item.id}
                     type="button"
                     onClick={item.action}
-                    className="flex-1 flex flex-col items-center justify-center h-full relative z-10 cursor-pointer active:scale-95 transition-all group px-0.5"
+                    className="flex-1 flex flex-col items-center justify-end pb-1 h-full relative z-10 cursor-pointer active:scale-95 transition-all group"
                   >
-                    {/* Icon area with active capsule pill */}
-                    <div className="relative flex items-center justify-center">
-                      <div
-                        className={`w-11 h-7 rounded-full flex items-center justify-center transition-all duration-200 ${
-                          isActive
-                            ? 'bg-gradient-to-tr from-[#005baa] via-[#006bbd] to-[#008fe3] text-white shadow-[0_2px_10px_rgba(0,91,170,0.4)]'
-                            : 'text-slate-400 dark:text-slate-500 group-hover:text-slate-600 dark:group-hover:text-slate-300'
-                        }`}
-                      >
-                        <IconComponent className={`w-[18px] h-[18px] ${isActive ? 'stroke-[2.3] animate-scaleIn' : 'stroke-[1.8]'}`} />
-                      </div>
+                    {/* Icon area — uniform height for all items */}
+                    <div className="relative flex items-center justify-center h-5 mb-1">
+                      {!isActive ? (
+                        <IconComponent className="w-[20px] h-[20px] text-slate-400 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors stroke-[1.8]" />
+                      ) : (
+                        /* Empty spacer for active item (icon is in the prominent elevated circular bubble above) */
+                        <div className="h-5" />
+                      )}
 
                       {/* Notification dot for chat */}
                       {!isActive && item.badgeDot && (
-                        <span className="absolute top-0 right-1.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-[#0c1427]" />
+                        <span className="absolute -top-0.5 -right-1.5 w-2 h-2 rounded-full bg-emerald-500 ring-2 ring-white dark:ring-[#0c1427]" />
                       )}
                     </div>
 
                     {/* Label */}
                     <span
-                      className={`text-[9.5px] leading-tight mt-1 transition-colors truncate max-w-full ${
+                      className={`text-[9.5px] leading-tight transition-colors ${
                         isActive
-                          ? 'text-[#005baa] dark:text-cyan-400 font-black'
-                          : 'text-slate-400 dark:text-slate-500 font-medium group-hover:text-slate-700 dark:group-hover:text-slate-300'
+                          ? 'text-[#005baa] dark:text-cyan-400 font-black mt-1'
+                          : 'text-slate-400 dark:text-slate-500 font-semibold group-hover:text-slate-700 dark:group-hover:text-slate-300'
                       }`}
                     >
                       {lang === 'km' ? item.labelKm : item.labelEn}
