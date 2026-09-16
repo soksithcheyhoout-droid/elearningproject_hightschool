@@ -140,51 +140,7 @@ function MainApp() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  const [isMobileNavVisible, setIsMobileNavVisible] = useState(true);
-
-  // 🌟 Auto-Hide Mobile Bottom Navigation on Scroll Down & Reveal on Scroll Up
-  useEffect(() => {
-    let lastScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
-    let ticking = false;
-
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const currentScrollY = window.scrollY;
-          const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-
-          // 1. Always keep visible at the top of the page (first 60px)
-          if (currentScrollY <= 60) {
-            setIsMobileNavVisible(true);
-          }
-          // 2. Always keep visible when user reaches the bottom of the page
-          else if (currentScrollY >= maxScroll - 40) {
-            setIsMobileNavVisible(true);
-          }
-          // 3. User scrolled DOWN by at least 10px -> Slide DOWN / HIDE
-          else if (currentScrollY > lastScrollY + 10) {
-            setIsMobileNavVisible(false);
-          }
-          // 4. User scrolled UP by at least 10px -> Slide UP / REVEAL
-          else if (currentScrollY < lastScrollY - 10) {
-            setIsMobileNavVisible(true);
-          }
-
-          lastScrollY = Math.max(0, currentScrollY);
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Ensure navigation is visible whenever user switches tabs
-  useEffect(() => {
-    setIsMobileNavVisible(true);
-  }, [activeTab]);
+  // Mobile bottom navigation is always visible (no scroll hide)
 
   // Real-Time Incoming Match Invitations Polling & Syncing (Cross-Tabs & Cross-Users)
   useEffect(() => {
@@ -775,9 +731,7 @@ function MainApp() {
 
         return (
           <nav 
-            className={`fixed bottom-0 left-0 right-0 w-full z-50 md:hidden select-none font-kantumruy transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] overflow-visible ${
-              isMobileNavVisible ? 'translate-y-0' : 'translate-y-[calc(100%+40px)] pointer-events-none'
-            }`}
+            className="fixed bottom-0 left-0 right-0 w-full z-50 md:hidden select-none font-kantumruy pointer-events-none overflow-visible"
             style={{
               paddingTop: '40px',
               willChange: 'transform'
@@ -785,7 +739,7 @@ function MainApp() {
           >
             {/* Visual Bar with background/border/shadow — sits below the transparent bubble zone */}
             <div 
-              className="relative bg-white dark:bg-[#0c1427] border-t border-slate-200/90 dark:border-slate-800 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.45)]"
+              className="relative bg-white dark:bg-[#0c1427] border-t border-slate-200/90 dark:border-slate-800 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.45)] pointer-events-auto"
               style={{
                 paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)',
                 paddingTop: '8px'
