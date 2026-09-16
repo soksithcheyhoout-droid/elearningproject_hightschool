@@ -51,7 +51,6 @@
     padding: 0;
     width: 100%;
     max-width: 100vw;
-    overflow-x: hidden;
     touch-action: manipulation;
     -webkit-text-size-adjust: 100%;
     -webkit-touch-callout: none !important;
@@ -87,8 +86,13 @@
     }
   }
 
-  /* Prevent horizontal overflow — use clip on body to avoid creating a scroll 
-     container that decouples position:fixed from the viewport on iOS */
+  /* Prevent horizontal overflow — use clip on body and #root to avoid creating a scroll 
+     container that breaks position: sticky or fixed positioning on iOS */
+  html, body {
+    overflow-x: clip;
+    max-width: 100vw;
+  }
+
   body {
     overflow-x: clip;
   }
@@ -96,7 +100,7 @@
   #root {
     width: 100%;
     max-width: 100vw;
-    overflow-x: hidden;
+    overflow-x: clip;
     min-height: 100vh;
     min-height: 100dvh;
   }

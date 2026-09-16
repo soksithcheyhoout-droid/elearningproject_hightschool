@@ -731,7 +731,7 @@ function MainApp() {
 
         return (
           <nav 
-            className="fixed bottom-0 left-0 right-0 w-full z-[9999] md:hidden select-none font-kantumruy bg-white dark:bg-[#0c1427] border-t border-slate-200/90 dark:border-slate-800 shadow-[0_-4px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_-4px_25px_rgba(0,0,0,0.45)] overflow-visible"
+            className="sticky bottom-0 left-0 right-0 w-full z-[9999] md:hidden select-none font-kantumruy bg-white dark:bg-[#0c1427] border-t border-slate-200/90 dark:border-slate-800 shadow-[0_-4px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_-4px_25px_rgba(0,0,0,0.45)] overflow-visible"
             style={{
               paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 14px)',
               paddingTop: '6px'
