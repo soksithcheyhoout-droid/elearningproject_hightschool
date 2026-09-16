@@ -821,6 +821,13 @@ function MainApp() {
                 );
               })}
             </div>
+
+            {/* iOS Safari/Chrome gap filler: extends nav background below the fixed bar
+                to cover the gap that appears when the browser toolbar collapses on scroll */}
+            <div 
+              className="absolute left-0 right-0 top-full h-[200px] bg-white dark:bg-[#0c1427] pointer-events-none"
+              aria-hidden="true"
+            />
           </nav>
         );
       })()}
