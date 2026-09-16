@@ -784,40 +784,41 @@ function MainApp() {
               willChange: 'transform'
             }}
           >
-            {/* Main Bar Container */}
-            <div className="relative h-[56px] flex items-stretch px-1 overflow-visible">
+            {/* Main Bar Container — with mx-3 for clean edge spacing on Tab 0 (Home) and Tab 5 (AI Tutor) */}
+            <div className="relative mx-3 h-[56px] flex items-stretch overflow-visible">
               
-              {/* Dynamic Curved Cutout Scoop (Perfect Smooth S-curve Notch — No Cuts) */}
+              {/* Dynamic Curved Cutout Scoop (Perfect Smooth S-curve Notch — Zero Edge Clipping) */}
               <svg
-                className="absolute -top-[1px] w-[84px] h-[26px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-10"
+                className="absolute -top-[1px] w-[70px] h-[22px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-10"
                 style={{
-                  left: `calc(${activeIndex * (100 / 6)}% + ${(100 / 6) / 2}% - 42px)`
+                  left: `calc((${activeIndex} + 0.5) * (100% / 6))`,
+                  transform: 'translateX(-50%)'
                 }}
-                viewBox="0 0 84 26"
+                viewBox="0 0 70 22"
                 fill="none"
               >
                 <path
-                  d="M0 0 C 18 0, 26 22, 42 22 C 58 22, 66 0, 84 0 L 84 0 L 0 0 Z"
+                  d="M0 0 C 15 0, 22 18, 35 18 C 48 18, 55 0, 70 0 L 70 0 L 0 0 Z"
                   className="fill-[#f4f7fb] dark:fill-[#090d16]"
                 />
                 <path
-                  d="M0 0 C 18 0, 26 22, 42 22 C 58 22, 66 0, 84 0"
+                  d="M0 0 C 15 0, 22 18, 35 18 C 48 18, 55 0, 70 0"
                   className="stroke-slate-200/90 dark:stroke-slate-800"
-                  strokeWidth="1"
+                  strokeWidth="1.2"
                   strokeLinecap="round"
                   fill="none"
                 />
               </svg>
 
-              {/* Floating Active Circular Bubble with Signature MoEYS Royal Blue Gradient — Elevated for Full View */}
+              {/* Floating Active Circular Bubble with Signature MoEYS Royal Blue Gradient — Elevated High (-top-[30px]) for Full 360° Visibility */}
               <div
-                className="absolute -top-[22px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-20"
+                className="absolute -top-[30px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-20"
                 style={{
-                  left: `calc(${activeIndex * (100 / 6)}% + ${(100 / 6) / 2}%)`,
+                  left: `calc((${activeIndex} + 0.5) * (100% / 6))`,
                   transform: 'translateX(-50%)'
                 }}
               >
-                <div className="w-[48px] h-[48px] rounded-full bg-gradient-to-tr from-[#005baa] via-[#006bbd] to-[#008fe3] text-white flex items-center justify-center shadow-[0_8px_22px_rgba(0,91,170,0.5)] border-[3.5px] border-white dark:border-[#0c1427]">
+                <div className="w-[48px] h-[48px] rounded-full bg-gradient-to-tr from-[#005baa] via-[#006bbd] to-[#008fe3] text-white flex items-center justify-center shadow-[0_10px_25px_rgba(0,91,170,0.55)] border-[3.5px] border-white dark:border-[#0c1427]">
                   {activeIndex === 0 && <Home className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
                   {activeIndex === 1 && <BookOpen className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
                   {activeIndex === 2 && <Gamepad2 className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
