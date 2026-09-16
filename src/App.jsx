@@ -140,44 +140,8 @@ function MainApp() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  const [isMobileNavVisible, setIsMobileNavVisible] = useState(true);
+  // Mobile bottom navigation is always visible (no scroll hide)
 
-  // 🌟 Auto-Hide Mobile Bottom Navigation on Scroll Down & Reveal on Scroll Up
-  useEffect(() => {
-    let lastScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
-    let ticking = false;
-
-    const handleScroll = () => {
-      if (!ticking) {
-        window.requestAnimationFrame(() => {
-          const currentScrollY = window.scrollY;
-          const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
-
-          if (currentScrollY <= 60) {
-            setIsMobileNavVisible(true);
-          } else if (currentScrollY >= maxScroll - 40) {
-            setIsMobileNavVisible(true);
-          } else if (currentScrollY > lastScrollY + 10) {
-            setIsMobileNavVisible(false);
-          } else if (currentScrollY < lastScrollY - 10) {
-            setIsMobileNavVisible(true);
-          }
-
-          lastScrollY = Math.max(0, currentScrollY);
-          ticking = false;
-        });
-        ticking = true;
-      }
-    };
-
-    window.addEventListener('scroll', handleScroll, { passive: true });
-    return () => window.removeEventListener('scroll', handleScroll);
-  }, []);
-
-  // Ensure navigation is visible whenever user switches tabs
-  useEffect(() => {
-    setIsMobileNavVisible(true);
-  }, [activeTab]);
 
   // Real-Time Incoming Match Invitations Polling & Syncing (Cross-Tabs & Cross-Users)
   useEffect(() => {
@@ -768,13 +732,10 @@ function MainApp() {
 
         return (
           <nav 
-            className={`fixed bottom-0 left-0 right-0 w-full z-50 md:hidden select-none font-kantumruy transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] bg-white dark:bg-[#0c1427] border-t border-slate-200/90 dark:border-slate-800 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.45)] overflow-visible ${
-              isMobileNavVisible ? 'translate-y-0' : 'translate-y-[calc(100%+40px)] pointer-events-none'
-            }`}
+            className="fixed bottom-0 left-0 right-0 w-full z-50 md:hidden select-none font-kantumruy bg-white dark:bg-[#0c1427] border-t border-slate-200/90 dark:border-slate-800 shadow-[0_-4px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_-4px_25px_rgba(0,0,0,0.45)] overflow-visible"
             style={{
-              paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)',
-              paddingTop: '8px',
-              willChange: 'transform'
+              paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 14px)',
+              paddingTop: '6px'
             }}
           >
             {/* Main Bar Container — with mx-3 for clean edge spacing */}
@@ -782,20 +743,20 @@ function MainApp() {
               
               {/* Dynamic Curved Cutout Scoop */}
               <svg
-                className="absolute -top-[9px] w-[70px] h-[26px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-10"
+                className="absolute -top-[7px] w-[68px] h-[24px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-10"
                 style={{
                   left: `calc((${activeIndex} + 0.5) * (100% / 6))`,
                   transform: 'translateX(-50%)'
                 }}
-                viewBox="0 0 70 26"
+                viewBox="0 0 68 24"
                 fill="none"
               >
                 <path
-                  d="M0 0 C 14 0, 20 22, 35 22 C 50 22, 56 0, 70 0 L 70 0 L 0 0 Z"
+                  d="M0 0 C 13 0, 18 20, 34 20 C 50 20, 55 0, 68 0 L 68 0 L 0 0 Z"
                   className="fill-[#f4f7fb] dark:fill-[#090d16]"
                 />
                 <path
-                  d="M0 0 C 14 0, 20 22, 35 22 C 50 22, 56 0, 70 0"
+                  d="M0 0 C 13 0, 18 20, 34 20 C 50 20, 55 0, 68 0"
                   className="stroke-slate-200/90 dark:stroke-slate-800"
                   strokeWidth="1.2"
                   strokeLinecap="round"
@@ -805,13 +766,13 @@ function MainApp() {
 
               {/* Floating Active Circular Bubble — Elevated for Full Visibility */}
               <div
-                className="absolute -top-[36px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-20"
+                className="absolute -top-[28px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-20"
                 style={{
                   left: `calc((${activeIndex} + 0.5) * (100% / 6))`,
                   transform: 'translateX(-50%)'
                 }}
               >
-                <div className="w-[48px] h-[48px] rounded-full bg-gradient-to-tr from-[#005baa] via-[#006bbd] to-[#008fe3] text-white flex items-center justify-center shadow-[0_10px_25px_rgba(0,91,170,0.55)] border-[3.5px] border-white dark:border-[#0c1427]">
+                <div className="w-[48px] h-[48px] rounded-full bg-gradient-to-tr from-[#005baa] via-[#006bbd] to-[#008fe3] text-white flex items-center justify-center shadow-[0_8px_20px_rgba(0,91,170,0.45)] border-[3.5px] border-white dark:border-[#0c1427]">
                   {activeIndex === 0 && <Home className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
                   {activeIndex === 1 && <BookOpen className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
                   {activeIndex === 2 && <Gamepad2 className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
@@ -831,14 +792,14 @@ function MainApp() {
                     key={item.id}
                     type="button"
                     onClick={item.action}
-                    className="flex-1 flex flex-col items-center justify-end pb-1 h-full relative z-10 cursor-pointer active:scale-95 transition-all group"
+                    className="flex-1 flex flex-col items-center justify-center h-full relative z-10 cursor-pointer active:scale-95 transition-all group"
                   >
                     {/* Icon area */}
-                    <div className="relative flex items-center justify-center h-5 mb-1">
+                    <div className="relative flex items-center justify-center h-6 mb-0.5">
                       {!isActive ? (
-                        <IconComponent className="w-[20px] h-[20px] text-slate-400 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors stroke-[1.8]" />
+                        <IconComponent className="w-[21px] h-[21px] text-slate-400 dark:text-slate-500 group-hover:text-slate-700 dark:group-hover:text-slate-200 transition-colors stroke-[1.8]" />
                       ) : (
-                        <div className="h-5" />
+                        <div className="w-[21px] h-[21px]" />
                       )}
 
                       {/* Notification dot for chat */}
@@ -849,9 +810,9 @@ function MainApp() {
 
                     {/* Label */}
                     <span
-                      className={`text-[9.5px] leading-tight transition-colors ${
+                      className={`text-[10px] leading-tight transition-colors whitespace-nowrap ${
                         isActive
-                          ? 'text-[#005baa] dark:text-cyan-400 font-black mt-1'
+                          ? 'text-[#005baa] dark:text-cyan-400 font-bold mt-0.5'
                           : 'text-slate-400 dark:text-slate-500 font-semibold group-hover:text-slate-700 dark:group-hover:text-slate-300'
                       }`}
                     >
