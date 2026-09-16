@@ -775,58 +775,66 @@ function MainApp() {
 
         return (
           <nav 
-            className={`fixed bottom-0 left-0 right-0 w-full z-50 md:hidden select-none font-kantumruy transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] bg-white dark:bg-[#0c1427] border-t border-slate-200/90 dark:border-slate-800 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.45)] overflow-visible ${
+            className={`fixed bottom-0 left-0 right-0 w-full z-50 md:hidden select-none font-kantumruy transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] overflow-visible ${
               isMobileNavVisible ? 'translate-y-0' : 'translate-y-[calc(100%+40px)] pointer-events-none'
             }`}
             style={{
-              paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)',
-              paddingTop: '8px',
+              paddingTop: '40px',
               willChange: 'transform'
             }}
           >
-            {/* Main Bar Container — with mx-3 for clean edge spacing on Tab 0 (Home) and Tab 5 (AI Tutor) */}
-            <div className="relative mx-3 h-[56px] flex items-stretch overflow-visible">
+            {/* Visual Bar with background/border/shadow — sits below the transparent bubble zone */}
+            <div 
+              className="relative bg-white dark:bg-[#0c1427] border-t border-slate-200/90 dark:border-slate-800 shadow-[0_-4px_20px_rgba(0,0,0,0.06)] dark:shadow-[0_-4px_20px_rgba(0,0,0,0.45)]"
+              style={{
+                paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)',
+                paddingTop: '8px'
+              }}
+            >
+              {/* Main Bar Container — with mx-3 for clean edge spacing on Tab 0 (Home) and Tab 5 (AI Tutor) */}
+              <div className="relative mx-3 h-[56px] flex items-stretch overflow-visible">
               
-              {/* Dynamic Curved Cutout Scoop (Deeper S-curve Notch — Zero Edge Clipping) */}
-              <svg
-                className="absolute -top-[1px] w-[70px] h-[26px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-10"
-                style={{
-                  left: `calc((${activeIndex} + 0.5) * (100% / 6))`,
-                  transform: 'translateX(-50%)'
-                }}
-                viewBox="0 0 70 26"
-                fill="none"
-              >
-                <path
-                  d="M0 0 C 14 0, 20 22, 35 22 C 50 22, 56 0, 70 0 L 70 0 L 0 0 Z"
-                  className="fill-[#f4f7fb] dark:fill-[#090d16]"
-                />
-                <path
-                  d="M0 0 C 14 0, 20 22, 35 22 C 50 22, 56 0, 70 0"
-                  className="stroke-slate-200/90 dark:stroke-slate-800"
-                  strokeWidth="1.2"
-                  strokeLinecap="round"
+                {/* Dynamic Curved Cutout Scoop (Deeper S-curve Notch — Zero Edge Clipping) */}
+                <svg
+                  className="absolute -top-[9px] w-[70px] h-[26px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-10"
+                  style={{
+                    left: `calc((${activeIndex} + 0.5) * (100% / 6))`,
+                    transform: 'translateX(-50%)'
+                  }}
+                  viewBox="0 0 70 26"
                   fill="none"
-                />
-              </svg>
+                >
+                  <path
+                    d="M0 0 C 14 0, 20 22, 35 22 C 50 22, 56 0, 70 0 L 70 0 L 0 0 Z"
+                    className="fill-[#f4f7fb] dark:fill-[#090d16]"
+                  />
+                  <path
+                    d="M0 0 C 14 0, 20 22, 35 22 C 50 22, 56 0, 70 0"
+                    className="stroke-slate-200/90 dark:stroke-slate-800"
+                    strokeWidth="1.2"
+                    strokeLinecap="round"
+                    fill="none"
+                  />
+                </svg>
 
-              {/* Floating Active Circular Bubble with Signature MoEYS Royal Blue Gradient — Elevated Extra High (-top-[36px]) for Full 360° Visibility */}
-              <div
-                className="absolute -top-[36px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-20"
-                style={{
-                  left: `calc((${activeIndex} + 0.5) * (100% / 6))`,
-                  transform: 'translateX(-50%)'
-                }}
-              >
-                <div className="w-[48px] h-[48px] rounded-full bg-gradient-to-tr from-[#005baa] via-[#006bbd] to-[#008fe3] text-white flex items-center justify-center shadow-[0_10px_25px_rgba(0,91,170,0.55)] border-[3.5px] border-white dark:border-[#0c1427]">
-                  {activeIndex === 0 && <Home className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
-                  {activeIndex === 1 && <BookOpen className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
-                  {activeIndex === 2 && <Gamepad2 className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
-                  {activeIndex === 3 && <GraduationCap className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
-                  {activeIndex === 4 && <MessageSquare className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
-                  {activeIndex === 5 && <Bot className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
+                {/* Floating Active Circular Bubble — positioned relative to inner bar, floats into the transparent nav padding zone above */}
+                <div
+                  className="absolute -top-[44px] pointer-events-none transition-all duration-300 ease-[cubic-bezier(0.34,1.56,0.64,1)] z-20"
+                  style={{
+                    left: `calc((${activeIndex} + 0.5) * (100% / 6))`,
+                    transform: 'translateX(-50%)'
+                  }}
+                >
+                  <div className="w-[48px] h-[48px] rounded-full bg-gradient-to-tr from-[#005baa] via-[#006bbd] to-[#008fe3] text-white flex items-center justify-center shadow-[0_10px_25px_rgba(0,91,170,0.55)] border-[3.5px] border-white dark:border-[#0c1427]">
+                    {activeIndex === 0 && <Home className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
+                    {activeIndex === 1 && <BookOpen className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
+                    {activeIndex === 2 && <Gamepad2 className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
+                    {activeIndex === 3 && <GraduationCap className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
+                    {activeIndex === 4 && <MessageSquare className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
+                    {activeIndex === 5 && <Bot className="w-5 h-5 animate-scaleIn stroke-[2.2]" />}
+                  </div>
                 </div>
-              </div>
+
 
               {/* Navigation Tab Buttons */}
               {navItems.map((item, index) => {
@@ -868,6 +876,7 @@ function MainApp() {
                   </button>
                 );
               })}
+              </div>
             </div>
           </nav>
         );
