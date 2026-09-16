@@ -140,6 +140,52 @@ function MainApp() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
+  const [isMobileNavVisible, setIsMobileNavVisible] = useState(true);
+
+  // 🌟 Auto-Hide Mobile Bottom Navigation on Scroll Down & Reveal on Scroll Up
+  useEffect(() => {
+    let lastScrollY = typeof window !== 'undefined' ? window.scrollY : 0;
+    let ticking = false;
+
+    const handleScroll = () => {
+      if (!ticking) {
+        window.requestAnimationFrame(() => {
+          const currentScrollY = window.scrollY;
+          const maxScroll = Math.max(0, document.documentElement.scrollHeight - window.innerHeight);
+
+          // 1. Always keep visible at the top of the page (first 60px)
+          if (currentScrollY <= 60) {
+            setIsMobileNavVisible(true);
+          }
+          // 2. Always keep visible when user reaches the bottom of the page
+          else if (currentScrollY >= maxScroll - 40) {
+            setIsMobileNavVisible(true);
+          }
+          // 3. User scrolled DOWN by at least 10px -> Slide DOWN / HIDE
+          else if (currentScrollY > lastScrollY + 10) {
+            setIsMobileNavVisible(false);
+          }
+          // 4. User scrolled UP by at least 10px -> Slide UP / REVEAL
+          else if (currentScrollY < lastScrollY - 10) {
+            setIsMobileNavVisible(true);
+          }
+
+          lastScrollY = Math.max(0, currentScrollY);
+          ticking = false;
+        });
+        ticking = true;
+      }
+    };
+
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  // Ensure navigation is visible whenever user switches tabs
+  useEffect(() => {
+    setIsMobileNavVisible(true);
+  }, [activeTab]);
+
   // Real-Time Incoming Match Invitations Polling & Syncing (Cross-Tabs & Cross-Users)
   useEffect(() => {
     if (!student?.id && !student?.username) return;
@@ -730,13 +776,16 @@ function MainApp() {
 
         return (
           <nav 
-            className="fixed bottom-0 left-0 right-0 w-full z-50 md:hidden select-none font-kantumruy"
+            className={`fixed bottom-0 left-0 right-0 w-full z-50 md:hidden select-none font-kantumruy transition-transform duration-300 ease-[cubic-bezier(0.32,0.72,0,1)] ${
+              isMobileNavVisible ? 'translate-y-0' : 'translate-y-[calc(100%+32px)] pointer-events-none'
+            }`}
             style={{
               background: '#ffffff',
               borderTop: '1px solid rgba(226, 232, 240, 0.9)',
               boxShadow: '0 -2px 10px rgba(0, 0, 0, 0.05)',
               paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 12px)',
-              paddingTop: '8px'
+              paddingTop: '8px',
+              willChange: 'transform'
             }}
           >
             {/* Main Bar Container */}
