@@ -140,53 +140,7 @@ function MainApp() {
     return () => window.removeEventListener('popstate', handlePopState);
   }, []);
 
-  // 📱 Permanently pin Mobile Bottom Navigation to the physical bottom edge of screen
-  // Prevents the floating gap on iOS Safari / Chrome when address/navigation bars collapse or expand
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    let rafId = null;
-
-    const syncBottomNav = () => {
-      if (rafId) cancelAnimationFrame(rafId);
-      rafId = requestAnimationFrame(() => {
-        const nav = document.getElementById('mobile-bottom-nav');
-        if (!nav) return;
-
-        if (window.visualViewport) {
-          const vv = window.visualViewport;
-          // When iOS Chrome / Safari collapses its bottom toolbar, visual viewport grows taller
-          // than layout viewport (window.innerHeight). Shift down to match physical bottom!
-          const shiftY = Math.round((vv.height + vv.offsetTop) - window.innerHeight);
-          if (shiftY !== 0) {
-            nav.style.transform = `translateY(${shiftY}px)`;
-          } else {
-            nav.style.transform = '';
-          }
-        }
-      });
-    };
-
-    if (window.visualViewport) {
-      window.visualViewport.addEventListener('resize', syncBottomNav);
-      window.visualViewport.addEventListener('scroll', syncBottomNav);
-    }
-    window.addEventListener('resize', syncBottomNav);
-    window.addEventListener('scroll', syncBottomNav, { passive: true });
-
-    syncBottomNav();
-
-    return () => {
-      if (rafId) cancelAnimationFrame(rafId);
-      if (window.visualViewport) {
-        window.visualViewport.removeEventListener('resize', syncBottomNav);
-        window.visualViewport.removeEventListener('scroll', syncBottomNav);
-      }
-      window.removeEventListener('resize', syncBottomNav);
-      window.removeEventListener('scroll', syncBottomNav);
-    };
-  }, [activeTab]);
-
+  // Mobile bottom navigation: always visible, pure CSS fixed positioning (no JS transforms)
 
   // Real-Time Incoming Match Invitations Polling & Syncing (Cross-Tabs & Cross-Users)
   useEffect(() => {
@@ -777,8 +731,7 @@ function MainApp() {
 
         return (
           <nav 
-            id="mobile-bottom-nav"
-            className="fixed bottom-0 left-0 right-0 w-full z-50 md:hidden select-none font-kantumruy bg-white dark:bg-[#0c1427] border-t border-slate-200/90 dark:border-slate-800 shadow-[0_-4px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_-4px_25px_rgba(0,0,0,0.45)] overflow-visible will-change-transform"
+            className="fixed bottom-0 left-0 right-0 w-full z-[9999] md:hidden select-none font-kantumruy bg-white dark:bg-[#0c1427] border-t border-slate-200/90 dark:border-slate-800 shadow-[0_-4px_25px_rgba(0,0,0,0.08)] dark:shadow-[0_-4px_25px_rgba(0,0,0,0.45)] overflow-visible"
             style={{
               paddingBottom: 'max(env(safe-area-inset-bottom, 0px), 14px)',
               paddingTop: '6px'
