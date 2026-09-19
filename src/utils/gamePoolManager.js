@@ -1,6 +1,7 @@
 import { playgroundGamesData } from '../data/playgroundGamesData.js';
 import { quizData } from '../data/quizData.js';
 import { arenaMasterQuestionBank } from '../data/arenaMasterQuestionBank.js';
+import { getInstantGradeQuestions } from './gradeQuestionBank.js';
 
 // In-Match / Session Seen Questions Set (Guarantees NO duplicate questions during an active match/game)
 const activeSessionSeenSet = new Set();
@@ -88,41 +89,38 @@ const SOCIAL_SUBJECTS = new Set([
  * @param {string|number} grade - Grade level '1' to '12'
  * @param {string} stream - 'science' | 'social' | 'random' | 'all'
  */
-export function getRandomizedGameQuestions(game, count = 20, grade = null, stream = null) {
-  const requestedStream = stream || game?.stream || 'science';
-  const targetSubjectKey = game?.subjectKey;
-  const targetSubject = game?.subject;
-  const gameTitle = game?.titleKm || '';
+export function getRandomizedGameQuestions(game, count = 20, grade = null, stream = null, explicitSubjectKey = null) {
+  const targetSubjectKey = explicitSubjectKey || (typeof game === 'string' ? game : game?.subjectKey);
+  const targetSubject = (typeof game === 'object' ? game?.subject : null) || targetSubjectKey;
+  const requestedStream = stream || (typeof game === 'object' ? game?.stream : null) || 'science';
+  const gameTitle = typeof game === 'object' ? (game?.titleKm || '') : '';
   const gameKeywords = gameTitle.replace(/[\(\)«»]/g, ' ').split(/\s+/).filter(w => w.length > 2);
 
-  // Determine if targetSubjectKey actually matches the requestedStream
-  const isSubjectAlignedWithStream = targetSubjectKey
-    ? (requestedStream === 'social' ? SOCIAL_SUBJECTS.has(targetSubjectKey) || (targetSubject && SOCIAL_SUBJECTS.has(targetSubject)) : requestedStream === 'science' ? SCIENCE_SUBJECTS.has(targetSubjectKey) || (targetSubject && SCIENCE_SUBJECTS.has(targetSubject)) : true)
-    : false;
-
-  const effectiveSubjectKey = isSubjectAlignedWithStream ? targetSubjectKey : null;
-  const effectiveSubject = isSubjectAlignedWithStream ? targetSubject : null;
+  const effectiveSubjectKey = targetSubjectKey || null;
+  const effectiveSubject = targetSubject || null;
 
   let rawPool = [];
 
   // 1. Priority #1: Game's OWN specific questions (Tum Teav, Kolab Pailin, Limits, etc.)
-  if (game && Array.isArray(game.questions) && game.questions.length > 0) {
+  if (game && typeof game === 'object' && Array.isArray(game.questions) && game.questions.length > 0) {
     game.questions.forEach((q) => {
       if (q && q.q) {
-        rawPool.push({
-          ...q,
-          stream: game.stream || requestedStream,
-          subject: q.subject || game.subject || effectiveSubject,
-          subjectKey: q.subjectKey || game.subjectKey || effectiveSubjectKey,
-          grade: q.grade || game.grade || '12',
-          isPriorityTopic: true
-        });
+        if (!effectiveSubjectKey || (q.subjectKey === effectiveSubjectKey || q.subject === effectiveSubject || q.subject === effectiveSubjectKey)) {
+          rawPool.push({
+            ...q,
+            stream: game.stream || requestedStream,
+            subject: q.subject || game.subject || effectiveSubject,
+            subjectKey: q.subjectKey || game.subjectKey || effectiveSubjectKey,
+            grade: q.grade || game.grade || '12',
+            isPriorityTopic: true
+          });
+        }
       }
     });
   }
 
-  // 2. Priority #2: Match specific topic keywords from Arena Master Bank
-  if (gameKeywords.length > 0 && Array.isArray(arenaMasterQuestionBank)) {
+  // 2. Priority #2: Match specific topic keywords from Arena Master Bank (only if not restricted by subject)
+  if (!effectiveSubjectKey && gameKeywords.length > 0 && Array.isArray(arenaMasterQuestionBank)) {
     arenaMasterQuestionBank.forEach((item) => {
       if (!item || !item.q) return;
       const text = item.q + ' ' + (item.explanation || '');
@@ -141,9 +139,11 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
     arenaMasterQuestionBank.forEach((item) => {
       if (!item || !item.q) return;
 
-      if (effectiveSubjectKey && requestedStream !== 'random' && requestedStream !== 'all') {
-        const matchesSub = (effectiveSubjectKey && item.subjectKey === effectiveSubjectKey) ||
-                           (effectiveSubject && item.subject === effectiveSubject);
+      if (effectiveSubjectKey) {
+        const itemSub = (item.subject || '').toLowerCase();
+        const itemSubKey = (item.subjectKey || '').toLowerCase();
+        const targetSub = effectiveSubjectKey.toLowerCase();
+        const matchesSub = itemSub.includes(targetSub) || targetSub.includes(itemSub) || itemSubKey.includes(targetSub);
         if (matchesSub) {
           rawPool.push(item);
         }
@@ -168,9 +168,14 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
   if (Array.isArray(quizData)) {
     quizData.forEach((qz) => {
       if (!qz || !Array.isArray(qz.questions)) return;
-      const matchesSub = effectiveSubjectKey && (qz.subjectKey === effectiveSubjectKey || qz.subject === effectiveSubject);
-      let matchesStream = requestedStream === 'all' || requestedStream === 'random' || qz.stream === requestedStream;
-      if (matchesSub || matchesStream) {
+      const qzSub = (qz.subject || '').toLowerCase();
+      const qzSubKey = (qz.subjectKey || '').toLowerCase();
+      const matchesSub = effectiveSubjectKey
+        ? qzSub.includes(effectiveSubjectKey.toLowerCase()) || qzSubKey.includes(effectiveSubjectKey.toLowerCase())
+        : true;
+      let matchesStream = effectiveSubjectKey ? true : (requestedStream === 'all' || requestedStream === 'random' || qz.stream === requestedStream);
+      
+      if (matchesSub && matchesStream) {
         qz.questions.forEach((q) => {
           if (q && q.q) {
             rawPool.push({
@@ -202,15 +207,33 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
     if (seenTexts.has(coreKey)) return;
     seenTexts.add(coreKey);
 
-    // Hard stream guard
-    if (requestedStream === 'social' && SCIENCE_SUBJECTS.has(q.subject) && !SOCIAL_SUBJECTS.has(q.subject)) return;
-    if (requestedStream === 'science' && SOCIAL_SUBJECTS.has(q.subject) && !SCIENCE_SUBJECTS.has(q.subject)) return;
+    // Hard subject guard when subject is specified: NEVER leak other subjects
+    if (effectiveSubjectKey) {
+      const qSub = (q.subject || q.subjectKey || '').toLowerCase();
+      const targetSub = effectiveSubjectKey.toLowerCase();
+      const isSubMatch = qSub.includes(targetSub) || targetSub.includes(qSub);
+      if (!isSubMatch) return;
+    } else {
+      // Hard stream guard when no specific subject is selected
+      if (requestedStream === 'social' && SCIENCE_SUBJECTS.has(q.subject) && !SOCIAL_SUBJECTS.has(q.subject)) return;
+      if (requestedStream === 'science' && SOCIAL_SUBJECTS.has(q.subject) && !SCIENCE_SUBJECTS.has(q.subject)) return;
+    }
 
-    // Optional grade alignment if grade is specified
-    if (grade && grade !== 'all' && grade !== '1-12' && q.grade) {
+    // Strict grade isolation guard
+    if (grade && grade !== 'all' && grade !== '1-12') {
       const targetG = parseInt(grade, 10);
       const qG = parseInt(q.grade, 10);
-      if (targetG >= 10 && qG < 7) return; // Keep high school away from 1st grade
+
+      // Strict lower secondary (Grades 7-9): reject high school (Grades 10-12) questions
+      if (targetG <= 9 && qG >= 10) return;
+      // Strict primary (Grades 1-6): reject secondary/high school questions
+      if (targetG <= 6 && qG >= 7) return;
+      // High school (Grades 10-12): reject primary questions
+      if (targetG >= 10 && qG <= 6) return;
+
+      // Reject questions that explicitly advertise a higher grade in the prompt text
+      if (targetG <= 9 && /\(ថ្នាក់ទី\s*(1[0-2]|១[០-២])\)/i.test(q.q)) return;
+      if (targetG <= 6 && /\(ថ្នាក់ទី\s*([7-9]|1[0-2]|៧|៨|៩|១[០-២])\)/i.test(q.q)) return;
     }
 
     const qIdKey = q.id ? String(q.id).trim() : null;
@@ -224,9 +247,23 @@ export function getRandomizedGameQuestions(game, count = 20, grade = null, strea
   });
 
   // Prioritize unseen questions first; backfill with seen only if unseen pool is exhausted
-  const finalCandidates = unseenPool.length >= count
+  let finalCandidates = unseenPool.length >= count
     ? unseenPool
     : [...unseenPool, ...fallbackSeenPool];
+
+  // If candidate pool is still insufficient, supplement from the authentic Grade Question Bank
+  if (finalCandidates.length < count && grade) {
+    const instantQuestions = getInstantGradeQuestions(grade, effectiveSubjectKey || 'គណិតវិទ្យា', count);
+    if (Array.isArray(instantQuestions) && instantQuestions.length > 0) {
+      instantQuestions.forEach((iq) => {
+        const cleanT = iq.q.replace(/\s*\((ថ្នាក់ទី|Grade)\s*\d+\)/gi, '').replace(/\*\*/g, '').trim().toLowerCase();
+        if (!seenTexts.has(cleanT)) {
+          seenTexts.add(cleanT);
+          finalCandidates.push(iq);
+        }
+      });
+    }
+  }
 
   const shuffledCandidates = shuffleArray(finalCandidates);
   const selectedQuestions = shuffledCandidates.slice(0, Math.min(count, shuffledCandidates.length));
@@ -276,8 +313,8 @@ export async function fetchLiveExamQuestions({ stream = 'science', subjectKey = 
     console.warn('[Live Exam Pool Fetch Warning]:', err.message);
   }
 
-  // Fallback to rich local synchronous pool (6,000+ questions)
-  return getRandomizedGameQuestions(null, limit, grade, stream);
+  // Fallback to rich local synchronous pool
+  return getRandomizedGameQuestions(null, limit, grade, stream, subjectKey);
 }
 
 // =========================================================================

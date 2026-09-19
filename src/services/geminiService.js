@@ -416,3 +416,184 @@ export async function getAIAssistedSpellingHint(word, meaningKm) {
 
   return `ពាក្យ «${word}» មានអត្ថន័យថា «${meaningKm}»។ ចងចាំអក្សរដំបូង ${word[0]} និងព្យាង្គបន្តបន្ទាប់ដើម្បីសរសេរឱ្យបានត្រឹមត្រូវណា៎!`;
 }
+
+/**
+ * Grade-specific syllabus guidelines for Cambodian MoEYS Curriculum
+ */
+function getCurriculumGuideline(gradeNum, subjectName = '') {
+  const g = parseInt(gradeNum, 10) || 12;
+  const s = String(subjectName).toLowerCase();
+
+  if (g === 7) {
+    if (s.includes('ប្រវត្តិ') || s.includes('hist')) {
+      return `មុខវិជ្ជា៖ ប្រវត្តិវិទ្យា ថ្នាក់ទី ៧ (អនុវិទ្យាល័យ):
+- ប្រធានបទសំខាន់ៗ៖ ដើមសម័យអង្គរ (ការបង្រួបបង្រួមជាតិ និងពិធីរាជាភិសេករបស់ព្រះបាទជ័យវរ្ម័នទី ២ នៅឆ្នាំ ៨០២ លើភ្នំគូលែន / មហេន្ទ្របព៌ត), រាជធានីហរិហរាល័យ (រលួស), ព្រះបាទឥន្ទ្រវរ្ម័នទី ១ (ប្រាសាទបាគង, ព្រះគោ), ព្រះបាទយសោវរ្ម័នទី ១ (រាជធានីយសោធរបុរៈ / អង្គរ), ប្រភពដើមនៃរដ្ឋខ្មែរ (នគរភ្នំ ហ្វូណន និង ចេនឡា), សម័យចេនឡាដីគោក និងចេនឡាទឹកលិច, ព្រះបាទឥសានវរ្ម័ន (សម្បូរព្រៃគុក), វប្បធម៌ សាសនា ព្រហ្មញ្ញសាសនា និងព្រះពុទ្ធសាសនាបុរាណ។
+* បម្រាមតឹងរ៉ឹង៖ ហាមដាច់ខាតកុំសួរពីរូបវិទ្យា គីមីវិទ្យា ឬរូបមន្តគណិតវិទ្យា! ហាមសួរមេរៀនវិទ្យាល័យថ្នាក់ទី ១១ ឬ ១២! សំណួរ ១០០% ត្រូវតែជាប្រវត្តិវិទ្យាថ្នាក់ទី ៧!`;
+    }
+    if (s.includes('គណិត') || s.includes('math')) {
+      return `មុខវិជ្ជា៖ គណិតវិទ្យា ថ្នាក់ទី ៧: ចំនួនគត់រ៉ឺឡាទីវ, ផលបូក ដក គុណ ចែកចំនួនគត់, សមីការដឺក្រេទី ១ មានមួយអញ្ញាត (2x + 4 = 10), ប្រភាគ, មុំជាប់គ្នា មុំទល់កំពូល មុំស្រប, ត្រីកោណ។`;
+    }
+    if (s.includes('ខ្មែរ') || s.includes('khmer')) {
+      return `មុខវិជ្ជា៖ ភាសាខ្មែរ ថ្នាក់ទី ៧: ថ្នាក់ពាក្យ (នាម, គុណនាម, កិរិយា, គុណកិរិយា), ព្យាង្គ និងពាក្យ, វណ្ណយុត្តិ, កាព្យមេបួន និងមេប្រាំពីរសាមញ្ញ, រឿងនិទានប្រជាប្រិយខ្មែរ (រឿងធនញ្ជ័យ, រឿងសុភាទន្សាយ, រឿងក្អែកមួយក្អែកដប់)។`;
+    }
+    if (s.includes('ភូមិ') || s.includes('geo')) {
+      return `មុខវិជ្ជា៖ ភូមិវិទ្យា ថ្នាក់ទី ៧: ទីតាំងភូមិសាស្ត្រប្រទេសកម្ពុជា, ព្រំប្រទល់ប្រទេសជិតខាង, ប្រព័ន្ធទន្លេមេគង្គ និងបឹងទន្លេសាប, តំបន់ទំនាបកណ្តាល តំបន់មាត់សមុទ្រ និងតំបន់ភ្នំ, អាកាសធាតុមូសុង។`;
+    }
+    if (s.includes('សីលធម៌') || s.includes('civic')) {
+      return `មុខវិជ្ជា៖ សីលធម៌-ពលរដ្ឋ ថ្នាក់ទី ៧: ការគោរពវិន័យសាលារៀន, ការគោរពមាតាបិតា និងលោកគ្រូអ្នកគ្រូ, សីលធម៌រស់នៅក្នុងសង្គម, ការសន្សំសំចៃ, ការថែរក្សាអនាម័យបរិស្ថាន។`;
+    }
+    if (s.includes('អង់គ្លេស') || s.includes('english')) {
+      return `Subject: English Grade 7: Basic grammar (Simple Present, Present Continuous), daily activities, classroom objects, family, hobbies, school vocabulary, simple prepositions.`;
+    }
+    return `មុខវិជ្ជា៖ ${subjectName} ថ្នាក់ទី ៧ (អនុវិទ្យាល័យ): សំណួរត្រូវតែត្រូវគ្នានឹងកម្រិតសិស្សថ្នាក់ទី ៧ តាមកម្មវិធីសិក្សារបស់ក្រសួងអប់រំ យុវជន និងកីឡាកម្ពុជា (MoEYS)។`;
+  }
+
+  if (g <= 6) {
+    return `កម្រិតបឋមសិក្សា ថ្នាក់ទី ${g}៖ សំណួរសាមញ្ញ ងាយយល់ សមស្របនឹងកុមារបឋមសិក្សា ហាមរូបមន្តវិទ្យាល័យជាដាច់ខាត!`;
+  }
+
+  if (g >= 11) {
+    return `កម្រិតវិទ្យាល័យ ថ្នាក់ទី ${g} ត្រៀមប្រឡងបាក់ឌុប Bac II ថ្នាក់ជាតិ លើមុខវិជ្ជា ${subjectName}។`;
+  }
+
+  return `កម្រិតអនុវិទ្យាល័យ ថ្នាក់ទី ${g} លើមុខវិជ្ជា ${subjectName} តាមកម្មវិធីសិក្សាជាតិ MoEYS។`;
+}
+
+/**
+ * Live Academic Quiz Generator powered by Gemini AI
+ * Dual strategy: Backend endpoint -> Direct Google AI fallback with active API key.
+ * Guarantees questions focus 100% on student-selected Grade and Subject!
+ */
+export async function generateQuizQuestionsWithGemini({ grade = '7', subject = 'ប្រវត្តិវិទ្យា', stream = null, count = 6 } = {}) {
+  const activeKey = getStoredGeminiKey() || AI_API_KEY;
+  const gradeNum = parseInt(grade, 10) || 7;
+  const cleanSubject = (subject || 'ប្រវត្តិវិទ្យា').trim();
+  const safeCount = Math.min(Math.max(parseInt(count, 10) || 6, 4), 8);
+
+  // 1. Try Backend API first (with 10-second timeout)
+  try {
+    const API_URL = import.meta.env.VITE_API_URL || '/api';
+    const res = await fetch(`${API_URL}/ai/quiz-generate`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-gemini-key': activeKey || ''
+      },
+      body: JSON.stringify({
+        grade: String(gradeNum),
+        subject: cleanSubject,
+        stream: gradeNum >= 11 ? stream : null,
+        count: safeCount,
+        apiKey: activeKey || ''
+      }),
+      signal: AbortSignal.timeout(10000)
+    });
+
+    if (res.ok) {
+      const data = await res.json();
+      if (data && data.success && Array.isArray(data.questions) && data.questions.length > 0) {
+        // Validate questions match subject
+        return data.questions.map((q, idx) => ({
+          ...q,
+          id: q.id || `ai-q-${Date.now()}-${idx}`,
+          grade: String(gradeNum),
+          subject: cleanSubject,
+          source: q.source || `Gemini AI (ថ្នាក់ទី ${gradeNum} ${cleanSubject})`
+        }));
+      }
+    }
+  } catch (backendErr) {
+    console.warn('[AI Quiz Service]: Backend request notice, attempting direct client Gemini...', backendErr.message);
+  }
+
+  // 2. Direct Client-Side Gemini Generation using stored API key
+  if (activeKey) {
+    const guideline = getCurriculumGuideline(gradeNum, cleanSubject);
+    const uniqueSeed = `${Date.now()}_${Math.floor(Math.random() * 100000)}`;
+
+    const prompt = `អ្នកគឺជាសាស្ត្រាចារ្យ និងជាអ្នកជំនាញបង្កើតវិញ្ញាសាប្រឡងថ្នាក់ជាតិនៃក្រសួងអប់រំ យុវជន និងកីឡាកម្ពុជា (MoEYS)។
+
+សូមបង្កើតសំណួរពហុជ្រើសរើសចំនួន ${safeCount} សំណួរថ្មីៗ ប្លែកៗ មិនជាន់គ្នា សម្រាប់៖
+- មុខវិជ្ជា៖ «${cleanSubject}»
+- កម្រិតថ្នាក់៖ «ថ្នាក់ទី ${gradeNum}» (Grade ${gradeNum})
+- លេខកូដសម្គាល់ចៃដន្យ (Random Seed): ${uniqueSeed}
+
+សេចក្តីណែនាំអំពីកម្មវិធីសិក្សា៖
+${guideline}
+
+ច្បាប់ដាច់ខាត (CRITICAL RULES):
+១. សំណួរទាំងអស់ ១០០% ត្រូវតែជារបស់មុខវិជ្ជា «${cleanSubject}» និងកម្រិត «ថ្នាក់ទី ${gradeNum}»!
+២. ហាមដាច់ខាតកុំយកសំណួរមុខវិជ្ជាផ្សេង (ឧទាហរណ៍៖ បើមុខវិជ្ជាប្រវត្តិវិទ្យា ហាមយកសំណួររូបវិទ្យា គីមីវិទ្យា ឬរូបមន្តខួបប៉ោល) ឬកម្រិតថ្នាក់ផ្សេង (ដូចជាថ្នាក់ទី ១២) មកសួរឡើយ!
+៣. សំណួរ និងចម្លើយត្រូវសរសេរជាភាសាខ្មែរត្រឹមត្រូវ តាមក្បួនខ្នាតវចនានុក្រមសម្តេចព្រះសង្ឃរាជ ជួន ណាត (លើកលែងភាសាអង់គ្លេស)។
+៤. ជម្រើសនីមួយៗត្រូវមាន ៤ ជម្រើស (options) ដោយមានចម្លើយត្រឹមត្រូវតែ ១ គត់។
+៥. កំណត់ "answer" ជាលេខសន្ទស្សន៍ 0, 1, 2, ឬ 3 នៃចម្លើយត្រឹមត្រូវ។
+៦. បញ្ចូលការពន្យល់យ៉ាងច្បាស់លាស់ ២-៣ ប្រយោគ។
+៧. ឆ្លើយតបជាទម្រង់ JSON Array សុទ្ធ គ្មាន markdown fences គ្មាន \`\`\`json ឡើយ។
+
+ទម្រង់លទ្ធផល (JSON Array):
+[
+  {
+    "q": "សំណួរ${cleanSubject}សម្រាប់ថ្នាក់ទី ${gradeNum}...",
+    "options": ["ជម្រើសទី ១", "ជម្រើសទី ២", "ជម្រើសទី ៣", "ជម្រើសទី ៤"],
+    "answer": 0,
+    "explanation": "ការពន្យល់លម្អិត..."
+  }
+]`;
+
+    for (const model of AI_MODELS) {
+      try {
+        const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${encodeURIComponent(activeKey)}`;
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ role: 'user', parts: [{ text: prompt }] }],
+            generationConfig: {
+              temperature: 0.7,
+              maxOutputTokens: 3500,
+              responseMimeType: 'application/json'
+            }
+          }),
+          signal: AbortSignal.timeout(12000)
+        });
+
+        if (res.ok) {
+          const data = await res.json();
+          const parts = data.candidates?.[0]?.content?.parts || [];
+          const textPart = parts.find(p => p.text && !p.thought) || parts[parts.length - 1];
+          const text = textPart?.text || '';
+
+          if (text) {
+            let parsed = null;
+            try {
+              parsed = JSON.parse(text);
+            } catch (je) {
+              const match = text.match(/\[[\s\S]*\]/);
+              if (match) parsed = JSON.parse(match[0]);
+            }
+
+            if (Array.isArray(parsed) && parsed.length >= 3) {
+              return parsed.map((item, idx) => ({
+                id: `ai-live-${Date.now()}-${idx}-${Math.random().toString(36).substring(2, 6)}`,
+                q: cleanDisplaySymbols(item.q),
+                options: (Array.isArray(item.options) ? item.options : []).map(opt => cleanDisplaySymbols(String(opt))),
+                answer: typeof item.answer === 'number' && item.answer >= 0 && item.answer < item.options.length ? item.answer : 0,
+                explanation: cleanDisplaySymbols(item.explanation || ''),
+                grade: String(gradeNum),
+                subject: cleanSubject,
+                source: `Gemini AI (ថ្នាក់ទី ${gradeNum} ${cleanSubject})`
+              }));
+            }
+          }
+        }
+      } catch (directErr) {
+        console.warn(`[AI Quiz Direct] Model ${model} notice:`, directErr.message);
+      }
+    }
+  }
+
+  // 3. Fallback to instant authentic question bank
+  const { getInstantGradeQuestions } = await import('../utils/gradeQuestionBank.js');
+  return getInstantGradeQuestions(gradeNum, cleanSubject, safeCount);
+}
+

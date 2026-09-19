@@ -36,6 +36,7 @@ import { useAuth, computeLevelData } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
 import { getRandomizedGameQuestions, fetchLiveExamQuestions, resetGameSessionQuestions } from '../../utils/gamePoolManager';
 import { getInstantGradeQuestions } from '../../utils/gradeQuestionBank';
+import { generateQuizQuestionsWithGemini } from '../../services/geminiService';
 import VictoryRewardCelebration from './VictoryRewardCelebration';
 import AcademicTextRenderer from '../common/AcademicTextRenderer';
 
@@ -167,27 +168,20 @@ export default function PlaygroundGameModal({ game, onClose }) {
     setSecondsLeft(Math.max(60, instantQuestions.length * 15));
     setStep('playing');
 
-    // 2. Fast background AI generation (non-blocking)
+    // 2. Fast background AI generation (non-blocking with dual-channel Gemini)
     try {
-      const API_URL = import.meta.env.VITE_API_URL || '/api';
-      const res = await fetch(`${API_URL}/ai/quiz-generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          grade: String(selectedGrade),
-          subject: subject.key,
-          stream: selectedStream,
-          count: 6
-        }),
-        signal: AbortSignal.timeout(4000)
-      });
-
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success && Array.isArray(data.questions) && data.questions.length > 0) {
-          setQuestions((prev) => (currentQIndex === 0 ? data.questions : prev));
+      generateQuizQuestionsWithGemini({
+        grade: selectedGrade,
+        subject: subject.key,
+        stream: selectedStream,
+        count: 8
+      }).then((newQuestions) => {
+        if (Array.isArray(newQuestions) && newQuestions.length > 0) {
+          setQuestions((prev) => (currentQIndex === 0 ? newQuestions : prev));
         }
-      }
+      }).catch((err) => {
+        console.warn('[Solo AI Quiz]:', err?.message || err);
+      });
     } catch (err) {
       // Instant questions are already active
     }

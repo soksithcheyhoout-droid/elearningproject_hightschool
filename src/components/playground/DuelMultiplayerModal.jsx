@@ -60,6 +60,7 @@ import { useAuth, computeLevelData } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
 import { getRandomizedGameQuestions, fetchLiveExamQuestions, expandQuestionsTo8Options, resetGameSessionQuestions } from '../../utils/gamePoolManager';
 import { getInstantGradeQuestions } from '../../utils/gradeQuestionBank';
+import { generateQuizQuestionsWithGemini } from '../../services/geminiService';
 import api from '../../services/api';
 
 // High-end Avatar with Frame Renderer
@@ -517,7 +518,8 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
         isSpecificGameCard && game?.stream === selectedStream ? game : null,
         20,
         String(selectedGrade),
-        selectedStream
+        selectedStream,
+        selectedSubjectKey
       ).filter(q => !solvedQuestionsSet.has(q?.id || q?.q));
       extra = expandQuestionsTo8Options(extraRaw);
       setQuestions((prev) => [...prev, ...extra]);
@@ -536,7 +538,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     try {
       await api.nextTurn(roomCode, currentQIndex, extra);
     } catch (e) { }
-  }, [currentQIndex, questions.length, roomCode, hostCorrectCount, challengerCorrectCount, myCorrectCount, opponentCorrectCount, addXP, game, selectedStream, solvedQuestionsSet]);
+  }, [currentQIndex, questions.length, roomCode, hostCorrectCount, challengerCorrectCount, myCorrectCount, opponentCorrectCount, addXP, game, selectedStream, selectedGrade, selectedSubjectKey, solvedQuestionsSet]);
 
   // Start 3-2-1 countdown after an answer is solved (Guaranteed 1 execution per question)
   const triggerTurnEndCountdown = useCallback((result) => {
@@ -714,10 +716,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
         });
     } else if (isHost && student) {
       const initGrade = String(selectedGrade);
-      const initialPool = expandQuestionsTo8Options(getRandomizedGameQuestions(game, 24, initGrade, selectedStream));
+      const initialPool = expandQuestionsTo8Options(getRandomizedGameQuestions(game, 24, initGrade, selectedStream, selectedSubjectKey));
       setQuestions(initialPool);
 
-      api.createArenaRoom(roomCode, game?.id || 'sci-m-01', game?.subject || 'គណិតវិទ្យា', currentStudentPayload, initialPool, initGrade, selectedStream)
+      api.createArenaRoom(roomCode, game?.id || 'sci-m-01', game?.subject || (selectedSubjectKey || 'គណិតវិទ្យា'), currentStudentPayload, initialPool, initGrade, selectedStream)
         .then((res) => {
           if (res && res.room && res.room.host) {
             setHostPlayer(res.room.host);
@@ -1019,55 +1021,53 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     } catch (e) {}
   };
 
-  // Live AI Question Generator for 1v1 Arena (Fast & Non-Blocking)
+  // Live AI Question Generator for 1v1 Arena (Fast & Non-Blocking with dual-channel Gemini integration)
   const fetchDuelAIQuestions = async (targetGrade, targetSubject, targetStream) => {
     setIsLoadingAI(true);
     try {
-      const API_URL = import.meta.env.VITE_API_URL || '/api';
       const streamParam = targetGrade >= 11 ? targetStream : null;
-      const res = await fetch(`${API_URL}/ai/quiz-generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          grade: String(targetGrade),
-          subject: targetSubject || 'គណិតវិទ្យា',
-          stream: streamParam,
-          count: 5
-        }),
-        signal: AbortSignal.timeout(5000)
+      const targetSub = targetSubject || selectedSubjectKey || (targetGrade <= 9 ? 'ប្រវត្តិវិទ្យា' : 'គណិតវិទ្យា');
+      const aiQuestions = await generateQuizQuestionsWithGemini({
+        grade: targetGrade,
+        subject: targetSub,
+        stream: streamParam,
+        count: 8
       });
 
-      if (res.ok) {
-        const data = await res.json();
-        if (data.success && Array.isArray(data.questions) && data.questions.length > 0) {
-          const expanded = expandQuestionsTo8Options(data.questions);
-          setQuestions(expanded);
-          setCurrentQIndex(0);
-          setIsLoadingAI(false);
+      if (Array.isArray(aiQuestions) && aiQuestions.length > 0) {
+        const taggedQuestions = aiQuestions.map((q) => ({
+          ...q,
+          grade: String(targetGrade),
+          subject: q.subject || targetSub,
+          category: targetSub
+        }));
+        const expanded = expandQuestionsTo8Options(taggedQuestions);
+        setQuestions(expanded);
+        setCurrentQIndex(0);
+        setIsLoadingAI(false);
 
-          try {
-            await api.updateArenaRoom(roomCode, { 
-              grade: String(targetGrade),
-              subjectKey: targetSubject,
-              stream: streamParam || 'general',
+        try {
+          await api.updateArenaRoom(roomCode, { 
+            grade: String(targetGrade),
+            subjectKey: targetSub,
+            stream: streamParam || 'general',
+            questions: expanded 
+          });
+          if (typeof BroadcastChannel !== 'undefined') {
+            const roomBc = new BroadcastChannel('khmer_elearn_arena_room_sync');
+            roomBc.postMessage({ 
+              type: 'STREAM_CHANGED', 
+              roomCode, 
+              stream: streamParam || 'general', 
               questions: expanded 
             });
-            if (typeof BroadcastChannel !== 'undefined') {
-              const roomBc = new BroadcastChannel('khmer_elearn_arena_room_sync');
-              roomBc.postMessage({ 
-                type: 'STREAM_CHANGED', 
-                roomCode, 
-                stream: streamParam || 'general', 
-                questions: expanded 
-              });
-              roomBc.close();
-            }
-          } catch (e) {}
-          return expanded;
-        }
+            roomBc.close();
+          }
+        } catch (e) {}
+        return expanded;
       }
     } catch (err) {
-      console.warn('[Duel AI Quiz]:', err.message);
+      console.warn('[Duel AI Quiz]:', err?.message || err);
     }
 
     setIsLoadingAI(false);
@@ -1079,7 +1079,6 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     if (!isHost) return;
     if (soundEnabled) playSound.click();
     setSelectedGrade(grade);
-    setSelectedSubjectKey(null);
 
     // If grade < 11, stream is 'random' (no science/social split); if >= 11, default to 'science'
     let nextStream = selectedStream;
@@ -1091,17 +1090,19 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     setSelectedStream(nextStream);
     resetGameSessionQuestions();
 
+    const activeSubject = selectedSubjectKey || (grade <= 9 ? 'ប្រវត្តិវិទ្យា' : 'គណិតវិទ្យា');
+
     // 1. INSTANT: Immediately switch questions to target grade in 0 milliseconds
-    const instantQ = expandQuestionsTo8Options(getInstantGradeQuestions(grade, 'គណិតវិទ្យា', 8));
+    const instantQ = expandQuestionsTo8Options(getInstantGradeQuestions(grade, activeSubject, 8));
     setQuestions(instantQ);
     setCurrentQIndex(0);
 
     try {
-      api.updateArenaRoom(roomCode, { grade: String(grade), stream: nextStream, questions: instantQ });
+      api.updateArenaRoom(roomCode, { grade: String(grade), subjectKey: selectedSubjectKey, stream: nextStream, questions: instantQ });
     } catch (e) {}
 
     // 2. Non-blocking AI background enrichment
-    fetchDuelAIQuestions(grade, 'គណិតវិទ្យា', nextStream);
+    fetchDuelAIQuestions(grade, activeSubject, nextStream);
   };
 
   // Host selects a specific subject — Instant 0ms response + background AI
@@ -1264,19 +1265,20 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
     let freshQuestions = null;
     if (isHost) {
-      // Host prepares fresh questions using the current selectedGrade & selectedStream
+      // Host prepares fresh questions using the current selectedGrade & selectedStream & selectedSubjectKey
       const currentGradeStr = String(selectedGrade);
       freshQuestions = expandQuestionsTo8Options(getRandomizedGameQuestions(
         isSpecificGameCard && game?.stream === selectedStream ? game : null,
         24,
         currentGradeStr,
-        selectedStream
+        selectedStream,
+        selectedSubjectKey
       ));
 
       try {
         const livePool = await fetchLiveExamQuestions({
           stream: selectedStream === 'social' ? 'social' : selectedStream === 'random' ? 'all' : 'science',
-          subjectKey: isSpecificGameCard && game?.stream === selectedStream ? game.subjectKey : '',
+          subjectKey: selectedSubjectKey || (isSpecificGameCard && game?.stream === selectedStream ? game.subjectKey : ''),
           grade: currentGradeStr,
           limit: 24,
           random: true
@@ -1572,7 +1574,9 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                 </span>
                 <span className={`text-[9px] sm:text-[10px] px-2 sm:px-2.5 py-0.5 rounded-full font-bold border transition-all duration-300 flex items-center gap-1 sm:gap-1.5 shadow-xs ${currentTheme.headerBadge}`}>
                   <CurrentStreamIcon className="w-3 h-3 sm:w-3.5 sm:h-3.5 flex-shrink-0" />
-                  <span className="truncate">{currentTheme.shortName}</span>
+                  <span className="truncate">
+                    {selectedSubjectKey ? `${selectedSubjectKey} • ថ្នាក់ទី ${selectedGrade}` : currentTheme.shortName}
+                  </span>
                 </span>
                 {isOvertime && (
                   <span className="text-[9px] sm:text-[10px] px-1.5 sm:px-2 py-0.5 rounded-full bg-rose-500/20 text-rose-300 font-bold border border-rose-500/40 animate-pulse flex items-center gap-1">
@@ -1582,18 +1586,22 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
               </div>
               <h2 className="text-xs sm:text-base md:text-lg font-black text-white leading-tight truncate mt-0.5">
                 <span className="hidden sm:inline">
-                  {selectedStream === 'social'
-                    ? 'សង្វៀនប្រឡងវិទ្យាសាស្ត្រសង្គម (Social Science Arena)'
-                    : selectedStream === 'random'
-                      ? 'សង្វៀនប្រកួតសំណួរចម្រុះ (Random Academic Arena)'
-                      : (game?.titleKm || 'សង្វៀនប្រឡងវិទ្យាសាស្ត្រពិត (Science Arena)')}
+                  {selectedSubjectKey
+                    ? `សង្វៀនប្រកួត ${selectedSubjectKey} ថ្នាក់ទី ${selectedGrade} (Grade ${selectedGrade} ${selectedSubjectKey})`
+                    : selectedStream === 'social'
+                      ? 'សង្វៀនប្រឡងវិទ្យាសាស្ត្រសង្គម (Social Science Arena)'
+                      : selectedStream === 'random'
+                        ? `សង្វៀនប្រកួតសំណួរចម្រុះ ថ្នាក់ទី ${selectedGrade} (Grade ${selectedGrade} Arena)`
+                        : (game?.titleKm || 'សង្វៀនប្រឡងវិទ្យាសាស្ត្រពិត (Science Arena)')}
                 </span>
                 <span className="sm:hidden">
-                  {selectedStream === 'social'
-                    ? 'សង្វៀនសង្គមវិទ្យា'
-                    : selectedStream === 'random'
-                      ? 'សង្វៀនសំណួរចម្រុះ'
-                      : 'សង្វៀនវិទ្យាសាស្ត្រ'}
+                  {selectedSubjectKey
+                    ? `សង្វៀន${selectedSubjectKey} ទី${selectedGrade}`
+                    : selectedStream === 'social'
+                      ? 'សង្វៀនសង្គមវិទ្យា'
+                      : selectedStream === 'random'
+                        ? `សង្វៀនទី${selectedGrade}`
+                        : 'សង្វៀនវិទ្យាសាស្ត្រ'}
                 </span>
               </h2>
             </div>
@@ -2714,7 +2722,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
 
               {/* Subject & Category Badge */}
               <span className="text-[10px] sm:text-xs font-black text-indigo-400 uppercase tracking-widest block mb-1 font-mono relative z-[1]">
-                {`${currentQ?.subject ? currentQ.subject + ' • ' : ''}${currentQ?.category || (selectedStream === 'social' ? 'SOCIAL SCIENCE' : selectedStream === 'random' ? 'MIXED ACADEMIC' : 'NATURAL SCIENCE')} #${currentQIndex + 1}`}
+                {`${currentQ?.subject || selectedSubjectKey || (selectedStream === 'social' ? 'វិទ្យាសាស្ត្រសង្គម' : selectedStream === 'random' ? 'សំណួរទូទៅ' : 'វិទ្យាសាស្ត្រ')} • ថ្នាក់ទី ${currentQ?.grade || selectedGrade} #${currentQIndex + 1}`}
               </span>
 
               {/* Question Text */}

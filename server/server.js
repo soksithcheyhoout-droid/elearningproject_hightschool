@@ -38,7 +38,7 @@ app.use(compression({
 app.use(cors({
   origin: '*',
   methods: ['GET', 'POST', 'PUT', 'DELETE'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization', 'x-gemini-key']
 }));
 
 // 3. Body parsing
