@@ -6,7 +6,9 @@ import {
   Calendar, 
   ArrowRight, 
   Users, 
-  BookCheck
+  BookCheck,
+  Atom,
+  Landmark
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
 import api from '../../services/api';
