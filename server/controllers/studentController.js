@@ -173,3 +173,21 @@ export const getRegisteredStudents = async (req, res) => {
   }
 };
 
+// Get Live Total Count of Real Registered Students
+export const getStudentCount = async (req, res) => {
+  try {
+    const students = db.all('SELECT id FROM students') || [];
+    const count = students.length;
+    return res.json({
+      success: true,
+      count,
+      totalStudents: count,
+      timestamp: new Date().toISOString()
+    });
+  } catch (err) {
+    console.error('[Get Student Count Error]:', err);
+    return res.status(500).json({ success: false, error: 'Failed to count registered students.', count: 0 });
+  }
+};
+
+

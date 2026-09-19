@@ -6,7 +6,8 @@ import {
   upload, 
   addXP, 
   getLeaderboard,
-  getRegisteredStudents 
+  getRegisteredStudents,
+  getStudentCount 
 } from '../controllers/studentController.js';
 import { saveCertificate, getStudentCertificates } from '../controllers/certificateController.js';
 import { recordQuizResult } from '../controllers/quizController.js';
@@ -49,6 +50,7 @@ router.post('/auth/complete-otp-profile', completeOtpProfile);
 router.get('/auth/me', getMe);
 
 // 2. Student Profile & Custom PF (Avatar) Upload
+router.get('/students/count', getStudentCount);
 router.get('/students', getRegisteredStudents);
 router.put('/students/profile/:id', updateProfile);
 router.post('/students/upload-avatar', upload.single('avatar'), uploadAvatar);

@@ -286,6 +286,54 @@ export const api = {
     }
   },
 
+  // Get Live Registered Students Count
+  getStudentCount: async () => {
+    const cacheKey = 'student_count';
+    const now = Date.now();
+    const cached = apiCache.get(cacheKey);
+    if (cached && (now - cached.ts < 5000)) {
+      return cached.data;
+    }
+
+    try {
+      const res = await fetch(`${API_BASE}/students/count`);
+      if (res.ok) {
+        const data = await res.json();
+        const safeCount = typeof data.count === 'number' ? data.count : (typeof data.totalStudents === 'number' ? data.totalStudents : 4);
+        if (typeof window !== 'undefined') {
+          try {
+            localStorage.setItem('khmer_elearn_registered_count', String(safeCount));
+          } catch (e) {}
+        }
+        apiCache.set(cacheKey, { data: { success: true, count: safeCount, totalStudents: safeCount }, ts: now });
+        return { success: true, count: safeCount, totalStudents: safeCount };
+      }
+      throw new Error(`HTTP ${res.status}`);
+    } catch (err) {
+      console.warn('[API Get Student Count Notice]:', err.message);
+      // Fallback: check localStorage or getRegisteredStudents
+      let fallbackCount = 4;
+      if (typeof window !== 'undefined') {
+        const saved = localStorage.getItem('khmer_elearn_registered_count');
+        if (saved && !isNaN(parseInt(saved, 10))) {
+          fallbackCount = parseInt(saved, 10);
+        }
+      }
+      try {
+        const studentsRes = await api.getRegisteredStudents();
+        if (studentsRes?.students?.length) {
+          fallbackCount = Math.max(fallbackCount, studentsRes.students.length);
+          if (typeof window !== 'undefined') {
+            try {
+              localStorage.setItem('khmer_elearn_registered_count', String(fallbackCount));
+            } catch (e) {}
+          }
+        }
+      } catch (e) {}
+      return { success: true, count: fallbackCount, totalStudents: fallbackCount };
+    }
+  },
+
   getRegisteredStudents: async () => {
     // Helper: collect and unify student profiles across localStorage
     const collectLocalProfiles = () => {

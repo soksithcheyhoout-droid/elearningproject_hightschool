@@ -1,26 +1,18 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { 
-  GraduationCap, 
   Play, 
   FileText, 
   Award, 
   Calendar, 
-  Clock, 
   ArrowRight, 
   Users, 
-  BookCheck, 
-  ShieldCheck, 
-  Building2, 
-  Atom, 
-  Landmark,
-  Sparkles
+  BookCheck
 } from 'lucide-react';
 import { useLanguage } from '../../context/LanguageContext';
-import { useAuth } from '../../context/AuthContext';
+import api from '../../services/api';
 
 export default function HeroSection({ onStartLearning, onExploreBacII }) {
   const { t, lang } = useLanguage();
-  const { student, selectedStream } = useAuth();
 
   // Calculate live countdown to upcoming August 10, 07:00 AM (BacII Exam Date)
   const getExamTargetDate = () => {
@@ -59,6 +51,113 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
       setTimeLeft(calculateTimeLeft());
     }, 1000);
     return () => clearInterval(timer);
+  }, []);
+
+  // Live Registered Students Dynamic Counter
+  const [studentCount, setStudentCount] = useState(() => {
+    try {
+      const cached = localStorage.getItem('khmer_elearn_registered_count');
+      if (cached && !isNaN(parseInt(cached, 10))) {
+        return parseInt(cached, 10);
+      }
+    } catch (e) {}
+    return 4;
+  });
+
+  const [displayCount, setDisplayCount] = useState(0);
+  const displayRef = useRef(0);
+
+  // Smooth Animated Number Deceleration (easeOutExpo)
+  useEffect(() => {
+    let startTimestamp = null;
+    const duration = 1200;
+    const startVal = displayRef.current;
+    const targetVal = studentCount;
+
+    if (startVal === targetVal) {
+      setDisplayCount(targetVal);
+      return;
+    }
+
+    let animId;
+    const step = (timestamp) => {
+      if (!startTimestamp) startTimestamp = timestamp;
+      const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+      const easeProgress = progress === 1 ? 1 : 1 - Math.pow(2, -10 * progress);
+      const current = Math.round(startVal + (targetVal - startVal) * easeProgress);
+      displayRef.current = current;
+      setDisplayCount(current);
+
+      if (progress < 1) {
+        animId = requestAnimationFrame(step);
+      } else {
+        displayRef.current = targetVal;
+        setDisplayCount(targetVal);
+      }
+    };
+
+    animId = requestAnimationFrame(step);
+    return () => cancelAnimationFrame(animId);
+  }, [studentCount]);
+
+  // Real-time synchronization for registered students count
+  useEffect(() => {
+    let isMounted = true;
+
+    const fetchCount = async () => {
+      try {
+        const res = await api.getStudentCount();
+        if (isMounted && res && typeof res.count === 'number') {
+          setStudentCount(res.count);
+        }
+      } catch (err) {
+        // Silently retain cached value
+      }
+    };
+
+    fetchCount();
+
+    // 1. Cross-tab synchronization via BroadcastChannel
+    let bc = null;
+    if (typeof BroadcastChannel !== 'undefined') {
+      try {
+        bc = new BroadcastChannel('khmer_elearn_profile_sync');
+        bc.onmessage = (ev) => {
+          if (
+            ev.data?.type === 'student_registered' || 
+            ev.data?.type === 'avatar_updated' || 
+            ev.data?.type === 'profile_updated'
+          ) {
+            fetchCount();
+          }
+        };
+      } catch (e) {}
+    }
+
+    // 2. Custom local window event listener
+    const handleRegistered = () => fetchCount();
+    window.addEventListener('student_registered', handleRegistered);
+
+    // 3. Re-check on tab visibility change or window focus
+    const handleVisibility = () => {
+      if (document.visibilityState === 'visible') {
+        fetchCount();
+      }
+    };
+    document.addEventListener('visibilitychange', handleVisibility);
+    window.addEventListener('focus', handleVisibility);
+
+    // 4. Background poll every 30 seconds to pick up new signups
+    const pollTimer = setInterval(fetchCount, 30000);
+
+    return () => {
+      isMounted = false;
+      if (bc) bc.close();
+      window.removeEventListener('student_registered', handleRegistered);
+      document.removeEventListener('visibilitychange', handleVisibility);
+      window.removeEventListener('focus', handleVisibility);
+      clearInterval(pollTimer);
+    };
   }, []);
 
   return (
@@ -145,13 +244,35 @@ export default function HeroSection({ onStartLearning, onExploreBacII }) {
 
             {/* Institutional Stats */}
             <div className="grid grid-cols-3 gap-2 sm:gap-4 pt-4 border-t border-white/10 max-w-lg text-xs text-white">
-              <div className="flex items-center gap-2.5">
-                <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0">
+              {/* Dynamic Live Registered Students Stat */}
+              <div 
+                className="flex items-center gap-2.5 group cursor-default transition-all select-none"
+                title={lang === 'km' 
+                  ? `មានសិស្សចំនួន ${displayCount.toLocaleString('en-US')} នាក់បានចុះឈ្មោះក្នុងប្រព័ន្ធ (ទិន្នន័យផ្សាយផ្ទាល់)` 
+                  : `${displayCount.toLocaleString('en-US')} registered students in the platform (Live Database)`
+                }
+              >
+                <div className="w-8 h-8 rounded-lg bg-white/5 border border-white/10 flex items-center justify-center shrink-0 group-hover:bg-white/10 group-hover:border-amber-400/30 transition-all">
                   <Users className="w-4 h-4 text-amber-400" />
                 </div>
                 <div className="min-w-0">
-                  <p className="font-extrabold text-white font-cinzel text-xs sm:text-sm leading-none truncate">35,000+</p>
-                  <p className="text-[9px] sm:text-[10.5px] text-slate-300 mt-1 truncate">{lang === 'km' ? 'សិស្សទូទាំងប្រទេស' : 'Students'}</p>
+                  <div className="flex items-center gap-1.5 leading-none">
+                    <p className="font-extrabold text-white font-cinzel text-xs sm:text-sm leading-none truncate">
+                      {displayCount >= 1000 ? `${displayCount.toLocaleString('en-US')}+` : displayCount.toLocaleString('en-US')}
+                    </p>
+                    <span 
+                      className="inline-flex items-center justify-center shrink-0" 
+                      title={lang === 'km' ? 'ផ្សាយផ្ទាល់ពីប្រព័ន្ធទិន្នន័យ (Live Database)' : 'Live Database Sync'}
+                    >
+                      <span className="relative flex h-1.5 w-1.5">
+                        <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75" />
+                        <span className="relative inline-flex rounded-full h-1.5 w-1.5 bg-emerald-500" />
+                      </span>
+                    </span>
+                  </div>
+                  <p className="text-[9px] sm:text-[10.5px] text-slate-300 mt-1 truncate">
+                    {lang === 'km' ? 'សិស្សបានចុះឈ្មោះ' : 'Registered Students'}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-2.5">

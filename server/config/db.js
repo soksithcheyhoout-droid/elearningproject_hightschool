@@ -213,6 +213,9 @@ export const db = {
 
     // 1. SELECT * FROM students ...
     if (cleanSql.includes('from students')) {
+      if (cleanSql.includes('count(*)')) {
+        return [{ count: inMemoryData.students.length }];
+      }
       let list = [...inMemoryData.students];
       if (cleanSql.includes('where')) {
         if (cleanSql.includes('where')) {
@@ -292,6 +295,9 @@ export const db = {
     // 6. SELECT * FROM chat_messages OR messages
     if (cleanSql.includes('from chat_messages') || cleanSql.includes('from messages')) {
       if (!Array.isArray(inMemoryData.messages)) inMemoryData.messages = [];
+      if (cleanSql.includes('count(*)')) {
+        return [{ count: inMemoryData.messages.length }];
+      }
       let list = [...inMemoryData.messages];
       if (cleanSql.includes('where channel_id = ?') || cleanSql.includes('where channel_id=')) {
         const channelId = params[0] || 'global';
@@ -554,6 +560,20 @@ export const db = {
       } else if (cleanSql.includes('where channel_id = ?')) {
         const channelId = params[0];
         inMemoryData.messages = inMemoryData.messages.filter(m => String(m.channel_id) !== String(channelId));
+      }
+      saveDatabase();
+      return { changes: 1 };
+    }
+
+    // 9. DELETE FROM students
+    if (cleanSql.startsWith('delete from students')) {
+      if (!Array.isArray(inMemoryData.students)) inMemoryData.students = [];
+      if (cleanSql.includes('where id = ?')) {
+        const targetId = Number(params[0]);
+        inMemoryData.students = inMemoryData.students.filter(s => Number(s.id) !== targetId);
+      } else if (cleanSql.includes('where username = ?')) {
+        const uname = String(params[0]).toLowerCase();
+        inMemoryData.students = inMemoryData.students.filter(s => String(s.username).toLowerCase() !== uname);
       }
       saveDatabase();
       return { changes: 1 };

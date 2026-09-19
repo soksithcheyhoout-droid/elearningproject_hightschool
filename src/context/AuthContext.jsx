@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
-import api from '../services/api';
+import api, { clearApiCache } from '../services/api';
 
 const AuthContext = createContext();
 
@@ -224,6 +224,19 @@ export function AuthProvider({ children }) {
     }
     setIsAuthenticated(true);
     localStorage.setItem('khmer_elearn_auth', 'true');
+
+    // Notify all tabs and components of new/logged-in student
+    clearApiCache('student_count');
+    if (typeof BroadcastChannel !== 'undefined') {
+      try {
+        const bc = new BroadcastChannel('khmer_elearn_profile_sync');
+        bc.postMessage({ type: 'student_registered', student: studentData });
+        bc.close();
+      } catch (e) {}
+    }
+    if (typeof window !== 'undefined') {
+      window.dispatchEvent(new CustomEvent('student_registered', { detail: studentData }));
+    }
   };
 
   const logout = () => {
