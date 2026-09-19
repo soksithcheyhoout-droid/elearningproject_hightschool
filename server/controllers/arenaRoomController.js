@@ -39,6 +39,7 @@ export const createOrGetRoom = (req, res) => {
         challengerReady: false,
         kickedStudentId: null,
         questions: Array.isArray(questions) ? questions : [],
+        questionsVersion: 1,
         status: 'waiting', // 'waiting' | 'ready' | 'countdown' | 'battle' | 'results'
         activeTurn: 'host', // 'host' | 'challenger'
         currentQIndex: 0,
@@ -64,6 +65,7 @@ export const createOrGetRoom = (req, res) => {
       if (stream) room.stream = stream;
       if (Array.isArray(questions) && questions.length > 0) {
         room.questions = questions;
+        room.questionsVersion = (room.questionsVersion || 0) + 1;
       }
       room.lastActive = Date.now();
     }
@@ -136,7 +138,10 @@ export const updateRoomStatus = (req, res) => {
     if (grade) room.grade = grade;
     if (status) room.status = status;
     if (activeTurn) room.activeTurn = activeTurn;
-    if (Array.isArray(questions) && questions.length > 0) room.questions = questions;
+    if (Array.isArray(questions) && questions.length > 0) {
+      room.questions = questions;
+      room.questionsVersion = (room.questionsVersion || 0) + 1;
+    }
     if (typeof challengerReady === 'boolean') {
       room.challengerReady = challengerReady;
       if (challengerReady) {
@@ -507,6 +512,7 @@ export const nextTurn = (req, res) => {
     if (nextQ >= room.questions.length) {
       if (Array.isArray(extraQuestions) && extraQuestions.length > 0) {
         room.questions = [...room.questions, ...extraQuestions];
+        room.questionsVersion = (room.questionsVersion || 0) + 1;
       }
     }
 
@@ -535,6 +541,9 @@ export const requestRematch = (req, res) => {
 
     if (isHost) {
       room.hostRematch = true;
+      if (Array.isArray(newQuestions) && newQuestions.length > 0) {
+        room.rematchQuestions = newQuestions;
+      }
     } else {
       room.challengerRematch = true;
     }
@@ -553,8 +562,13 @@ export const requestRematch = (req, res) => {
       room.isOvertime = false;
       room.hostRematch = false;
       room.challengerRematch = false;
-      if (Array.isArray(newQuestions) && newQuestions.length > 0) {
+      if (Array.isArray(room.rematchQuestions) && room.rematchQuestions.length > 0) {
+        room.questions = room.rematchQuestions;
+        room.questionsVersion = (room.questionsVersion || 0) + 1;
+        room.rematchQuestions = null;
+      } else if (Array.isArray(newQuestions) && newQuestions.length > 0) {
         room.questions = newQuestions;
+        room.questionsVersion = (room.questionsVersion || 0) + 1;
       }
     }
 

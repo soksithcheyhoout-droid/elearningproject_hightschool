@@ -318,6 +318,8 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
       username: student?.username || 'student',
       school: student?.school || 'វិទ្យាល័យ ព្រះស៊ីសុវត្ថិ',
       province: student?.province || 'រាជធានីភ្នំពេញ',
+      grade: student?.grade || '12',
+      stream: student?.stream || 'science',
       level: levelInfo?.level || student?.level || 1,
       xp: student?.xp || 500,
       avatar: student?.avatar || '/assets/anime/boys/boy_1.png',
@@ -336,6 +338,8 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
         username: student?.username || 'student',
         school: student?.school || 'វិទ្យាល័យ ព្រះស៊ីសុវត្ថិ',
         province: student?.province || 'រាជធានីភ្នំពេញ',
+        grade: student?.grade || String(selectedGrade),
+        stream: student?.stream || selectedStream,
         level: levelInfo?.level || student?.level || 1,
         xp: student?.xp || 500,
         avatar: api.formatAvatarUrl(student?.avatar),
@@ -360,15 +364,20 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   const CurrentStreamIcon = currentTheme.icon || Atom;
 
   // Grade & Subject Selection for AI Questions
-  const [selectedGrade, setSelectedGrade] = useState(() => parseInt(student?.grade, 10) || 12);
+  const [selectedGrade, setSelectedGrade] = useState(() => {
+    const g = parseInt(student?.grade, 10);
+    return (g >= 1 && g <= 12) ? g : 12;
+  });
   const [selectedSubjectKey, setSelectedSubjectKey] = useState(null);
   const [isLoadingAI, setIsLoadingAI] = useState(false);
   const duelSubjects = selectedGrade >= 11
     ? (selectedStream === 'social' ? DUEL_SOCIAL_SUBJECTS : DUEL_SCIENCE_SUBJECTS)
     : DUEL_GENERAL_SUBJECTS;
 
-  // Synchronized Questions Pool (Instant grade-matched pool + AI enrichment)
+  // Synchronized Questions Pool — ONLY HOST generates, challenger syncs from server
+  const [questionsVersion, setQuestionsVersion] = useState(0);
   const [questions, setQuestions] = useState(() => {
+    if (initialRoomCode) return []; // Challenger: wait for server sync, don't generate
     const initG = parseInt(student?.grade, 10) || 12;
     return expandQuestionsTo8Options(getInstantGradeQuestions(initG, 'គណិតវិទ្យា', 8));
   });
@@ -428,9 +437,9 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
   useEffect(() => {
     document.body.style.overflow = 'hidden';
 
-    // Asynchronously enrich questions from 70k master question bank ONLY for Grade 11-12
+    // Asynchronously enrich questions from 70k master question bank — HOST ONLY
     let isSubscribed = true;
-    if (selectedGrade >= 11) {
+    if (isHost && selectedGrade >= 11) {
       fetchLiveExamQuestions({
         stream: selectedStream === 'social' ? 'social' : selectedStream === 'random' ? 'all' : 'science',
         subjectKey: isSpecificGameCard && game?.stream === selectedStream ? game.subjectKey : '',
@@ -441,7 +450,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
         if (isSubscribed && Array.isArray(livePool) && livePool.length > 0) {
           const expanded8 = expandQuestionsTo8Options(livePool);
           setQuestions(expanded8);
-          if (isHost && roomCode) {
+          if (roomCode) {
             api.createArenaRoom(roomCode, game?.id || 'arena-1v1-master', game?.subject || 'វិទ្យាសាស្ត្រ', currentStudentPayload, expanded8, String(selectedGrade), selectedStream);
           }
         }
@@ -475,6 +484,8 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     username: student?.username || 'student',
     school: student?.school || 'វិទ្យាល័យ ព្រះស៊ីសុវត្ថិ',
     province: student?.province || 'រាជធានីភ្នំពេញ',
+    grade: student?.grade || String(selectedGrade),
+    stream: student?.stream || selectedStream,
     level: levelInfo?.level || student?.level || 1,
     xp: student?.xp || 500,
     avatar: api.formatAvatarUrl(student?.avatar),
@@ -499,13 +510,13 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
       return;
     }
 
-    // Prepare next question from 60k pool without repeating solved ones
+    // Prepare next question from 60k pool without repeating solved ones (Host only)
     let extra = [];
-    if (currentQIndex + 1 >= questions.length) {
+    if (currentQIndex + 1 >= questions.length && isHost) {
       const extraRaw = getRandomizedGameQuestions(
         isSpecificGameCard && game?.stream === selectedStream ? game : null,
         20,
-        '12',
+        String(selectedGrade),
         selectedStream
       ).filter(q => !solvedQuestionsSet.has(q?.id || q?.q));
       extra = expandQuestionsTo8Options(extraRaw);
@@ -573,7 +584,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     clearInterval(countdownIntervalRef.current);
 
     if (Array.isArray(roomQuestions) && roomQuestions.length > 0) {
-      setQuestions(expandQuestionsTo8Options(roomQuestions));
+      setQuestions(roomQuestions);
     }
     lastProcessedTurnRef.current = null;
     setCurrentQIndex(0);
@@ -657,7 +668,7 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
           if (msg.type === 'STREAM_CHANGED' && msg.stream) {
             setSelectedStream(msg.stream);
             if (Array.isArray(msg.questions) && msg.questions.length > 0) {
-              setQuestions(expandQuestionsTo8Options(msg.questions));
+              setQuestions(msg.questions);
             }
           }
         }
@@ -683,8 +694,10 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
             if (res.room.host) setHostPlayer(res.room.host);
             if (res.room.challenger) setChallengerPlayer(res.room.challenger);
             if (res.room.stream) setSelectedStream(res.room.stream);
+            if (res.room.grade) setSelectedGrade(parseInt(res.room.grade, 10) || 12);
+            if (typeof res.room.questionsVersion === 'number') setQuestionsVersion(res.room.questionsVersion);
             if (Array.isArray(res.room.questions) && res.room.questions.length > 0) {
-              setQuestions(expandQuestionsTo8Options(res.room.questions));
+              setQuestions(res.room.questions);
             }
           } else {
             setHostWarningNotice('ម្ចាស់បន្ទប់ (Admin) បានបោះបង់ ឬបិទការប្រកួតហើយ!');
@@ -700,13 +713,17 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
           }, 1800);
         });
     } else if (isHost && student) {
-      const initialPool = expandQuestionsTo8Options(getRandomizedGameQuestions(game, 24, '12', selectedStream));
+      const initGrade = String(selectedGrade);
+      const initialPool = expandQuestionsTo8Options(getRandomizedGameQuestions(game, 24, initGrade, selectedStream));
       setQuestions(initialPool);
 
-      api.createArenaRoom(roomCode, game?.id || 'sci-m-01', game?.subject || 'គណិតវិទ្យា', currentStudentPayload, initialPool, '12', selectedStream)
+      api.createArenaRoom(roomCode, game?.id || 'sci-m-01', game?.subject || 'គណិតវិទ្យា', currentStudentPayload, initialPool, initGrade, selectedStream)
         .then((res) => {
           if (res && res.room && res.room.host) {
             setHostPlayer(res.room.host);
+          }
+          if (typeof res?.room?.questionsVersion === 'number') {
+            setQuestionsVersion(res.room.questionsVersion);
           }
         });
     }
@@ -819,14 +836,24 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
           startCountdown(room.questions);
         }
 
-        // Synchronize Questions pool for Challenger without creating unnecessary re-renders
-        if (!isHost && Array.isArray(room.questions) && room.questions.length > 0) {
-          setQuestions((prev) => {
-            if (prev && prev.length === room.questions.length && prev[0]?.id === room.questions[0]?.id) {
-              return prev;
-            }
-            return room.questions;
-          });
+        // Synchronize Questions pool for Challenger using questionsVersion for reliable sync
+        if (Array.isArray(room.questions) && room.questions.length > 0) {
+          const serverVersion = room.questionsVersion || 0;
+          if (!isHost) {
+            // Challenger ALWAYS takes questions from server — never generates locally
+            setQuestionsVersion((prevVer) => {
+              if (serverVersion > prevVer) {
+                setQuestions(room.questions);
+                if (room.grade) setSelectedGrade(parseInt(room.grade, 10) || 12);
+                if (room.stream) setSelectedStream(room.stream);
+                return serverVersion;
+              }
+              return prevVer;
+            });
+          } else {
+            // Host also syncs version number but doesn't overwrite own questions
+            setQuestionsVersion((prevVer) => Math.max(prevVer, serverVersion));
+          }
         }
 
         // Synchronize Scores & Correct Counts only when values change
@@ -1114,8 +1141,11 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
         setIsChallengerReady(false);
         setHostPlayer(res.room.host);
         setChallengerPlayer(currentStudentPayload);
+        if (res.room.grade) setSelectedGrade(parseInt(res.room.grade, 10) || 12);
+        if (res.room.stream) setSelectedStream(res.room.stream);
+        if (typeof res.room.questionsVersion === 'number') setQuestionsVersion(res.room.questionsVersion);
         if (Array.isArray(res.room.questions) && res.room.questions.length > 0) {
-          setQuestions(expandQuestionsTo8Options(res.room.questions));
+          setQuestions(res.room.questions);
         }
         setTab('host');
         if (soundEnabled) playSound.click();
@@ -1232,33 +1262,37 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
     // Reset session seen questions so fresh questions from the whole bank are chosen
     resetGameSessionQuestions();
 
-    // Fetch completely fresh 24-question pool using the CURRENT selectedStream
-    let freshQuestions = expandQuestionsTo8Options(getRandomizedGameQuestions(
-      isSpecificGameCard && game?.stream === selectedStream ? game : null,
-      24,
-      student?.grade || '12',
-      selectedStream
-    ));
+    let freshQuestions = null;
+    if (isHost) {
+      // Host prepares fresh questions using the current selectedGrade & selectedStream
+      const currentGradeStr = String(selectedGrade);
+      freshQuestions = expandQuestionsTo8Options(getRandomizedGameQuestions(
+        isSpecificGameCard && game?.stream === selectedStream ? game : null,
+        24,
+        currentGradeStr,
+        selectedStream
+      ));
 
-    try {
-      const livePool = await fetchLiveExamQuestions({
-        stream: selectedStream === 'social' ? 'social' : selectedStream === 'random' ? 'all' : 'science',
-        subjectKey: isSpecificGameCard && game?.stream === selectedStream ? game.subjectKey : '',
-        grade: student?.grade || '12',
-        limit: 24,
-        random: true
-      });
-      if (Array.isArray(livePool) && livePool.length > 0) {
-        freshQuestions = expandQuestionsTo8Options(livePool);
-      }
-    } catch (e) {}
+      try {
+        const livePool = await fetchLiveExamQuestions({
+          stream: selectedStream === 'social' ? 'social' : selectedStream === 'random' ? 'all' : 'science',
+          subjectKey: isSpecificGameCard && game?.stream === selectedStream ? game.subjectKey : '',
+          grade: currentGradeStr,
+          limit: 24,
+          random: true
+        });
+        if (Array.isArray(livePool) && livePool.length > 0) {
+          freshQuestions = expandQuestionsTo8Options(livePool);
+        }
+      } catch (e) {}
 
-    setQuestions(freshQuestions);
+      setQuestions(freshQuestions);
+    }
 
     try {
       const res = await api.requestArenaRematch(roomCode, isHost, freshQuestions);
       if (res && res.bothReady) {
-        startCountdown(freshQuestions);
+        startCountdown(res.room?.questions || freshQuestions);
       }
     } catch (e) { }
   };
@@ -2133,10 +2167,20 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                           <Building2 className="w-3.5 h-3.5 text-cyan-400 flex-shrink-0" />
                           <span className="truncate">{hostPlayer.school || 'វិទ្យាល័យជាតិ'}</span>
                         </p>
+                        {hostPlayer.province && (
+                          <p className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5 truncate max-w-[220px]">
+                            <Compass className="w-3 h-3 text-cyan-400/60 flex-shrink-0" />
+                            <span className="truncate">{hostPlayer.province}</span>
+                          </p>
+                        )}
 
-                        {/* XP Badge */}
-                        <div className="mt-3">
-                          <span className="px-3 py-1 rounded-xl bg-indigo-500/15 border border-indigo-400/30 text-indigo-300 text-xs font-bold flex items-center gap-1 shadow-xs font-mono">
+                        {/* Grade & XP Badges */}
+                        <div className="mt-3 flex items-center gap-2 flex-wrap justify-center">
+                          <span className="px-2.5 py-0.5 rounded-lg bg-cyan-500/15 border border-cyan-400/30 text-cyan-300 text-[10px] font-bold flex items-center gap-1">
+                            <GraduationCap className="w-3 h-3" />
+                            ថ្នាក់ទី {KHMER_NUMS[(parseInt(hostPlayer.grade || selectedGrade, 10) || 12) - 1] || '១២'}
+                          </span>
+                          <span className="px-3 py-0.5 rounded-lg bg-indigo-500/15 border border-indigo-400/30 text-indigo-300 text-[10px] font-bold flex items-center gap-1 font-mono">
                             {(hostPlayer.xp || 500).toLocaleString()} XP
                           </span>
                         </div>
@@ -2240,10 +2284,20 @@ export default function DuelMultiplayerModal({ game, onClose, initialRoomCode = 
                           <Building2 className="w-3.5 h-3.5 text-rose-400 flex-shrink-0" />
                           <span className="truncate">{challengerPlayer.school}</span>
                         </p>
+                        {challengerPlayer.province && (
+                          <p className="text-[10px] text-slate-400 flex items-center gap-1 mt-0.5 truncate max-w-[220px]">
+                            <Compass className="w-3 h-3 text-rose-400/60 flex-shrink-0" />
+                            <span className="truncate">{challengerPlayer.province}</span>
+                          </p>
+                        )}
 
-                        {/* XP Badge */}
-                        <div className="mt-3">
-                          <span className="px-3 py-1 rounded-xl bg-indigo-500/15 border border-indigo-400/30 text-indigo-300 text-xs font-bold flex items-center gap-1 shadow-xs font-mono">
+                        {/* Grade & XP Badges */}
+                        <div className="mt-3 flex items-center gap-2 flex-wrap justify-center">
+                          <span className="px-2.5 py-0.5 rounded-lg bg-rose-500/15 border border-rose-400/30 text-rose-300 text-[10px] font-bold flex items-center gap-1">
+                            <GraduationCap className="w-3 h-3" />
+                            ថ្នាក់ទី {KHMER_NUMS[(parseInt(challengerPlayer.grade || selectedGrade, 10) || 12) - 1] || '១២'}
+                          </span>
+                          <span className="px-3 py-0.5 rounded-lg bg-indigo-500/15 border border-indigo-400/30 text-indigo-300 text-[10px] font-bold flex items-center gap-1 font-mono">
                             {(challengerPlayer.xp || 500).toLocaleString()} XP
                           </span>
                         </div>
