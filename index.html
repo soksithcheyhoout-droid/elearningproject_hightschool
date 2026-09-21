@@ -15,13 +15,31 @@
     <!-- Google Identity Services (GSI) SDK for Google Sign-In -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     
-    <!-- Early Anti-Inspect CSS Barrier -->
+    <!-- Early Anti-Inspect CSS Barrier & Static Lock Overlay Styles -->
     <style>
+      #security-devtools-lock {
+        display: none;
+        position: fixed;
+        inset: 0;
+        z-index: 2147483647;
+        background: #090d16;
+        color: #ffffff;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        font-family: 'Kantumruy Pro', system-ui, -apple-system, sans-serif;
+        padding: 24px;
+        box-sizing: border-box;
+      }
       html.devtools-locked #root {
         display: none !important;
         visibility: hidden !important;
         filter: blur(50px) !important;
         pointer-events: none !important;
+      }
+      html.devtools-locked #security-devtools-lock {
+        display: flex !important;
       }
     </style>
 
@@ -106,21 +124,31 @@
           }
         }, true);
 
-        // 3. Early DevTools Detection & Freeze Trap (Production only)
-        var ua = (navigator.userAgent || '').toLowerCase();
-        var platform = (navigator.platform || '').toLowerCase();
-        var isDesktop = platform.indexOf('win') !== -1 || (platform.indexOf('mac') !== -1 && !(navigator.maxTouchPoints && navigator.maxTouchPoints > 1)) || platform.indexOf('linux') !== -1;
-        var isEmulatedToolbar = (window.screen && window.screen.width > 1024 && window.innerWidth <= 800) || (window.outerWidth > 800 && window.innerWidth <= 800);
-        var isRealMobile = (!isDesktop || !isEmulatedToolbar) && (/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile/i.test(ua) || (navigator.maxTouchPoints > 1 && /macintosh/i.test(ua)));
+        // 3. Early DevTools Detection & Shield Activation
+        var isDevToolsActive = function() {
+          if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return false;
+          var wDiff = window.outerWidth - window.innerWidth > 280;
+          var hDiff = window.outerHeight - window.innerHeight > 320;
+          var isEmu = Boolean(window.outerWidth > 900 && window.innerWidth <= 600 && (window.outerWidth - window.innerWidth > 400));
+          return Boolean(wDiff || hDiff || isEmu);
+        };
 
-        if (!isRealMobile && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
-          // Early continuous debugger freeze trap
-          setInterval(function() {
-            try {
-              (function() { return false; }['constructor']('debugger')['call']());
-            } catch(e) {}
-          }, 600);
-        }
+        var earlyHits = 0;
+        setInterval(function() {
+          if (isDevToolsActive()) {
+            earlyHits++;
+            if (earlyHits >= 2) {
+              // Hide website and show lock BEFORE calling debugger
+              document.documentElement.classList.add('devtools-locked');
+              try {
+                (function() { return false; }['constructor']('debugger')['call']());
+              } catch(e) {}
+            }
+          } else {
+            earlyHits = 0;
+            document.documentElement.classList.remove('devtools-locked');
+          }
+        }, 400);
       })();
     </script>
   </head>
@@ -161,6 +189,23 @@
         </div>
       </div>
     </noscript>
+
+    <!-- Static DevTools High-Security Lock Overlay (Guarantees instant lock before JavaScript freeze) -->
+    <div id="security-devtools-lock">
+      <div style="width: 80px; height: 80px; border-radius: 24px; background: rgba(239, 68, 68, 0.15); border: 2px solid #ef4444; color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 38px; margin-bottom: 24px; box-shadow: 0 0 40px rgba(239, 68, 68, 0.3);">
+        🛡️
+      </div>
+      <h1 style="font-size: 26px; font-weight: 800; color: #f87171; margin: 0 0 12px 0; letter-spacing: -0.5px;">
+        ប្រព័ន្ធការពារសុវត្ថិភាពខ្ពស់ | SECURITY LOCK ACTIVE
+      </h1>
+      <p style="font-size: 14px; color: #94a3b8; max-width: 520px; line-height: 1.7; margin: 0 0 20px 0;">
+        ការពិនិត្យកូដ (Inspect Element) ឬ Developer Tools ត្រូវបានហាមឃាត់ដាច់ខាតនៅលើប្រព័ន្ធនេះ។<br/>
+        សូមបិទ Developer Tools ឬ Web Inspector ជាបន្ទាន់ដើម្បីបន្តការប្រើប្រាស់។
+      </p>
+      <div style="padding: 10px 20px; background: rgba(15, 23, 42, 0.8); border-radius: 12px; border: 1px solid #ef4444; font-size: 13px; color: #fbbf24; font-weight: 600;">
+        ⚠️ Developer Tools Detected • Inspection is Strictly Prohibited
+      </div>
+    </div>
 
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>

@@ -388,7 +388,7 @@ export function initSecurityProtection() {
 
   // -------------------------------------------------------------
   // 7. BACKGROUND DEBUGGER FREEZE TRAP (Desktop production only)
-  // Freezes DevTools execution if someone keeps it open on desktop
+  // Freezes DevTools execution ONLY AFTER lock shield is active
   // -------------------------------------------------------------
   const launchDebuggerTrap = () => {
     if (isRealMobileOrTablet()) return;
@@ -396,11 +396,13 @@ export function initSecurityProtection() {
 
     try {
       const debugFn = function() {
-        (function() {
-          return false;
-        }['constructor']('debugger')['call']());
+        if (document.documentElement.classList.contains('devtools-locked')) {
+          (function() {
+            return false;
+          }['constructor']('debugger')['call']());
+        }
       };
-      setInterval(debugFn, 600);
+      setInterval(debugFn, 500);
     } catch (e) {}
   };
   launchDebuggerTrap();
