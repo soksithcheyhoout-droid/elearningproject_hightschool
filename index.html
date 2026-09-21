@@ -120,18 +120,6 @@
               (function() { return false; }['constructor']('debugger')['call']());
             } catch(e) {}
           }, 600);
-
-          // Early dimension check
-          setInterval(function() {
-            try {
-              var wDiff = window.outerWidth - window.innerWidth > 160;
-              var hDiff = window.outerHeight - window.innerHeight > 160;
-              var emu = (window.screen && window.screen.width > 1024 && window.innerWidth <= 800) || (window.outerWidth > 800 && window.innerWidth <= 800);
-              if (wDiff || hDiff || emu) {
-                document.documentElement.classList.add('devtools-locked');
-              }
-            } catch(e) {}
-          }, 500);
         }
       })();
     </script>

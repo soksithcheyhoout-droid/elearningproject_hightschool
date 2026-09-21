@@ -19,10 +19,14 @@ export const isRealMobileOrTablet = () => {
   const isDesktopOS = platform.includes('win') || (platform.includes('mac') && !(navigator.maxTouchPoints && navigator.maxTouchPoints > 1)) || platform.includes('linux x86_64');
 
   // DevTools responsive emulation signature:
-  // Desktop OS or physical screen is desktop resolution (>1024), but viewport is shrunk to mobile (<=800)
-  const isEmulatedToolbar = (
-    (window.screen && window.screen.width > 1024 && window.innerWidth <= 800) ||
-    (window.outerWidth > 800 && window.innerWidth <= 800)
+  // Desktop OS with large window (outerWidth > 900), but viewport shrunk to mobile canvas (innerWidth <= 600)
+  // On normal window resize, outerWidth - innerWidth is always <= 30px
+  const isEmulatedToolbar = Boolean(
+    window.outerWidth &&
+    window.innerWidth &&
+    window.outerWidth > 900 &&
+    window.innerWidth <= 600 &&
+    (window.outerWidth - window.innerWidth > 400)
   );
 
   if (isDesktopOS && isEmulatedToolbar) {
@@ -321,24 +325,10 @@ export function initSecurityProtection() {
   // -------------------------------------------------------------
   // ADVANCED DEVTOOLS DETECTION HOOKS (Console Getters, Dimensions, Timing)
   // -------------------------------------------------------------
+  // -------------------------------------------------------------
+  // ADVANCED DEVTOOLS DETECTION HOOKS (Calibrated Dimensions & Emulation)
+  // -------------------------------------------------------------
   let consecutiveHits = 0;
-  let devtoolsConsoleTriggered = false;
-
-  // Hook 1: Console RegExp & Object toString evaluation
-  // When DevTools Console/Elements is open, Chrome/Edge calls toString/getters on logged items
-  const regExpDetector = /./;
-  regExpDetector.toString = function() {
-    devtoolsConsoleTriggered = true;
-    return '';
-  };
-
-  const imgDetector = new Image();
-  Object.defineProperty(imgDetector, 'id', {
-    get: function() {
-      devtoolsConsoleTriggered = true;
-      return 'sec-shield';
-    }
-  });
 
   const checkDevTools = () => {
     // Real mobile & tablet devices NEVER have docked DevTools panes
@@ -356,59 +346,35 @@ export function initSecurityProtection() {
     }
 
     // Vector 1: Desktop Window Threshold Check (Docked DevTools on bottom/right/left)
+    // Note: Normal Windows 11 Chrome window has tabs (40px) + URL (42px) + bookmarks (34px) + taskbar (48px) = ~160-220px.
+    // Docked DevTools on bottom adds >= 250px (total diff > 380px).
+    // Docked DevTools on right/left takes >= 280px.
     const dpr = window.devicePixelRatio || 1;
-    const isStandardZoom = Math.abs(dpr - 1) < 0.25;
+    const isStandardZoom = Math.abs(dpr - 1) < 0.35;
 
     let dockedDetected = false;
     if (isStandardZoom) {
-      // Normal browser chrome tabs + URL bar is ~80-120px
-      // DevTools docked pane takes >= 160px
-      const widthDiff = window.outerWidth - window.innerWidth > 160;
-      const heightDiff = window.outerHeight - window.innerHeight > 160;
+      const widthDiff = window.outerWidth - window.innerWidth > 280;
+      const heightDiff = window.outerHeight - window.innerHeight > 320;
       if (widthDiff || heightDiff) {
         dockedDetected = true;
       }
     }
 
     // Vector 2: Chrome DevTools Responsive Device Mode Emulation Toolbar Check
-    // Desktop monitor resolution (>1024) but viewport shrunk to mobile (<=800)
-    let emulationDetected = false;
-    if (
-      (window.screen && window.screen.width > 1024 && window.innerWidth <= 800) ||
-      (window.outerWidth > 800 && window.innerWidth <= 800)
-    ) {
-      emulationDetected = true;
-    }
+    // Desktop monitor resolution but outerWidth is full browser window while innerWidth is shrunk to mobile canvas
+    const emulationDetected = Boolean(
+      window.outerWidth &&
+      window.innerWidth &&
+      window.outerWidth > 900 &&
+      window.innerWidth <= 600 &&
+      (window.outerWidth - window.innerWidth > 400)
+    );
 
-    // Vector 3: Console Object/Getter Trigger (Works even if DevTools is undocked/detached into separate window!)
-    let consoleDetected = false;
-    try {
-      devtoolsConsoleTriggered = false;
-      console.log('%c', imgDetector);
-      console.log('%c', regExpDetector);
-      console.clear();
-      if (devtoolsConsoleTriggered) {
-        consoleDetected = true;
-      }
-    } catch (e) {}
-
-    // Vector 4: Timing check with debugger execution delay
-    let timingDetected = false;
-    const start = performance.now();
-    try {
-      (function() {
-        return false;
-      }['constructor']('debugger')['call']());
-    } catch (e) {}
-    const end = performance.now();
-
-    if (end - start > 120) {
-      timingDetected = true;
-    }
-
-    if (dockedDetected || emulationDetected || consoleDetected || timingDetected) {
+    if (dockedDetected || emulationDetected) {
       consecutiveHits++;
-      if (consecutiveHits >= 1) {
+      // Require at least 2 consecutive positive detections to eliminate transient false positives
+      if (consecutiveHits >= 2) {
         setDevToolsLocked(true);
       }
     } else {
@@ -417,8 +383,8 @@ export function initSecurityProtection() {
     }
   };
 
-  // Run DevTools detection check every 400ms
-  setInterval(checkDevTools, 400);
+  // Run DevTools detection check every 500ms
+  setInterval(checkDevTools, 500);
 
   // -------------------------------------------------------------
   // 7. BACKGROUND DEBUGGER FREEZE TRAP (Desktop production only)
