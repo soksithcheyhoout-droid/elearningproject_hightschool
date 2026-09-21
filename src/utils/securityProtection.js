@@ -7,35 +7,49 @@
  * - Android (Chrome, Samsung Internet)
  */
 
-// Helper to reliably detect mobile and tablet devices
-export const isMobileOrTabletDevice = () => {
+// Helper to reliably detect genuine mobile and tablet devices
+// Crucial: Differentiates real phones from Chrome/Edge DevTools Responsive Emulation Mode
+export const isRealMobileOrTablet = () => {
   if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
 
   const ua = (navigator.userAgent || navigator.vendor || window.opera || '').toLowerCase();
+  const platform = (navigator.platform || '').toLowerCase();
+
+  // Desktop indicators
+  const isDesktopOS = platform.includes('win') || (platform.includes('mac') && !(navigator.maxTouchPoints && navigator.maxTouchPoints > 1)) || platform.includes('linux x86_64');
+
+  // DevTools responsive emulation signature:
+  // Desktop OS or physical screen is desktop resolution (>1024), but viewport is shrunk to mobile (<=800)
+  const isEmulatedToolbar = (
+    (window.screen && window.screen.width > 1024 && window.innerWidth <= 800) ||
+    (window.outerWidth > 800 && window.innerWidth <= 800)
+  );
+
+  if (isDesktopOS && isEmulatedToolbar) {
+    return false; // This is DevTools Device Mode on desktop, NOT a real mobile!
+  }
 
   // 1. Mobile & tablet user agent keywords (iPhone, iPad, Android, etc.)
   const isMobileUA = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|silk|fennec|tablet/i.test(ua);
-  if (isMobileUA) return true;
+  if (isMobileUA && !isEmulatedToolbar) return true;
 
   // 2. iPadOS Safari (reports as Macintosh with touch points)
   const isIPadOS = /macintosh/i.test(ua) && Boolean(navigator.maxTouchPoints && navigator.maxTouchPoints > 1);
-  if (isIPadOS) return true;
+  if (isIPadOS && !isEmulatedToolbar) return true;
 
-  // 3. Touch device checks (coarse pointer, touch screen)
-  const hasTouchCapability = Boolean(
-    (navigator.maxTouchPoints && navigator.maxTouchPoints > 0) ||
-    'ontouchstart' in window ||
-    (window.matchMedia && window.matchMedia('(pointer: coarse)').matches) ||
-    (window.matchMedia && window.matchMedia('(hover: none)').matches)
-  );
+  // 3. Physical screen dimensions of genuine mobile/tablet devices
+  const isSmallPhysicalScreen = Boolean(window.screen && (window.screen.width <= 1024 || window.screen.height <= 1024));
+  const hasTouch = Boolean(navigator.maxTouchPoints > 0 || 'ontouchstart' in window);
 
-  // If touch is enabled and screen width/height is in mobile/tablet range (<= 1024)
-  if (hasTouchCapability && (window.innerWidth <= 1024 || window.innerHeight <= 1024 || (window.screen && window.screen.width <= 1024))) {
+  if (hasTouch && isSmallPhysicalScreen && (window.outerWidth <= 1024 || !window.outerWidth)) {
     return true;
   }
 
   return false;
 };
+
+// Export legacy name for backward compatibility
+export const isMobileOrTabletDevice = isRealMobileOrTablet;
 
 export function initSecurityProtection() {
   if (typeof window === 'undefined') return;
@@ -270,8 +284,8 @@ export function initSecurityProtection() {
           ការពិនិត្យកូដ (Inspect Element) ឬ Developer Tools ត្រូវបានហាមឃាត់ដាច់ខាតនៅលើប្រព័ន្ធនេះ។<br/>
           សូមបិទ Developer Tools ឬ Web Inspector ជាបន្ទាន់ដើម្បីបន្តការប្រើប្រាស់។
         </p>
-        <div style="padding: 10px 20px; background: rgba(15, 23, 42, 0.8); border-radius: 12px; border: 1px solid #334155; font-size: 13px; color: #fbbf24; font-weight: 600;">
-          ⚠️ Developer Tools Detected • Inspection is Prohibited
+        <div style="padding: 10px 20px; background: rgba(15, 23, 42, 0.8); border-radius: 12px; border: 1px solid #ef4444; font-size: 13px; color: #fbbf24; font-weight: 600;">
+          ⚠️ Developer Tools Detected • Inspection is Strictly Prohibited
         </div>
       `;
       document.body.appendChild(lockOverlay);
@@ -280,29 +294,55 @@ export function initSecurityProtection() {
   };
 
   const setDevToolsLocked = (isLocked) => {
-    // If mobile or tablet device, NEVER lock screen
-    if (isMobileOrTabletDevice()) {
+    // If real mobile or tablet device, NEVER lock screen
+    if (isRealMobileOrTablet()) {
       isLocked = false;
     }
 
     const overlay = getOrCreateLockOverlay();
     const rootEl = document.getElementById('root');
     if (isLocked) {
+      document.documentElement.classList.add('devtools-locked');
       overlay.style.display = 'flex';
-      if (rootEl) rootEl.style.filter = 'blur(20px)';
+      if (rootEl) {
+        rootEl.style.display = 'none';
+        rootEl.style.filter = 'blur(40px)';
+      }
     } else {
+      document.documentElement.classList.remove('devtools-locked');
       overlay.style.display = 'none';
-      if (rootEl) rootEl.style.filter = 'none';
+      if (rootEl) {
+        rootEl.style.display = '';
+        rootEl.style.filter = 'none';
+      }
     }
   };
 
-  // Continuous DevTools Dimension & Timing Detector (Desktop only)
+  // -------------------------------------------------------------
+  // ADVANCED DEVTOOLS DETECTION HOOKS (Console Getters, Dimensions, Timing)
+  // -------------------------------------------------------------
   let consecutiveHits = 0;
+  let devtoolsConsoleTriggered = false;
+
+  // Hook 1: Console RegExp & Object toString evaluation
+  // When DevTools Console/Elements is open, Chrome/Edge calls toString/getters on logged items
+  const regExpDetector = /./;
+  regExpDetector.toString = function() {
+    devtoolsConsoleTriggered = true;
+    return '';
+  };
+
+  const imgDetector = new Image();
+  Object.defineProperty(imgDetector, 'id', {
+    get: function() {
+      devtoolsConsoleTriggered = true;
+      return 'sec-shield';
+    }
+  });
 
   const checkDevTools = () => {
-    // 1. Mobile & tablet devices NEVER have docked DevTools panes.
-    // Their window.outerHeight vs innerHeight differences are caused by Safari/Chrome URL bars and bottom toolbars.
-    if (isMobileOrTabletDevice()) {
+    // Real mobile & tablet devices NEVER have docked DevTools panes
+    if (isRealMobileOrTablet()) {
       consecutiveHits = 0;
       setDevToolsLocked(false);
       return;
@@ -315,23 +355,44 @@ export function initSecurityProtection() {
       return;
     }
 
-    // 2. Desktop Window Threshold Check
-    // Exclude cases where browser is zoomed in (devicePixelRatio changed)
+    // Vector 1: Desktop Window Threshold Check (Docked DevTools on bottom/right/left)
     const dpr = window.devicePixelRatio || 1;
-    const isStandardZoom = Math.abs(dpr - 1) < 0.2; // ~100% zoom (0.8x - 1.2x)
+    const isStandardZoom = Math.abs(dpr - 1) < 0.25;
 
     let dockedDetected = false;
     if (isStandardZoom) {
-      // Normal desktop browser chrome (tabs + address bar + borders) is ~80-120px.
-      // Docked DevTools takes at least 220px.
-      const widthDiff = window.outerWidth - window.innerWidth > 220;
-      const heightDiff = window.outerHeight - window.innerHeight > 220;
+      // Normal browser chrome tabs + URL bar is ~80-120px
+      // DevTools docked pane takes >= 160px
+      const widthDiff = window.outerWidth - window.innerWidth > 160;
+      const heightDiff = window.outerHeight - window.innerHeight > 160;
       if (widthDiff || heightDiff) {
         dockedDetected = true;
       }
     }
 
-    // 3. Timing check with debugger
+    // Vector 2: Chrome DevTools Responsive Device Mode Emulation Toolbar Check
+    // Desktop monitor resolution (>1024) but viewport shrunk to mobile (<=800)
+    let emulationDetected = false;
+    if (
+      (window.screen && window.screen.width > 1024 && window.innerWidth <= 800) ||
+      (window.outerWidth > 800 && window.innerWidth <= 800)
+    ) {
+      emulationDetected = true;
+    }
+
+    // Vector 3: Console Object/Getter Trigger (Works even if DevTools is undocked/detached into separate window!)
+    let consoleDetected = false;
+    try {
+      devtoolsConsoleTriggered = false;
+      console.log('%c', imgDetector);
+      console.log('%c', regExpDetector);
+      console.clear();
+      if (devtoolsConsoleTriggered) {
+        consoleDetected = true;
+      }
+    } catch (e) {}
+
+    // Vector 4: Timing check with debugger execution delay
     let timingDetected = false;
     const start = performance.now();
     try {
@@ -341,14 +402,13 @@ export function initSecurityProtection() {
     } catch (e) {}
     const end = performance.now();
 
-    if (end - start > 150) {
+    if (end - start > 120) {
       timingDetected = true;
     }
 
-    if (dockedDetected || timingDetected) {
+    if (dockedDetected || emulationDetected || consoleDetected || timingDetected) {
       consecutiveHits++;
-      // Require at least 2 consecutive positive detections to prevent false positives from transient CPU hiccups
-      if (consecutiveHits >= 2) {
+      if (consecutiveHits >= 1) {
         setDevToolsLocked(true);
       }
     } else {
@@ -357,18 +417,15 @@ export function initSecurityProtection() {
     }
   };
 
-  // Run DevTools detection check every 600ms
-  setInterval(checkDevTools, 600);
+  // Run DevTools detection check every 400ms
+  setInterval(checkDevTools, 400);
 
   // -------------------------------------------------------------
   // 7. BACKGROUND DEBUGGER FREEZE TRAP (Desktop production only)
   // Freezes DevTools execution if someone keeps it open on desktop
   // -------------------------------------------------------------
   const launchDebuggerTrap = () => {
-    // Never run freeze trap on mobile/tablet devices (prevents battery drain & UI stutter)
-    if (isMobileOrTabletDevice()) return;
-
-    // Do not run in local development
+    if (isRealMobileOrTablet()) return;
     if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return;
 
     try {
@@ -377,7 +434,7 @@ export function initSecurityProtection() {
           return false;
         }['constructor']('debugger')['call']());
       };
-      setInterval(debugFn, 1000);
+      setInterval(debugFn, 600);
     } catch (e) {}
   };
   launchDebuggerTrap();

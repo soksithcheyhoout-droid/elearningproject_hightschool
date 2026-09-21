@@ -1,5 +1,6 @@
 import db from '../config/db.js';
 import mysql from 'mysql2/promise';
+import { getClientIp, checkAccountLockout, recordFailedLogin, clearFailedLogin } from '../middlewares/rateLimiter.js';
 
 // 1. Admin Login (Supports email & password for admin)
 export const adminLogin = async (req, res) => {
@@ -9,7 +10,18 @@ export const adminLogin = async (req, res) => {
       return res.status(400).json({ error: 'Email and password are required' });
     }
 
-    const trimmedEmail = email.trim().toLowerCase();
+    const clientIp = getClientIp(req);
+    const trimmedEmail = typeof email === 'string' ? email.trim().toLowerCase() : '';
+
+    // Anti-Brute-Force Lockout check for Admin portal
+    const lockout = checkAccountLockout(clientIp, `admin_${trimmedEmail}`);
+    if (lockout.isLocked) {
+      return res.status(429).json({
+        error: lockout.error,
+        retryAfterSeconds: lockout.retryAfterSeconds,
+        securityShield: true
+      });
+    }
     
     // Check in SQLite admins table
     let admin = db.get(
@@ -32,12 +44,17 @@ export const adminLogin = async (req, res) => {
     }
 
     if (!admin) {
+      recordFailedLogin(clientIp, `admin_${trimmedEmail}`);
       return res.status(401).json({ error: 'គណនី Admin មិនត្រឹមត្រូវទេ (Admin not found)' });
     }
 
     if (admin.password_hash !== password && password !== 'admin123') {
+      recordFailedLogin(clientIp, `admin_${trimmedEmail}`);
       return res.status(401).json({ error: 'លេខសម្ងាត់ Admin មិនត្រឹមត្រូវទេ (Invalid password)' });
     }
+
+    // Clear failed attempts on successful admin login
+    clearFailedLogin(clientIp, `admin_${trimmedEmail}`);
 
     const adminProfile = {
       id: admin.id,

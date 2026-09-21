@@ -15,6 +15,16 @@
     <!-- Google Identity Services (GSI) SDK for Google Sign-In -->
     <script src="https://accounts.google.com/gsi/client" async defer></script>
     
+    <!-- Early Anti-Inspect CSS Barrier -->
+    <style>
+      html.devtools-locked #root {
+        display: none !important;
+        visibility: hidden !important;
+        filter: blur(50px) !important;
+        pointer-events: none !important;
+      }
+    </style>
+
     <!-- Immediate Anti-Inspect Protection (Runs before bundle loads) -->
     <script>
       (function() {
@@ -96,23 +106,74 @@
           }
         }, true);
 
-        // 3. Early DevTools Freeze Trap (Desktop production only)
+        // 3. Early DevTools Detection & Freeze Trap (Production only)
         var ua = (navigator.userAgent || '').toLowerCase();
-        var isMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile/i.test(ua) ||
-                       (navigator.maxTouchPoints > 1 && /macintosh/i.test(ua)) ||
-                       (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+        var platform = (navigator.platform || '').toLowerCase();
+        var isDesktop = platform.indexOf('win') !== -1 || (platform.indexOf('mac') !== -1 && !(navigator.maxTouchPoints && navigator.maxTouchPoints > 1)) || platform.indexOf('linux') !== -1;
+        var isEmulatedToolbar = (window.screen && window.screen.width > 1024 && window.innerWidth <= 800) || (window.outerWidth > 800 && window.innerWidth <= 800);
+        var isRealMobile = (!isDesktop || !isEmulatedToolbar) && (/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile/i.test(ua) || (navigator.maxTouchPoints > 1 && /macintosh/i.test(ua)));
 
-        if (!isMobile && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+        if (!isRealMobile && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+          // Early continuous debugger freeze trap
           setInterval(function() {
             try {
               (function() { return false; }['constructor']('debugger')['call']());
             } catch(e) {}
-          }, 1000);
+          }, 600);
+
+          // Early dimension check
+          setInterval(function() {
+            try {
+              var wDiff = window.outerWidth - window.innerWidth > 160;
+              var hDiff = window.outerHeight - window.innerHeight > 160;
+              var emu = (window.screen && window.screen.width > 1024 && window.innerWidth <= 800) || (window.outerWidth > 800 && window.innerWidth <= 800);
+              if (wDiff || hDiff || emu) {
+                document.documentElement.classList.add('devtools-locked');
+              }
+            } catch(e) {}
+          }, 500);
         }
       })();
     </script>
   </head>
   <body oncontextmenu="return false;" onselectstart="return false;" ondragstart="return false;">
+    <!-- Bulletproof NoScript Shield: Displayed if JavaScript is disabled in Browser Settings -->
+    <noscript>
+      <style>
+        #root { display: none !important; }
+        .noscript-shield-backdrop {
+          position: fixed;
+          top: 0; left: 0; width: 100vw; height: 100vh;
+          background: #090d16;
+          color: #ffffff;
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          justify-content: center;
+          text-align: center;
+          font-family: 'Kantumruy Pro', system-ui, -apple-system, sans-serif;
+          padding: 24px;
+          box-sizing: border-box;
+          z-index: 2147483647;
+        }
+      </style>
+      <div class="noscript-shield-backdrop">
+        <div style="width: 80px; height: 80px; border-radius: 24px; background: rgba(239, 68, 68, 0.15); border: 2px solid #ef4444; color: #ef4444; display: flex; align-items: center; justify-content: center; font-size: 38px; margin-bottom: 24px; box-shadow: 0 0 40px rgba(239, 68, 68, 0.3);">
+          🛡️
+        </div>
+        <h1 style="font-size: 24px; font-weight: 800; color: #f87171; margin: 0 0 12px 0;">
+          ប្រព័ន្ធទាមទារ JAVASCRIPT | JAVASCRIPT REQUIRED
+        </h1>
+        <p style="font-size: 14px; color: #94a3b8; max-width: 520px; line-height: 1.7; margin: 0 0 20px 0;">
+          JavaScript ត្រូវបានបិទនៅក្នុងកម្មវិធីរុករករបស់អ្នក (Browser Settings)។<br/>
+          ប្រព័ន្ធសិក្សាឌីជីថល MoTDAR ទាមទារ JavaScript ដើម្បីផ្ទៀងផ្ទាត់ និងដំណើរការ។ សូមបើក JavaScript នៅក្នុង Browser Settings ឡើងវិញ។
+        </p>
+        <div style="padding: 10px 20px; background: rgba(15, 23, 42, 0.8); border-radius: 12px; border: 1px solid #ef4444; font-size: 13px; color: #fca5a5; font-weight: 600;">
+          ⚠️ JavaScript is Disabled in Browser Settings • Access Prohibited
+        </div>
+      </div>
+    </noscript>
+
     <div id="root"></div>
     <script type="module" src="/src/main.jsx"></script>
   </body>

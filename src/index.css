@@ -2612,4 +2612,10 @@ html[data-theme="dark"] .truck-lampPost,
   animation: ytShimmerEffect 1.5s infinite linear;
 }
 
-
+/* Security Protection: Maximum DevTools Anti-Inspect Shield */
+html.devtools-locked #root {
+  display: none !important;
+  visibility: hidden !important;
+  filter: blur(50px) !important;
+  pointer-events: none !important;
+}

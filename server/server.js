@@ -6,6 +6,7 @@ import { fileURLToPath } from 'url';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import apiRoutes from './routes/api.js';
+import { ipFirewallMiddleware, globalApiLimiter } from './middlewares/rateLimiter.js';
 
 dotenv.config();
 
@@ -15,8 +16,13 @@ const __dirname = path.dirname(__filename);
 const app = express();
 const PORT = process.env.PORT || 5000;
 
-// Security Hardening: Hide server footprint & add protective HTTP headers
+// Crucial for Render / Cloudflare reverse proxy: Trust X-Forwarded-For headers
+app.set('trust proxy', 1);
+
+// Security Hardening: Anti-DDoS Firewall & protective HTTP headers
 app.disable('x-powered-by');
+app.use(ipFirewallMiddleware);
+
 app.use((req, res, next) => {
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
   res.setHeader('X-Content-Type-Options', 'nosniff');
@@ -97,8 +103,8 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// 7. API Routes
-app.use('/api', apiRoutes);
+// 7. API Routes with Global Rate Limiting
+app.use('/api', globalApiLimiter, apiRoutes);
 
 // 8. SPA Fallback for client-side routing
 app.get('*', (req, res, next) => {

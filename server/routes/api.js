@@ -1,5 +1,6 @@
 import express from 'express';
 import { register, login, getMe, googleLogin, sendOtp, verifyOtp, completeOtpProfile } from '../controllers/authController.js';
+import { authRateLimiter } from '../middlewares/rateLimiter.js';
 import { 
   updateProfile, 
   uploadAvatar, 
@@ -40,13 +41,13 @@ router.get('/health', (req, res) => {
   });
 });
 
-// 1. Authentication Routes
-router.post('/auth/register', register);
-router.post('/auth/login', login);
-router.post('/auth/google-login', googleLogin);
-router.post('/auth/send-otp', sendOtp);
-router.post('/auth/verify-otp', verifyOtp);
-router.post('/auth/complete-otp-profile', completeOtpProfile);
+// 1. Authentication Routes (Protected by Multi-Tier Rate Limiting Shield)
+router.post('/auth/register', authRateLimiter, register);
+router.post('/auth/login', authRateLimiter, login);
+router.post('/auth/google-login', authRateLimiter, googleLogin);
+router.post('/auth/send-otp', authRateLimiter, sendOtp);
+router.post('/auth/verify-otp', authRateLimiter, verifyOtp);
+router.post('/auth/complete-otp-profile', authRateLimiter, completeOtpProfile);
 router.get('/auth/me', getMe);
 
 // 2. Student Profile & Custom PF (Avatar) Upload
@@ -120,8 +121,8 @@ router.post('/chat/messages/:id/react', toggleReaction);
 router.delete('/chat/messages/:id', deleteMessage);
 router.delete('/chat/messages', clearChannel);
 
-// 8. Super Admin Management & Control Center
-router.post('/admin/login', adminLogin);
+// 8. Super Admin Management & Control Center (Protected by Security Shield)
+router.post('/admin/login', authRateLimiter, adminLogin);
 router.get('/admin/stats', getAdminStats);
 router.get('/admin/students', getAdminStudents);
 router.put('/admin/students/:id', updateAdminStudent);

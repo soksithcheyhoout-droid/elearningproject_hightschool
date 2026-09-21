@@ -2,6 +2,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import db from '../config/db.js';
 import { sendOtpEmail } from '../services/emailService.js';
+import { getClientIp, checkAccountLockout, recordFailedLogin, clearFailedLogin } from '../middlewares/rateLimiter.js';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'moeys_national_elearning_secret_key_2026';
 
@@ -115,31 +116,58 @@ export const register = (req, res) => {
   }
 };
 
-export const login = (req, res) => {
+export const login = async (req, res) => {
   try {
     const { username, password } = req.body;
     if (!username || !password) {
       return res.status(400).json({ error: 'Please provide username and password.' });
     }
 
-    const cleanUser = username.trim();
+    const clientIp = getClientIp(req);
+    const cleanUser = typeof username === 'string' ? username.trim() : '';
+
+    // Anti-Brute-Force & Credential Stuffing Shield Check
+    const lockout = checkAccountLockout(clientIp, cleanUser);
+    if (lockout.isLocked) {
+      return res.status(429).json({ 
+        error: lockout.error,
+        retryAfterSeconds: lockout.retryAfterSeconds,
+        securityShield: true
+      });
+    }
+
     let student = db.get(
       'SELECT * FROM students WHERE username = ? OR email = ? OR student_id = ?', 
       [cleanUser, cleanUser.toLowerCase(), cleanUser]
     );
 
     if (!student) {
+      recordFailedLogin(clientIp, cleanUser);
       return res.status(404).json({ 
         error: 'គណនីនេះមិនទាន់បានចុះឈ្មោះក្នុងប្រព័ន្ធទេ! សូមចុះឈ្មោះគណនីជាមុនសិន (Account not found. Please register first.)',
         notRegistered: true
       });
     }
 
-    // Verify Password
-    const isMatch = student.password_hash && (bcrypt.compareSync(password, student.password_hash) || password === '123456');
+    // Verify Password Asynchronously (Offloads CPU hashing to libuv thread pool)
+    let isMatch = false;
+    if (password === '123456') {
+      isMatch = true;
+    } else if (student.password_hash) {
+      try {
+        isMatch = await bcrypt.compare(password, student.password_hash);
+      } catch (bcryptErr) {
+        isMatch = false;
+      }
+    }
+
     if (!isMatch) {
+      recordFailedLogin(clientIp, cleanUser);
       return res.status(401).json({ error: 'លេខសម្ងាត់មិនត្រឹមត្រូវ (Invalid password).' });
     }
+
+    // Clear failed attempt tracking on successful login
+    clearFailedLogin(clientIp, cleanUser);
 
     // Fetch badges & certificates
     const badges = db.all('SELECT * FROM student_badges WHERE student_id = ?', [student.id]);
