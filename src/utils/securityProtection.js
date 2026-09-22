@@ -395,50 +395,41 @@ export function initSecurityProtection() {
     }
 
     // Vector 1: Desktop Window Docked DevTools (Right, Left, Bottom)
-    // Works universally across all Windows DPI scaling (100%, 125%, 150%, 200%)
-    const widthDiff = window.outerWidth - window.innerWidth > 160;
-    const heightDiff = window.outerHeight - window.innerHeight > 200;
+    // Normal maximized Windows 11 Chrome: wDiff is 0-16px, hDiff is ~160-220px.
+    // Docked DevTools on bottom adds >= 250px (total diff > 320px).
+    // Docked DevTools on right/left takes >= 280px.
+    const widthDiff = window.outerWidth - window.innerWidth > 280;
+    const heightDiff = window.outerHeight - window.innerHeight > 320;
 
     // Vector 2: Chrome DevTools Responsive Device Mode Emulation Toolbar Check
     const emulationDetected = Boolean(
       window.outerWidth &&
       window.innerWidth &&
-      window.outerWidth > 700 &&
+      window.outerWidth > 900 &&
       window.innerWidth <= 600 &&
-      (window.outerWidth - window.innerWidth > 180)
+      (window.outerWidth - window.innerWidth > 350)
     );
 
-    // Vector 3: Debugger Execution Timing Benchmark Check
-    let timingDetected = false;
-    try {
-      const t0 = performance.now();
-      triggerDebuggerFreeze();
-      const t1 = performance.now();
-      if (t1 - t0 > 100) {
-        timingDetected = true;
-      }
-    } catch (e) {}
-
-    if (widthDiff || heightDiff || emulationDetected || timingDetected) {
+    if (widthDiff || heightDiff || emulationDetected) {
       consecutiveHits++;
       if (consecutiveHits >= 2) {
         setDevToolsLocked(true);
       }
     } else {
       consecutiveHits = 0;
-      // Note: Only unlock if disableDevtool also agrees it's not opened
+      // Unlock only if disableDevtool also agrees it is not open
       if (!disableDevtool?.isDevToolOpened?.()) {
         setDevToolsLocked(false);
       }
     }
   };
 
-  // Run secondary DevTools detection check every 250ms
-  setInterval(checkDevToolsSecondary, 250);
+  // Run secondary DevTools detection check every 350ms
+  setInterval(checkDevToolsSecondary, 350);
 
   // -------------------------------------------------------------
-  // 7. AGGRESSIVE BACKGROUND DEBUGGER FREEZE TRAP (Desktop production only)
-  // The moment DevTools opens via Chrome 3-dot menu or any method, it hits debugger and freezes!
+  // 7. BACKGROUND DEBUGGER FREEZE TRAP (Desktop production only)
+  // Freezes DevTools execution ONLY WHEN DevTools is detected and locked
   // -------------------------------------------------------------
   const launchDebuggerTrap = () => {
     if (isRealMobileOrTablet()) return;
@@ -446,12 +437,13 @@ export function initSecurityProtection() {
 
     try {
       const debugFn = function() {
-        (function() {
-          return false;
-        }['constructor']('debugger')['call']());
+        if (document.documentElement.classList.contains('devtools-locked')) {
+          (function() {
+            return false;
+          }['constructor']('debugger')['call']());
+        }
       };
-      // Runs every 80ms to lock the inspector thread immediately upon opening
-      setInterval(debugFn, 80);
+      setInterval(debugFn, 150);
     } catch (e) {}
   };
   launchDebuggerTrap();
