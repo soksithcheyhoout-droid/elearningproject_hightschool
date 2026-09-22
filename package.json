@@ -19,6 +19,7 @@
     "canvas-confetti": "^1.9.4",
     "compression": "^1.8.1",
     "cors": "^2.8.5",
+    "disable-devtool": "^0.3.9",
     "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "html-to-image": "^1.11.13",

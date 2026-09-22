@@ -1,3 +1,5 @@
+import disableDevtool from 'disable-devtool';
+
 /**
  * MoTDAR National E-Learning Platform - Maximum Anti-Inspect & DevTools Shield
  * Absolute blocking of inspection across ALL devices:
@@ -8,48 +10,41 @@
  */
 
 // Helper to reliably detect genuine mobile and tablet devices
-// Crucial: Differentiates real phones from Chrome/Edge DevTools Responsive Emulation Mode
+// Differentiates real phones from Chrome/Edge DevTools Responsive Emulation Mode
 export const isRealMobileOrTablet = () => {
   if (typeof window === 'undefined' || typeof navigator === 'undefined') return false;
 
   const ua = (navigator.userAgent || navigator.vendor || window.opera || '').toLowerCase();
   const platform = (navigator.platform || '').toLowerCase();
 
-  // Desktop indicators
-  const isDesktopOS = platform.includes('win') || (platform.includes('mac') && !(navigator.maxTouchPoints && navigator.maxTouchPoints > 1)) || platform.includes('linux x86_64');
+  // Desktop indicators (Windows, Mac desktop, Linux desktop)
+  const isWindows = platform.includes('win') || ua.includes('windows');
+  const isLinuxDesktop = platform.includes('linux x86_64') || (platform.includes('linux') && !ua.includes('android'));
+  const isMacDesktop = platform.includes('mac') && !navigator.maxTouchPoints;
 
-  // DevTools responsive emulation signature:
-  // Desktop OS with large window (outerWidth > 900), but viewport shrunk to mobile canvas (innerWidth <= 600)
-  // On normal window resize, outerWidth - innerWidth is always <= 30px
-  const isEmulatedToolbar = Boolean(
-    window.outerWidth &&
-    window.innerWidth &&
-    window.outerWidth > 900 &&
-    window.innerWidth <= 600 &&
-    (window.outerWidth - window.innerWidth > 400)
-  );
-
-  if (isDesktopOS && isEmulatedToolbar) {
-    return false; // This is DevTools Device Mode on desktop, NOT a real mobile!
+  // Desktop OS is NEVER a real mobile or tablet!
+  if (isWindows || isLinuxDesktop || isMacDesktop) {
+    return false;
   }
 
-  // 1. Mobile & tablet user agent keywords (iPhone, iPad, Android, etc.)
-  const isMobileUA = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|silk|fennec|tablet/i.test(ua);
-  if (isMobileUA && !isEmulatedToolbar) return true;
-
-  // 2. iPadOS Safari (reports as Macintosh with touch points)
-  const isIPadOS = /macintosh/i.test(ua) && Boolean(navigator.maxTouchPoints && navigator.maxTouchPoints > 1);
-  if (isIPadOS && !isEmulatedToolbar) return true;
-
-  // 3. Physical screen dimensions of genuine mobile/tablet devices
-  const isSmallPhysicalScreen = Boolean(window.screen && (window.screen.width <= 1024 || window.screen.height <= 1024));
-  const hasTouch = Boolean(navigator.maxTouchPoints > 0 || 'ontouchstart' in window);
-
-  if (hasTouch && isSmallPhysicalScreen && (window.outerWidth <= 1024 || !window.outerWidth)) {
-    return true;
+  // Large physical monitor (screen width/height > 1200) indicates desktop PC with emulation
+  if (window.screen && (window.screen.width > 1200 || window.screen.height > 1200)) {
+    return false;
   }
 
-  return false;
+  // Desktop browser window outerWidth vs shrunk inner viewport (Device Mode emulation signature)
+  if (window.outerWidth && window.innerWidth && (window.outerWidth - window.innerWidth > 120)) {
+    return false;
+  }
+
+  // Genuine mobile user-agents
+  const isMobileUA = /android|webos|iphone|ipod|blackberry|iemobile|opera mini|mobile|silk/i.test(ua);
+  const isIPad = /ipad/i.test(ua) || (platform.includes('mac') && Boolean(navigator.maxTouchPoints && navigator.maxTouchPoints > 1));
+
+  // On real mobile devices, window.outerWidth is either 0 or approximately matches window.innerWidth (diff <= 30)
+  const hasMatchingDimensions = !window.outerWidth || Math.abs(window.outerWidth - window.innerWidth) <= 30;
+
+  return Boolean((isMobileUA || isIPad) && hasMatchingDimensions);
 };
 
 // Export legacy name for backward compatibility
@@ -286,15 +281,25 @@ export function initSecurityProtection() {
         </h1>
         <p style="font-size: 14px; color: #94a3b8; max-width: 520px; line-height: 1.7; margin: 0 0 20px 0;">
           ការពិនិត្យកូដ (Inspect Element) ឬ Developer Tools ត្រូវបានហាមឃាត់ដាច់ខាតនៅលើប្រព័ន្ធនេះ។<br/>
-          សូមបិទ Developer Tools ឬ Web Inspector ជាបន្ទាន់ដើម្បីបន្តការប្រើប្រាស់។
+          សូមបិទ Developer Tools ឬ Web Inspector ជាបន្ទាន់។ ប្រព័ន្ធនឹងបិទទំព័រដោយស្វ័យប្រវត្តិប្រសិនបើរំលោភបំពាន។
         </p>
         <div style="padding: 10px 20px; background: rgba(15, 23, 42, 0.8); border-radius: 12px; border: 1px solid #ef4444; font-size: 13px; color: #fbbf24; font-weight: 600;">
-          ⚠️ Developer Tools Detected • Inspection is Strictly Prohibited
+          ⚠️ Developer Tools Detected • Session Terminating Automatically
         </div>
       `;
       document.body.appendChild(lockOverlay);
     }
     return lockOverlay;
+  };
+
+  let redirectTimer = null;
+
+  const triggerDebuggerFreeze = () => {
+    try {
+      (function() {
+        return false;
+      }['constructor']('debugger')['call']());
+    } catch (e) {}
   };
 
   const setDevToolsLocked = (isLocked) => {
@@ -305,12 +310,31 @@ export function initSecurityProtection() {
 
     const overlay = getOrCreateLockOverlay();
     const rootEl = document.getElementById('root');
+
     if (isLocked) {
       document.documentElement.classList.add('devtools-locked');
       overlay.style.display = 'flex';
       if (rootEl) {
         rootEl.style.display = 'none';
         rootEl.style.filter = 'blur(40px)';
+      }
+
+      // Immediate debugger trap execution
+      triggerDebuggerFreeze();
+
+      // Auto-terminate session if DevTools remains open for > 1.8s
+      const isLocalhost = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+      const isTestingSecurity = window.location.search.includes('test_security=1');
+
+      if ((!isLocalhost || isTestingSecurity) && !redirectTimer) {
+        redirectTimer = setTimeout(() => {
+          if (document.documentElement.classList.contains('devtools-locked')) {
+            try {
+              window.close();
+            } catch (e) {}
+            window.location.replace('about:blank');
+          }
+        }, 1800);
       }
     } else {
       document.documentElement.classList.remove('devtools-locked');
@@ -319,90 +343,115 @@ export function initSecurityProtection() {
         rootEl.style.display = '';
         rootEl.style.filter = 'none';
       }
+      if (redirectTimer) {
+        clearTimeout(redirectTimer);
+        redirectTimer = null;
+      }
     }
   };
 
   // -------------------------------------------------------------
-  // ADVANCED DEVTOOLS DETECTION HOOKS (Console Getters, Dimensions, Timing)
+  // 6.1 PRIMARY ENGINE: DISABLE-DEVTOOL (Catches Chrome 3-Dot Menu, Undocked, Console Getters)
   // -------------------------------------------------------------
+  const isLocalhost = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1');
+  const isTestingSecurity = typeof window !== 'undefined' && window.location.search.includes('test_security=1');
+
+  if (typeof window !== 'undefined' && (!isLocalhost || isTestingSecurity)) {
+    try {
+      disableDevtool({
+        ondevtoolopen() {
+          setDevToolsLocked(true);
+        },
+        ondevtoolclose() {
+          setDevToolsLocked(false);
+        },
+        interval: 200,
+        disableMenu: true,
+        clearLog: true,
+        detectors: 'all',
+        disableIframeParents: true
+      });
+    } catch (e) {
+      console.warn('DisableDevtool init fallback', e);
+    }
+  }
+
   // -------------------------------------------------------------
-  // ADVANCED DEVTOOLS DETECTION HOOKS (Calibrated Dimensions & Emulation)
+  // 6.2 SECONDARY ENGINE: MULTI-VECTOR DETECTION (Dimensions, Emulation, Timing)
   // -------------------------------------------------------------
   let consecutiveHits = 0;
 
-  const checkDevTools = () => {
-    // Real mobile & tablet devices NEVER have docked DevTools panes
+  const checkDevToolsSecondary = () => {
     if (isRealMobileOrTablet()) {
       consecutiveHits = 0;
       setDevToolsLocked(false);
       return;
     }
 
-    // Do not lock during local development
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    if (isLocalhost && !isTestingSecurity) {
       consecutiveHits = 0;
       setDevToolsLocked(false);
       return;
     }
 
-    // Vector 1: Desktop Window Threshold Check (Docked DevTools on bottom/right/left)
-    // Note: Normal Windows 11 Chrome window has tabs (40px) + URL (42px) + bookmarks (34px) + taskbar (48px) = ~160-220px.
-    // Docked DevTools on bottom adds >= 250px (total diff > 380px).
-    // Docked DevTools on right/left takes >= 280px.
-    const dpr = window.devicePixelRatio || 1;
-    const isStandardZoom = Math.abs(dpr - 1) < 0.35;
-
-    let dockedDetected = false;
-    if (isStandardZoom) {
-      const widthDiff = window.outerWidth - window.innerWidth > 280;
-      const heightDiff = window.outerHeight - window.innerHeight > 320;
-      if (widthDiff || heightDiff) {
-        dockedDetected = true;
-      }
-    }
+    // Vector 1: Desktop Window Docked DevTools (Right, Left, Bottom)
+    // Works universally across all Windows DPI scaling (100%, 125%, 150%, 200%)
+    const widthDiff = window.outerWidth - window.innerWidth > 160;
+    const heightDiff = window.outerHeight - window.innerHeight > 200;
 
     // Vector 2: Chrome DevTools Responsive Device Mode Emulation Toolbar Check
-    // Desktop monitor resolution but outerWidth is full browser window while innerWidth is shrunk to mobile canvas
     const emulationDetected = Boolean(
       window.outerWidth &&
       window.innerWidth &&
-      window.outerWidth > 900 &&
+      window.outerWidth > 700 &&
       window.innerWidth <= 600 &&
-      (window.outerWidth - window.innerWidth > 400)
+      (window.outerWidth - window.innerWidth > 180)
     );
 
-    if (dockedDetected || emulationDetected) {
+    // Vector 3: Debugger Execution Timing Benchmark Check
+    let timingDetected = false;
+    try {
+      const t0 = performance.now();
+      triggerDebuggerFreeze();
+      const t1 = performance.now();
+      if (t1 - t0 > 100) {
+        timingDetected = true;
+      }
+    } catch (e) {}
+
+    if (widthDiff || heightDiff || emulationDetected || timingDetected) {
       consecutiveHits++;
-      // Require at least 2 consecutive positive detections to eliminate transient false positives
       if (consecutiveHits >= 2) {
         setDevToolsLocked(true);
       }
     } else {
       consecutiveHits = 0;
-      setDevToolsLocked(false);
+      // Note: Only unlock if disableDevtool also agrees it's not opened
+      if (!disableDevtool?.isDevToolOpened?.()) {
+        setDevToolsLocked(false);
+      }
     }
   };
 
-  // Run DevTools detection check every 500ms
-  setInterval(checkDevTools, 500);
+  // Run secondary DevTools detection check every 250ms
+  setInterval(checkDevToolsSecondary, 250);
 
   // -------------------------------------------------------------
-  // 7. BACKGROUND DEBUGGER FREEZE TRAP (Desktop production only)
-  // Freezes DevTools execution ONLY AFTER lock shield is active
+  // 7. AGGRESSIVE BACKGROUND DEBUGGER FREEZE TRAP (Desktop production only)
+  // The moment DevTools opens via Chrome 3-dot menu or any method, it hits debugger and freezes!
   // -------------------------------------------------------------
   const launchDebuggerTrap = () => {
     if (isRealMobileOrTablet()) return;
-    if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return;
+    if (isLocalhost && !isTestingSecurity) return;
 
     try {
       const debugFn = function() {
-        if (document.documentElement.classList.contains('devtools-locked')) {
-          (function() {
-            return false;
-          }['constructor']('debugger')['call']());
-        }
+        (function() {
+          return false;
+        }['constructor']('debugger')['call']());
       };
-      setInterval(debugFn, 500);
+      // Runs every 80ms to lock the inspector thread immediately upon opening
+      setInterval(debugFn, 80);
     } catch (e) {}
   };
   launchDebuggerTrap();
@@ -410,7 +459,7 @@ export function initSecurityProtection() {
   // -------------------------------------------------------------
   // 8. CONSOLE SECURITY & OBFUSCATION (Production only)
   // -------------------------------------------------------------
-  if (typeof window !== 'undefined' && window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1') {
+  if (typeof window !== 'undefined' && (!isLocalhost || isTestingSecurity)) {
     try {
       const warningStyle = 'background: #0f172a; color: #ef4444; font-size: 16px; font-weight: bold; padding: 10px 16px; border-radius: 8px; border: 1px solid #ef4444;';
       const infoStyle = 'color: #94a3b8; font-size: 12px; margin-top: 4px;';

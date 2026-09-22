@@ -125,30 +125,111 @@
         }, true);
 
         // 3. Early DevTools Detection & Shield Activation
-        var isDevToolsActive = function() {
-          if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') return false;
-          var wDiff = window.outerWidth - window.innerWidth > 280;
-          var hDiff = window.outerHeight - window.innerHeight > 320;
-          var isEmu = Boolean(window.outerWidth > 900 && window.innerWidth <= 600 && (window.outerWidth - window.innerWidth > 400));
-          return Boolean(wDiff || hDiff || isEmu);
+        var isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1';
+        var isTestingSecurity = window.location.search.indexOf('test_security=1') !== -1;
+        var earlyRedirectTimer = null;
+
+        var isRealMobile = function() {
+          var ua = (navigator.userAgent || '').toLowerCase();
+          var platform = (navigator.platform || '').toLowerCase();
+          if (platform.indexOf('win') !== -1 || ua.indexOf('windows') !== -1 || platform.indexOf('linux x86_64') !== -1) return false;
+          if (window.screen && (window.screen.width > 1200 || window.screen.height > 1200)) return false;
+          if (window.outerWidth && window.innerWidth && (window.outerWidth - window.innerWidth > 120)) return false;
+          var isMobileUA = /android|webos|iphone|ipod|blackberry|iemobile|opera mini|mobile|silk/i.test(ua);
+          var isIPad = /ipad/i.test(ua) || (platform.indexOf('mac') !== -1 && Boolean(navigator.maxTouchPoints && navigator.maxTouchPoints > 1));
+          return Boolean((isMobileUA || isIPad) && (!window.outerWidth || Math.abs(window.outerWidth - window.innerWidth) <= 30));
         };
 
-        var earlyHits = 0;
-        setInterval(function() {
-          if (isDevToolsActive()) {
-            earlyHits++;
-            if (earlyHits >= 2) {
-              // Hide website and show lock BEFORE calling debugger
-              document.documentElement.classList.add('devtools-locked');
-              try {
-                (function() { return false; }['constructor']('debugger')['call']());
-              } catch(e) {}
+        var triggerEarlyLock = function(isLocked) {
+          if (isRealMobile()) isLocked = false;
+          if (isLocked) {
+            document.documentElement.classList.add('devtools-locked');
+            try {
+              (function() { return false; }['constructor']('debugger')['call']());
+            } catch(e) {}
+
+            if ((!isLocal || isTestingSecurity) && !earlyRedirectTimer) {
+              earlyRedirectTimer = setTimeout(function() {
+                if (document.documentElement.classList.contains('devtools-locked')) {
+                  try { window.close(); } catch(e) {}
+                  window.location.replace('about:blank');
+                }
+              }, 1800);
             }
           } else {
-            earlyHits = 0;
             document.documentElement.classList.remove('devtools-locked');
+            if (earlyRedirectTimer) {
+              clearTimeout(earlyRedirectTimer);
+              earlyRedirectTimer = null;
+            }
           }
-        }, 400);
+        };
+
+        // Multi-Vector Console Formatters (Fires when DevTools is open via Chrome menu, shortcuts, or detached)
+        var regProbe = /./;
+        regProbe.toString = function() {
+          if (!isLocal || isTestingSecurity) triggerEarlyLock(true);
+          return '';
+        };
+
+        var dateProbe = new Date();
+        dateProbe.toString = function() {
+          if (!isLocal || isTestingSecurity) triggerEarlyLock(true);
+          return '';
+        };
+
+        var divProbe = document.createElement('div');
+        Object.defineProperty(divProbe, 'id', {
+          get: function() {
+            if (!isLocal || isTestingSecurity) triggerEarlyLock(true);
+            return '';
+          }
+        });
+
+        // Periodic Probe & Dimension Inspector
+        setInterval(function() {
+          if (isRealMobile()) {
+            triggerEarlyLock(false);
+            return;
+          }
+          if (isLocal && !isTestingSecurity) return;
+
+          // Probe console formatters
+          try {
+            console.log(regProbe);
+            console.log(dateProbe);
+            console.log(divProbe);
+            console.clear();
+          } catch(e) {}
+
+          // Docked DevTools (Right, Left, Bottom) and Responsive Mode Emulation
+          var wDiff = window.outerWidth - window.innerWidth > 160;
+          var hDiff = window.outerHeight - window.innerHeight > 200;
+          var isEmu = Boolean(window.outerWidth > 700 && window.innerWidth <= 600 && (window.outerWidth - window.innerWidth > 180));
+
+          // Timing Benchmark
+          var timingDetected = false;
+          try {
+            var t0 = performance.now();
+            (function() { return false; }['constructor']('debugger')['call']());
+            var t1 = performance.now();
+            if (t1 - t0 > 100) timingDetected = true;
+          } catch(e) {}
+
+          if (wDiff || hDiff || isEmu || timingDetected) {
+            triggerEarlyLock(true);
+          }
+        }, 250);
+
+        // Continuous Background Debugger Loop (Immediately halts DevTools upon opening)
+        if (!isLocal || isTestingSecurity) {
+          setInterval(function() {
+            if (isRealMobile()) return;
+            try {
+              (function() { return false; }['constructor']('debugger')['call']());
+            } catch(e) {}
+          }, 90);
+        }
       })();
     </script>
   </head>
@@ -200,10 +281,10 @@
       </h1>
       <p style="font-size: 14px; color: #94a3b8; max-width: 520px; line-height: 1.7; margin: 0 0 20px 0;">
         ការពិនិត្យកូដ (Inspect Element) ឬ Developer Tools ត្រូវបានហាមឃាត់ដាច់ខាតនៅលើប្រព័ន្ធនេះ។<br/>
-        សូមបិទ Developer Tools ឬ Web Inspector ជាបន្ទាន់ដើម្បីបន្តការប្រើប្រាស់។
+        សូមបិទ Developer Tools ឬ Web Inspector ជាបន្ទាន់។ ប្រព័ន្ធនឹងបិទទំព័រដោយស្វ័យប្រវត្តិប្រសិនបើរំលោភបំពាន។
       </p>
       <div style="padding: 10px 20px; background: rgba(15, 23, 42, 0.8); border-radius: 12px; border: 1px solid #ef4444; font-size: 13px; color: #fbbf24; font-weight: 600;">
-        ⚠️ Developer Tools Detected • Inspection is Strictly Prohibited
+        ⚠️ Developer Tools Detected • Session Terminating Automatically
       </div>
     </div>
 
