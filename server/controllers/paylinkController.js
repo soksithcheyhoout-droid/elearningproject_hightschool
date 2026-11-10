@@ -8,11 +8,11 @@ import crypto from 'node:crypto';
  *
  * Endpoints consumed on the Paylink gateway:
  *   POST /payment/generate-qr   -> creates a dynamic EMVCo KHQR (ABA + Bakong rails), returns tranId + md5
- *   GET  /payment/check-payment -> best-effort status poll (used only if/when the gateway exposes it)
+ *   GET  /payment/check?tranId= -> real-time settlement status (the gateway's live polling endpoint)
  *
- * Settlement confirmation is delivered by Paylink via a signed webhook (see handlePaylinkWebhook),
- * which is the authoritative source of "paid" status. The frontend polls /api/payment/status/:tranId,
- * which reads from the in-memory settlement ledger populated by that webhook.
+ * The frontend polls /api/payment/status/:tranId, which asks the Paylink gateway directly
+ * (GET /payment/check), so payments confirm with no external setup required. The signed webhook
+ * (handlePaylinkWebhook) is an optional fast-path that records settlements in an in-memory ledger.
  */
 
 const PAYLINK_BASE_URL = (process.env.PAYLINK_BASE_URL || 'https://paylinkapibank.com/api/v2').replace(/\/+$/, '');
@@ -142,16 +142,15 @@ export async function checkPaylinkStatus(req, res) {
     });
   }
 
-  // 2. Best-effort: ask the gateway directly (works only if/when Paylink exposes this route).
+  // 2. Primary: poll the Paylink gateway for real-time settlement status.
   if (PAYLINK_API_KEY) {
     try {
-      const resp = await fetch(`${PAYLINK_BASE_URL}/payment/check-payment?tranId=${encodeURIComponent(tranId)}`, {
+      const resp = await fetch(`${PAYLINK_BASE_URL}/payment/check?tranId=${encodeURIComponent(tranId)}`, {
         method: 'GET',
         headers: { 'Accept': 'application/json', 'x-api-key': PAYLINK_API_KEY },
         signal: AbortSignal.timeout(8000)
       });
-      const ct = resp.headers.get('content-type') || '';
-      if (resp.ok && ct.includes('application/json')) {
+      if (resp.ok) {
         const data = parseMaybeJson(await resp.text());
         if (data && typeof data === 'object') {
           const status = String(data.status || '').toUpperCase();
@@ -170,7 +169,7 @@ export async function checkPaylinkStatus(req, res) {
         }
       }
     } catch {
-      // Gateway status endpoint unavailable — fall through to pending.
+      // Network hiccup — report pending; the next poll will retry.
     }
   }
 

@@ -1044,31 +1044,40 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                   <div className={`qr-scan-beam-anim ${paymentGateway === 'aba' ? '' : 'bakong'}`} />
 
                   <div className="relative p-1 bg-white flex items-center justify-center rounded-xl">
-                    <QRCodeSVG
-                      value={paylinkData?.qrString || 'LOADING'}
-                      size={220}
-                      level="H"
-                      marginSize={1}
-                      fgColor={paymentGateway === 'aba' ? '#002D56' : '#000000'}
-                      bgColor="#ffffff"
-                    />
+                    {paylinkData?.qrString ? (
+                      <>
+                        <QRCodeSVG
+                          value={paylinkData.qrString}
+                          size={220}
+                          level="H"
+                          marginSize={1}
+                          fgColor={paymentGateway === 'aba' ? '#002D56' : '#000000'}
+                          bgColor="#ffffff"
+                        />
 
-                    {/* DYNAMIC CENTER EMBLEM: ABA Logo Badge vs Bakong NBC Emblem */}
-                    {paymentGateway === 'aba' ? (
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11 h-11 rounded-xl bg-[#002D56] shadow-md border-[2.5px] border-white flex items-center justify-center pointer-events-none ring-1 ring-black/10 select-none">
-                        <span className="font-mono font-black text-white text-[13px] tracking-tight">ABA</span>
-                        <span className="font-mono font-black text-[#00A3E0] text-[15px] -ml-[0.5px] -mt-[1px]">'</span>
-                      </div>
+                        {/* DYNAMIC CENTER EMBLEM: ABA Logo Badge vs Bakong NBC Emblem */}
+                        {paymentGateway === 'aba' ? (
+                          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11 h-11 rounded-xl bg-[#002D56] shadow-md border-[2.5px] border-white flex items-center justify-center pointer-events-none ring-1 ring-black/10 select-none">
+                            <span className="font-mono font-black text-white text-[13px] tracking-tight">ABA</span>
+                            <span className="font-mono font-black text-[#00A3E0] text-[15px] -ml-[0.5px] -mt-[1px]">'</span>
+                          </div>
+                        ) : (
+                          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-[#E21A1A] p-1.5 shadow-md border-[2.5px] border-white flex items-center justify-center pointer-events-none ring-1 ring-black/10">
+                            <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                              <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="1.6" strokeDasharray="2 1.5"/>
+                              <path d="M12 4.5L15 9.5H9L12 4.5Z" fill="white"/>
+                              <path d="M12 19.5L9 14.5H15L12 19.5Z" fill="white"/>
+                              <path d="M4.5 12L9.5 9V15L4.5 12Z" fill="white"/>
+                              <path d="M19.5 12L14.5 15V9L19.5 12Z" fill="white"/>
+                              <circle cx="12" cy="12" r="2.2" fill="white"/>
+                            </svg>
+                          </div>
+                        )}
+                      </>
                     ) : (
-                      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-[#E21A1A] p-1.5 shadow-md border-[2.5px] border-white flex items-center justify-center pointer-events-none ring-1 ring-black/10">
-                        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                          <circle cx="12" cy="12" r="10" stroke="white" strokeWidth="1.6" strokeDasharray="2 1.5"/>
-                          <path d="M12 4.5L15 9.5H9L12 4.5Z" fill="white"/>
-                          <path d="M12 19.5L9 14.5H15L12 19.5Z" fill="white"/>
-                          <path d="M4.5 12L9.5 9V15L4.5 12Z" fill="white"/>
-                          <path d="M19.5 12L14.5 15V9L19.5 12Z" fill="white"/>
-                          <circle cx="12" cy="12" r="2.2" fill="white"/>
-                        </svg>
+                      <div className="w-[220px] h-[220px] flex flex-col items-center justify-center gap-2 text-slate-400">
+                        <Loader2 className="w-8 h-8 animate-spin" />
+                        <span className="text-[11px] font-mono">កំពុងបង្កើតកាត QR...</span>
                       </div>
                     )}
                   </div>
