@@ -10,7 +10,6 @@
   },
   "dependencies": {
     "@travisvn/edge-tts": "^1.0.2",
-    "bakong-khqr": "^1.0.20",
     "bcryptjs": "^2.4.3",
     "better-sqlite3": "^11.8.1",
     "compression": "^1.7.5",

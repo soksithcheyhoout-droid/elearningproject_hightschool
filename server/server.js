@@ -8,10 +8,12 @@ import fs from 'fs';
 import apiRoutes from './routes/api.js';
 import { ipFirewallMiddleware, globalApiLimiter } from './middlewares/rateLimiter.js';
 
-dotenv.config();
-
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
+
+// Load environment from server/.env regardless of the current working directory.
+// (dotenv does not override variables already present in process.env, e.g. on Render.)
+dotenv.config({ path: path.join(__dirname, '.env') });
 
 const app = express();
 const PORT = process.env.PORT || 5000;
@@ -47,8 +49,11 @@ app.use(cors({
   allowedHeaders: ['Content-Type', 'Authorization', 'x-gemini-key']
 }));
 
-// 3. Body parsing
-app.use(express.json({ limit: '10mb' }));
+// 3. Body parsing (capture the raw body so payment webhook signatures can be verified)
+app.use(express.json({
+  limit: '10mb',
+  verify: (req, _res, buf) => { req.rawBody = buf; }
+}));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 
 // 4. Serve Uploaded Media & Audios statically with full Range support for mobile playback & caching

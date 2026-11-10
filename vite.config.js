@@ -33,7 +33,7 @@ export default defineConfig({
   server: {
     port: 5173,
     watch: {
-      ignored: ['**/Bakong Bypass/**', '**/server/data/**', '**/.git/**']
+      ignored: ['**/server/data/**', '**/.git/**']
     },
     proxy: {
       '/api': {

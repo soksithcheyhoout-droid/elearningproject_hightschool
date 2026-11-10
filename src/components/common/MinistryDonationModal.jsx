@@ -36,8 +36,7 @@ import confetti from 'canvas-confetti';
 import { QRCodeSVG } from 'qrcode.react';
 import { useAuth } from '../../context/AuthContext';
 import { playSound } from '../../utils/audioEffects';
-import { generateKhqrString, checkBakongTransactionStatus } from '../../utils/khqrGenerator';
-import { generateAbaPaymentQr, checkAbaPaymentStatus } from '../../utils/abaPayment';
+import { createPaylinkPayment, checkPaylinkStatus } from '../../utils/paylinkPayment';
 
 // Official ABA Bank Logo Badge Component
 function AbaLogoBadge({ size = "sm" }) {
@@ -89,13 +88,11 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
   const [step, setStep] = useState(1); // 1 = Select Tier, 2 = KHQR Scan, 3 = Success Certificate
   const [isGeneratingQR, setIsGeneratingQR] = useState(false);
   const [genStage, setGenStage] = useState(1);
-  const [khqrData, setKhqrData] = useState(null);
-  const [abaData, setAbaData] = useState(null);
+  const [paylinkData, setPaylinkData] = useState(null);
   
   // Expiration countdown timer (5 minutes = 300 seconds)
   const [timeLeft, setTimeLeft] = useState(300);
   const [isExpired, setIsExpired] = useState(false);
-  const [qrRefreshCount, setQrRefreshCount] = useState(0);
   const [copied, setCopied] = useState(false);
 
   const pollTimerRef = useRef(null);
@@ -124,42 +121,15 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
 
   const [sessionBillNumber, setSessionBillNumber] = useState('');
 
-  // Pre-generate Initial QR Data
+  // Ensure a unique session bill number exists while the modal is open.
+  // The live KHQR itself is created on demand (handleProceedToQR) via the Paylink gateway.
   useEffect(() => {
-    if (isOpen) {
-      try {
-        const billNum = sessionBillNumber || ('TXN' + Date.now());
-        if (!sessionBillNumber) setSessionBillNumber(billNum);
-
-        const generated = generateKhqrString({
-          bakongAccount: 'hut_soksitchey1@aclb',
-          merchantName: 'chey_dev',
-          merchantCity: 'Phnom Penh',
-          currency: amountType === 'usd' ? 'USD' : 'KHR',
-          amount: currentAmount,
-          billNumber: billNum,
-          storeLabel: 'chey_dev'
-        });
-        setKhqrData(generated);
-
-        // Pre-fetch ABA PayWay QR if ABA is active
-        if (paymentGateway === 'aba') {
-          generateAbaPaymentQr({
-            amount: currentAmount,
-            currency: amountType
-          }).then(res => {
-            if (res && res.success) {
-              setAbaData(res);
-            }
-          }).catch(() => {});
-        }
-      } catch (e) {
-        console.warn('[QR Gen Error]:', e);
-      }
+    if (isOpen && !sessionBillNumber) {
+      setSessionBillNumber('TXN' + Date.now());
     }
-  }, [isOpen, paymentGateway, currentAmount, amountType, qrRefreshCount, sessionBillNumber]);
+  }, [isOpen, sessionBillNumber]);
 
-  // Handle countdown & dynamic auto-poll for Bakong or ABA when on Step 2
+  // Countdown + auto-poll the Paylink settlement status while on Step 2.
   useEffect(() => {
     if (step === 2 && isOpen) {
       setTimeLeft(300);
@@ -179,42 +149,29 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
         });
       }, 1000);
 
-      // 2. Continuous Auto-Polling: ABA Gateway OR Bakong NBC Gateway (every 2.0s)
+      // 2. Continuous Auto-Polling against our backend's Paylink settlement ledger (every 2.5s)
       if (pollTimerRef.current) clearInterval(pollTimerRef.current);
       pollTimerRef.current = setInterval(async () => {
         try {
-          if (paymentGateway === 'aba' && abaData) {
-            const res = await checkAbaPaymentStatus({
-              tranId: abaData.tranId,
-              clientId: abaData.clientId,
-              requestTime: abaData.requestTime,
-              token: abaData.token,
-              merchantLink: abaData.merchantLink
-            });
-            if (res && (res.paid === true || res.status === 'PAID')) {
-              if (pollTimerRef.current) clearInterval(pollTimerRef.current);
-              if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
-              handlePaymentSuccess();
-            }
-          } else if (paymentGateway === 'bakong' && khqrData) {
-            const res = await checkBakongTransactionStatus(khqrData.md5);
-            if (res && res.status === 'SUCCESS') {
+          if (paylinkData?.tranId) {
+            const res = await checkPaylinkStatus(paylinkData.tranId);
+            if (res && (res.paid === true || res.status === 'PAID' || res.status === 'SUCCESS')) {
               if (pollTimerRef.current) clearInterval(pollTimerRef.current);
               if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
               handlePaymentSuccess();
             }
           }
         } catch (e) {
-          // ignore network hiccups
+          // ignore transient network hiccups
         }
-      }, 2000);
+      }, 2500);
 
       return () => {
         if (pollTimerRef.current) clearInterval(pollTimerRef.current);
         if (countdownTimerRef.current) clearInterval(countdownTimerRef.current);
       };
     }
-  }, [step, isOpen, khqrData, abaData, paymentGateway]);
+  }, [step, isOpen, paylinkData]);
 
   if (!isOpen) return null;
 
@@ -225,7 +182,7 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
     setTimeLeft(300);
     const newBillNum = 'TXN' + Date.now();
     setSessionBillNumber(newBillNum);
-    setQrRefreshCount(prev => prev + 1);
+    setPaylinkData(null);
     setIsGeneratingQR(true);
     setGenStage(1);
 
@@ -241,39 +198,19 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
     }, 900);
 
     try {
-      if (paymentGateway === 'aba') {
-        const abaRes = await generateAbaPaymentQr({
-          amount: currentAmount,
-          currency: amountType
-        });
-        if (abaRes && abaRes.success) {
-          setAbaData(abaRes);
-        } else {
-          const generated = generateKhqrString({
-            bakongAccount: 'hut_soksitchey1@aclb',
-            merchantName: 'chey_dev',
-            merchantCity: 'Phnom Penh',
-            currency: amountType === 'usd' ? 'USD' : 'KHR',
-            amount: currentAmount,
-            billNumber: newBillNum,
-            storeLabel: 'chey_dev'
-          });
-          setKhqrData(generated);
-        }
+      const res = await createPaylinkPayment({
+        amount: currentAmount,
+        currency: amountType,
+        billNumber: newBillNum
+      });
+      if (res && res.success) {
+        setPaylinkData(res);
       } else {
-        const generated = generateKhqrString({
-          bakongAccount: 'hut_soksitchey1@aclb',
-          merchantName: 'chey_dev',
-          merchantCity: 'Phnom Penh',
-          currency: amountType === 'usd' ? 'USD' : 'KHR',
-          amount: currentAmount,
-          billNumber: newBillNum,
-          storeLabel: 'chey_dev'
-        });
-        setKhqrData(generated);
+        setPaylinkData(null);
+        console.warn('Paylink QR generation failed:', res?.error);
       }
     } catch (err) {
-      console.warn('QR Generation Error:', err);
+      console.warn('Paylink QR Generation Error:', err);
     }
 
     const scanAudio = new Audio('/assets/audio/qr-scan-sreymom.mp3?v=2');
@@ -1108,19 +1045,7 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
 
                   <div className="relative p-1 bg-white flex items-center justify-center rounded-xl">
                     <QRCodeSVG
-                      value={
-                        (paymentGateway === 'aba' && abaData?.qrString)
-                          ? abaData.qrString
-                          : (khqrData?.qrString || generateKhqrString({
-                              bakongAccount: 'hut_soksitchey1@aclb',
-                              merchantName: 'chey_dev',
-                              merchantCity: 'Phnom Penh',
-                              currency: amountType === 'usd' ? 'USD' : 'KHR',
-                              amount: currentAmount,
-                              billNumber: sessionBillNumber,
-                              storeLabel: 'chey_dev'
-                            }).qrString)
-                      }
+                      value={paylinkData?.qrString || 'LOADING'}
                       size={220}
                       level="H"
                       marginSize={1}
@@ -1205,21 +1130,16 @@ export default function MinistryDonationModal({ isOpen, onClose }) {
                 </div>
               </div>
 
-              {/* Direct Deep Link Action Controls (Official abamobilebank:// only) */}
-              {paymentGateway === 'aba' && (
+              {/* Direct Deep Link: open the KHQR straight in a mobile banking app (ABA / Bakong) */}
+              {paylinkData?.deepLink && (
                 <div className="w-full max-w-[310px] sm:max-w-[330px]">
                   <a
-                    href={
-                      abaData?.deepLink ||
-                      `abamobilebank://ababank.com?type=payway&qrcode=${encodeURIComponent(
-                        abaData?.qrString || khqrData?.qrString || ''
-                      )}`
-                    }
+                    href={paylinkData.deepLink}
                     onClick={handleOpenDeepLink}
                     className="w-full py-3 px-4 rounded-xl bg-gradient-to-r from-[#002D56] via-[#004B87] to-[#00A3E0] hover:brightness-110 text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition-all border border-[#00A3E0]/50 shadow-md active:scale-98 cursor-pointer select-none text-center"
                   >
                     <Smartphone className="w-4 h-4 text-cyan-300" />
-                    <span>បើកក្នុង ABA Mobile (Deep Link)</span>
+                    <span>បើកក្នុង App ធនាគារ (Open Banking App)</span>
                     <ExternalLink className="w-3.5 h-3.5 text-cyan-200" />
                   </a>
                 </div>

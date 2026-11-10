@@ -35,26 +35,7 @@ pythonProcess.on('error', (err) => {
   console.warn('⚠️ Python AI process warning (Node.js fallback will be used):', err.message);
 });
 
-// 2. Launch Bakong KHQR Bypass Server (Port 3000)
-let bakongProcess = null;
-const bakongDir = path.join(__dirname, 'Bakong Bypass');
-const bakongScript = path.join(bakongDir, 'server.js');
-try {
-  console.log('🇰🇭 Launching Bakong KHQR High-Speed SSR Engine on port 3000...');
-  bakongProcess = spawn('node', [bakongScript], {
-    cwd: bakongDir,
-    stdio: 'inherit',
-    env: { ...process.env, PORT: '3000', KH_PROXY: 'true' }
-  });
-
-  bakongProcess.on('error', (err) => {
-    console.warn('⚠️ Bakong Bypass process notice:', err.message);
-  });
-} catch (e) {
-  console.warn('⚠️ Bakong bypass start notice:', e.message);
-}
-
-// 3. Launch Node.js Backend Server
+// 2. Launch Node.js Backend Server
 console.log('🌐 Launching Node.js Express Server...');
 const serverDir = path.join(__dirname, 'server');
 const serverScript = path.join(serverDir, 'server.js');
@@ -69,9 +50,6 @@ nodeProcess.on('exit', (code) => {
   if (pythonProcess && !pythonProcess.killed) {
     pythonProcess.kill();
   }
-  if (bakongProcess && !bakongProcess.killed) {
-    bakongProcess.kill();
-  }
   process.exit(code || 0);
 });
 
@@ -79,7 +57,6 @@ nodeProcess.on('exit', (code) => {
 const cleanup = () => {
   console.log('🛑 Shutting down production services...');
   if (pythonProcess && !pythonProcess.killed) pythonProcess.kill();
-  if (bakongProcess && !bakongProcess.killed) bakongProcess.kill();
   if (nodeProcess && !nodeProcess.killed) nodeProcess.kill();
   process.exit(0);
 };

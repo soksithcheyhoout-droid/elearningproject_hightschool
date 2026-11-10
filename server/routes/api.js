@@ -134,19 +134,16 @@ router.post('/admin/announcement', broadcastAnnouncement);
 // 9. Exams & Bac II Management (Public + Admin)
 router.get('/admin/exams', getAllExams);
 router.post('/admin/exams', createExam);
-import { generateBakongKhqr, checkBakongStatus } from '../controllers/bakongController.js';
-import { generateAbaQr, checkAbaPayment } from '../controllers/abaPaywayController.js';
+import { createPaylinkPayment, checkPaylinkStatus, handlePaylinkWebhook } from '../controllers/paylinkController.js';
 import { synthesizeSpeech, getVoiceProfiles } from '../controllers/ttsController.js';
 import { handleAIChat } from '../controllers/aiTutorController.js';
 import { generateAIQuizQuestions } from '../controllers/aiQuizController.js';
 
-// 10. Bakong KHQR Payment & Bypass Gateway (Merchant: hut_soksitchey1@aclb)
-router.post('/bakong/generate-khqr', generateBakongKhqr);
-router.get('/bakong/check/:md5', checkBakongStatus);
-
-// 10.1 ABA Bank PayWay KHQR Payment Gateway (Direct ABA Merchant Integration)
-router.post('/aba/generate-qr', generateAbaQr);
-router.post('/aba/check-payment', checkAbaPayment);
+// 10. Paylink Unified Payment Gateway (paylinkapibank.com — ABA PayWay + NBC Bakong rails)
+//     Create a dynamic KHQR, poll settlement status, and receive signed settlement webhooks.
+router.post('/payment/create', createPaylinkPayment);
+router.get('/payment/status/:tranId', checkPaylinkStatus);
+router.post('/payment/webhook', handlePaylinkWebhook);
 
 // 11. Ultra-Realistic Neural Human Voice Engine (Microsoft Edge Neural TTS: Piseth & Sreymom)
 router.get('/tts/voices', getVoiceProfiles);

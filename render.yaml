@@ -19,3 +19,10 @@ services:
         sync: false
       - key: GMAIL_WEBHOOK_URL
         value: https://script.google.com/macros/s/AKfycbxu8QZ0wiuVkWBIoWhjmEoi7-I2LvgdTKWf8mE1tK2odHGKVnifh2wblxEzc7tEeU8S5w/exec
+      # Paylink payment gateway — secret values are set in the Render dashboard (sync: false)
+      - key: PAYLINK_BASE_URL
+        value: https://paylinkapibank.com/api/v2
+      - key: PAYLINK_API_KEY
+        sync: false
+      - key: PAYLINK_WEBHOOK_SECRET
+        sync: false
